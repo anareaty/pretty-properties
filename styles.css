@@ -1,8 +1,121 @@
-/*
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
 
-If your plugin does not need CSS, delete this file.
 
-*/
+.markdown-preview-view .banner-image:not(:empty) {
+    width: calc(100% + var(--file-margins) * 2);
+    margin-top: calc(0px - var(--file-margins));
+    margin-left: calc(0px - var(--file-margins));
+    margin-bottom: 0.5em;
+}
+
+.is-live-preview .banner-image:not(:empty) {
+    width: calc(100% + var(--file-margins) * 2);
+    margin-top: calc(0px - var(--file-margins));
+    margin-left: calc(0px - var(--file-margins));
+    margin-right: calc(0px - var(--file-margins));
+    margin-bottom: 0.5em;
+}
+
+
+.cm-scroller {
+    flex-wrap: wrap;
+}
+
+.markdown-source-view:not(.is-live-preview) .banner-image:not(:empty) {
+    display: none;
+}
+
+.banner-image img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    mask-image: linear-gradient(to bottom, black 25%, transparent);
+    -webkit-mask-image: linear-gradient(to bottom, black 25%, transparent);
+    margin-bottom: 0.5em;
+    border-top-left-radius: 10px !important;
+    border-top-right-radius: 10px !important;
+}
+
+.markdown-preview-view:not(:has(.banner-image)) {
+    opacity: 0;
+}
+
+
+
+
+/* SIDE IMAGES*/
+
+body:not(.is-mobile) .metadata-container:has(.metadata-side-image) {
+  --metadata-display-editing: grid;
+  --metadata-display-reading: grid;
+  grid-column-gap: 15px;
+  grid-template-rows: auto 1fr;
+}
+
+.metadata-side-image {
+    grid-row: 1/3;
+}
+
+.metadata-container:has(.metadata-side-image.vertical) {
+  grid-template-columns: 200px auto;
+}
+
+.metadata-container:has(.metadata-side-image.horizontal) {
+  grid-template-columns: 300px auto;
+}
+
+.metadata-container:has(.metadata-side-image.square) {
+  grid-template-columns: 250px auto;
+}
+
+
+.metadata-container:has(.metadata-side-image.circle) {
+  grid-template-columns: 250px auto;
+}
+
+.is-mobile .metadata-side-image img {
+  height: 200px !important;
+  object-fit: contain !important;
+}
+
+
+
+.metadata-side-image.vertical img {
+  aspect-ratio: 0.63;
+  object-fit: contain;
+  object-position: top;
+}
+
+.metadata-side-image.horizontal img {
+  aspect-ratio: 4/3;
+  object-fit: cover;
+}
+
+.metadata-side-image.square img {
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.metadata-side-image.circle img {
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+
+
+.metadata-side-image > img {
+  width: 100%;
+}
+
+.metadata-content {
+  min-width: 0 !important;
+}
+
+
+.multi-select-pill {
+  --pill-padding-x: var(--tag-padding-x);
+  --pill-padding-y: var(--tag-padding-y);
+}
+
+
