@@ -150,7 +150,7 @@ export default class MyPlugin extends Plugin {
 						.setIcon('lucide-image-plus')
 						.setSection('pretty-properties')
 						.onClick(() => {
-							this.settings.hiddenProperties.remove(propName)
+							if (propName) this.settings.hiddenProperties.remove(propName)
 							this.saveSettings()
 							this.updateHiddenProperties()
 						})
@@ -163,7 +163,7 @@ export default class MyPlugin extends Plugin {
 						.setIcon('lucide-image-plus')
 						.setSection('pretty-properties')
 						.onClick(() => {
-							this.settings.hiddenProperties.push(propName)
+							if (propName) this.settings.hiddenProperties.push(propName)
 							this.saveSettings()
 							this.updateHiddenProperties()
 						})
@@ -209,7 +209,7 @@ export default class MyPlugin extends Plugin {
 
 						item.setTitle(color)
 						.onClick(() => {
-							this.settings.propertyPillColors[pillVal] = color
+							if (pillVal) this.settings.propertyPillColors[pillVal] = color
 							this.saveSettings()
 							this.updatePillColors()
 						})
@@ -253,7 +253,7 @@ export default class MyPlugin extends Plugin {
 							sub.addItem((item: MenuItem) => {
 							item.setTitle(color)
 							.onClick(() => {
-								this.settings.propertyPillColors[pillVal] = color
+								if (pillVal) this.settings.propertyPillColors[pillVal] = color
 								this.saveSettings()
 								this.updatePillColors()
 							})
