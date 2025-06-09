@@ -190,7 +190,7 @@ export default class MyPlugin extends Plugin {
 
 					//@ts-ignore
 					let sub = item.setSubmenu() as Menu
-					let colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink", "none"]
+					let colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink", "none", "default"]
 
 					for (let color of colors) {
 						sub.addItem((item: MenuItem) => {
@@ -209,7 +209,14 @@ export default class MyPlugin extends Plugin {
 
 						item.setTitle(color)
 						.onClick(() => {
-							if (pillVal) this.settings.propertyPillColors[pillVal] = color
+
+							if (color == "default") {
+								if (pillVal) delete(this.settings.propertyPillColors[pillVal])
+							} else {
+								if (pillVal) this.settings.propertyPillColors[pillVal] = color;
+							}
+
+
 							this.saveSettings()
 							this.updatePillColors()
 						})
