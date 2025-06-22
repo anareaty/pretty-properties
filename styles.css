@@ -43,17 +43,6 @@ body:not(.is-mobile) {
 
 
 
-.view-content > .markdown-reading-view > .markdown-preview-view:not(:has(.banner-image)),
-.view-content > .markdown-source-view:not(:has(.banner-image)) {
-    opacity: 0;
-}
-
-
-
-
-
-
-
 
 /* SIDE IMAGES*/
 
