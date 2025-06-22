@@ -45,3 +45,19 @@ You can also add you own styling to the list properties. Each of them (even not 
     /* my styles */
 }
 ```
+
+## Installation
+
+Untill this plugin is made availiable in the official plugins menu it can be insalled via BRAT:
+
+1. Install the BRAT plugin from "Community plugins" page.
+2. Go to the BRAT settings.
+3. Click "Add Beta Plugin" button.
+4. Paste the following URL in the text field: https://github.com/anareaty/pretty-properties.
+5. Select the latest release.
+6. Make sure that "Enable after installing the plugin" is checked.
+7. Click "Add Plugin" button.
+
+## Acknowledgments
+
+This plugin uses a bit of code from the [Iconic plugin](https://github.com/gfxholo/iconic) to be able to add new items to menus. 
