@@ -74,9 +74,17 @@ body:not(.is-mobile) .metadata-container:has(.metadata-side-image img) {
   grid-template-columns: var(--cover-width-circle) auto;
 }
 
+.is-mobile .metadata-side-image {
+  width: 100%;
+  text-align: center;
+}
+
+
 .is-mobile .metadata-side-image img {
   height: 200px !important;
-  object-fit: contain !important;
+  width: unset;
+  object-fit: cover !important;
+  margin: auto;
 }
 
 
@@ -98,7 +106,7 @@ body:not(.is-mobile) .metadata-container:has(.metadata-side-image img) {
 }
 
 .metadata-side-image.circle img {
-  aspect-ratio: 1;
+  aspect-ratio: 1 !important;
   object-fit: cover;
   border-radius: 50%;
 }
@@ -114,9 +122,12 @@ body:not(.is-mobile) .metadata-container:has(.metadata-side-image img) {
 }
 
 
+
+
 .multi-select-pill {
   --pill-padding-x: var(--tag-padding-x);
   --pill-padding-y: var(--tag-padding-y);
+  
 }
 
 
