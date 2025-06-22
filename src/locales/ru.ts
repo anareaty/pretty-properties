@@ -12,6 +12,8 @@ export default {
   BANNER_MARGIN: "Отступ баннера",
   ENABLE_COVER: "Включить обложки",
   COVER_PROPERTY: "Свойство обложки",
+  ADD_EXTRA_COVER_PROPERTY: "Добавить дополнительное свойство обложки",
+  EXTRA_COVER_PROPERTY: "Дополнительное свойство обложки",
   VERTICAL_COVER_WIDTH: "Ширина вертикальной обложки",
   HORIZONTAL_COVER_WIDTH: "Ширина горизонтальной обложки",
   SQUARE_COVER_WIDTH: "Ширина квадратной обложки",

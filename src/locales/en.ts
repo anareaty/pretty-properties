@@ -12,6 +12,8 @@ export default {
   BANNER_MARGIN: "Banner margin",
   ENABLE_COVER: "Enable covers",
   COVER_PROPERTY: "Cover property",
+  ADD_EXTRA_COVER_PROPERTY: "Add extra cover property",
+  EXTRA_COVER_PROPERTY: "Extra cover property",
   VERTICAL_COVER_WIDTH: "Vertical cover width",
   HORIZONTAL_COVER_WIDTH: "Horizontal cover width",
   SQUARE_COVER_WIDTH: "Square cover width",

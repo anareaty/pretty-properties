@@ -12,6 +12,7 @@ interface PPPluginSettings {
 	enableCover: boolean;
 	bannerProperty: string;
 	coverProperty: string;
+	extraCoverProperties: string[],
 	bannerHeight: number;
 	bannerHeightMobile: number;
 	bannerMargin: number;
@@ -30,6 +31,7 @@ const DEFAULT_SETTINGS: PPPluginSettings = {
 	enableCover: true,
 	bannerProperty: "banner",
 	coverProperty: "cover",
+	extraCoverProperties: [],
 	bannerHeight: 150, 
 	bannerHeightMobile: 100,
 	bannerMargin: 15,
@@ -345,8 +347,18 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 				let coverVal
 				let cssVal
+				let coverProp
 
-				let coverProp = mdEditor.properties.find((p: any) => p.key == this.settings.coverProperty)
+				let props = [...this.settings.extraCoverProperties]
+				props.unshift(this.settings.coverProperty)
+
+				for (let prop of props) {
+					coverProp = mdEditor.properties.find((p: any) => p.key == prop)
+					if (coverProp) break
+				}
+
+
+
 				let cssProp = mdEditor.properties.find((p: any) => p.key == "cssclasses")
 
 				if (coverProp) {
@@ -635,6 +647,8 @@ class SampleSettingTab extends PluginSettingTab {
 				}));
 
 		if (this.plugin.settings.enableCover) {
+
+
 			new Setting(containerEl)
 			.setName(i18n.t("COVER_PROPERTY"))
 			.addText(text => text
@@ -645,6 +659,45 @@ class SampleSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 					this.plugin.updateSideImages()
 				}));
+
+			
+			new Setting(containerEl)
+			.setName(i18n.t("ADD_EXTRA_COVER_PROPERTY"))
+			.addButton(button => button
+				.setIcon("plus")
+				.onClick(async () => {
+					if (this.plugin.settings.extraCoverProperties.find(p => p == "") === undefined) {
+						this.plugin.settings.extraCoverProperties.push("")
+						await this.plugin.saveSettings();
+						this.display();
+					}
+				}))
+
+
+			for (let i = 0; i < this.plugin.settings.extraCoverProperties.length; i++) {
+				let prop = this.plugin.settings.extraCoverProperties[i]
+				new Setting(containerEl)
+				.setName(i18n.t("EXTRA_COVER_PROPERTY"))
+				.addText(text => text
+					.setValue(prop)
+					.onChange(async (value) => {
+						this.plugin.settings.extraCoverProperties[i] = value;
+						await this.plugin.saveSettings();
+						this.plugin.updateSideImages()
+					}))
+				.addButton(button => button
+				.setIcon("x")
+				.onClick(async () => {
+					
+					prop = this.plugin.settings.extraCoverProperties[i]
+					
+					this.plugin.settings.extraCoverProperties = this.plugin.settings.extraCoverProperties.filter(p => p != prop)
+					
+					
+					await this.plugin.saveSettings();
+					this.display();
+				}))
+			}
 
 			new Setting(containerEl)
 			.setName(i18n.t("VERTICAL_COVER_WIDTH"))
@@ -722,7 +775,7 @@ class SampleSettingTab extends PluginSettingTab {
 					this.plugin.updateCoverStyles()
 					this.plugin.updateSideImages()
 					this.display();
-					console.log(this.plugin.settings)
+					
 					new Notice(i18n.t("CLEAR_SETTINGS_NOTICE"))
 
 				}))
