@@ -41,7 +41,7 @@ You can make you list properties stand out by assigning each item their own colo
 You can also add you own styling to the list properties. Each of them (even not colored ones) will get attribute "data-property-pill-value" containing actual value of item. You can use these attributes to write you own css for any individual item like this:
 
 ```
-[data-proprty-pill-value="my-property-value"] {
+[data-property-pill-value="my-property-value"] {
     /* my styles */
 }
 ```
