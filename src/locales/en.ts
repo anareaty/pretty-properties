@@ -1,6 +1,6 @@
 
 export default {
-  HIDE_SHOW_HIDDEN_PROPERTIES: "Toggle hide / show hidden properties",
+  HIDE_SHOW_HIDDEN_PROPERTIES: "Toggle reveal / hide hidden properties",
   HIDE_PROPERTY: "Hide property",
   UNHIDE_PROPERTY: "Unhide property",
   SELECT_COLOR: "Select color",

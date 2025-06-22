@@ -22,7 +22,7 @@ You can add simple banners to your notes. To do so add the link to the "banner" 
 
 ![note with banner](images/image-3.png)
 
-I intend to keep this very basic and simple, and will not add any complex banner features. If you want to use some other banner plugin with more options, like Pixel Banner, for example, turn off the banner functional in the settings. 
+I intend to keep this very basic and simple and will not add any complex banner features. If you want to use some other banner plugin with more options, like Pixel Banner, turn off the banner functional in the settings. 
 
 Banners might nor work well with every theme. If you banner margins are weird you will need to make some manual adjustments with css.
 
@@ -38,4 +38,10 @@ You can make you list properties stand out by assigning each item their own colo
 
 ![property color menu](images/image-5.png)
 
-You can also add you own styling to the list properties. Each of them (even not colored ones) will get attribute "data-property-pill-value" containing actual value of item. You can use these attributes to write you own css for any individual item.
+You can also add you own styling to the list properties. Each of them (even not colored ones) will get attribute "data-property-pill-value" containing actual value of item. You can use these attributes to write you own css for any individual item like this:
+
+```
+[data-proprty-pill-value="my-property-value"] {
+    /* my styles */
+}
+```
