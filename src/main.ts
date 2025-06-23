@@ -47,7 +47,13 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 	async onload() {
 
-		const locale = getLanguage()
+		let locale = "en"
+		if (getLanguage) {
+			locale = getLanguage()
+		} else {
+			locale = window.localStorage.language
+		}
+		
     	i18n.setLocale(locale);
 
 		await this.loadSettings();
