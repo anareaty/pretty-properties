@@ -46,6 +46,12 @@ You can also add you own styling to the list properties. Each of them (even not 
 }
 ```
 
+### Progress-bars
+
+Add simple progress-bar to any number property. By default maximum value of progress-bar is 100 and property value is treated as percent. If you want to add custom number as progress maximum, you need to add additional number property to the note and in the first property menu select the option "Set max progress from another property".
+
+![progress-bar](images/image-6.png)
+
 ## Installation
 
 Untill this plugin is made availiable in the official plugins menu it can be insalled via BRAT:
