@@ -31,5 +31,9 @@ export default {
   purple: "фиолетовый",
   pink: "розовый",
   none: "нет",
-  default: "по умолчанию"
+  default: "по умолчанию",
+  SHOW_PROGRESS_BAR: "Показать полосу прогресса",
+  SET_PROGRESS_MAX_VALUE_100: "Установить максимум прогресса = 100",
+  SET_PROGRESS_MAX_VALUE_PROPERTY: "Установить максимум прогресса из другого свойства",
+  REMOVE_PROGRESS_BAR: "Удалить полосу прогресса"
 };

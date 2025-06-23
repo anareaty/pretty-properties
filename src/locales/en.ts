@@ -22,6 +22,10 @@ export default {
   CLEAR: "Clear",
   CLEAR_SETTINGS_DESCRIPTION: "This will remove all property colors and unhide all hidden properties",
   CLEAR_SETTINGS_NOTICE: "Pretty properties settings have been cleared.",
+  SHOW_PROGRESS_BAR: "Show progress-bar",
+  SET_PROGRESS_MAX_VALUE_100: "Set max progress = 100",
+  SET_PROGRESS_MAX_VALUE_PROPERTY: "Set max progress from another property",
+  REMOVE_PROGRESS_BAR: "Remove progress-bar"
 };
 
 

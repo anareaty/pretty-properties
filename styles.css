@@ -131,3 +131,28 @@ body:not(.is-mobile) .metadata-container:has(.metadata-side-image img) {
 }
 
 
+.markdown-preview-view progress.metadata-progress, 
+.markdown-source-view.is-live-preview progress.metadata-progress {
+  width: 150px;
+  height: 9px;
+  vertical-align: middle;
+  margin-top: auto;
+  margin-bottom: auto;
+  max-width: 100%;
+
+}
+
+.metadata-progress-wrapper {
+  padding-left: var(--size-4-2);
+  display: flex;
+  flex-shrink: 1;
+  width: 100%;
+  max-width: 150px;
+  gap: var(--size-2-2);
+  align-items: center;
+  align-self: stretch;
+  min-height: var(--input-height);
+  background-color: var(--metadata-input-background);
+  border-bottom: var(--metadata-divider-width) solid var(--metadata-divider-color);
+  overflow: hidden;
+}

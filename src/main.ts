@@ -1,7 +1,6 @@
-import { App, getLanguage, CachedMetadata, MarkdownRenderer, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile, MenuItem } from 'obsidian';
+import { App, Menu, getLanguage, setTooltip, CachedMetadata, MarkdownRenderer, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile, MenuItem } from 'obsidian';
 import MenuManager from 'src/MenuManager';
 import { i18n } from './localization';
-
 
 
 interface PPPluginSettings {
@@ -21,6 +20,7 @@ interface PPPluginSettings {
 	coverHorizontalWidth: number;
 	coverSquareWidth: number;
 	coverCircleWidth: number;
+	progressProperties: any;
 }
 
 const DEFAULT_SETTINGS: PPPluginSettings = {
@@ -39,7 +39,8 @@ const DEFAULT_SETTINGS: PPPluginSettings = {
 	coverVerticalWidth: 200,
 	coverHorizontalWidth: 300,
 	coverSquareWidth: 250,
-	coverCircleWidth: 250
+	coverCircleWidth: 250,
+	progressProperties: {}
 }
 
 export default class PrettyPropertiesPlugin extends Plugin {
@@ -69,6 +70,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		this.registerEvent(
 			this.app.workspace.on("layout-change", async () => {
 				this.updateSideImages()
+				this.updateProgressBars();
 				this.updateBanners()
 				this.addClassestoProperties()
 			})
@@ -78,6 +80,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		this.registerEvent(
 			this.app.workspace.on("file-open", async (file) => {
 				this.updateSideImages(file);
+				this.updateProgressBars(file);
 				this.updateBanners(file);
 				this.addClassestoProperties();
 			})
@@ -87,6 +90,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		this.registerEvent(
 			this.app.metadataCache.on("changed", async (file, data, cache) => {
 				this.updateSideImages(file, cache)
+				this.updateProgressBars(file, cache);
 				this.updateBanners(file, cache)
 				this.addClassestoProperties()
 			})
@@ -180,6 +184,85 @@ export default class PrettyPropertiesPlugin extends Plugin {
 							if (propName) this.settings.hiddenProperties.push(propName)
 							this.saveSettings()
 							this.updateHiddenProperties()
+						})
+					);
+				}
+
+
+				//@ts-ignore
+				let propertyType = this.app.metadataTypeManager.getPropertyInfo(propName.toLowerCase()).type
+
+				if (propertyType == "number" && !this.settings.progressProperties[propName]) {
+					menuManager.addItemAfter(["clipboard"], (item: MenuItem) => item
+					.setTitle(i18n.t("SHOW_PROGRESS_BAR"))
+					.setIcon("lucide-bar-chart-horizontal-big")
+					.setSection("pretty-properties")
+					.onClick(() => {
+						if (propName) {
+							this.settings.progressProperties[propName] = {
+							maxNumber: 100
+							}
+						}
+						this.saveSettings();
+						this.updateProgressBars();
+						})
+					);
+				} else if (this.settings.progressProperties[propName]) {
+					if (this.settings.progressProperties[propName].maxProperty) {
+						menuManager.addItemAfter(["clipboard"], (item: MenuItem) => item
+							.setTitle(i18n.t("SET_PROGRESS_MAX_VALUE_100"))
+							.setIcon("lucide-bar-chart-horizontal-big")
+							.setSection("pretty-properties")
+							.onClick(() => {
+								if (propName) {
+									delete this.settings.progressProperties[propName].maxProperty
+									this.settings.progressProperties[propName].maxNumber = 100
+								}
+								this.saveSettings();
+								this.updateProgressBars();
+							})
+						);
+					}
+
+
+					menuManager.addItemAfter(["clipboard"], (item: MenuItem) => {item
+						.setTitle(i18n.t("SET_PROGRESS_MAX_VALUE_PROPERTY"))
+						.setIcon("lucide-bar-chart-horizontal-big")
+						.setSection("pretty-properties")
+						
+						//@ts-ignore
+						let sub = item.setSubmenu()
+						//@ts-ignore
+						let properties = this.app.metadataTypeManager.getAllProperties()
+						let numberProperties = Object.keys(properties).filter(p => properties[p].type == "number").map(p => properties[p].name)
+
+						for (let numberProp of numberProperties) {
+							sub.addItem((subitem: MenuItem) => {
+								subitem.setTitle(numberProp)
+								.setChecked(this.settings.progressProperties[propName].maxProperty == numberProp)
+								.onClick(() => {
+									if (propName) {
+										delete this.settings.progressProperties[propName].maxNumber
+										this.settings.progressProperties[propName].maxProperty = numberProp
+									}
+									this.saveSettings();
+									this.updateProgressBars();
+								}) 
+							})
+						}
+					});
+					
+
+					menuManager.addItemAfter(["clipboard"], (item: MenuItem) => item
+						.setTitle(i18n.t("REMOVE_PROGRESS_BAR"))
+						.setIcon("lucide-bar-chart-horizontal-big")
+						.setSection("pretty-properties")
+						.onClick(() => {
+							if (propName) {
+								delete this.settings.progressProperties[propName]
+							}
+							this.saveSettings();
+							this.updateProgressBars();
 						})
 					);
 				}
@@ -440,6 +523,87 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			}
 		}
 	}
+
+
+
+	updateProgressBars(changedFile?: TFile | null, cache?: CachedMetadata | null) {
+	
+		let leaves = this.app.workspace.getLeavesOfType("markdown");
+		for (let leaf of leaves) {
+		  if (leaf.view instanceof MarkdownView) {
+			if (changedFile && leaf.view.file && leaf.view.file.path != changedFile.path) {
+			  continue;
+			}
+	
+			//@ts-ignore
+			let mdEditor = leaf.view.metadataEditor;
+			let mdContainer = mdEditor.containerEl;
+	
+			if (mdContainer instanceof HTMLElement) {
+				let oldProgresses = mdContainer.querySelectorAll(".metadata-property > .metadata-progress-wrapper")
+				for (let oldProgress of oldProgresses) {
+					oldProgress.remove()
+				}
+			}
+			
+			let props = Object.keys(this.settings.progressProperties)
+	
+			for (let prop of props) {
+			  let progressProp = mdEditor.properties.find((p: any) => p.key == prop)
+			  let progressVal 
+	
+			  if (progressProp) {
+				progressVal = progressProp.value;
+			  } else {
+				if (leaf.view.file instanceof TFile) {
+				  let cache = this.app.metadataCache.getFileCache(leaf.view.file);
+				  progressVal = cache?.frontmatter?.[progressProp]
+				}
+			  }
+	
+			  if (progressVal !== undefined && mdContainer instanceof HTMLElement) {
+				let propertyKeyEl = mdContainer.querySelector(".metadata-property[data-property-key='" + prop + "'] > .metadata-property-key")
+	
+				if (propertyKeyEl instanceof HTMLElement) {
+				  let maxVal
+	
+				  if (this.settings.progressProperties[prop].maxNumber) {
+					maxVal = this.settings.progressProperties[prop].maxNumber
+				  } else {
+					let maxProperty = this.settings.progressProperties[prop].maxProperty
+					let maxProp = mdEditor.properties.find((p: any) => p.key == maxProperty)
+					
+					if (maxProp) {
+					  maxVal = maxProp.value;
+					} else {
+					  if (leaf.view.file instanceof TFile) {
+						let cache = this.app.metadataCache.getFileCache(leaf.view.file);
+						maxVal = cache?.frontmatter?.[maxProperty];
+					  }
+					} 
+				  }
+	
+				  if (maxVal) {
+					let progressWrapper = document.createElement("div")
+					progressWrapper.classList.add("metadata-progress-wrapper")
+	
+					let progress = document.createElement("progress")
+					progress.classList.add("metadata-progress")
+					progress.max = maxVal
+					progress.value = progressVal || 0
+	
+					let percent = " " + Math.round(progress.value * 100 / progress.max) + " %"
+					setTooltip(progress, percent, {delay: 1, placement: "top"})
+
+					progressWrapper.append(progress)
+					propertyKeyEl.after(progressWrapper)
+				  }
+				}
+			  }
+			}
+		  }
+		}
+	  }
 
 
 
