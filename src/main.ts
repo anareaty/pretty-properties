@@ -238,16 +238,16 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 						for (let numberProp of numberProperties) {
 							sub.addItem((subitem: MenuItem) => {
-								subitem.setTitle(numberProp)
-								.setChecked(this.settings.progressProperties[propName].maxProperty == numberProp)
-								.onClick(() => {
-									if (propName) {
-										delete this.settings.progressProperties[propName].maxNumber
-										this.settings.progressProperties[propName].maxProperty = numberProp
-									}
-									this.saveSettings();
-									this.updateProgressBars();
-								}) 
+								if (propName) {
+									subitem.setTitle(numberProp)
+									.setChecked(this.settings.progressProperties[propName].maxProperty == numberProp)
+									.onClick(() => {
+											delete this.settings.progressProperties[propName].maxNumber
+											this.settings.progressProperties[propName].maxProperty = numberProp
+										this.saveSettings();
+										this.updateProgressBars();
+									})
+								} 
 							})
 						}
 					});
