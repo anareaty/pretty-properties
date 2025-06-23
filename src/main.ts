@@ -242,8 +242,10 @@ export default class PrettyPropertiesPlugin extends Plugin {
 									subitem.setTitle(numberProp)
 									.setChecked(this.settings.progressProperties[propName].maxProperty == numberProp)
 									.onClick(() => {
+										if (propName) {
 											delete this.settings.progressProperties[propName].maxNumber
 											this.settings.progressProperties[propName].maxProperty = numberProp
+										}
 										this.saveSettings();
 										this.updateProgressBars();
 									})
