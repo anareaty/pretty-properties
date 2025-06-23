@@ -375,7 +375,12 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				} else {
 					if (leaf.view.file instanceof TFile) {
 						let cache = this.app.metadataCache.getFileCache(leaf.view.file)
-						coverVal = cache?.frontmatter?.[this.settings.coverProperty]
+
+						for (let prop of props) {
+					        coverVal = cache?.frontmatter?.[prop]
+					        if (coverVal) break
+						}
+						
 						cssVal = cache?.frontmatter?.cssclasses
 					}
 				}
