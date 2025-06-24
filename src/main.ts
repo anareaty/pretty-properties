@@ -386,8 +386,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			if (this.settings.bannerFading) {
 				styleText = styleText  +
 				".banner-image img {\n" + 
-				"mask-image: linear-gradient(to bottom, black 25%, transparent);\n"
-				"-webkit-mask-image: linear-gradient(to bottom, black 25%, transparent);\n"
+				"--banner-fading: linear-gradient(to bottom, black 25%, transparent);\n" +
 				"}"
 			}
 
