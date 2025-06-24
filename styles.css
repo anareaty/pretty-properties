@@ -179,3 +179,7 @@ body:not(.is-mobile) {
   border-bottom: var(--metadata-divider-width) solid var(--metadata-divider-color);
   overflow: hidden;
 }
+
+.metadata-container.is-collapsed .metadata-side-image {
+	display: none;
+}
