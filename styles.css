@@ -38,6 +38,8 @@ body:not(.is-mobile) {
     object-fit: cover;
     border-top-left-radius: 10px !important;
     border-top-right-radius: 10px !important;
+	mask-image: var(--banner-fading);
+	-webkit-mask-image: var(--banner-fading);
 }
 
 
