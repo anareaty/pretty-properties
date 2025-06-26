@@ -65,6 +65,7 @@ body:not(.is-mobile) {
 
 .metadata-side-image {
     grid-row: 1/3;
+    font-size: 0;
 }
 
 .metadata-container:has(.metadata-side-image.vertical) {
@@ -93,14 +94,17 @@ body:not(.is-mobile) {
   }
   
   .metadata-side-image img {
-    height: 200px !important;
-    width: unset;
-    object-fit: cover !important;
+    height: 200px;
     margin: auto;
   }
 
-  .metadata-side-image.horizontal img {
-    width: 100% !important;
+  .metadata-side-image.vertical img {
+    aspect-ratio: auto !important;
+  }
+
+  .metadata-side-image.square img,
+  .metadata-side-image.circle img {
+    width: 200px;
   }
 }
 
@@ -129,7 +133,7 @@ body:not(.is-mobile) {
 }
 
 .metadata-side-image.circle img {
-  aspect-ratio: 1 !important;
+  aspect-ratio: 1;
   object-fit: cover;
   border-radius: 50%;
 }
