@@ -192,13 +192,11 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 				//@ts-ignore
-				let propertyTypeObject = this.app.metadataTypeManager.getPropertyInfo(propName.toLowerCase()).type
+				let propertyTypeObject = this.app.metadataTypeManager.getPropertyInfo(propName.toLowerCase())
 				let propertyType
 				if (propertyTypeObject) {
 					propertyType = propertyTypeObject.widget || propertyTypeObject.type
 				}
-
-				
 
 				if (propertyType == "number" && !this.settings.progressProperties[propName]) {
 
