@@ -85,8 +85,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				this.addClassestoProperties();
 			})
 		);
-
 		
+
 		this.registerEvent(
 			this.app.metadataCache.on("changed", async (file, data, cache) => {
 				this.updateSideImages(file, cache)
