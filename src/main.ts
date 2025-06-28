@@ -188,11 +188,20 @@ export default class PrettyPropertiesPlugin extends Plugin {
 					);
 				}
 
+				
+
 
 				//@ts-ignore
-				let propertyType = this.app.metadataTypeManager.getPropertyInfo(propName.toLowerCase()).type
+				let propertyTypeObject = this.app.metadataTypeManager.getPropertyInfo(propName.toLowerCase()).type
+				let propertyType
+				if (propertyTypeObject) {
+					propertyType = propertyTypeObject.widget || propertyTypeObject.type
+				}
+
+				
 
 				if (propertyType == "number" && !this.settings.progressProperties[propName]) {
+
 					menuManager.addItemAfter(["clipboard"], (item: MenuItem) => item
 					.setTitle(i18n.t("SHOW_PROGRESS_BAR"))
 					.setIcon("lucide-bar-chart-horizontal-big")
@@ -234,7 +243,11 @@ export default class PrettyPropertiesPlugin extends Plugin {
 						let sub = item.setSubmenu()
 						//@ts-ignore
 						let properties = this.app.metadataTypeManager.getAllProperties()
-						let numberProperties = Object.keys(properties).filter(p => properties[p].type == "number").map(p => properties[p].name)
+						let numberProperties = Object.keys(properties).filter(p => {
+							let property = properties[p]
+							let type = property.widget || property.type
+							return type == "number"
+						}).map(p => properties[p].name)
 
 						for (let numberProp of numberProperties) {
 							sub.addItem((subitem: MenuItem) => {
