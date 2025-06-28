@@ -1,4 +1,19 @@
-import { App, Menu, getLanguage, setTooltip, CachedMetadata, MarkdownRenderer, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile, MenuItem } from 'obsidian';
+import { 
+	App, 
+	Menu, 
+	getLanguage, 
+	setTooltip, 
+	CachedMetadata, 
+	MarkdownRenderer, 
+	MarkdownView, 
+	Notice, 
+	Plugin, 
+	PluginSettingTab, 
+	Setting, 
+	TFile, 
+	MenuItem,
+	FrontMatterCache
+ } from 'obsidian';
 import MenuManager from 'src/MenuManager';
 import { i18n } from './localization';
 
@@ -69,30 +84,14 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 		this.registerEvent(
 			this.app.workspace.on("layout-change", async () => {
-				this.updateSideImages()
-				this.updateProgressBars();
-				this.updateBanners()
-				this.addClassestoProperties()
+				this.updateElements()
 			})
 		);
 
-
-		this.registerEvent(
-			this.app.workspace.on("file-open", async (file) => {
-				this.updateSideImages(file);
-				this.updateProgressBars(file);
-				this.updateBanners(file);
-				this.addClassestoProperties();
-			})
-		);
-		
 
 		this.registerEvent(
 			this.app.metadataCache.on("changed", async (file, data, cache) => {
-				this.updateSideImages(file, cache)
-				this.updateProgressBars(file, cache);
-				this.updateBanners(file, cache)
-				this.addClassestoProperties()
+				this.updateElements(file)
 			})
 		);
 
@@ -211,7 +210,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 							}
 						}
 						this.saveSettings();
-						this.updateProgressBars();
+						this.updateElements();
 						})
 					);
 				} else if (this.settings.progressProperties[propName]) {
@@ -226,7 +225,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 									this.settings.progressProperties[propName].maxNumber = 100
 								}
 								this.saveSettings();
-								this.updateProgressBars();
+								this.updateElements();
 							})
 						);
 					}
@@ -258,7 +257,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 											this.settings.progressProperties[propName].maxProperty = numberProp
 										}
 										this.saveSettings();
-										this.updateProgressBars();
+										this.updateElements();
 									})
 								} 
 							})
@@ -275,7 +274,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 								delete this.settings.progressProperties[propName]
 							}
 							this.saveSettings();
-							this.updateProgressBars();
+							this.updateElements();
 						})
 					);
 				}
@@ -430,291 +429,254 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 
-
-	updateSideImages(changedFile?: TFile | null, cache?: CachedMetadata | null) {
-
+	updateElements(changedFile?: TFile | null, cache?: CachedMetadata | null) {
 		let leaves = this.app.workspace.getLeavesOfType("markdown")
-
 		for (let leaf of leaves) {
-
 			if (leaf.view instanceof MarkdownView) {
 				if(changedFile && leaf.view.file && leaf.view.file.path != changedFile.path) {
 					continue
 				}
-		
-				//@ts-ignore
-				let mdEditor = leaf.view.metadataEditor
-				let mdContainer = mdEditor.containerEl
+				this.updateLeafElements(leaf.view, cache)
+			}
+		}
+	}
 
-				let coverVal
-				let cssVal
-				let coverProp
+	async updateLeafElements(view: MarkdownView, cache?: CachedMetadata | null) {
+		this.addClassestoProperties(view)
+		if (!cache && view.file) {
+			cache = this.app.metadataCache.getFileCache(view.file)
+		}
+		let frontmatter
+		if (cache) {
+			frontmatter = cache.frontmatter
+		}
+		this.updateCoverImages(view, frontmatter)
+		this.updateBannerImages(view, frontmatter)
+		this.updateProgressBars(view, frontmatter)
 
-				let props = [...this.settings.extraCoverProperties]
-				props.unshift(this.settings.coverProperty)
+	}
 
-				for (let prop of props) {
-					coverProp = mdEditor.properties.find((p: any) => p.key == prop)
-					if (coverProp) break
+
+	async updateCoverImages(view: MarkdownView, frontmatter: FrontMatterCache | undefined) {
+		//@ts-ignore
+		let mdEditor = view.metadataEditor
+		let mdContainer = mdEditor.containerEl
+		let coverVal
+		let cssVal
+		let coverProp
+
+		let props = [...this.settings.extraCoverProperties]
+		props.unshift(this.settings.coverProperty)
+
+		for (let prop of props) {
+			coverProp = mdEditor.properties.find((p: any) => p.key == prop)
+			if (coverProp) break
+		}
+
+		let cssProp = mdEditor.properties.find((p: any) => p.key == "cssclasses")
+
+		if (coverProp) {
+			coverVal = coverProp.value
+			if (cssProp) {
+				cssVal = cssProp.value
+			}
+		} else {
+			for (let prop of props) {
+				coverVal = frontmatter?.[prop]
+				if (coverVal) break
+			}
+			cssVal = frontmatter?.cssclasses
+		}
+
+		if (mdContainer instanceof HTMLElement) {
+			let coverDiv
+			let oldCoverDiv = mdContainer.querySelector(".metadata-side-image")
+
+			if (coverVal && this.settings.enableCover) {
+				if (coverVal.startsWith("http")) coverVal = "![](" + coverVal + ")"
+				if (!coverVal.startsWith("!")) coverVal = "!" + coverVal
+				coverDiv = document.createElement("div");
+				coverDiv.classList.add("metadata-side-image")
+			
+				if (cssVal && cssVal.includes("cover-vertical")) {
+				coverDiv.classList.add("vertical")
+				}
+	
+				else if (cssVal && cssVal.includes("cover-horizontal")) {
+				coverDiv.classList.add("horizontal")
+				}
+	
+				else if (cssVal && cssVal.includes("cover-square")) {
+				coverDiv.classList.add("square")
 				}
 
-
-
-				let cssProp = mdEditor.properties.find((p: any) => p.key == "cssclasses")
-
-				if (coverProp) {
-					coverVal = coverProp.value
-					if (cssProp) {
-						cssVal = cssProp.value
+				else if (cssVal && cssVal.includes("cover-circle")) {
+				coverDiv.classList.add("circle")
+				}
+	
+				else {
+				coverDiv.classList.add("vertical")
+				}
+	
+				let coverTemp = document.createElement("div");
+				MarkdownRenderer.render(this.app, coverVal, coverTemp, "", this);
+				let image = coverTemp.querySelector("img")
+				if (image) {
+					coverDiv.append(image)
+				}
+			}
+			
+			if (coverDiv) {
+				if (oldCoverDiv) {
+					if (coverDiv.outerHTML != oldCoverDiv.outerHTML) {
+					oldCoverDiv.remove()
+					mdContainer.prepend(coverDiv)
 					}
 				} else {
-					if (leaf.view.file instanceof TFile) {
-						let cache = this.app.metadataCache.getFileCache(leaf.view.file)
-
-						for (let prop of props) {
-					        coverVal = cache?.frontmatter?.[prop]
-					        if (coverVal) break
-						}
-						
-						cssVal = cache?.frontmatter?.cssclasses
-					}
+					mdContainer.prepend(coverDiv)
 				}
-
-				if (mdContainer instanceof HTMLElement) {
-					let coverDiv
-					let oldCoverDiv = mdContainer.querySelector(".metadata-side-image")
-
-					if (coverVal && this.settings.enableCover) {
-						if (coverVal.startsWith("http")) coverVal = "![](" + coverVal + ")"
-						if (!coverVal.startsWith("!")) coverVal = "!" + coverVal
-						coverDiv = document.createElement("div");
-						coverDiv.classList.add("metadata-side-image")
-					
-						if (cssVal && cssVal.includes("cover-vertical")) {
-						coverDiv.classList.add("vertical")
-						}
-			
-						else if (cssVal && cssVal.includes("cover-horizontal")) {
-						coverDiv.classList.add("horizontal")
-						}
-			
-						else if (cssVal && cssVal.includes("cover-square")) {
-						coverDiv.classList.add("square")
-						}
-
-						else if (cssVal && cssVal.includes("cover-circle")) {
-						coverDiv.classList.add("circle")
-						}
-			
-						else {
-						coverDiv.classList.add("vertical")
-						}
-			
-						let coverTemp = document.createElement("div");
-						MarkdownRenderer.render(this.app, coverVal, coverTemp, "", this);
-						let image = coverTemp.querySelector("img")
-						if (image) {
-							coverDiv.append(image)
-						}
-					}
-					
-			
-					if (coverDiv) {
-						if (oldCoverDiv) {
-							if (coverDiv.outerHTML != oldCoverDiv.outerHTML) {
-							oldCoverDiv.remove()
-							mdContainer.prepend(coverDiv)
-							}
-						} else {
-							mdContainer.prepend(coverDiv)
-						}
-					} else {
-						if (oldCoverDiv) oldCoverDiv.remove()
-					}
-				}
+			} else {
+				if (oldCoverDiv) oldCoverDiv.remove()
 			}
 		}
 	}
 
 
+	async updateBannerImages(view: MarkdownView, frontmatter: FrontMatterCache | undefined) {
+		//@ts-ignore
+		let mdEditor = view.metadataEditor
+		let contentEl = view.contentEl
+		let bannerContainer
+		let mode = view.getMode()
 
-	updateProgressBars(changedFile?: TFile | null, cache?: CachedMetadata | null) {
-	
-		let leaves = this.app.workspace.getLeavesOfType("markdown");
-		for (let leaf of leaves) {
-		  if (leaf.view instanceof MarkdownView) {
-			if (changedFile && leaf.view.file && leaf.view.file.path != changedFile.path) {
-			  continue;
-			}
-	
-			//@ts-ignore
-			let mdEditor = leaf.view.metadataEditor;
-			let mdContainer = mdEditor.containerEl;
-	
-			if (mdContainer instanceof HTMLElement) {
-				let oldProgresses = mdContainer.querySelectorAll(".metadata-property > .metadata-progress-wrapper")
-				for (let oldProgress of oldProgresses) {
-					oldProgress.remove()
+		if (mode == "preview") {
+			bannerContainer = contentEl.querySelector(".markdown-preview-view")
+		}
+
+		if (mode == "source") {
+			bannerContainer = contentEl.querySelector(".cm-scroller")
+		}
+
+		let bannerVal
+
+		let bannerProp = mdEditor.properties.find((p: any) => p.key == this.settings.bannerProperty)
+
+		if (bannerProp) {
+			bannerVal = bannerProp.value
+		} else {
+			bannerVal = frontmatter?.[this.settings.bannerProperty]
+		}
+
+		if (bannerContainer instanceof HTMLElement) {
+
+			let oldBannerDiv = bannerContainer.querySelector(".banner-image")
+			let bannerDiv = document.createElement("div");
+			bannerDiv.classList.add("banner-image")
+
+			if (bannerVal && this.settings.enableBanner) {
+				if (bannerVal.startsWith("http")) bannerVal = "![](" + bannerVal + ")"
+				if (!bannerVal.startsWith("!")) bannerVal = "!" + bannerVal
+				let bannerTemp = document.createElement("div");
+				MarkdownRenderer.render(this.app, bannerVal, bannerTemp, "", this);
+				let image = bannerTemp.querySelector("img")
+				if (image) {
+					bannerDiv.append(image)
 				}
 			}
-			
-			let props = Object.keys(this.settings.progressProperties)
-	
-			for (let prop of props) {
-			  let progressProp = mdEditor.properties.find((p: any) => p.key == prop)
-			  let progressVal 
-	
-			  if (progressProp) {
-				progressVal = progressProp.value;
-			  } else {
-				if (leaf.view.file instanceof TFile) {
-				  let cache = this.app.metadataCache.getFileCache(leaf.view.file);
-				  progressVal = cache?.frontmatter?.[progressProp]
+
+			if (oldBannerDiv) {
+				if (oldBannerDiv.outerHTML != bannerDiv.outerHTML) {
+					oldBannerDiv.remove();
+					bannerContainer.prepend(bannerDiv)
 				}
-			  }
-	
-			  if (progressVal !== undefined && mdContainer instanceof HTMLElement) {
-				let propertyKeyEl = mdContainer.querySelector(".metadata-property[data-property-key='" + prop + "'] > .metadata-property-key")
-	
+			} else {
+				bannerContainer.prepend(bannerDiv)
+			}
+		}
+	}
+
+
+	async updateProgressBars(view: MarkdownView, frontmatter: FrontMatterCache | undefined) {
+		//@ts-ignore
+		let mdEditor = view.metadataEditor;
+		let mdContainer = mdEditor.containerEl;
+
+		if (mdContainer instanceof HTMLElement) {
+			let oldProgresses = mdContainer.querySelectorAll(".metadata-property > .metadata-progress-wrapper")
+			for (let oldProgress of oldProgresses) {
+				oldProgress.remove()
+			}
+		}
+		
+		let props = Object.keys(this.settings.progressProperties)
+
+		for (let prop of props) {
+			let progressProp = mdEditor.properties.find((p: any) => p.key == prop)
+			let progressVal 
+
+			if (progressProp) {
+			progressVal = progressProp.value;
+			} else {
+				progressVal = frontmatter?.[progressProp]
+			}
+
+			if (progressVal !== undefined && mdContainer instanceof HTMLElement) {
+			let propertyKeyEl = mdContainer.querySelector(".metadata-property[data-property-key='" + prop + "'] > .metadata-property-key")
+
 				if (propertyKeyEl instanceof HTMLElement) {
-				  let maxVal
-	
-				  if (this.settings.progressProperties[prop].maxNumber) {
+					let maxVal
+
+					if (this.settings.progressProperties[prop].maxNumber) {
 					maxVal = this.settings.progressProperties[prop].maxNumber
-				  } else {
-					let maxProperty = this.settings.progressProperties[prop].maxProperty
-					let maxProp = mdEditor.properties.find((p: any) => p.key == maxProperty)
-					
-					if (maxProp) {
-					  maxVal = maxProp.value;
 					} else {
-					  if (leaf.view.file instanceof TFile) {
-						let cache = this.app.metadataCache.getFileCache(leaf.view.file);
-						maxVal = cache?.frontmatter?.[maxProperty];
-					  }
-					} 
-				  }
-	
-				  if (maxVal) {
+						let maxProperty = this.settings.progressProperties[prop].maxProperty
+						let maxProp = mdEditor.properties.find((p: any) => p.key == maxProperty)
+						
+						if (maxProp) {
+							maxVal = maxProp.value;
+						} else {
+							maxVal = frontmatter?.[maxProperty];
+						} 
+					}
+
+					if (maxVal) {
 					let progressWrapper = document.createElement("div")
 					progressWrapper.classList.add("metadata-progress-wrapper")
-	
+
 					let progress = document.createElement("progress")
 					progress.classList.add("metadata-progress")
 					progress.max = maxVal
 					progress.value = progressVal || 0
-	
+
 					let percent = " " + Math.round(progress.value * 100 / progress.max) + " %"
 					setTooltip(progress, percent, {delay: 1, placement: "top"})
 
 					progressWrapper.append(progress)
 					propertyKeyEl.after(progressWrapper)
-				  }
-				}
-			  }
-			}
-		  }
-		}
-	  }
-
-
-
-
-
-	updateBanners(changedFile?: TFile | null, cache?: CachedMetadata | null) {
-		
-		let leaves = this.app.workspace.getLeavesOfType("markdown")
-
-		for (let leaf of leaves) {
-
-			if (leaf.view instanceof MarkdownView) {
-				if(changedFile && leaf.view.file && leaf.view.file.path != changedFile.path) {
-					continue
-				}
-
-				let contentEl = leaf.view.contentEl
-
-				//@ts-ignore
-				let mdEditor = leaf.view.metadataEditor
-				let bannerContainer
-				let mode = leaf.view.getMode()
-
-				if (mode == "preview") {
-					bannerContainer = contentEl.querySelector(".markdown-preview-view")
-				}
-
-				if (mode == "source") {
-					bannerContainer = contentEl.querySelector(".cm-scroller")
-				}
-
-				let bannerVal
-
-				let bannerProp = mdEditor.properties.find((p: any) => p.key == this.settings.bannerProperty)
-
-				if (bannerProp) {
-					bannerVal = bannerProp.value
-				} else {
-					if (leaf.view.file instanceof TFile) {
-						let cache = this.app.metadataCache.getFileCache(leaf.view.file)
-						bannerVal = cache?.frontmatter?.[this.settings.bannerProperty]
 					}
 				}
+			}
+		}
+	}
 
 
-				if (bannerContainer instanceof HTMLElement) {
-
-					let oldBannerDiv = bannerContainer.querySelector(".banner-image")
-						
-						let bannerDiv = document.createElement("div");
-						bannerDiv.classList.add("banner-image")
-
-						if (bannerVal && this.settings.enableBanner) {
-							if (bannerVal.startsWith("http")) bannerVal = "![](" + bannerVal + ")"
-							if (!bannerVal.startsWith("!")) bannerVal = "!" + bannerVal
-							let bannerTemp = document.createElement("div");
-							MarkdownRenderer.render(this.app, bannerVal, bannerTemp, "", this);
-							let image = bannerTemp.querySelector("img")
-							if (image) {
-								bannerDiv.append(image)
-							}
-						}
-
-						if (oldBannerDiv) {
-							if (oldBannerDiv.outerHTML != bannerDiv.outerHTML) {
-								oldBannerDiv.remove();
-								bannerContainer.prepend(bannerDiv)
-							}
-						} else {
-							bannerContainer.prepend(bannerDiv)
-						}
+	async addClassestoProperties(view: MarkdownView) {
+		//@ts-ignore
+		let mdEditor = view.metadataEditor;
+		if (mdEditor) {
+			let container = mdEditor.containerEl;
+			let pills = container.querySelectorAll(".multi-select-pill:not([data-property-pill-value])")
+			for (let pill of pills) {
+				let content = pill.querySelector(".multi-select-pill-content")
+				if (content instanceof HTMLElement) {
+					let value = content.innerText
+					pill.setAttribute("data-property-pill-value", value)
 				}
 			}
 		}
 	}
 
 
-	addClassestoProperties() {
-		let leaves = this.app.workspace.getLeavesOfType("markdown")
-		for (let leaf of leaves) {
-
-		//@ts-ignore
-		let mdEditor = leaf.view.metadataEditor;
-		if (mdEditor) {
-			let container = mdEditor.containerEl;
-
-			let pills = container.querySelectorAll(".multi-select-pill:not([data-property-pill-value])")
-			for (let pill of pills) {
-			let content = pill.querySelector(".multi-select-pill-content")
-			if (content instanceof HTMLElement) {
-				let value = content.innerText
-				pill.setAttribute("data-property-pill-value", value)
-			}
-			}
-			
-		}
-		
-		}
-	}
 
 	async loadSettings() {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
@@ -748,7 +710,7 @@ class SampleSettingTab extends PluginSettingTab {
 					this.plugin.settings.enableBanner = value
 					await this.plugin.saveSettings();
 					this.display();
-					this.plugin.updateBanners();
+					this.plugin.updateElements();
 					this.plugin.updateBannerStyles();
 				}));
 
@@ -762,7 +724,7 @@ class SampleSettingTab extends PluginSettingTab {
 				.onChange(async (value) => {
 					this.plugin.settings.bannerProperty = value;
 					await this.plugin.saveSettings();
-				    this.plugin.updateBanners();
+				    this.plugin.updateElements();
 				}));
 
 			new Setting(containerEl)
@@ -829,7 +791,7 @@ class SampleSettingTab extends PluginSettingTab {
 					this.plugin.settings.enableCover = value
 					await this.plugin.saveSettings();
 					this.display();
-					this.plugin.updateSideImages()
+					this.plugin.updateElements()
 					this.plugin.updateCoverStyles()
 				}));
 
@@ -844,7 +806,7 @@ class SampleSettingTab extends PluginSettingTab {
 				.onChange(async (value) => {
 					this.plugin.settings.coverProperty = value;
 					await this.plugin.saveSettings();
-					this.plugin.updateSideImages()
+					this.plugin.updateElements()
 				}));
 
 			
@@ -870,7 +832,7 @@ class SampleSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.extraCoverProperties[i] = value;
 						await this.plugin.saveSettings();
-						this.plugin.updateSideImages()
+						this.plugin.updateElements()
 					}))
 				.addButton(button => button
 				.setIcon("x")
@@ -955,16 +917,13 @@ class SampleSettingTab extends PluginSettingTab {
 					this.plugin.settings.propertyPillColors = {}
 					this.plugin.settings.hiddenProperties = []
 					await this.plugin.saveSettings();
+					this.plugin.updateElements()
 					this.plugin.updateHiddenProperties()
 					this.plugin.updatePillColors()
-					this.plugin.updateBanners()
 					this.plugin.updateBannerStyles()
 					this.plugin.updateCoverStyles()
-					this.plugin.updateSideImages()
 					this.display();
-					
 					new Notice(i18n.t("CLEAR_SETTINGS_NOTICE"))
-
 				}))
 	}
 }
