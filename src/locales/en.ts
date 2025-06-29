@@ -25,7 +25,17 @@ export default {
   SHOW_PROGRESS_BAR: "Show progress-bar",
   SET_PROGRESS_MAX_VALUE_100: "Set max progress = 100",
   SET_PROGRESS_MAX_VALUE_PROPERTY: "Set max progress from another property",
-  REMOVE_PROGRESS_BAR: "Remove progress-bar"
+  REMOVE_PROGRESS_BAR: "Remove progress-bar",
+  BANNERS: "Banners",
+  COVERS: "Covers",
+  TASKS: "Tasks",
+  OTHER: "Other",
+  ALL_TASKS_COUNT_PROPERTY: "Property to count all tasks",
+  UNCOMPLETED_TASKS_COUNT_PROPERTY: "Property to count uncompleted tasks",
+  COMPLETED_TASKS_COUNT_PROPERTY: "Property to count completed tasks",
+  TASK_STATUSES_DESCRIPTION: "Set statuses that will be count as completed or uncompleted. Tasks with any other statuses will be ignored in all counts (including all tasks count)",
+  UNCOMPLETED_TASKS_COUNT_STATUSES: "Uncompleted tasks statuses",
+  COMPLETED_TASKS_COUNT_STATUSES: "Completed tasks statuses",
 };
 
 

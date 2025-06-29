@@ -1,62 +1,22 @@
-import { 
-	App, 
+import {  
 	Menu, 
 	getLanguage, 
 	setTooltip, 
 	CachedMetadata, 
 	MarkdownRenderer, 
 	MarkdownView, 
-	Notice, 
 	Plugin, 
-	PluginSettingTab, 
-	Setting, 
 	TFile, 
 	MenuItem,
 	FrontMatterCache
  } from 'obsidian';
 import MenuManager from 'src/MenuManager';
 import { i18n } from './localization';
+import PPSettingTab from './settings';
+import { PPPluginSettings, DEFAULT_SETTINGS } from './settings';
 
 
-interface PPPluginSettings {
-	mySetting: string;
-	hiddenProperties: string[];
-	propertyPillColors: any;
-	enableBanner: boolean;
-	enableCover: boolean;
-	bannerProperty: string;
-	coverProperty: string;
-	extraCoverProperties: string[],
-	bannerHeight: number;
-	bannerHeightMobile: number;
-	bannerMargin: number;
-	bannerFading: boolean;
-	coverVerticalWidth: number;
-	coverHorizontalWidth: number;
-	coverSquareWidth: number;
-	coverCircleWidth: number;
-	progressProperties: any;
-}
 
-const DEFAULT_SETTINGS: PPPluginSettings = {
-	mySetting: 'default',
-	hiddenProperties: [],
-	propertyPillColors: {},
-	enableBanner: true,
-	enableCover: true,
-	bannerProperty: "banner",
-	coverProperty: "cover",
-	extraCoverProperties: [],
-	bannerHeight: 150, 
-	bannerHeightMobile: 100,
-	bannerMargin: 15,
-	bannerFading: true,
-	coverVerticalWidth: 200,
-	coverHorizontalWidth: 300,
-	coverSquareWidth: 250,
-	coverCircleWidth: 250,
-	progressProperties: {}
-}
 
 export default class PrettyPropertiesPlugin extends Plugin {
 	settings: PPPluginSettings;
@@ -141,7 +101,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
             }
         })
 	
-		this.addSettingTab(new SampleSettingTab(this.app, this));
+		this.addSettingTab(new PPSettingTab(this.app, this));
 	}
 
 	onunload() {
@@ -450,10 +410,80 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		if (cache) {
 			frontmatter = cache.frontmatter
 		}
+
 		this.updateCoverImages(view, frontmatter)
 		this.updateBannerImages(view, frontmatter)
 		this.updateProgressBars(view, frontmatter)
+		if (cache && frontmatter) {
+			this.updateTasksCount(view, cache)
+		}
+		
+	}
 
+
+	async updateTasksCount(view: MarkdownView, cache: CachedMetadata) {
+		let frontmatter = cache.frontmatter
+		let tasksProp = this.settings.allTasksCount
+		let completedProp = this.settings.completedTasksCount
+		let uncompletedProp = this.settings.uncompletedTasksCount
+		let tasksVal = frontmatter?.[tasksProp]
+		let completedVal = frontmatter?.[completedProp]
+		let uncompletedVal = frontmatter?.[uncompletedProp]
+
+		if (tasksVal !== undefined || completedVal !== undefined || uncompletedVal !== undefined) {
+			let file = view.file
+			let listItems = cache.listItems
+			if (listItems) {
+				let allTasksStatuses = this.settings.completedTasksStatuses.concat(this.settings.uncompletedTasksStatuses)
+				let tasks = listItems.filter(l => l.task && allTasksStatuses.includes(l.task))
+
+				if (tasks.length == 0 && 
+					(tasksVal === null || tasksVal === undefined) && 
+					(completedVal === null || completedVal === undefined) && 
+					(uncompletedVal === null || uncompletedVal === undefined)) {
+					return
+				}
+
+				if (tasksVal !== undefined) {
+					let tasksNum = tasks.length
+					if (tasksNum != tasksVal) {
+						if (file instanceof TFile) {
+							this.app.fileManager.processFrontMatter(file, fm => {
+								fm[tasksProp] = tasksNum
+							})
+						}
+					}
+				}
+
+				if (completedVal !== undefined) {
+					let completed = tasks.filter(t => t.task && this.settings.completedTasksStatuses.includes(t.task))
+					let completedNum = completed.length
+					if (completedNum != completedVal) {
+						if (file instanceof TFile) {
+							this.app.fileManager.processFrontMatter(file, fm => {
+								fm[completedProp] = completedNum
+							})
+						}
+					}
+				}
+
+				if (uncompletedVal !== undefined) {
+					let uncompleted = tasks.filter(t => t.task && this.settings.uncompletedTasksStatuses.includes(t.task))
+					let uncompletedNum = uncompleted.length
+					if (uncompletedNum != uncompletedVal) {
+						if (file instanceof TFile) {
+							this.app.fileManager.processFrontMatter(file, fm => {
+								fm[uncompletedProp] = uncompletedNum
+							})
+						}
+					}
+				}
+
+
+				
+				
+			}
+		}
 	}
 
 
@@ -462,31 +492,15 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		let mdEditor = view.metadataEditor
 		let mdContainer = mdEditor.containerEl
 		let coverVal
-		let cssVal
-		let coverProp
 
 		let props = [...this.settings.extraCoverProperties]
 		props.unshift(this.settings.coverProperty)
 
 		for (let prop of props) {
-			coverProp = mdEditor.properties.find((p: any) => p.key == prop)
-			if (coverProp) break
+			coverVal = frontmatter?.[prop]
+			if (coverVal) break
 		}
-
-		let cssProp = mdEditor.properties.find((p: any) => p.key == "cssclasses")
-
-		if (coverProp) {
-			coverVal = coverProp.value
-			if (cssProp) {
-				cssVal = cssProp.value
-			}
-		} else {
-			for (let prop of props) {
-				coverVal = frontmatter?.[prop]
-				if (coverVal) break
-			}
-			cssVal = frontmatter?.cssclasses
-		}
+		let cssVal = frontmatter?.cssclasses
 
 		if (mdContainer instanceof HTMLElement) {
 			let coverDiv
@@ -543,8 +557,6 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 	async updateBannerImages(view: MarkdownView, frontmatter: FrontMatterCache | undefined) {
-		//@ts-ignore
-		let mdEditor = view.metadataEditor
 		let contentEl = view.contentEl
 		let bannerContainer
 		let mode = view.getMode()
@@ -557,15 +569,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			bannerContainer = contentEl.querySelector(".cm-scroller")
 		}
 
-		let bannerVal
-
-		let bannerProp = mdEditor.properties.find((p: any) => p.key == this.settings.bannerProperty)
-
-		if (bannerProp) {
-			bannerVal = bannerProp.value
-		} else {
-			bannerVal = frontmatter?.[this.settings.bannerProperty]
-		}
+		let bannerVal = frontmatter?.[this.settings.bannerProperty]
+		
 
 		if (bannerContainer instanceof HTMLElement) {
 
@@ -611,15 +616,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		let props = Object.keys(this.settings.progressProperties)
 
 		for (let prop of props) {
-			let progressProp = mdEditor.properties.find((p: any) => p.key == prop)
-			let progressVal 
-
-			if (progressProp) {
-			progressVal = progressProp.value;
-			} else {
-				progressVal = frontmatter?.[progressProp]
-			}
-
+			let progressVal = frontmatter?.[prop]
+			
 			if (progressVal !== undefined && mdContainer instanceof HTMLElement) {
 			let propertyKeyEl = mdContainer.querySelector(".metadata-property[data-property-key='" + prop + "'] > .metadata-property-key")
 
@@ -630,13 +628,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 					maxVal = this.settings.progressProperties[prop].maxNumber
 					} else {
 						let maxProperty = this.settings.progressProperties[prop].maxProperty
-						let maxProp = mdEditor.properties.find((p: any) => p.key == maxProperty)
-						
-						if (maxProp) {
-							maxVal = maxProp.value;
-						} else {
-							maxVal = frontmatter?.[maxProperty];
-						} 
+						maxVal = frontmatter?.[maxProperty];
 					}
 
 					if (maxVal) {
@@ -689,241 +681,4 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 
-class SampleSettingTab extends PluginSettingTab {
-	plugin: PrettyPropertiesPlugin;
 
-	constructor(app: App, plugin: PrettyPropertiesPlugin) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
-
-	display(): void {
-		const {containerEl} = this;
-
-		containerEl.empty();
-
-		new Setting(containerEl)
-			.setName(i18n.t("ENABLE_BANNER"))
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.enableBanner)
-				.onChange(async (value) => {
-					this.plugin.settings.enableBanner = value
-					await this.plugin.saveSettings();
-					this.display();
-					this.plugin.updateElements();
-					this.plugin.updateBannerStyles();
-				}));
-
-
-		if (this.plugin.settings.enableBanner) {
-			new Setting(containerEl)
-			.setName(i18n.t("BANNER_PROPERTY"))
-			.addText(text => text
-				.setPlaceholder('banner')
-				.setValue(this.plugin.settings.bannerProperty)
-				.onChange(async (value) => {
-					this.plugin.settings.bannerProperty = value;
-					await this.plugin.saveSettings();
-				    this.plugin.updateElements();
-				}));
-
-			new Setting(containerEl)
-			.setName(i18n.t("BANNER_FADING"))
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.bannerFading)
-				.onChange(async (value) => {
-					this.plugin.settings.bannerFading = value
-					await this.plugin.saveSettings();
-					this.plugin.updateBannerStyles();
-				}));
-
-			new Setting(containerEl)
-			.setName(i18n.t("BANNER_HEIGHT"))
-			.addText(text => {
-				text.inputEl.type = "number"
-				text.setValue(this.plugin.settings.bannerHeight.toString())
-				.setPlaceholder('150')
-				.onChange(async (value) => {
-					if (!value) value = "0"
-					this.plugin.settings.bannerHeight = Number(value);
-					await this.plugin.saveSettings();
-				    this.plugin.updateBannerStyles();
-				})
-			});
-
-			new Setting(containerEl)
-			.setName(i18n.t("BANNER_HEIGHT_MOBILE"))
-			.addText(text => {
-				text.inputEl.type = "number"
-				text.setValue(this.plugin.settings.bannerHeightMobile.toString())
-				.setPlaceholder('100')
-				.onChange(async (value) => {
-					if (!value) value = "0"
-					this.plugin.settings.bannerHeightMobile = Number(value);
-					await this.plugin.saveSettings();
-				    this.plugin.updateBannerStyles();
-				})
-			});
-
-			new Setting(containerEl)
-			.setName(i18n.t("BANNER_MARGIN"))
-			.addText(text => {
-				text.inputEl.type = "number"
-				text.setValue(this.plugin.settings.bannerMargin.toString())
-				.setPlaceholder('15')
-				.onChange(async (value) => {
-					if (!value) value = "0"
-					this.plugin.settings.bannerMargin = Number(value);
-					await this.plugin.saveSettings();
-				    this.plugin.updateBannerStyles();
-				})
-			});
-
-			
-		}
-
-
-		new Setting(containerEl)
-			.setName(i18n.t("ENABLE_COVER"))
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.enableCover)
-				.onChange(async (value) => {
-					this.plugin.settings.enableCover = value
-					await this.plugin.saveSettings();
-					this.display();
-					this.plugin.updateElements()
-					this.plugin.updateCoverStyles()
-				}));
-
-		if (this.plugin.settings.enableCover) {
-
-
-			new Setting(containerEl)
-			.setName(i18n.t("COVER_PROPERTY"))
-			.addText(text => text
-				.setPlaceholder('cover')
-				.setValue(this.plugin.settings.coverProperty)
-				.onChange(async (value) => {
-					this.plugin.settings.coverProperty = value;
-					await this.plugin.saveSettings();
-					this.plugin.updateElements()
-				}));
-
-			
-			new Setting(containerEl)
-			.setName(i18n.t("ADD_EXTRA_COVER_PROPERTY"))
-			.addButton(button => button
-				.setIcon("plus")
-				.onClick(async () => {
-					if (this.plugin.settings.extraCoverProperties.find(p => p == "") === undefined) {
-						this.plugin.settings.extraCoverProperties.push("")
-						await this.plugin.saveSettings();
-						this.display();
-					}
-				}))
-
-
-			for (let i = 0; i < this.plugin.settings.extraCoverProperties.length; i++) {
-				let prop = this.plugin.settings.extraCoverProperties[i]
-				new Setting(containerEl)
-				.setName(i18n.t("EXTRA_COVER_PROPERTY"))
-				.addText(text => text
-					.setValue(prop)
-					.onChange(async (value) => {
-						this.plugin.settings.extraCoverProperties[i] = value;
-						await this.plugin.saveSettings();
-						this.plugin.updateElements()
-					}))
-				.addButton(button => button
-				.setIcon("x")
-				.onClick(async () => {
-					
-					prop = this.plugin.settings.extraCoverProperties[i]
-					
-					this.plugin.settings.extraCoverProperties = this.plugin.settings.extraCoverProperties.filter(p => p != prop)
-					
-					
-					await this.plugin.saveSettings();
-					this.display();
-				}))
-			}
-
-			new Setting(containerEl)
-			.setName(i18n.t("VERTICAL_COVER_WIDTH"))
-			.addText(text => {
-				text.inputEl.type = "number"
-				text.setValue(this.plugin.settings.coverVerticalWidth.toString())
-				.setPlaceholder('200')
-				.onChange(async (value) => {
-					if (!value) value = "0"
-					this.plugin.settings.coverVerticalWidth = Number(value);
-					await this.plugin.saveSettings();
-				    this.plugin.updateCoverStyles();
-				})
-			});
-
-			new Setting(containerEl)
-			.setName(i18n.t("HORIZONTAL_COVER_WIDTH"))
-			.addText(text => {
-				text.inputEl.type = "number"
-				text.setValue(this.plugin.settings.coverHorizontalWidth.toString())
-				.setPlaceholder('300')
-				.onChange(async (value) => {
-					if (!value) value = "0"
-					this.plugin.settings.coverHorizontalWidth = Number(value);
-					await this.plugin.saveSettings();
-				    this.plugin.updateCoverStyles();
-				})
-			});
-
-			new Setting(containerEl)
-			.setName(i18n.t("SQUARE_COVER_WIDTH"))
-			.addText(text => {
-				text.inputEl.type = "number"
-				text.setValue(this.plugin.settings.coverSquareWidth.toString())
-				.setPlaceholder('250')
-				.onChange(async (value) => {
-					if (!value) value = "0"
-					this.plugin.settings.coverSquareWidth = Number(value);
-					await this.plugin.saveSettings();
-				    this.plugin.updateCoverStyles();
-				})
-			});
-
-			new Setting(containerEl)
-			.setName(i18n.t("CIRCLE_COVER_WIDTH"))
-			.addText(text => {
-				text.inputEl.type = "number"
-				text.setValue(this.plugin.settings.coverCircleWidth.toString())
-				.setPlaceholder('250')
-				.onChange(async (value) => {
-					if (!value) value = "0"
-					this.plugin.settings.coverCircleWidth = Number(value);
-					await this.plugin.saveSettings();
-				    this.plugin.updateCoverStyles();
-				})
-			});
-		}
-
-
-		new Setting(containerEl)
-			.setName(i18n.t("CLEAR_SETTINGS"))
-			.setDesc(i18n.t("CLEAR_SETTINGS_DESCRIPTION"))
-			.addButton(button => button
-				.setButtonText(i18n.t("CLEAR"))
-				.setClass("mod-warning")
-				.onClick(async () => {
-					this.plugin.settings = Object.assign({}, DEFAULT_SETTINGS);
-					this.plugin.settings.propertyPillColors = {}
-					this.plugin.settings.hiddenProperties = []
-					await this.plugin.saveSettings();
-					this.plugin.updateElements()
-					this.plugin.updateHiddenProperties()
-					this.plugin.updatePillColors()
-					this.plugin.updateBannerStyles()
-					this.plugin.updateCoverStyles()
-					this.display();
-					new Notice(i18n.t("CLEAR_SETTINGS_NOTICE"))
-				}))
-	}
-}

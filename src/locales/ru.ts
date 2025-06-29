@@ -35,5 +35,15 @@ export default {
   SHOW_PROGRESS_BAR: "Показать полосу прогресса",
   SET_PROGRESS_MAX_VALUE_100: "Установить максимум прогресса = 100",
   SET_PROGRESS_MAX_VALUE_PROPERTY: "Установить максимум прогресса из другого свойства",
-  REMOVE_PROGRESS_BAR: "Удалить полосу прогресса"
+  REMOVE_PROGRESS_BAR: "Удалить полосу прогресса",
+  BANNERS: "Баннеры",
+  COVERS: "Обложки",
+  TASKS: "Задачи",
+  OTHER: "Другое",
+  ALL_TASKS_COUNT_PROPERTY: "Свойство для подсчёта всех задач",
+  UNCOMPLETED_TASKS_COUNT_PROPERTY: "Свойство для подсчёта невыполненных задач",
+  COMPLETED_TASKS_COUNT_PROPERTY: "Свойство для подсчёта выполненных задач",
+  TASK_STATUSES_DESCRIPTION: "Укажите статусы задач, которые считаются выполненными и невыполненными. Задачи с другими статусами будут игнорироваться во всех подсчётах (включая подсчёт всех задач).",
+  UNCOMPLETED_TASKS_COUNT_STATUSES: "Статусы невыполненных задач",
+  COMPLETED_TASKS_COUNT_STATUSES: "Статусы выполненных задач",
 };
