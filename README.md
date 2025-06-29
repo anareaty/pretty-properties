@@ -54,7 +54,7 @@ Add simple progress-bar to any number property. By default maximum value of prog
 
 ### Sync tasks count to properties
 
-If you set special properties for tasks, completed tasks and uncompleted tasks and add this properties to your note, the plugin will count existing tasks in the note and periodically save the count number to the properties. It is useful if you want to show task count in Bases or see task progress inside your note.
+If you set special properties for tasks, completed tasks and uncompleted tasks and add this properties to your note, the plugin will count existing tasks in the active note and periodically save the count number to the properties. It is useful if you want to show task count in Bases or see task progress inside your note.
 
 ## Installation
 
