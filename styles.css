@@ -187,3 +187,18 @@ body:not(.is-mobile) {
 .metadata-container.is-collapsed .metadata-side-image {
 	display: none;
 }
+
+
+
+
+.image-suggestion-item.banner img {
+  width: 100%;
+  height: 130px;
+  object-fit: cover;
+}
+
+
+.image-suggestion-item.cover img {
+  height: 150px;
+  object-fit: cover;
+}

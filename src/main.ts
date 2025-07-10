@@ -8,12 +8,14 @@ import {
 	Plugin, 
 	TFile, 
 	MenuItem,
+	Platform,
 	FrontMatterCache
  } from 'obsidian';
 import MenuManager from 'src/MenuManager';
 import { i18n } from './localization';
 import PPSettingTab from './settings';
 import { PPPluginSettings, DEFAULT_SETTINGS } from './settings';
+import { ImageSuggestModal } from './modal';
 
 
 
@@ -57,8 +59,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 
-		//@ts-ignore
-		if (this.app.isMobile) {
+		
+		if (Platform.isMobile) {
 			this.registerDomEvent(document, "contextmenu", (e: MouseEvent) => {
 				if (e.target instanceof HTMLElement && 
 				e.target.closest(".multi-select-pill")) {
@@ -79,9 +81,24 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 		} else {
 			this.registerDomEvent(document, "mousedown", (e: MouseEvent) => {
-				if (e.button == 2 && e.target instanceof HTMLElement && 
-				  e.target.closest(".multi-select-pill")) {
-					this.handlePillMenu(e.target)
+
+				let targetEl = e.target
+				if (e.button == 2 && targetEl instanceof HTMLElement) { 
+
+					
+
+					if (targetEl.closest(".multi-select-pill")) {
+						this.handlePillMenu(targetEl)
+					}
+
+
+
+					
+
+
+
+
+
 				}
 				
 				if ((e.target instanceof HTMLElement || 
@@ -93,6 +110,42 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		}
 
 
+
+		this.registerDomEvent(document, "click", (e: MouseEvent) => {
+
+			if (e.ctrlKey && e.target instanceof HTMLElement) {
+				let value = this.getPropertyValue(e)
+				if (value !== undefined) {
+					let propEl = e.target.closest(".metadata-property")
+					let prop = propEl!.getAttribute("data-property-key")
+					let search = '[' + prop + ': "' + value +'"]'
+					//@ts-ignore
+					this.app.internalPlugins.plugins["global-search"].instance.openGlobalSearch(search)
+				}
+			}
+		})
+
+
+
+
+		this.registerDomEvent(document, "contextmenu", (e: MouseEvent) => {
+			let targetEl = e.target
+			if (targetEl instanceof HTMLElement) {
+				if (targetEl.closest(".banner-image")) {
+						this.createBannerMenu(e)
+					}
+
+					if (targetEl.closest(".metadata-side-image")) {
+						this.createCoverMenu(e)
+					}
+				
+			}
+		})
+
+
+
+
+
 		this.addCommand({
             id: "toggle-hidden-properties",
             name: i18n.t("HIDE_SHOW_HIDDEN_PROPERTIES"),
@@ -100,6 +153,56 @@ export default class PrettyPropertiesPlugin extends Plugin {
                 document.body.classList.toggle("show-hidden-properties")
             }
         })
+
+
+		this.addCommand({
+            id: "select-banner-image",
+            name: i18n.t("SELECT_BANNER_IMAGE"),
+            callback: async () => {
+                this.selectBannerImage()
+            }
+        })
+
+
+		this.addCommand({
+            id: "select-cover-image",
+            name: i18n.t("SELECT_COVER_IMAGE"),
+            callback: async () => {
+				let file = this.app.workspace.getActiveFile()
+
+				if (file instanceof TFile) {
+					let cache = this.app.metadataCache.getFileCache(file)
+					let frontmatter = cache!.frontmatter
+					let props = [...this.settings.extraCoverProperties]
+					props.unshift(this.settings.coverProperty)
+					let propName: string | undefined
+					for (let prop of props) {
+						propName = prop
+						if (frontmatter?.[prop] !== undefined) break
+					}
+
+					if (propName) {
+						this.selectCoverImage(propName)
+					}
+				}
+			}
+        })
+
+
+		this.addCommand({
+            id: "select-cover-shape",
+            name: i18n.t("SELECT_COVER_SHAPE"),
+            callback: async () => {
+				let file = this.app.workspace.getActiveFile()
+
+				if (file instanceof TFile) {
+					this.selectCoverShape(file)
+				}
+			}
+        })
+
+
+
 	
 		this.addSettingTab(new PPSettingTab(this.app, this));
 	}
@@ -108,6 +211,238 @@ export default class PrettyPropertiesPlugin extends Plugin {
 	}
 
 
+	createBannerMenu(e: MouseEvent) {
+		let propName = this.settings.bannerProperty
+
+		let menuManager = new MenuManager()
+
+		menuManager.addItemAfter(['clipboard'], (item: MenuItem) => item
+			.setTitle(i18n.t("SELECT_BANNER_IMAGE"))
+			.setIcon('lucide-image-plus')
+			.setSection('pretty-properties')
+			.onClick(async () => {
+				this.selectBannerImage()
+			})
+		);
+
+
+		if (this.settings.hiddenProperties.find(p => p == propName)) {
+			menuManager.addItemAfter(['clipboard'], (item: MenuItem) => item
+			.setTitle(i18n.t("UNHIDE_BANNER_PROPERTY"))
+			.setIcon('lucide-eye')
+			.setSection('pretty-properties')
+			.onClick(() => {
+				if (propName) this.settings.hiddenProperties.remove(propName)
+				this.saveSettings()
+				this.updateHiddenProperties()			
+			})
+		);
+				
+		}
+	}
+
+
+	async selectBannerImage() {
+		let propName = this.settings.bannerProperty
+		let file = this.app.workspace.getActiveFile()
+		if (file instanceof TFile) {
+
+			let bannerFolder = this.settings.bannersFolder
+			
+			let files = this.app.vault.getFiles()
+
+			let formats = ["avif", "bmp", "gif", "jpeg", "jpg", ".png", "svg", "webp"]
+
+			files = files.filter(f => formats.find(e => e == f.extension))
+			
+			let bannerFiles = files
+			if (bannerFolder) {
+				bannerFiles = files.filter(f => f.parent!.path == bannerFolder || f.parent!.path.startsWith(bannerFolder + "/"))
+			}
+			
+			let bannerPaths = bannerFiles.map(f => f.path)
+			let bannerNames = bannerFiles.map(f => f.basename)
+			let bannerPath = await this.imageSuggester(this, "banner", bannerPaths, bannerNames)
+
+			if (bannerPath) {
+				let bannerFile = this.app.vault.getAbstractFileByPath(bannerPath)
+				if (bannerFile instanceof TFile) {
+					let bannerLink = this.app.fileManager.generateMarkdownLink(bannerFile, "")
+				
+					this.app.fileManager.processFrontMatter(file, fm => {
+						fm[propName] = bannerLink
+					})
+				}
+			}
+		}
+	}
+
+
+
+
+
+
+	async selectCoverImage(propName: string) {
+		let file = this.app.workspace.getActiveFile()
+		if (file instanceof TFile) {
+
+			let coverFolder = this.settings.coversFolder
+			let files = this.app.vault.getFiles()
+			let formats = ["avif", "bmp", "gif", "jpeg", "jpg", ".png", "svg", "webp"]
+			files = files.filter(f => formats.find(e => e == f.extension))
+			
+			let coverFiles = files
+			if (coverFolder) {
+				coverFiles = files.filter(f => f.parent!.path == coverFolder || f.parent!.path.startsWith(coverFolder + "/"))
+			}
+
+			let coverPaths = coverFiles.map(f => f.path)
+			let coverNames = coverFiles.map(f => f.basename)
+			let coverPath = await this.imageSuggester(this, "cover", coverPaths, coverNames)
+
+			if (coverPath) {
+				let coverFile = this.app.vault.getAbstractFileByPath(coverPath)
+				if (coverFile instanceof TFile) {
+					let coverLink = this.app.fileManager.generateMarkdownLink(coverFile, "")
+				
+					this.app.fileManager.processFrontMatter(file, fm => {
+						fm[propName] = coverLink
+					})
+				}
+			}
+		}
+	}
+
+
+
+
+
+	createCoverMenu(e:MouseEvent) {
+
+		let file = this.app.workspace.getActiveFile()
+
+		if (file instanceof TFile) {
+			let cache = this.app.metadataCache.getFileCache(file)
+			let frontmatter = cache!.frontmatter
+			let props = [...this.settings.extraCoverProperties]
+			props.unshift(this.settings.coverProperty)
+			let propName: string | undefined
+			for (let prop of props) {
+				propName = prop
+				
+				if (frontmatter?.[prop] !== undefined) break
+			}
+
+			if (propName) {
+
+				let menu = new Menu()
+
+				menu.addItem((item: MenuItem) => item
+					.setTitle(i18n.t("SELECT_COVER_IMAGE"))
+					.setIcon('lucide-image-plus')
+					.setSection('pretty-properties')
+					.onClick(async () => {
+						this.selectCoverImage(propName)
+					})
+				);
+
+
+
+
+				menu.addItem((item: MenuItem) => item
+					.setTitle(i18n.t("SELECT_COVER_SHAPE"))
+					.setIcon('lucide-shapes')
+					.setSection('pretty-properties')
+					.onClick(async () => {
+						this.selectCoverShape(file)
+					})
+				);
+
+
+
+
+
+				if (this.settings.hiddenProperties.find(p => p == propName)) {
+					menu.addItem((item: MenuItem) => item
+					.setTitle(i18n.t("UNHIDE_COVER_PROPERTY"))
+					.setIcon('lucide-eye')
+					.setSection('pretty-properties')
+					.onClick(() => {
+						if (propName) this.settings.hiddenProperties.remove(propName)
+						this.saveSettings()
+						this.updateHiddenProperties()			
+					})
+				)}
+
+				menu.showAtMouseEvent(e)
+			}
+		}
+	}
+
+
+
+
+	async selectCoverShape(file: TFile) {
+		let shapes = ["vertical", "horizontal", "square", "circle"]
+		let shape = await this.imageSuggester(this, "text", shapes)
+
+		if (shape) {
+			this.app.fileManager.processFrontMatter(file, fm => {
+				let cssclasses = fm.cssclasses || []
+				cssclasses = cssclasses.filter((c: string) => !shapes.find(s => c == "cover-" + s))
+				cssclasses.push("cover-" + shape)
+				fm.cssclasses = cssclasses
+			})
+		}
+
+	}
+
+
+	
+
+
+	
+
+
+	getPropertyValue(e: MouseEvent) {
+		let targetEl = e.target
+		let text
+		if (targetEl instanceof HTMLElement) {
+			let valueTextEl = targetEl.closest(".metadata-input-longtext") || targetEl.closest(".multi-select-pill-content")
+			let valueInputEl = targetEl.closest(".metadata-input-number") || targetEl.closest(".metadata-input-text")
+			let checkboxEl = targetEl.closest(".metadata-input-checkbox")
+
+			if (valueTextEl instanceof HTMLElement) {
+				text = valueTextEl.innerText
+			}
+			else if (valueInputEl instanceof HTMLInputElement) {
+				text = valueInputEl.value
+			}
+
+			else if (checkboxEl) {
+				e.preventDefault()
+				let currentFile = this.app.workspace.getActiveFile()
+				let propEl = targetEl.closest(".metadata-property")
+				let prop = propEl!.getAttribute("data-property-key")
+				if (currentFile instanceof TFile && prop) {
+					text = this.app.metadataCache.getFileCache(currentFile)!.frontmatter![prop]
+				}
+			}
+		}
+		return text
+	}
+
+
+
+
+
+
+	async imageSuggester(plugin: PrettyPropertiesPlugin, shape: string, values: string[], names?: string[]) {
+		let data: Promise<string|undefined> = new Promise((resolve, reject) => {
+			new ImageSuggestModal(plugin.app, plugin, resolve, reject, shape, values, names).open()  
+		})
+		return data
+	}
 
 
 
@@ -124,7 +459,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 					menuManager.addItemAfter(['clipboard'], (item: MenuItem) => item
 						.setTitle(i18n.t("UNHIDE_PROPERTY"))
-						.setIcon('lucide-image-plus')
+						.setIcon('lucide-eye')
 						.setSection('pretty-properties')
 						.onClick(() => {
 							if (propName) this.settings.hiddenProperties.remove(propName)
@@ -137,7 +472,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 					menuManager.addItemAfter(['clipboard'], (item: MenuItem) => item
 						.setTitle(i18n.t("HIDE_PROPERTY"))
-						.setIcon('lucide-image-plus')
+						.setIcon('lucide-eye-off')
 						.setSection('pretty-properties')
 						.onClick(() => {
 							if (propName) this.settings.hiddenProperties.push(propName)
@@ -253,6 +588,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			if (pillVal) {
 				menuManager.addItemAfter(['clipboard'], (item: MenuItem) => {
 					item.setTitle(i18n.t("SELECT_COLOR"))
+					.setIcon("paintbrush")
 					.setSection('pretty-properties')
 
 					//@ts-ignore
@@ -511,6 +847,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				if (!coverVal.startsWith("!")) coverVal = "!" + coverVal
 				coverDiv = document.createElement("div");
 				coverDiv.classList.add("metadata-side-image")
+
+				
 			
 				if (cssVal && cssVal.includes("cover-vertical")) {
 				coverDiv.classList.add("vertical")

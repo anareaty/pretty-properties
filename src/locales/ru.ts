@@ -46,4 +46,11 @@ export default {
   TASK_STATUSES_DESCRIPTION: "Укажите статусы задач, которые считаются выполненными и невыполненными. Задачи с другими статусами будут игнорироваться во всех подсчётах (включая подсчёт всех задач).",
   UNCOMPLETED_TASKS_COUNT_STATUSES: "Статусы невыполненных задач",
   COMPLETED_TASKS_COUNT_STATUSES: "Статусы выполненных задач",
+  SELECT_COVER_IMAGE: "Выбрать изображение обложки",
+  SELECT_COVER_SHAPE: "Выбрать форму обложки",
+  UNHIDE_COVER_PROPERTY: "Показать свойство обложки",
+  SELECT_BANNER_IMAGE: "Выбрать изображение баннера",
+  UNHIDE_BANNER_PROPERTY: "Показать свойство баннера",
+  BANNERS_FOLDER: "Папка с изображениями для баннеров",
+  COVERS_FOLDER: "Папка с изображениями для обложек",
 };

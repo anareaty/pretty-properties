@@ -24,7 +24,9 @@ export interface PPPluginSettings {
     completedTasksCount: string;
     uncompletedTasksCount: string;
     completedTasksStatuses: string[];
-    uncompletedTasksStatuses: string[]
+    uncompletedTasksStatuses: string[];
+	bannersFolder: string;
+	coversFolder: string;
 }
 
 export const DEFAULT_SETTINGS: PPPluginSettings = {
@@ -50,6 +52,8 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
     uncompletedTasksCount: "tasks_uncompleted",
     completedTasksStatuses: ["x"],
     uncompletedTasksStatuses: [" "],
+	bannersFolder: "",
+	coversFolder: ""
 }
 
 
@@ -91,6 +95,15 @@ export default class PPSettingTab extends PluginSettingTab {
 					this.plugin.settings.bannerProperty = value;
 					await this.plugin.saveSettings();
 				    this.plugin.updateElements();
+				}));
+
+			new Setting(containerEl)
+			.setName(i18n.t("BANNERS_FOLDER"))
+			.addText(text => text
+				.setValue(this.plugin.settings.bannersFolder)
+				.onChange(async (value) => {
+					this.plugin.settings.bannersFolder = value;
+					await this.plugin.saveSettings();
 				}));
 
 			new Setting(containerEl)
@@ -177,6 +190,15 @@ export default class PPSettingTab extends PluginSettingTab {
 					this.plugin.settings.coverProperty = value;
 					await this.plugin.saveSettings();
 					this.plugin.updateElements()
+				}));
+
+			new Setting(containerEl)
+			.setName(i18n.t("COVERS_FOLDER"))
+			.addText(text => text
+				.setValue(this.plugin.settings.coversFolder)
+				.onChange(async (value) => {
+					this.plugin.settings.coversFolder = value;
+					await this.plugin.saveSettings();
 				}));
 
 			

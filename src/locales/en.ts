@@ -36,6 +36,13 @@ export default {
   TASK_STATUSES_DESCRIPTION: "Set statuses that will be count as completed or uncompleted. Tasks with any other statuses will be ignored in all counts (including all tasks count)",
   UNCOMPLETED_TASKS_COUNT_STATUSES: "Uncompleted tasks statuses",
   COMPLETED_TASKS_COUNT_STATUSES: "Completed tasks statuses",
+  SELECT_COVER_IMAGE: "Select cover image",
+  SELECT_COVER_SHAPE: "Select cover shape",
+  UNHIDE_COVER_PROPERTY: "Unhide cover property",
+  SELECT_BANNER_IMAGE: "Select banner image",
+  UNHIDE_BANNER_PROPERTY: "Unhide banner property",
+  BANNERS_FOLDER: "Folder with images for banners",
+  COVERS_FOLDER: "Folder with images for covers",
 };
 
 
