@@ -267,7 +267,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			if (bannerPath) {
 				let bannerFile = this.app.vault.getAbstractFileByPath(bannerPath)
 				if (bannerFile instanceof TFile) {
-					let bannerLink = this.app.fileManager.generateMarkdownLink(bannerFile, "")
+					let bannerLink = this.app.fileManager.generateMarkdownLink(bannerFile, "").replace(/^\!/, "")
 				
 					this.app.fileManager.processFrontMatter(file, fm => {
 						fm[propName] = bannerLink
@@ -303,7 +303,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			if (coverPath) {
 				let coverFile = this.app.vault.getAbstractFileByPath(coverPath)
 				if (coverFile instanceof TFile) {
-					let coverLink = this.app.fileManager.generateMarkdownLink(coverFile, "")
+					let coverLink = this.app.fileManager.generateMarkdownLink(coverFile, "").replace(/^\!/, "")
 				
 					this.app.fileManager.processFrontMatter(file, fm => {
 						fm[propName] = coverLink
