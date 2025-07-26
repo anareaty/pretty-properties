@@ -9,7 +9,8 @@ import {
 	TFile, 
 	MenuItem,
 	Platform,
-	FrontMatterCache
+	FrontMatterCache,
+	WorkspaceLeaf
  } from 'obsidian';
 import MenuManager from 'src/MenuManager';
 import { i18n } from './localization';
@@ -47,6 +48,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		this.registerEvent(
 			this.app.workspace.on("layout-change", async () => {
 				this.updateElements()
+				//this.updateBaseProgress()
 			})
 		);
 
@@ -54,6 +56,67 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		this.registerEvent(
 			this.app.metadataCache.on("changed", async (file, data, cache) => {
 				this.updateElements(file)
+				setTimeout(() => {
+					//this.updateBaseProgress()
+				}, 200)
+				
+			})
+		);
+
+
+		this.registerEvent(
+			this.app.workspace.on("file-open", async () => {
+				let baseLeafs = this.app.workspace.getLeavesOfType("bases")
+				for (let leaf of baseLeafs) {
+					this.updateBaseLeafProgress(leaf)
+					const targetNode = leaf.view.containerEl;
+
+					const observer = new MutationObserver((mutations) => {
+
+						console.log(mutations)
+	
+						let multiSelectMutation = mutations.find(mutation => {
+							let target = mutation.target
+							if (target instanceof HTMLElement) {
+								if (target.classList.contains("bases-view")) return true
+								if (target.classList.contains("bases-table-container")) return true
+								if (target.classList.contains("bases-cards-container")) return true
+								if (target.classList.contains("bases-cards-group")) return true
+								if (target.classList.contains("bases-tbody")) return true
+								if (target.classList.contains("bases-tr")) return true
+								return target.classList.contains("multi-select-container") || target.classList.contains("value-list-container")
+							}
+							return false
+						})
+
+						if (multiSelectMutation) {
+							this.updateBaseLeafPills(leaf)
+						}
+
+
+						let progressMutation = mutations.find(mutation => {
+							
+							let target = mutation.target
+							if (target instanceof HTMLElement) {
+								if (target.classList.contains("bases-view")) return true
+								if (target.classList.contains("bases-table-container")) return true
+								if (target.classList.contains("bases-cards-container")) return true
+								if (target.classList.contains("bases-cards-group")) return true
+								if (target.classList.contains("bases-tbody")) return true
+								if (target.classList.contains("bases-tr")) return true
+								let progressEl = target.closest('[data-property*="formula.pp_progress"]')
+								return progressEl && target.classList.contains("bases-rendered-value")
+							}
+							return false
+						})
+
+						if (progressMutation) {
+							this.updateBaseLeafProgress(leaf)
+						}
+						
+					});
+					observer.observe(targetNode, { childList: true, subtree: true });
+				}
 			})
 		);
 
@@ -661,7 +724,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		for (let prop in this.settings.propertyPillColors) {
 			styleText = styleText + "[data-property-pill-value='" + prop + "'] {" + 
 			"--pill-color-rgb: var(--color-" + this.settings.propertyPillColors[prop] + "-rgb); \n" + 
-			"--pill-background: rgba(var(--pill-color-rgb), 0.2); \n--pill-background-hover: rgba(var(--pill-color-rgb), 0.3);}\n"
+			"--pill-background-modified: rgba(var(--pill-color-rgb), 0.2); \n--pill-background-hover-modified: rgba(var(--pill-color-rgb), 0.3); \n" +
+			"--tag-background-modified: rgba(var(--pill-color-rgb), 0.2); \n--tag-background-hover-modified: rgba(var(--pill-color-rgb), 0.3);}\n"
 		}
 
 		let oldStyle = document.head.querySelector("style#pp-pill-colors")
@@ -742,6 +806,181 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			}
 		}
 	}
+
+
+	updateBaseLeafPills(leaf: WorkspaceLeaf) {
+		
+		let baseTableContainer = leaf.view.containerEl.querySelector(".bases-table-container")
+
+		if (baseTableContainer) {
+			const updateBasePills = () => {
+				if (baseTableContainer.classList.contains("is-loading")) {
+					setTimeout(updateBasePills, 50)
+				} else {
+					let pills = baseTableContainer.querySelectorAll(".multi-select-pill:not([data-property-pill-value])")
+					for (let pill of pills) {
+						let content = pill.querySelector(".multi-select-pill-content")
+						if (content instanceof HTMLElement) {
+							let value = content.innerText
+							pill.setAttribute("data-property-pill-value", value)
+						}
+					}
+
+					let formulaTagPills = baseTableContainer.querySelectorAll("[data-property='formula.tags'] .value-list-element:not([data-property-pill-value])")
+					for (let pill of formulaTagPills) {
+						if (pill instanceof HTMLElement) {
+							let value = pill.innerText.replace(/^#/, "")
+							pill.setAttribute("data-property-pill-value", value)
+						}
+					}
+				}
+			}
+
+			updateBasePills()	
+		}
+
+
+		let baseCardsContainer = leaf.view.containerEl.querySelector(".bases-cards-container")
+
+		if (baseCardsContainer) {
+			const updateBasePills = () => {
+				if (baseCardsContainer.classList.contains("is-loading")) {
+					setTimeout(updateBasePills, 50)
+				} else {
+					let pills = baseCardsContainer.querySelectorAll(".bases-cards-property .value-list-element:not([data-property-pill-value])")
+					for (let pill of pills) {
+						if (pill instanceof HTMLElement) {
+							let value = pill.innerText.replace(/^#/, "")
+							pill.setAttribute("data-property-pill-value", value)
+						}
+					}
+				}
+			}
+			updateBasePills()
+		}
+	}
+
+
+
+
+
+
+
+
+	updateBaseLeafProgress(leaf: WorkspaceLeaf) {
+		
+
+		let baseTableContainer = leaf.view.containerEl.querySelector(".bases-table-container")
+		
+		if (baseTableContainer) {
+			
+			const updateProgress = () => {
+				if (baseTableContainer.classList.contains("is-loading")) {
+					
+					setTimeout(updateProgress, 50)
+				} else {
+					
+					
+					let progressEls = baseTableContainer.querySelectorAll(".bases-td[data-property*='formula.pp_progress']")
+					for (let progressEl of progressEls) {
+						if (progressEl instanceof HTMLElement) {
+							let oldProgress = progressEl.querySelector(".metadata-progress-wrapper")
+							if (oldProgress) {
+								oldProgress.remove()
+								progressEl.classList.remove("has-progress-bar")
+							}
+
+							let valueEl = progressEl.querySelector(".bases-rendered-value")
+							if (valueEl instanceof HTMLElement) {
+								
+								let valueString = valueEl.innerText
+								if (valueString) {
+									let valueParts = valueString.match(/(\d+)(\/)(\d+)/)
+									if (valueParts) {
+										let progressWrapper = document.createElement("div")
+										progressWrapper.classList.add("metadata-progress-wrapper")
+										let progress = document.createElement("progress")
+										progress.classList.add("metadata-progress")
+										progress.value = Number(valueParts[1])
+										progress.max = Number(valueParts[3])
+
+										let percent = " " + Math.round(progress.value * 100 / progress.max) + " %"
+										setTooltip(progress, percent, {delay: 500, placement: "top"})
+
+										progressWrapper.append(progress)
+										progressEl.classList.add("has-progress-bar")
+										progressEl.prepend(progressWrapper)
+									}
+								}
+							}
+							
+						}
+					}
+				}
+			}
+			updateProgress()	
+		}
+
+
+
+		let baseCardsContainer = leaf.view.containerEl.querySelector(".bases-cards-container")
+
+		if (baseCardsContainer) {
+			const updateProgress = () => {
+				if (baseCardsContainer.classList.contains("is-loading")) {
+					
+					setTimeout(updateProgress, 50)
+				} else {
+					let progressEls = baseCardsContainer.querySelectorAll(".bases-cards-property[data-property*='formula.pp_progress']")
+					for (let progressEl of progressEls) {
+						if (progressEl instanceof HTMLElement) {
+							let oldProgress = progressEl.querySelector(".metadata-progress-wrapper")
+							if (oldProgress) {
+								oldProgress.remove()
+								progressEl.classList.remove("has-progress-bar")
+							}
+
+							let valueEl = progressEl.querySelector(".bases-rendered-value")
+							if (valueEl instanceof HTMLElement) {
+								
+								let valueString = valueEl.innerText
+								if (valueString) {
+									let valueParts = valueString.match(/(\d+)(\/)(\d+)/)
+									if (valueParts) {
+										let progressWrapper = document.createElement("div")
+										progressWrapper.classList.add("metadata-progress-wrapper")
+										let progress = document.createElement("progress")
+										progress.classList.add("metadata-progress")
+										progress.value = Number(valueParts[1])
+										progress.max = Number(valueParts[3])
+
+										let percent = " " + Math.round(progress.value * 100 / progress.max) + " %"
+										setTooltip(progress, percent, {delay: 500, placement: "top"})
+
+										progressWrapper.append(progress)
+										progressEl.classList.add("has-progress-bar")
+										let label = progressEl.firstChild
+										label?.after(progressWrapper)
+									}
+								}
+							}
+							
+						}
+					}
+				}
+			}
+			updateProgress()	
+			
+		}
+			
+	}
+
+
+
+
+
+
+
 
 	async updateLeafElements(view: MarkdownView, cache?: CachedMetadata | null) {
 		this.addClassestoProperties(view)

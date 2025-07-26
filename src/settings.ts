@@ -338,6 +338,9 @@ export default class PPSettingTab extends PluginSettingTab {
 			
             containerEl.createEl("p", {text: i18n.t("TASK_STATUSES_DESCRIPTION")})
 
+			
+			
+
             new Setting(containerEl)
 			.setName(i18n.t("UNCOMPLETED_TASKS_COUNT_STATUSES"))
 			.addText(text => text
