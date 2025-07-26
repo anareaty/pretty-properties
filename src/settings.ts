@@ -70,7 +70,8 @@ export default class PPSettingTab extends PluginSettingTab {
 
 		containerEl.empty();
 
-		containerEl.createEl("h3", {text: i18n.t("BANNERS")})
+		
+		new Setting(containerEl).setName(i18n.t("BANNERS")).setHeading();
 
 		new Setting(containerEl)
 			.setName(i18n.t("ENABLE_BANNER"))
@@ -163,7 +164,8 @@ export default class PPSettingTab extends PluginSettingTab {
 
 
 
-		containerEl.createEl("h3", {text: i18n.t("COVERS")})
+		
+		new Setting(containerEl).setName(i18n.t("COVERS")).setHeading();
 
 
 		new Setting(containerEl)
@@ -298,7 +300,7 @@ export default class PPSettingTab extends PluginSettingTab {
 		}
 
 
-		containerEl.createEl("h3", {text: i18n.t("TASKS")})
+		new Setting(containerEl).setName(i18n.t("TASKS")).setHeading();
 
 			new Setting(containerEl)
 			.setName(i18n.t("ALL_TASKS_COUNT_PROPERTY"))
@@ -383,7 +385,8 @@ export default class PPSettingTab extends PluginSettingTab {
 				}));
 
 
-		containerEl.createEl("h3", {text: i18n.t("OTHER")})
+		
+		new Setting(containerEl).setName(i18n.t("OTHER")).setHeading();
 
 
 		new Setting(containerEl)
