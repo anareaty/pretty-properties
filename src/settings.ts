@@ -40,7 +40,7 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
     extraCoverProperties: [],
     bannerHeight: 150, 
     bannerHeightMobile: 100,
-    bannerMargin: 15,
+    bannerMargin: -20,
     bannerFading: true,
     coverVerticalWidth: 200,
     coverHorizontalWidth: 300,
@@ -147,10 +147,11 @@ export default class PPSettingTab extends PluginSettingTab {
 
 			new Setting(containerEl)
 			.setName(i18n.t("BANNER_MARGIN"))
+			.setDesc(i18n.t("CAN_BE_POSITIVE_OR_NEGATIVE"))
 			.addText(text => {
 				text.inputEl.type = "number"
 				text.setValue(this.plugin.settings.bannerMargin.toString())
-				.setPlaceholder('15')
+				.setPlaceholder('-20')
 				.onChange(async (value) => {
 					if (!value) value = "0"
 					this.plugin.settings.bannerMargin = Number(value);

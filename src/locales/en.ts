@@ -43,6 +43,7 @@ export default {
   UNHIDE_BANNER_PROPERTY: "Unhide banner property",
   BANNERS_FOLDER: "Folder with images for banners",
   COVERS_FOLDER: "Folder with images for covers",
+  CAN_BE_POSITIVE_OR_NEGATIVE: "Can be positive or negative",
 };
 
 

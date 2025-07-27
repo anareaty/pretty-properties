@@ -53,4 +53,5 @@ export default {
   UNHIDE_BANNER_PROPERTY: "Показать свойство баннера",
   BANNERS_FOLDER: "Папка с изображениями для баннеров",
   COVERS_FOLDER: "Папка с изображениями для обложек",
+  CAN_BE_POSITIVE_OR_NEGATIVE: "Может быть положительным или отрицательным",
 };
