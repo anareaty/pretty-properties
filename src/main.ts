@@ -216,7 +216,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 		let menuManager = new MenuManager()
 
-		menuManager.addItemAfter(['clipboard'], (item: MenuItem) => item
+		menuManager.addItemAfter(['clipboard'], i18n.t("SELECT_BANNER_IMAGE"), (item: MenuItem) => item
 			.setTitle(i18n.t("SELECT_BANNER_IMAGE"))
 			.setIcon('lucide-image-plus')
 			.setSection('pretty-properties')
@@ -227,7 +227,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 		if (this.settings.hiddenProperties.find(p => p == propName)) {
-			menuManager.addItemAfter(['clipboard'], (item: MenuItem) => item
+			menuManager.addItemAfter(['clipboard'], i18n.t("UNHIDE_BANNER_PROPERTY"), (item: MenuItem) => item
 			.setTitle(i18n.t("UNHIDE_BANNER_PROPERTY"))
 			.setIcon('lucide-eye')
 			.setSection('pretty-properties')
@@ -457,7 +457,9 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 				if (this.settings.hiddenProperties.find(p => p == propName)) {
 
-					menuManager.addItemAfter(['clipboard'], (item: MenuItem) => item
+
+
+					menuManager.addItemAfter(['clipboard'], i18n.t("UNHIDE_PROPERTY"), (item: MenuItem) => item
 						.setTitle(i18n.t("UNHIDE_PROPERTY"))
 						.setIcon('lucide-eye')
 						.setSection('pretty-properties')
@@ -470,7 +472,11 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 				} else {
 
-					menuManager.addItemAfter(['clipboard'], (item: MenuItem) => item
+					
+
+					
+
+					menuManager.addItemAfter(['clipboard'], i18n.t("HIDE_PROPERTY"), (item: MenuItem) => item
 						.setTitle(i18n.t("HIDE_PROPERTY"))
 						.setIcon('lucide-eye-off')
 						.setSection('pretty-properties')
@@ -494,7 +500,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 				if (propertyType == "number" && !this.settings.progressProperties[propName]) {
 
-					menuManager.addItemAfter(["clipboard"], (item: MenuItem) => item
+					menuManager.addItemAfter(["clipboard"], i18n.t("SHOW_PROGRESS_BAR"), (item: MenuItem) => item
 					.setTitle(i18n.t("SHOW_PROGRESS_BAR"))
 					.setIcon("lucide-bar-chart-horizontal-big")
 					.setSection("pretty-properties")
@@ -510,7 +516,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 					);
 				} else if (this.settings.progressProperties[propName]) {
 					if (this.settings.progressProperties[propName].maxProperty) {
-						menuManager.addItemAfter(["clipboard"], (item: MenuItem) => item
+						menuManager.addItemAfter(["clipboard"], i18n.t("SET_PROGRESS_MAX_VALUE_100"), (item: MenuItem) => item
 							.setTitle(i18n.t("SET_PROGRESS_MAX_VALUE_100"))
 							.setIcon("lucide-bar-chart-horizontal-big")
 							.setSection("pretty-properties")
@@ -526,7 +532,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 					}
 
 
-					menuManager.addItemAfter(["clipboard"], (item: MenuItem) => {item
+					menuManager.addItemAfter(["clipboard"], i18n.t("SET_PROGRESS_MAX_VALUE_PROPERTY"), (item: MenuItem) => {item
 						.setTitle(i18n.t("SET_PROGRESS_MAX_VALUE_PROPERTY"))
 						.setIcon("lucide-bar-chart-horizontal-big")
 						.setSection("pretty-properties")
@@ -560,7 +566,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 					});
 					
 
-					menuManager.addItemAfter(["clipboard"], (item: MenuItem) => item
+					menuManager.addItemAfter(["clipboard"], i18n.t("REMOVE_PROGRESS_BAR"), (item: MenuItem) => item
 						.setTitle(i18n.t("REMOVE_PROGRESS_BAR"))
 						.setIcon("lucide-bar-chart-horizontal-big")
 						.setSection("pretty-properties")
@@ -586,7 +592,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			let pillVal = pillEl?.getAttribute("data-property-pill-value")
 
 			if (pillVal) {
-				menuManager.addItemAfter(['clipboard'], (item: MenuItem) => {
+				menuManager.addItemAfter(['clipboard'], i18n.t("SELECT_COLOR"), (item: MenuItem) => {
 					item.setTitle(i18n.t("SELECT_COLOR"))
 					.setIcon("paintbrush")
 					.setSection('pretty-properties')

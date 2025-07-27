@@ -31,6 +31,13 @@ export default class MenuManager {
 		for (const action of actions) action();
 	}
 
+
+
+	
+
+
+
+
 	/**
 	 * Add a menu item.
 	 */
@@ -46,15 +53,32 @@ export default class MenuManager {
 	/**
 	 * Add a menu item after the given sections, prioritized by array order.
 	 */
-	addItemAfter(preSections: string | string[], callback: (item: MenuItem) => void): this {
+	addItemAfter(preSections: string | string[], itemTitle: string, callback: (item: MenuItem) => void): this {
 		//@ts-ignore
-		if (this.menu/* && !this.menu.parentMenu*/) {
+		if (this.menu) {
 
+			// Check if item with this name already exist
+
+			//@ts-ignore
+			let items = this.menu.items
+			let existingItem = null
+			if (items) {
+				existingItem = items.find((i: MenuItem) => {
+					//@ts-ignore
+					let titleEl = i.titleEl
+					if (titleEl) return titleEl.innerText == itemTitle
+					return false
+				})
+			}
+
+			if (existingItem) return this
 			
 
 			if (typeof preSections === 'string') preSections = [preSections];
 
 			this.menu.addItem(item => {
+
+			
 
 
 				callback(item);
@@ -81,12 +105,8 @@ export default class MenuManager {
 				sections.splice(index, 0, section);
 			});
 
-
-			
-
-
 		} else {
-			this.queuedActions.push(() => this.addItemAfter(preSections, callback));
+			this.queuedActions.push(() => this.addItemAfter(preSections, itemTitle, callback));
 		}
 		return this;
 	}
