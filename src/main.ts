@@ -72,8 +72,6 @@ export default class PrettyPropertiesPlugin extends Plugin {
 					const targetNode = leaf.view.containerEl;
 
 					const observer = new MutationObserver((mutations) => {
-
-						console.log(mutations)
 	
 						let multiSelectMutation = mutations.find(mutation => {
 							let target = mutation.target
