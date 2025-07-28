@@ -315,12 +315,15 @@ body {
   width: 100%;
 }
 
+
+
+.workspace-leaf-content[data-type="file-properties"] progress,
 .bases-view progress {
     appearance: none;
     height: 9px;
 }
 
-
+.workspace-leaf-content[data-type="file-properties"] progress::-webkit-progress-bar,
 .bases-view progress::-webkit-progress-bar {
   background-color: var(--background-secondary);
   box-shadow: inset 0px 0px 0px 1px var(--background-modifier-border);
@@ -328,6 +331,7 @@ body {
   overflow: hidden;
 }
 
+.workspace-leaf-content[data-type="file-properties"] progress::-webkit-progress-value,
 .bases-view progress::-webkit-progress-value {
   background-color: var(--color-accent-1);
 }

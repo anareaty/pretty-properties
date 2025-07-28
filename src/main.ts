@@ -1,4 +1,7 @@
-import {  
+import { 
+	FileView,
+	EventRef,
+	View,
 	Menu, 
 	getLanguage, 
 	setTooltip, 
@@ -21,8 +24,11 @@ import { ImageSuggestModal } from './modal';
 
 
 
+
 export default class PrettyPropertiesPlugin extends Plugin {
 	settings: PPPluginSettings;
+	mutations: any[]
+	observers: MutationObserver[]
 
 	async onload() {
 
@@ -41,167 +47,118 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		this.updateBannerStyles()
 		this.updateCoverStyles()
 
+		this.observers = []
 
-		
+
 
 
 		this.registerEvent(
 			this.app.workspace.on("layout-change", async () => {
 				this.updateElements()
-				//this.updateBaseProgress()
 			})
 		);
-
 
 		this.registerEvent(
 			this.app.metadataCache.on("changed", async (file, data, cache) => {
 				this.updateElements(file)
-				setTimeout(() => {
-					//this.updateBaseProgress()
-				}, 200)
-				
 			})
 		);
-
 
 		this.registerEvent(
-			this.app.workspace.on("file-open", async () => {
+			this.app.workspace.on("layout-change", async () => {
+				let mdLeafs = this.app.workspace.getLeavesOfType("markdown")
 				let baseLeafs = this.app.workspace.getLeavesOfType("bases")
+				let propLeafs = this.app.workspace.getLeavesOfType("file-properties")
+
+				this.observers.forEach(obs => {
+					obs.disconnect()
+				})
+				this.observers = []
+
+				for (let leaf of mdLeafs) {
+					this.startObservingLeaf(leaf, "markdown")
+				}
+
 				for (let leaf of baseLeafs) {
-					this.updateBaseLeafProgress(leaf)
-					const targetNode = leaf.view.containerEl;
+					this.startObservingLeaf(leaf, "bases")
+				}
 
-					const observer = new MutationObserver((mutations) => {
-	
-						let multiSelectMutation = mutations.find(mutation => {
-							let target = mutation.target
-							if (target instanceof HTMLElement) {
-								if (target.classList.contains("bases-view")) return true
-								if (target.classList.contains("bases-table-container")) return true
-								if (target.classList.contains("bases-cards-container")) return true
-								if (target.classList.contains("bases-cards-group")) return true
-								if (target.classList.contains("bases-tbody")) return true
-								if (target.classList.contains("bases-tr")) return true
-								return target.classList.contains("multi-select-container") || target.classList.contains("value-list-container")
-							}
-							return false
-						})
-
-						if (multiSelectMutation) {
-							this.updateBaseLeafPills(leaf)
-						}
-
-
-						let progressMutation = mutations.find(mutation => {
-							
-							let target = mutation.target
-							if (target instanceof HTMLElement) {
-								if (target.classList.contains("bases-view")) return true
-								if (target.classList.contains("bases-table-container")) return true
-								if (target.classList.contains("bases-cards-container")) return true
-								if (target.classList.contains("bases-cards-group")) return true
-								if (target.classList.contains("bases-tbody")) return true
-								if (target.classList.contains("bases-tr")) return true
-								let progressEl = target.closest('[data-property*="formula.pp_progress"]')
-								return progressEl && target.classList.contains("bases-rendered-value")
-							}
-							return false
-						})
-
-						if (progressMutation) {
-							this.updateBaseLeafProgress(leaf)
-						}
-						
-					});
-					observer.observe(targetNode, { childList: true, subtree: true });
+				for (let leaf of propLeafs) {
+					this.startObservingLeaf(leaf, "file-properties")
 				}
 			})
 		);
 
 
 
-		
-		if (Platform.isMobile) {
-			this.registerDomEvent(document, "contextmenu", (e: MouseEvent) => {
-				if (e.target instanceof HTMLElement && 
-				e.target.closest(".multi-select-pill")) {
-				  this.handlePillMenu(e.target)
-				}
-			});
 
 
-			this.registerDomEvent(document, "touchstart", (e: TouchEvent) => {
-				if ((e.target instanceof HTMLElement || 
-				e.target instanceof SVGElement) && 
-				e.target.closest(".metadata-property-icon")) {
-				  this.handlePropertyMenu(e.target)
-				}
-			});
+		const registerDocumentEvents = (doc: Document) => {
+			if (Platform.isMobile) {
+				this.registerDomEvent(doc, "contextmenu", (e: MouseEvent) => {
+					if (e.target instanceof HTMLElement && 
+					e.target.closest(".multi-select-pill")) {
+					this.handlePillMenu(e.target)
+					}
+				});
 
-
-
-		} else {
-			this.registerDomEvent(document, "mousedown", (e: MouseEvent) => {
-
-				let targetEl = e.target
-				if (e.button == 2 && targetEl instanceof HTMLElement) { 
-
-					
-
-					if (targetEl.closest(".multi-select-pill")) {
-						this.handlePillMenu(targetEl)
+				this.registerDomEvent(doc, "touchstart", (e: TouchEvent) => {
+					if ((e.target instanceof HTMLElement || 
+					e.target instanceof SVGElement) && 
+					e.target.closest(".metadata-property-icon")) {
+					this.handlePropertyMenu(e.target)
+					}
+				});
+			} else {
+				this.registerDomEvent(doc, "mousedown", (e: MouseEvent) => {
+					let targetEl = e.target as HTMLElement
+					if (e.button == 2) { 
+						if (targetEl.closest(".multi-select-pill")) {
+							this.handlePillMenu(targetEl)
+						}
 					}
 
-
-
-					
-
-
-
-
-
-				}
-				
-				if ((e.target instanceof HTMLElement || 
-				  e.target instanceof SVGElement) && 
-				  e.target.closest(".metadata-property-icon")) {
-					this.handlePropertyMenu(e.target)
-				}
-			  });
-		}
-
-
-
-		this.registerDomEvent(document, "click", (e: MouseEvent) => {
-
-			if (e.ctrlKey && e.target instanceof HTMLElement) {
-				let value = this.getPropertyValue(e)
-				if (value !== undefined) {
-					let propEl = e.target.closest(".metadata-property")
-					let prop = propEl!.getAttribute("data-property-key")
-					let search = '[' + prop + ': "' + value +'"]'
-					//@ts-ignore
-					this.app.internalPlugins.plugins["global-search"].instance.openGlobalSearch(search)
-				}
+					if (targetEl.closest(".metadata-property-icon")) {
+						this.handlePropertyMenu(targetEl)
+					}
+				});
 			}
-		})
 
+			this.registerDomEvent(doc, "click", (e: MouseEvent) => {
+				if (e.ctrlKey && e.target instanceof HTMLElement) {
+					let value = this.getPropertyValue(e)
+					if (value !== undefined) {
+						let propEl = e.target.closest(".metadata-property")
+						let prop = propEl!.getAttribute("data-property-key")
+						let search = '[' + prop + ': "' + value +'"]'
+						//@ts-ignore
+						this.app.internalPlugins.plugins["global-search"].instance.openGlobalSearch(search)
+					}
+				}
+			})
 
-
-
-		this.registerDomEvent(document, "contextmenu", (e: MouseEvent) => {
-			let targetEl = e.target
-			if (targetEl instanceof HTMLElement) {
-				if (targetEl.closest(".banner-image")) {
+			this.registerDomEvent(doc, "contextmenu", (e: MouseEvent) => {
+				let targetEl = e.target
+				if (targetEl instanceof HTMLElement) {
+					if (targetEl.closest(".banner-image")) {
 						this.createBannerMenu(e)
 					}
 
 					if (targetEl.closest(".metadata-side-image")) {
+						e.preventDefault()
 						this.createCoverMenu(e)
 					}
-				
-			}
-		})
+				}
+			}, true)
+		}
+
+		registerDocumentEvents(document)
+
+		this.registerEvent(
+			this.app.workspace.on("window-open", async (win, window) => {
+				registerDocumentEvents(win.doc)
+			})
+		);
 
 
 
@@ -270,6 +227,82 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 	onunload() {
 	}
+
+
+
+	startObservingLeaf(leaf: WorkspaceLeaf, type: string) {
+
+		let view = leaf.view
+
+		this.addClassestoProperties(view)
+
+		let targetNode = view.containerEl;
+		let observer = new MutationObserver((mutations) => {
+
+			
+
+			let baseMutation
+			let multiSelectMutation
+			let progressMutation
+
+			for (let mutation of mutations) {
+				let target = mutation.target
+				if (target instanceof HTMLElement) {
+					if (target.classList.contains("bases-view") ||
+					target.classList.contains("bases-table-container") ||
+					target.classList.contains("bases-tbody") ||
+					target.classList.contains("bases-tr") ||
+					target.classList.contains("bases-cards-container") ||
+					target.classList.contains("bases-cards-group") ||
+					target.classList.contains("bases-cards-item")) {
+						baseMutation = true
+						break
+					}
+					
+					if (target.classList.contains("metadata-properties")) {
+						multiSelectMutation = true
+						progressMutation = true
+						break
+					}
+
+					if (target.classList.contains("multi-select-container") || 
+					target.classList.contains("value-list-container")) {
+						multiSelectMutation = true
+						if (progressMutation) break
+					}
+
+					let progressEl = target.closest('[data-property*="formula.pp_progress"]')
+
+					if (progressEl && 
+					target.classList.contains("bases-rendered-value")) {
+						progressMutation = true
+						if (multiSelectMutation) break
+					}
+				}
+			}
+
+			if (type == "markdown" || type == "file-properties") {
+				if (multiSelectMutation) {
+					this.addClassestoProperties(view)
+				}
+				if (progressMutation) {
+					this.updateViewProgress(view)
+				}
+			}
+
+			else if (type == "bases") {
+				if (baseMutation || multiSelectMutation) {
+					this.updateBaseLeafPills(leaf)
+				}
+				if (baseMutation || progressMutation) {
+					this.updateBaseLeafProgress(leaf)
+				}
+			}
+		});
+		observer.observe(targetNode, { childList: true, subtree: true });
+		this.observers.push(observer)
+	}
+
 
 
 	createBannerMenu(e: MouseEvent) {
@@ -343,36 +376,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 
-	async selectCoverImage(propName: string) {
-		let file = this.app.workspace.getActiveFile()
-		if (file instanceof TFile) {
-
-			let coverFolder = this.settings.coversFolder
-			let files = this.app.vault.getFiles()
-			let formats = ["avif", "bmp", "gif", "jpeg", "jpg", ".png", "svg", "webp"]
-			files = files.filter(f => formats.find(e => e == f.extension))
-			
-			let coverFiles = files
-			if (coverFolder) {
-				coverFiles = files.filter(f => f.parent!.path == coverFolder || f.parent!.path.startsWith(coverFolder + "/"))
-			}
-
-			let coverPaths = coverFiles.map(f => f.path)
-			let coverNames = coverFiles.map(f => f.basename)
-			let coverPath = await this.imageSuggester(this, "cover", coverPaths, coverNames)
-
-			if (coverPath) {
-				let coverFile = this.app.vault.getAbstractFileByPath(coverPath)
-				if (coverFile instanceof TFile) {
-					let coverLink = this.app.fileManager.generateMarkdownLink(coverFile, "").replace(/^\!/, "")
-				
-					this.app.fileManager.processFrontMatter(file, fm => {
-						fm[propName] = coverLink
-					})
-				}
-			}
-		}
-	}
+	
 
 
 
@@ -440,8 +444,36 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		}
 	}
 
+	async selectCoverImage(propName: string) {
+		let file = this.app.workspace.getActiveFile()
+		if (file instanceof TFile) {
 
+			let coverFolder = this.settings.coversFolder
+			let files = this.app.vault.getFiles()
+			let formats = ["avif", "bmp", "gif", "jpeg", "jpg", ".png", "svg", "webp"]
+			files = files.filter(f => formats.find(e => e == f.extension))
+			
+			let coverFiles = files
+			if (coverFolder) {
+				coverFiles = files.filter(f => f.parent!.path == coverFolder || f.parent!.path.startsWith(coverFolder + "/"))
+			}
 
+			let coverPaths = coverFiles.map(f => f.path)
+			let coverNames = coverFiles.map(f => f.basename)
+			let coverPath = await this.imageSuggester(this, "cover", coverPaths, coverNames)
+
+			if (coverPath) {
+				let coverFile = this.app.vault.getAbstractFileByPath(coverPath)
+				if (coverFile instanceof TFile) {
+					let coverLink = this.app.fileManager.generateMarkdownLink(coverFile, "").replace(/^\!/, "")
+				
+					this.app.fileManager.processFrontMatter(file, fm => {
+						fm[propName] = coverLink
+					})
+				}
+			}
+		}
+	}
 
 	async selectCoverShape(file: TFile) {
 		let shapes = ["vertical", "horizontal", "square", "circle"]
@@ -803,11 +835,29 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				this.updateLeafElements(leaf.view, cache)
 			}
 		}
+
+
+		let propLeaves = this.app.workspace.getLeavesOfType("file-properties")
+		for (let leaf of propLeaves) {
+			if (leaf.view instanceof FileView) {
+				if(changedFile && leaf.view.file && leaf.view.file.path != changedFile.path) {
+					continue
+				}
+				this.updateLeafElements(leaf.view, cache)
+			}
+		}
+
+		let baseLeaves = this.app.workspace.getLeavesOfType("bases")
+		for (let leaf of baseLeaves) {
+			if (leaf.view instanceof FileView) {
+				this.updateBaseLeafPills(leaf)
+				this.updateBaseLeafProgress(leaf)
+			}
+		}
 	}
 
 
 	updateBaseLeafPills(leaf: WorkspaceLeaf) {
-		
 		let baseTableContainer = leaf.view.containerEl.querySelector(".bases-table-container")
 
 		if (baseTableContainer) {
@@ -815,22 +865,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				if (baseTableContainer.classList.contains("is-loading")) {
 					setTimeout(updateBasePills, 50)
 				} else {
-					let pills = baseTableContainer.querySelectorAll(".multi-select-pill:not([data-property-pill-value])")
-					for (let pill of pills) {
-						let content = pill.querySelector(".multi-select-pill-content")
-						if (content instanceof HTMLElement) {
-							let value = content.innerText
-							pill.setAttribute("data-property-pill-value", value)
-						}
-					}
-
-					let formulaTagPills = baseTableContainer.querySelectorAll("[data-property='formula.tags'] .value-list-element:not([data-property-pill-value])")
-					for (let pill of formulaTagPills) {
-						if (pill instanceof HTMLElement) {
-							let value = pill.innerText.replace(/^#/, "")
-							pill.setAttribute("data-property-pill-value", value)
-						}
-					}
+					this.addClassestoProperties(leaf.view)
 				}
 			}
 
@@ -848,7 +883,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 					let pills = baseCardsContainer.querySelectorAll(".bases-cards-property .value-list-element:not([data-property-pill-value])")
 					for (let pill of pills) {
 						if (pill instanceof HTMLElement) {
-							let value = pill.innerText.replace(/^#/, "")
+							let value = pill.innerText
 							pill.setAttribute("data-property-pill-value", value)
 						}
 					}
@@ -866,19 +901,13 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 	updateBaseLeafProgress(leaf: WorkspaceLeaf) {
-		
-
 		let baseTableContainer = leaf.view.containerEl.querySelector(".bases-table-container")
 		
 		if (baseTableContainer) {
-			
 			const updateProgress = () => {
 				if (baseTableContainer.classList.contains("is-loading")) {
-					
 					setTimeout(updateProgress, 50)
 				} else {
-					
-					
 					let progressEls = baseTableContainer.querySelectorAll(".bases-td[data-property*='formula.pp_progress']")
 					for (let progressEl of progressEls) {
 						if (progressEl instanceof HTMLElement) {
@@ -907,6 +936,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 										progressWrapper.append(progress)
 										progressEl.classList.add("has-progress-bar")
+
 										progressEl.prepend(progressWrapper)
 									}
 								}
@@ -957,6 +987,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 										progressWrapper.append(progress)
 										progressEl.classList.add("has-progress-bar")
+
 										let label = progressEl.firstChild
 										label?.after(progressWrapper)
 									}
@@ -968,9 +999,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				}
 			}
 			updateProgress()	
-			
 		}
-			
 	}
 
 
@@ -980,8 +1009,10 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 
-	async updateLeafElements(view: MarkdownView, cache?: CachedMetadata | null) {
+	async updateLeafElements(view: MarkdownView | FileView, cache?: CachedMetadata | null) {
+
 		this.addClassestoProperties(view)
+
 		if (!cache && view.file) {
 			cache = this.app.metadataCache.getFileCache(view.file)
 		}
@@ -990,17 +1021,20 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			frontmatter = cache.frontmatter
 		}
 
-		this.updateCoverImages(view, frontmatter)
-		this.updateBannerImages(view, frontmatter)
-		this.updateProgressBars(view, frontmatter)
-		if (cache && frontmatter) {
-			this.updateTasksCount(view, cache)
+		if (view instanceof MarkdownView) {
+			this.updateCoverImages(view, frontmatter)
+			this.updateBannerImages(view, frontmatter)
+			if (cache && frontmatter) {
+				this.updateTasksCount(view, cache)
+			}
 		}
-		
+
+		//this.updateProgressBars(view, frontmatter)
+		this.updateViewProgress(view)
 	}
 
 
-	async updateTasksCount(view: MarkdownView, cache: CachedMetadata) {
+	async updateTasksCount(view: MarkdownView | FileView, cache: CachedMetadata) {
 		let frontmatter = cache.frontmatter
 		let tasksProp = this.settings.allTasksCount
 		let completedProp = this.settings.completedTasksCount
@@ -1027,7 +1061,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 					let tasksNum = tasks.length
 					if (tasksNum != tasksVal) {
 						if (file instanceof TFile) {
-							this.app.fileManager.processFrontMatter(file, fm => {
+							await this.app.fileManager.processFrontMatter(file, fm => {
 								fm[tasksProp] = tasksNum
 							})
 						}
@@ -1039,7 +1073,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 					let completedNum = completed.length
 					if (completedNum != completedVal) {
 						if (file instanceof TFile) {
-							this.app.fileManager.processFrontMatter(file, fm => {
+							await this.app.fileManager.processFrontMatter(file, fm => {
 								fm[completedProp] = completedNum
 							})
 						}
@@ -1051,7 +1085,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 					let uncompletedNum = uncompleted.length
 					if (uncompletedNum != uncompletedVal) {
 						if (file instanceof TFile) {
-							this.app.fileManager.processFrontMatter(file, fm => {
+							await this.app.fileManager.processFrontMatter(file, fm => {
 								fm[uncompletedProp] = uncompletedNum
 							})
 						}
@@ -1182,7 +1216,21 @@ export default class PrettyPropertiesPlugin extends Plugin {
 	}
 
 
-	async updateProgressBars(view: MarkdownView, frontmatter: FrontMatterCache | undefined) {
+
+
+
+
+
+	async updateViewProgress(view: View) {
+
+		let cache
+		if (view instanceof FileView && view.file) {
+			cache = this.app.metadataCache.getFileCache(view.file)
+		}
+		let frontmatter = cache?.frontmatter
+
+
+
 		//@ts-ignore
 		let mdEditor = view.metadataEditor;
 		let mdContainer = mdEditor.containerEl;
@@ -1233,18 +1281,18 @@ export default class PrettyPropertiesPlugin extends Plugin {
 	}
 
 
-	async addClassestoProperties(view: MarkdownView) {
-		//@ts-ignore
-		let mdEditor = view.metadataEditor;
-		if (mdEditor) {
-			let container = mdEditor.containerEl;
-			let pills = container.querySelectorAll(".multi-select-pill:not([data-property-pill-value])")
-			for (let pill of pills) {
-				let content = pill.querySelector(".multi-select-pill-content")
-				if (content instanceof HTMLElement) {
-					let value = content.innerText
-					pill.setAttribute("data-property-pill-value", value)
-				}
+
+
+
+	async addClassestoProperties(view: View) {
+		let container = view.containerEl;
+		
+		let pills = container.querySelectorAll(".multi-select-pill:not([data-property-pill-value])")
+		for (let pill of pills) {
+			let content = pill.querySelector(".multi-select-pill-content")
+			if (content instanceof HTMLElement) {
+				let value = content.innerText
+				pill.setAttribute("data-property-pill-value", value)
 			}
 		}
 	}
