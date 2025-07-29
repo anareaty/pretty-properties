@@ -1,39 +1,18 @@
 
 /* BANNERS */
 
-body:not(.is-mobile) {
-  --side-margin:  var(--size-4-8);
-  --top-margin: var(--size-4-8);
-}
 
-.is-mobile {
-  --side-margin: var(--size-4-6);
-  --top-margin: var(--size-4-2);
-}
-
-.markdown-preview-view .banner-image:not(:empty),
-.is-live-preview .banner-image:not(:empty) {
-    width: calc(100% + var(--side-margin) * 2);
-    margin-top: calc(0px - var(--top-margin));
-    margin-left: calc(0px - var(--side-margin));
-    margin-bottom: var(--banner-margin);
-}
-
-.is-live-preview .banner-image:not(:empty) {
-    margin-right: calc(0px - var(--side-margin));
-}
-
-
-.cm-scroller {
-    flex-wrap: wrap;
-}
-
-.markdown-source-view:not(.is-live-preview) .banner-image:not(:empty) {
-    display: none;
+.banner-image:not(:empty) {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
 }
 
 .banner-image img {
-    width: 100%;
+    width: 100% !important;
+    max-width: 100% !important;
     height: var(--banner-height);
     object-fit: cover;
     border-top-left-radius: 10px !important;
@@ -41,6 +20,13 @@ body:not(.is-mobile) {
 	mask-image: var(--banner-fading);
 	-webkit-mask-image: var(--banner-fading);
 }
+
+.cm-scroller:has(.banner-image:not(:empty)) .cm-sizer,
+.markdown-preview-view:has(.banner-image:not(:empty)) .markdown-preview-sizer {
+  margin-top: calc(var(--banner-height) + var(--banner-margin));
+}
+
+
 
 
 
@@ -149,13 +135,26 @@ body:not(.is-mobile) {
 }
 
 
-
-
-.multi-select-pill {
-  --pill-padding-x: var(--tag-padding-x);
-  --pill-padding-y: var(--tag-padding-y);
-  
+.bases-table-cell {
+  --tag-padding-x: 0.5em;
+  --tag-padding-y: 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+.bases-td[data-property="formula.tags"] .bases-table-cell {
+  display: flex;
+}
+
+
 
 
 .markdown-preview-view progress.metadata-progress, 
@@ -166,8 +165,11 @@ body:not(.is-mobile) {
   margin-top: auto;
   margin-bottom: auto;
   max-width: 100%;
-
 }
+
+
+
+
 
 .metadata-progress-wrapper {
   padding-left: var(--size-4-2);
@@ -191,6 +193,9 @@ body:not(.is-mobile) {
 
 
 
+
+
+
 .image-suggestion-item.banner img {
   width: 100%;
   height: 130px;
@@ -201,4 +206,125 @@ body:not(.is-mobile) {
 .image-suggestion-item.cover img {
   height: 150px;
   object-fit: cover;
+}
+
+
+
+
+.multi-select-pill:not(:hover, :focus, :focus-within) .multi-select-pill-remove-button svg {
+  opacity:0.5;
+}
+
+
+body {
+    --pill-focus-width: calc(100% + 2px);
+    --pill-focus-left-adjust: -1px;
+}
+
+
+
+
+
+body {
+  --pill-background-modified: var(--pill-background);
+  --pill-background-hover-modified: var(--pill-background-hover);
+  --tag-background-modified: var(--tag-background);
+  --tag-background-hover-modified: var(--tag-background-hover);
+}
+
+.metadata-property-value .multi-select-pill,
+.bases-td[data-property="formula.tags"] .value-list-element,
+.bases-cards-property[data-property="formula.tags"] .value-list-element {
+  --pill-padding-x: var(--tag-padding-x);
+  --pill-padding-y: var(--tag-padding-y);
+  
+}
+
+.bases-td[data-property="formula.tags"] .value-list-element,
+.bases-cards-property[data-property="formula.tags"] .value-list-element {
+    border: var(--pill-border-width) solid var(--pill-border-color);
+    border-radius: var(--pill-radius);
+    color: var(--pill-color);
+    font-weight: var(--pill-weight);
+    padding: var(--pill-padding-y) var(--pill-padding-x);
+    line-height: var(--line-height-tight);
+}
+
+
+
+
+.bases-td[data-property="note.tags"] .multi-select-pill,
+.bases-td[data-property="formula.tags"] .value-list-element,
+.bases-cards-property[data-property="formula.tags"] .value-list-element {
+    --pill-color: var(--tag-color);
+    --pill-color-hover: var(--tag-color-hover);
+    --pill-color-remove: var(--tag-color);
+    --pill-color-remove-hover: var(--tag-color-hover);
+    --pill-decoration: var(--tag-decoration);
+    --pill-decoration-hover: var(--tag-decoration-hover);
+    --pill-background: var(--tag-background-modified) !important;
+    --pill-background-hover: var(--tag-background-hover-modified) !important;
+    --pill-border-color: var(--tag-border-color);
+    --pill-border-color-hover: var(--tag-border-color-hover);
+    --pill-border-width: var(--tag-border-width); 
+}
+
+
+.value-list-element {
+  background-color: var(--pill-background);
+  border-radius: var(--pill-radius);
+  padding: 2px 4px !important;
+  display: inline-block;
+}
+
+.multi-select-pill,
+.value-list-element {
+  --pill-background: var(--pill-background-modified) !important;
+  --pill-background-hover: var(--pill-background-hover-modified) !important;
+}
+
+
+
+.bases-td.has-progress-bar .bases-rendered-value {
+  width: fit-content;
+  min-width: fit-content;
+  font-size:0;
+  padding: 0;
+}
+
+.bases-td.has-progress-bar .metadata-progress-wrapper {
+    padding-right: var(--size-4-2);
+    height: var(--input-height);
+}
+
+
+.bases-cards-property .metadata-progress-wrapper {
+  padding-right: var(--size-4-2);
+  width: 100%;
+  max-width: 100%;
+}
+
+.bases-cards-property .metadata-progress{
+  width: 100%;
+}
+
+
+
+.workspace-leaf-content[data-type="file-properties"] progress,
+.bases-view progress {
+    appearance: none;
+    height: 9px;
+}
+
+.workspace-leaf-content[data-type="file-properties"] progress::-webkit-progress-bar,
+.bases-view progress::-webkit-progress-bar {
+  background-color: var(--background-secondary);
+  box-shadow: inset 0px 0px 0px 1px var(--background-modifier-border);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.workspace-leaf-content[data-type="file-properties"] progress::-webkit-progress-value,
+.bases-view progress::-webkit-progress-value {
+  background-color: var(--color-accent-1);
 }
