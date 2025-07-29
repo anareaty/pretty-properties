@@ -342,7 +342,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 					.setIcon('lucide-image-plus')
 					.setSection('pretty-properties')
 					.onClick(async () => {
-						this.selectCoverImage(propName)
+						if (propName) this.selectCoverImage(propName)
 					})
 				);
 
@@ -354,7 +354,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 					.setIcon('lucide-shapes')
 					.setSection('pretty-properties')
 					.onClick(async () => {
-						this.selectCoverShape(file)
+						if (file instanceof TFile) this.selectCoverShape(file)
 					})
 				);
 
