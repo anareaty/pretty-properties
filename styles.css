@@ -282,6 +282,7 @@ body {
   background-color: var(--pill-background);
   border-radius: var(--pill-radius);
   padding: 2px 4px !important;
+  display: inline-block;
 }
 
 .multi-select-pill,
