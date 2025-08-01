@@ -13,13 +13,19 @@ import {
 	MenuItem,
 	Platform,
 	FrontMatterCache,
-	WorkspaceLeaf
+	WorkspaceLeaf,
+	getIconIds,
+	getIcon,
+	setIcon,
+	IconName,
+	SuggestModal
  } from 'obsidian';
 import MenuManager from 'src/MenuManager';
 import { i18n } from './localization';
 import PPSettingTab from './settings';
 import { PPPluginSettings, DEFAULT_SETTINGS } from './settings';
 import { ImageSuggestModal } from './modal';
+import Emojilib from "emojilib";
 
 
 
@@ -45,6 +51,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		this.updateHiddenProperties()
 		this.updatePillColors()
 		this.updateBannerStyles()
+		this.updateIconStyles()
 		this.updateCoverStyles()
 
 		this.observers = []
@@ -139,14 +146,21 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 			this.registerDomEvent(doc, "contextmenu", (e: MouseEvent) => {
 				let targetEl = e.target
-				if (targetEl instanceof HTMLElement) {
+				if (targetEl instanceof Element) {
+
 					if (targetEl.closest(".banner-image")) {
+						e.preventDefault()
 						this.createBannerMenu(e)
 					}
 
 					if (targetEl.closest(".metadata-side-image")) {
 						e.preventDefault()
 						this.createCoverMenu(e)
+					}
+
+					if (targetEl.closest(".pp-icon")) {
+						e.preventDefault()
+						this.createIconMenu(e)
 					}
 				}
 			}, true)
@@ -306,11 +320,13 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 	createBannerMenu(e: MouseEvent) {
+
 		let propName = this.settings.bannerProperty
 
-		let menuManager = new MenuManager()
 
-		menuManager.addItemAfter(['clipboard'], i18n.t("SELECT_BANNER_IMAGE"), (item: MenuItem) => item
+		let menu = new Menu()
+
+		menu.addItem( (item: MenuItem) => item
 			.setTitle(i18n.t("SELECT_BANNER_IMAGE"))
 			.setIcon('lucide-image-plus')
 			.setSection('pretty-properties')
@@ -321,7 +337,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 		if (this.settings.hiddenProperties.find(p => p == propName)) {
-			menuManager.addItemAfter(['clipboard'], i18n.t("UNHIDE_BANNER_PROPERTY"), (item: MenuItem) => item
+			menu.addItem((item: MenuItem) => item
 			.setTitle(i18n.t("UNHIDE_BANNER_PROPERTY"))
 			.setIcon('lucide-eye')
 			.setSection('pretty-properties')
@@ -329,11 +345,222 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				if (propName) this.settings.hiddenProperties.remove(propName)
 				this.saveSettings()
 				this.updateHiddenProperties()			
+			}))
+		}
+
+		menu.showAtMouseEvent(e)
+	}
+
+
+
+	createIconMenu(e: MouseEvent) {
+
+		let propName = this.settings.iconProperty
+
+
+		let menu = new Menu()
+
+		menu.addItem( (item: MenuItem) => item
+			.setTitle(i18n.t("SELECT_ICON"))
+			.setIcon('lucide-image-plus')
+			.setSection('pretty-properties')
+			.onClick(async () => {
+				this.selectIcon()
 			})
 		);
+
+
+		if (this.settings.hiddenProperties.find(p => p == propName)) {
+			menu.addItem((item: MenuItem) => item
+			.setTitle(i18n.t("UNHIDE_ICON_PROPERTY"))
+			.setIcon('lucide-eye')
+			.setSection('pretty-properties')
+			.onClick(() => {
+				if (propName) this.settings.hiddenProperties.remove(propName)
+				this.saveSettings()
+				this.updateHiddenProperties()			
+			}))
+		}
+
+		menu.showAtMouseEvent(e)
+	}
+
+
+
+	async selectIcon() {
+
+		let options: any = {
+			"image": i18n.t("LOCAL_IMAGE"),
+			"svg": i18n.t("LUCIDE_ICON"),
+			"emoji": i18n.t("EMOJI")
+		}
+
+		let plugin = this
+
+		class IconSuggestModal extends SuggestModal<string> {
+			getSuggestions(query:string): string[] {
+				return Object.keys(options).filter((key) => {
+					return options[key].toLowerCase().includes(query.toLowerCase())
+				})
+			}
+			async renderSuggestion(key: string, el: Element) {
+				el.append(options[key])
+			}
+			onChooseSuggestion(val: string) {
+
+				if (val == "image") {
+					plugin.selectIconImage()
+				}
+
+				if (val == "svg") {
+					plugin.selectIconSvg()
+				}
+
+				if (val == "emoji") {
+					plugin.selectIconEmoji()
+				}
+			} 
+		}
+
+		new IconSuggestModal(this.app).open()
+	}
+
+
+
+
+
+
+	async selectIconImage() {
+		let propName = this.settings.iconProperty
+		let file = this.app.workspace.getActiveFile()
+		if (file instanceof TFile) {
+
+			let iconFolder = this.settings.iconsFolder
+			
+			let files = this.app.vault.getFiles()
+
+			let formats = ["avif", "bmp", "gif", "jpeg", "jpg", ".png", "svg", "webp"]
+
+			files = files.filter(f => formats.find(e => e == f.extension))
+			
+			let iconFiles = files
+			if (iconFolder) {
+				iconFiles = files.filter(f => f.parent!.path == iconFolder || f.parent!.path.startsWith(iconFolder + "/"))
+			}
+			
+			let iconPaths = iconFiles.map(f => f.path)
+			let iconNames = iconFiles.map(f => f.basename)
+			let iconPath = await this.imageSuggester(this, "icon", iconPaths, iconNames)
+
+			if (iconPath) {
+				let iconFile = this.app.vault.getAbstractFileByPath(iconPath)
+				if (iconFile instanceof TFile) {
+					let iconLink = this.app.fileManager.generateMarkdownLink(iconFile, "").replace(/^\!/, "")
 				
+					this.app.fileManager.processFrontMatter(file, fm => {
+						fm[propName] = iconLink
+					})
+				}
+			}
 		}
 	}
+
+
+
+
+
+
+
+	async selectIconSvg() {
+		let propName = this.settings.iconProperty
+		
+		
+
+		let iconIds = getIconIds()
+
+		class SvgSuggestModal extends SuggestModal<string> {
+
+			getSuggestions(query:string): string[] {
+				return iconIds.filter((val) => {
+					return val.toLowerCase().includes(query.toLowerCase())
+				});
+			}
+			async renderSuggestion(id: string, el: Element) {
+				let svg = getIcon(id) || ""
+				el.append(svg)
+				el.classList.add("image-suggestion-item")
+            	el.classList.add("svg-icon")
+			}
+			onChooseSuggestion(id: string) {
+				if (id) {
+					let file = this.app.workspace.getActiveFile()
+					if (file instanceof TFile) {
+						this.app.fileManager.processFrontMatter(file, fm => {
+							fm[propName] = id
+						})
+					}
+				}
+			} 
+		}
+
+		new SvgSuggestModal(this.app).open()
+
+			/*
+
+			if (iconPath) {
+				let iconFile = this.app.vault.getAbstractFileByPath(iconPath)
+				if (iconFile instanceof TFile) {
+					let iconLink = this.app.fileManager.generateMarkdownLink(iconFile, "").replace(/^\!/, "")
+				
+					this.app.fileManager.processFrontMatter(file, fm => {
+						fm[propName] = iconLink
+					})
+				}
+			}
+
+			*/
+		
+	}
+
+
+
+
+	async selectIconEmoji() {
+		let propName = this.settings.iconProperty
+
+		class EmojiSuggestModal extends SuggestModal<string> {
+
+			getSuggestions(query:string): string[] {
+				return Object.keys(Emojilib).filter((emoji) => {
+					let keywords = Emojilib[emoji]
+					return keywords.find(keyword => {
+						return keyword.toLowerCase().includes(query.toLowerCase())
+					})
+				});
+			}
+			async renderSuggestion(emoji: string, el: Element) {
+				el.createEl("div", {text: emoji})
+				el.classList.add("image-suggestion-item")
+            	el.classList.add("emoji-icon")
+			}
+			onChooseSuggestion(emoji: string) {
+				if (emoji) {
+					let file = this.app.workspace.getActiveFile()
+					if (file instanceof TFile) {
+						this.app.fileManager.processFrontMatter(file, fm => {
+							fm[propName] = emoji
+						})
+					}
+				}
+			} 
+		}
+
+		new EmojiSuggestModal(this.app).open()
+	
+	}
+
+
+
 
 
 	async selectBannerImage() {
@@ -804,6 +1031,41 @@ export default class PrettyPropertiesPlugin extends Plugin {
 	}
 
 
+
+
+
+	updateIconStyles() {
+
+		let oldStyle = document.head.querySelector("style#pp-icon-styles")
+		if (oldStyle) oldStyle.remove()
+
+		if (this.settings.enableIcon) {
+
+			let iconColor = this.settings.iconColor
+			if (!iconColor) iconColor = "var(--text-normal)"
+
+
+			let styleText = "body {\n" + 
+			"--pp-icon-size: " + this.settings.iconSize + "px;\n" +
+			"--pp-icon-top-margin: " + this.settings.iconTopMargin + "px;\n" +
+			"--pp-icon-top-margin-wb: " + this.settings.iconTopMarginWithoutBanner + "px;\n" +
+			"--pp-icon-gap: " + this.settings.iconGap + "px;\n" +
+			"--pp-banner-icon-gap: " + this.settings.bannerIconGap + "px;\n" +
+			"--pp-icon-left-margin: " + this.settings.iconLeftMargin + "px;\n" +
+			"--pp-icon-color: " + iconColor + ";\n" +
+			"}\n"
+
+			const style = document.createElement("style")
+			style.textContent = styleText
+			style.id = "pp-icon-styles"
+			document.head.appendChild(style)
+		}
+	}
+
+
+
+
+
 	updateCoverStyles() {
 		let oldStyle = document.head.querySelector("style#pp-cover-styles")
 		if (oldStyle) oldStyle.remove()
@@ -1023,7 +1285,9 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 		if (view instanceof MarkdownView) {
 			this.updateCoverImages(view, frontmatter)
+			this.updateIcons(view, frontmatter)
 			this.updateBannerImages(view, frontmatter)
+			
 			if (cache && frontmatter) {
 				this.updateTasksCount(view, cache)
 			}
@@ -1211,6 +1475,80 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				}
 			} else {
 				bannerContainer.prepend(bannerDiv)
+			}
+		}
+	}
+
+
+
+
+
+
+
+
+
+	async updateIcons(view: MarkdownView, frontmatter: FrontMatterCache | undefined) {
+		let contentEl = view.contentEl
+		let iconContainer
+		let mode = view.getMode()
+
+		if (mode == "preview") {
+			iconContainer = contentEl.querySelector(".markdown-preview-view")
+		}
+
+		if (mode == "source") {
+			iconContainer = contentEl.querySelector(".cm-scroller")
+		}
+
+		let iconVal = frontmatter?.[this.settings.iconProperty]
+		
+
+		if (iconContainer instanceof HTMLElement) {
+
+			let oldIconDiv = iconContainer.querySelector(".icon-wrapper")
+			let iconDiv = document.createElement("div");
+			iconDiv.classList.add("icon-wrapper")
+
+			if (iconVal && this.settings.enableIcon) {
+
+				
+
+				let image: HTMLDivElement | HTMLImageElement | SVGSVGElement | null = getIcon(iconVal)
+
+				if (!image) {
+					let iconLink = iconVal
+					if (iconLink.startsWith("http")) iconLink = "![](" + iconLink + ")"
+					if (!iconLink.startsWith("!")) iconLink = "!" + iconLink
+					let iconTemp = document.createElement("div");
+					MarkdownRenderer.render(this.app, iconLink, iconTemp, "", this);
+					image = iconTemp.querySelector("img")
+				}
+
+				if (!image) {
+					image = document.createElement("div")
+					image.classList.add("pp-text-icon")
+					let symbolArr = [...iconVal]
+					let iconSymbol = symbolArr[0] 
+					image.append(iconSymbol)
+				}
+
+
+				
+				if (image) {
+					image.classList.add("pp-icon")
+					let iconSizer = iconDiv.createEl("div", {cls: "icon-sizer"})
+					let iconImage = iconSizer.createEl("div", {cls: "icon-image"})
+					iconImage.append(image)
+				}
+			}
+
+			if (oldIconDiv) {
+				if (oldIconDiv.outerHTML != iconDiv.outerHTML) {
+					oldIconDiv.remove();
+					iconContainer.prepend(iconDiv)
+				}
+			} else {
+				iconContainer.prepend(iconDiv)
 			}
 		}
 	}

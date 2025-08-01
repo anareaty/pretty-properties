@@ -9,7 +9,7 @@ export default {
   BANNER_FADING: "Banner fading",
   BANNER_HEIGHT: "Banner height",
   BANNER_HEIGHT_MOBILE: "Banner height on mobile",
-  BANNER_MARGIN: "Banner margin",
+  GAP_AFTER_BANNER: "Gap after banner",
   ENABLE_COVER: "Enable covers",
   COVER_PROPERTY: "Cover property",
   ADD_EXTRA_COVER_PROPERTY: "Add extra cover property",
@@ -44,6 +44,30 @@ export default {
   BANNERS_FOLDER: "Folder with images for banners",
   COVERS_FOLDER: "Folder with images for covers",
   CAN_BE_POSITIVE_OR_NEGATIVE: "Can be positive or negative",
+  PROPERTY_SETTINGS: "Property settings",
+  SHOW_COLORED_PROPERTIES: "Show colored properties list",
+  ADD_COLORED_PROPERTY: "Add colored property",
+  SHOW_HIDDEN_PROPERTIES_LIST: "Show hidden properties list",
+  ADD_HIDDEN_PROPERTY: "Add hidden property",
+  SELECT_ICON: "Select icon",
+  LOCAL_IMAGE: "Local image",
+  LUCIDE_ICON: "Lucide icon",
+  EMOJI: "Emoji",
+  GAP_AFTER_BANNER_WITH_ICON: "Gap after banner with icon",
+  ENABLE_ICONS: "Enable icons",
+  ICON_PROPERTY: "Icon property",
+  ICONS_FOLDER: "Icons folder",
+  ICON_SIZE: "Icon size",
+  ICON_COLOR: "Icon color",
+  ICON_LEFT_MARGIN: "Icon left margin",
+  ICON_TOP_MARGIN_WITHOUT_BANNER: "Icon top margin without banner",
+  ICON_TOP_MARGIN_WITH_BANNER: "Icon top margin with banner",
+  GAP_AFTER_ICON_WITHOUT_BANNER: "Gap after icon without banner",
+  ICONS: "Icons",
+
+
+
+
 };
 
 

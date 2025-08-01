@@ -1,4 +1,4 @@
-import { App, Notice, PluginSettingTab, Setting } from 'obsidian';
+import { App, Notice, PluginSettingTab, Setting, Menu, MenuItem, TextComponent } from 'obsidian';
 import { i18n } from './localization';
 import PrettyPropertiesPlugin from "./main";
 
@@ -7,8 +7,10 @@ export interface PPPluginSettings {
     hiddenProperties: string[];
     propertyPillColors: any;
     enableBanner: boolean;
+	enableIcon: boolean;
     enableCover: boolean;
     bannerProperty: string;
+	iconProperty: string;
     coverProperty: string;
     extraCoverProperties: string[],
     bannerHeight: number;
@@ -27,6 +29,18 @@ export interface PPPluginSettings {
     uncompletedTasksStatuses: string[];
 	bannersFolder: string;
 	coversFolder: string;
+	iconsFolder: string;
+	showColorSettings: boolean;
+	showHiddenSettings: boolean;
+	iconSize: number;
+	iconTopMargin: number;
+	iconTopMarginWithoutBanner: number;
+	iconLeftMargin: number;
+	iconGap: number;
+	bannerIconGap: number;
+	iconColor: string;
+	
+	
 }
 
 export const DEFAULT_SETTINGS: PPPluginSettings = {
@@ -34,8 +48,10 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
     hiddenProperties: [],
     propertyPillColors: {},
     enableBanner: true,
+	enableIcon: true,
     enableCover: true,
     bannerProperty: "banner",
+	iconProperty: "icon",
     coverProperty: "cover",
     extraCoverProperties: [],
     bannerHeight: 150, 
@@ -53,7 +69,17 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
     completedTasksStatuses: ["x"],
     uncompletedTasksStatuses: [" "],
 	bannersFolder: "",
-	coversFolder: ""
+	coversFolder: "",
+	showColorSettings: false,
+	showHiddenSettings: false,
+	iconsFolder: "",
+	iconSize: 70,
+	iconTopMargin: 70,
+	iconTopMarginWithoutBanner: -10,
+	iconLeftMargin: 0,
+	iconGap: 20,
+	bannerIconGap: 30,
+	iconColor: ""
 }
 
 
@@ -146,7 +172,7 @@ export default class PPSettingTab extends PluginSettingTab {
 			});
 
 			new Setting(containerEl)
-			.setName(i18n.t("BANNER_MARGIN"))
+			.setName(i18n.t("GAP_AFTER_BANNER"))
 			.setDesc(i18n.t("CAN_BE_POSITIVE_OR_NEGATIVE"))
 			.addText(text => {
 				text.inputEl.type = "number"
@@ -160,8 +186,171 @@ export default class PPSettingTab extends PluginSettingTab {
 				})
 			});
 
+
+			new Setting(containerEl)
+			.setName(i18n.t("GAP_AFTER_BANNER_WITH_ICON"))
+			.setDesc(i18n.t("CAN_BE_POSITIVE_OR_NEGATIVE"))
+			.addText(text => {
+				text.inputEl.type = "number"
+				text.setValue(this.plugin.settings.bannerIconGap.toString())
+				.setPlaceholder('-20')
+				.onChange(async (value) => {
+					if (!value) value = "0"
+					this.plugin.settings.bannerIconGap = Number(value);
+					await this.plugin.saveSettings();
+				    this.plugin.updateIconStyles();
+				})
+			});
+
 			
 		}
+
+
+
+
+
+
+		new Setting(containerEl).setName(i18n.t("ICONS")).setHeading();
+
+		new Setting(containerEl)
+			.setName(i18n.t("ENABLE_ICONS"))
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableIcon)
+				.onChange(async (value) => {
+					this.plugin.settings.enableIcon = value
+					await this.plugin.saveSettings();
+					this.display();
+					this.plugin.updateElements();
+					this.plugin.updateIconStyles();
+				}));
+
+
+		if (this.plugin.settings.enableIcon) {
+			new Setting(containerEl)
+			.setName(i18n.t("ICON_PROPERTY"))
+			.addText(text => text
+				.setPlaceholder('icon')
+				.setValue(this.plugin.settings.iconProperty)
+				.onChange(async (value) => {
+					this.plugin.settings.iconProperty = value;
+					await this.plugin.saveSettings();
+				    this.plugin.updateElements();
+				}));
+
+			new Setting(containerEl)
+			.setName(i18n.t("ICONS_FOLDER"))
+			.addText(text => text
+				.setValue(this.plugin.settings.iconsFolder)
+				.onChange(async (value) => {
+					this.plugin.settings.iconsFolder = value;
+					await this.plugin.saveSettings();
+				}));
+
+			new Setting(containerEl)
+			.setName(i18n.t("ICON_SIZE"))
+			.addText(text => {
+				text.inputEl.type = "number"
+				text.setValue(this.plugin.settings.iconSize.toString())
+				.setPlaceholder('70')
+				.onChange(async (value) => {
+					if (!value) value = "0"
+					this.plugin.settings.iconSize = Number(value);
+					await this.plugin.saveSettings();
+				    this.plugin.updateIconStyles();
+				})
+			});
+
+
+			new Setting(containerEl)
+			.setName(i18n.t("ICON_COLOR"))
+			.addColorPicker(color => color
+				.setValue(this.plugin.settings.iconColor)
+				.onChange(async (value) => {
+					this.plugin.settings.iconColor = value
+					await this.plugin.saveSettings();
+				    this.plugin.updateIconStyles();
+				})
+			)
+
+
+
+			new Setting(containerEl)
+			.setName(i18n.t("ICON_LEFT_MARGIN"))
+			.setDesc(i18n.t("CAN_BE_POSITIVE_OR_NEGATIVE"))
+			.addText(text => {
+				text.inputEl.type = "number"
+				text.setValue(this.plugin.settings.iconLeftMargin.toString())
+				.setPlaceholder('100')
+				.onChange(async (value) => {
+					if (!value) value = "0"
+					this.plugin.settings.iconLeftMargin = Number(value);
+					await this.plugin.saveSettings();
+				    this.plugin.updateIconStyles();
+				})
+			});
+
+			
+
+			
+
+
+
+			new Setting(containerEl)
+			.setName(i18n.t("ICON_TOP_MARGIN_WITHOUT_BANNER"))
+			.setDesc(i18n.t("CAN_BE_POSITIVE_OR_NEGATIVE"))
+			.addText(text => {
+				text.inputEl.type = "number"
+				text.setValue(this.plugin.settings.iconTopMarginWithoutBanner.toString())
+				.setPlaceholder('0')
+				.onChange(async (value) => {
+					if (!value) value = "0"
+					this.plugin.settings.iconTopMarginWithoutBanner = Number(value);
+					await this.plugin.saveSettings();
+				    this.plugin.updateIconStyles();
+				})
+			});
+
+
+			new Setting(containerEl)
+			.setName(i18n.t("ICON_TOP_MARGIN_WITH_BANNER"))
+			.setDesc(i18n.t("CAN_BE_POSITIVE_OR_NEGATIVE"))
+			.addText(text => {
+				text.inputEl.type = "number"
+				text.setValue(this.plugin.settings.iconTopMargin.toString())
+				.setPlaceholder('100')
+				.onChange(async (value) => {
+					if (!value) value = "0"
+					this.plugin.settings.iconTopMargin = Number(value);
+					await this.plugin.saveSettings();
+				    this.plugin.updateIconStyles();
+				})
+			});
+
+
+			new Setting(containerEl)
+			.setName(i18n.t("GAP_AFTER_ICON_WITHOUT_BANNER"))
+			.setDesc(i18n.t("CAN_BE_POSITIVE_OR_NEGATIVE"))
+			.addText(text => {
+				text.inputEl.type = "number"
+				text.setValue(this.plugin.settings.iconGap.toString())
+				.setPlaceholder('-20')
+				.onChange(async (value) => {
+					if (!value) value = "0"
+					this.plugin.settings.iconGap = Number(value);
+					await this.plugin.saveSettings();
+				    this.plugin.updateIconStyles();
+				})
+			});
+
+
+			
+
+			
+		}
+
+
+
+
 
 
 
@@ -390,6 +579,237 @@ export default class PPSettingTab extends PluginSettingTab {
 
 
 		
+
+
+
+		new Setting(containerEl).setName(i18n.t("PROPERTY_SETTINGS")).setHeading();
+
+		new Setting(containerEl)
+		.setName(i18n.t("SHOW_COLORED_PROPERTIES"))
+		.addToggle(toggle => {
+			toggle.setValue(this.plugin.settings.showColorSettings)
+			.onChange(value => {
+				this.plugin.settings.showColorSettings = value
+				this.plugin.saveSettings()
+				this.display()
+			})
+		});
+
+
+		if (this.plugin.settings.showColorSettings) { 
+
+			let colorSettingsEl = containerEl.createEl("div")
+
+			const addColorSetting = (property: string) => {
+				let currentColor = this.plugin.settings.propertyPillColors[property]
+				
+				let propertyColorSetting = new Setting(colorSettingsEl)
+
+				propertyColorSetting.settingEl.classList.add("color-" + currentColor)
+
+				let pillEl = propertyColorSetting.nameEl.createEl("div", {
+					cls: "multi-select-pill",
+					attr : {
+						"data-property-pill-value": property
+					},
+				})
+
+				pillEl.createEl("div", {text: property, cls: "multi-select-pill-content"})
+
+				propertyColorSetting.addText(text => {
+					text.setValue(property)
+					let inputEl = text.inputEl
+					inputEl.onblur = () => {
+						let value = inputEl.value
+						if (value && !this.plugin.settings.propertyPillColors[value]) {
+							this.plugin.settings.propertyPillColors[value] = this.plugin.settings.propertyPillColors[property]
+							delete this.plugin.settings.propertyPillColors[property]
+							this.plugin.saveSettings()
+							this.plugin.updatePillColors()
+							this.display()
+						}
+					}
+				})
+				.addButton(btn => btn
+					.setIcon("paintbrush")
+					.setClass("property-color-setting-button")
+					.onClick((e) => {
+						let menu = new Menu()
+						let colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink", "none"]
+
+						for (let color of colors) {
+							menu.addItem((item: MenuItem) => {
+								item.setIcon("square")
+								if (color != "default" && color != "none") {
+									//@ts-ignore
+									item.iconEl.style = "color: transparent; background-color: rgba(var(--color-" + color + "-rgb), 0.3);"
+								}
+						
+								if (color == "none") {
+									//@ts-ignore
+									item.iconEl.style = "opacity: 0.2;"
+								}
+						
+								item.setTitle(i18n.t(color))
+								.onClick(() => {
+
+									propertyColorSetting.settingEl.classList.forEach(cls => {
+										if (cls.startsWith("color")) {
+											propertyColorSetting.settingEl.classList.remove(cls)
+										}
+									})
+
+									propertyColorSetting.settingEl.classList.add("color-" + color)
+
+									this.plugin.settings.propertyPillColors[property] = color
+									this.plugin.saveSettings()
+									this.plugin.updatePillColors()
+
+								})
+
+								item.setChecked(color == this.plugin.settings.propertyPillColors[property])
+							})
+						}
+
+						menu.showAtMouseEvent(e)
+					})
+				)
+				.addButton(btn => btn
+					.setIcon("x")
+					.onClick(() => {
+						delete this.plugin.settings.propertyPillColors[property]
+						this.plugin.saveSettings()
+						propertyColorSetting.settingEl.remove()
+						this.plugin.updatePillColors()
+					})
+				)
+			}
+			
+			for (let property in this.plugin.settings.propertyPillColors) {
+				addColorSetting(property)
+			}
+
+
+			let newProperty = ""
+			let newPropertySetting = new Setting(containerEl)
+				.setName(i18n.t("ADD_COLORED_PROPERTY"))
+				.addText(text => text
+					.setValue("")
+					.onChange(value => newProperty = value)
+				)
+				.addButton(btn => btn
+					.setIcon("plus")
+					.onClick(() => {
+						newProperty = newProperty.trim()
+						if (newProperty && !this.plugin.settings.propertyPillColors[newProperty]) {
+							this.plugin.settings.propertyPillColors[newProperty] = "none"
+							this.plugin.saveSettings()
+							addColorSetting(newProperty)
+							let inputSetting = newPropertySetting.components[0]
+							if (inputSetting instanceof TextComponent) {
+								inputSetting.setValue("")
+							}
+						}
+					})
+				)
+		}
+
+
+		
+
+
+		new Setting(containerEl)
+		.setName(i18n.t("SHOW_HIDDEN_PROPERTIES_LIST"))
+		.addToggle(toggle => {
+			toggle.setValue(this.plugin.settings.showHiddenSettings)
+			.onChange(value => {
+				this.plugin.settings.showHiddenSettings = value
+				this.plugin.saveSettings()
+				this.display()
+			})
+		});
+
+
+
+
+
+
+
+		if (this.plugin.settings.showHiddenSettings) { 
+
+			let hiddenSettingsEl = containerEl.createEl("div")
+
+			const addHiddenSetting = (property: string) => {
+
+				let propertyHiddenSetting = new Setting(hiddenSettingsEl)
+
+				propertyHiddenSetting.addText(text => {
+					text.setValue(property)
+					let inputEl = text.inputEl
+					inputEl.onblur = () => {
+						let value = inputEl.value
+						if (value && !this.plugin.settings.hiddenProperties.find(p => p == value)) {
+							this.plugin.settings.hiddenProperties.push(value)
+							this.plugin.settings.hiddenProperties = this.plugin.settings.hiddenProperties.filter(p => p != property)
+							this.plugin.saveSettings()
+							this.plugin.updateHiddenProperties()
+							this.display()
+						}
+					}
+				})
+
+				.addButton(btn => btn
+					.setIcon("x")
+					.onClick(() => {
+						this.plugin.settings.hiddenProperties = this.plugin.settings.hiddenProperties.filter(p => p != property)
+						this.plugin.saveSettings()
+						propertyHiddenSetting.settingEl.remove()
+						this.plugin.updateHiddenProperties()
+					})
+				)
+			}
+			
+			for (let property of this.plugin.settings.hiddenProperties) {
+				addHiddenSetting(property)
+			}
+
+
+			let newProperty = ""
+			let newPropertySetting = new Setting(containerEl)
+				.setName(i18n.t("ADD_HIDDEN_PROPERTY"))
+				.addText(text => text
+					.setValue("")
+					.onChange(value => newProperty = value)
+				)
+				.addButton(btn => btn
+					.setIcon("plus")
+					.onClick(() => {
+						newProperty = newProperty.trim()
+						if (newProperty && !this.plugin.settings.hiddenProperties.find(p => p == newProperty)) {
+
+							this.plugin.settings.hiddenProperties.push(newProperty)
+							this.plugin.saveSettings()
+							this.plugin.updateHiddenProperties()
+							addHiddenSetting(newProperty)
+
+							let inputSetting = newPropertySetting.components[0]
+							if (inputSetting instanceof TextComponent) {
+								inputSetting.setValue("")
+							}
+						}
+							
+					})
+				)
+		}
+
+
+
+
+
+
+
+
+
 		new Setting(containerEl).setName(i18n.t("OTHER")).setHeading();
 
 
@@ -408,9 +828,16 @@ export default class PPSettingTab extends PluginSettingTab {
 					this.plugin.updateHiddenProperties()
 					this.plugin.updatePillColors()
 					this.plugin.updateBannerStyles()
+					this.plugin.updateIconStyles()
 					this.plugin.updateCoverStyles()
 					this.display();
 					new Notice(i18n.t("CLEAR_SETTINGS_NOTICE"))
 				}))
+
+
+
+
+	
+	
 	}
 }

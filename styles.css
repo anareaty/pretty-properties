@@ -29,10 +29,99 @@
 	-webkit-mask-image: var(--banner-fading);
 }
 
+
+
 .cm-scroller:has(.banner-image:not(:empty)) .cm-sizer,
 .markdown-preview-view:has(.banner-image:not(:empty)) .markdown-preview-sizer {
   margin-top: calc(var(--banner-height) + var(--banner-margin));
 }
+
+
+.cm-scroller:has(.icon-image:not(:empty)) .cm-sizer,
+.markdown-preview-view:has(.icon-image:not(:empty)) .markdown-preview-sizer {
+  margin-top: calc(var(--pp-icon-size) + var(--pp-icon-top-margin-wb) + var(--pp-icon-gap));
+}
+
+
+.cm-scroller:has(.banner-image:not(:empty)):has(.icon-image:not(:empty)) .cm-sizer,
+.markdown-preview-view:has(.banner-image:not(:empty)):has(.icon-image:not(:empty)) .markdown-preview-sizer {
+  margin-top: calc(var(--banner-height) + var(--banner-margin) + var(--pp-banner-icon-gap));
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/* ICONS */
+
+
+
+
+.cm-scroller {
+  flex-wrap: wrap;
+}
+
+
+.icon-wrapper {
+    width: 100%;
+    
+}
+
+
+.is-readable-line-width .icon-sizer {
+    max-width: var(--file-line-width);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+.icon-image {
+  position: absolute;
+  z-index: 99;
+  width: var(--pp-icon-size);
+  height: var(--pp-icon-size);
+  margin-top: var(--pp-icon-top-margin-wb);
+  margin-left: var(--pp-icon-left-margin);
+}
+
+
+
+
+.cm-scroller:has(.banner-image:not(:empty)) .icon-image,
+.markdown-preview-view:has(.banner-image:not(:empty)) .icon-image {
+  margin-top: var(--pp-icon-top-margin);
+}
+
+
+
+
+
+
+.icon-image img,
+.icon-image svg,
+.icon-image .pp-text-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  color: var(--pp-icon-color);
+}
+
+.icon-image {
+  container-type: inline-size;
+}
+
+.icon-image .pp-text-icon {
+  font-size: 90cqw;
+  line-height: 1;
+}
+
 
 
 
@@ -208,13 +297,110 @@
   width: 100%;
   height: 130px;
   object-fit: cover;
+  margin: 0;
 }
 
+
+
+
+
+
+
+
+.image-suggestion-item.cover {
+  height: 240px;
+  width: 130px;
+  display: inline-block;
+}
+
+.image-suggestion-item.cover > div {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+}
 
 .image-suggestion-item.cover img {
-  height: 150px;
+  width: 100%;
+  height: 160px;
   object-fit: cover;
+  margin: 0;
 }
+
+
+
+
+
+
+
+
+
+.image-suggestion-item.icon {
+  height: calc(var(--pp-icon-size) + 70px);
+  width: calc(var(--pp-icon-size) + 24px);
+  display: inline-block;
+}
+
+.image-suggestion-item.icon > div {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+
+.image-suggestion-item.icon img {
+  height: var(--pp-icon-size);
+  width: var(--pp-icon-size);
+  object-fit: contain;
+  margin: 0;
+}
+
+
+
+
+
+
+
+
+
+.image-suggestion-item.svg-icon,
+.image-suggestion-item.emoji-icon  {
+  height: 48px;
+  width: 48px;
+  display: inline-block;
+}
+
+.image-suggestion-item.svg-icon > div {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+
+.image-suggestion-item.svg-icon svg {
+  height: 24px;
+  width: 24px;
+  object-fit: contain;
+  margin: 0;
+}
+
+
+
+
+.image-suggestion-item.emoji-icon {
+  container-type: inline-size;
+}
+
+
+.image-suggestion-item.emoji-icon > div {
+  font-size: 90cqw;
+}
+
+
+
+
+
+
+
 
 
 
@@ -335,4 +521,45 @@ body {
 .workspace-leaf-content[data-type="file-properties"] progress::-webkit-progress-value,
 .bases-view progress::-webkit-progress-value {
   background-color: var(--color-accent-1);
+}
+
+
+
+
+.setting-item-name .multi-select-pill {
+    width: fit-content;
+    padding-right: var(--pill-padding-x);
+}
+
+
+.setting-item.color-red .multi-select-pill {
+    --pill-color-rgb: var(--color-red-rgb);
+}
+
+.setting-item.color-orange .multi-select-pill {
+    --pill-color-rgb: var(--color-orange-rgb);
+}
+
+.setting-item.color-yellow .multi-select-pill {
+    --pill-color-rgb: var(--color-yellow-rgb);
+}
+
+.setting-item.color-green .multi-select-pill {
+    --pill-color-rgb: var(--color-green-rgb);
+}
+
+.setting-item.color-cyan .multi-select-pill {
+    --pill-color-rgb: var(--color-cyan-rgb);
+}
+
+.setting-item.color-blue .multi-select-pill {
+    --pill-color-rgb: var(--color-blue-rgb);
+}
+
+.setting-item.color-purple .multi-select-pill {
+    --pill-color-rgb: var(--color-purple-rgb);
+}
+
+.setting-item.color-pink .multi-select-pill {
+    --pill-color-rgb: var(--color-pink-rgb);
 }

@@ -1,6 +1,7 @@
 import { SuggestModal, App, MarkdownRenderer, TFile } from "obsidian";
 import PrettyPropertiesPlugin from "./main";
 
+
 export class ImageSuggestModal extends SuggestModal<string> {
     plugin: PrettyPropertiesPlugin
 	resolve: any
@@ -35,8 +36,8 @@ export class ImageSuggestModal extends SuggestModal<string> {
             let link = this.app.fileManager.generateMarkdownLink(file, "")
             let image = document.createElement("div")
             await MarkdownRenderer.render(this.app, link, image, "", this.plugin)
-            image.classList.add("image-suggestion-item")
-            image.classList.add(this.shape)
+            el.classList.add("image-suggestion-item")
+            el.classList.add(this.shape)
             image.append(name)
             el.append(image)
         } else {
