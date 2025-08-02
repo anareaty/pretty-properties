@@ -66,6 +66,9 @@ export default {
   ICONS: "Icons",
   UNHIDE_ICON_PROPERTY: "Unhide icon property",
   ICON_BACKGROUND: "Icon background",
+  EXTERNAL_IMAGE: "External image",
+  LINK_TO_EXTERNAL_IMAGE: "Link to external image",
+  SAVE: "Save",
 
 
 

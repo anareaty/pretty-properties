@@ -570,3 +570,14 @@ body {
 .setting-item.color-pink .multi-select-pill {
     --pill-color-rgb: var(--color-pink-rgb);
 }
+
+
+
+.prompt-setting {
+  display: grid;
+}
+
+
+.prompt-setting input {
+  width: 100%;
+}

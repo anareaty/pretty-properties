@@ -76,4 +76,7 @@ export default {
   ICONS: "Иконки",
   UNHIDE_ICON_PROPERTY: "Показать свойство иконки",
   ICON_BACKGROUND: "Фон иконки",
+  EXTERNAL_IMAGE: "Внешнее изображение",
+  LINK_TO_EXTERNAL_IMAGE: "Ссылка на внешнее изображение",
+  SAVE: "Сохранить",
 };

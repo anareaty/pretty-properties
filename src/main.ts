@@ -18,7 +18,10 @@ import {
 	getIcon,
 	setIcon,
 	IconName,
-	SuggestModal
+	SuggestModal,
+	Modal,
+	App,
+	Setting
  } from 'obsidian';
 import MenuManager from 'src/MenuManager';
 import { i18n } from './localization';
@@ -400,6 +403,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 		let options: any = {
 			"image": i18n.t("LOCAL_IMAGE"),
+			"link": i18n.t("EXTERNAL_IMAGE"),
 			"svg": i18n.t("LUCIDE_ICON"),
 			"emoji": i18n.t("EMOJI")
 		}
@@ -419,6 +423,10 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 				if (val == "image") {
 					plugin.selectIconImage()
+				}
+
+				if (val == "link") {
+					plugin.promptIconLink()
 				}
 
 				if (val == "svg") {
@@ -445,17 +453,25 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		if (file instanceof TFile) {
 
 			let iconFolder = this.settings.iconsFolder
+
+			
 			
 			let files = this.app.vault.getFiles()
 
-			let formats = ["avif", "bmp", "gif", "jpeg", "jpg", ".png", "svg", "webp"]
+			let formats = ["avif", "bmp", "gif", "jpeg", "jpg", "png", "svg", "webp"]
 
 			files = files.filter(f => formats.find(e => e == f.extension))
-			
+
+
+
 			let iconFiles = files
 			if (iconFolder) {
-				iconFiles = files.filter(f => f.parent!.path == iconFolder || f.parent!.path.startsWith(iconFolder + "/"))
+				iconFiles = files.filter(f => {
+					return f.parent!.path == iconFolder || f.parent!.path.startsWith(iconFolder + "/")
+				})
 			}
+
+			
 			
 			let iconPaths = iconFiles.map(f => f.path)
 			let iconNames = iconFiles.map(f => f.basename)
@@ -514,20 +530,6 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 		new SvgSuggestModal(this.app).open()
 
-			/*
-
-			if (iconPath) {
-				let iconFile = this.app.vault.getAbstractFileByPath(iconPath)
-				if (iconFile instanceof TFile) {
-					let iconLink = this.app.fileManager.generateMarkdownLink(iconFile, "").replace(/^\!/, "")
-				
-					this.app.fileManager.processFrontMatter(file, fm => {
-						fm[propName] = iconLink
-					})
-				}
-			}
-
-			*/
 		
 	}
 
@@ -571,6 +573,73 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 
+	promptIconLink() {
+		let propName = this.settings.iconProperty
+
+		class ImageLinkPrompt extends Modal {
+			result: string
+
+            constructor(app: App) {
+                super(app);
+                this.eventInput = this.eventInput.bind(this)
+				this.result = ""
+            }
+
+            eventInput(e: KeyboardEvent) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    this.close()
+                }
+            }
+            
+            onOpen() {
+                const {contentEl} = this
+            
+
+				let promptSetting = new Setting(contentEl)
+				.setName(i18n.t("LINK_TO_EXTERNAL_IMAGE"))
+					.addText(text => text
+						.setValue(this.result)
+						.onChange((value) => {
+							this.result = value
+						})
+					)
+
+				let buttonSetting = new Setting(contentEl)
+				.addButton(btn => btn
+					.setButtonText(i18n.t("SAVE"))
+					.setCta()
+					.onClick(() => {
+						this.close()
+					})
+				)
+			
+				promptSetting.settingEl.classList.add("prompt-setting")
+                contentEl.addEventListener("keydown", this.eventInput)
+            }
+
+            onClose() {
+                const {contentEl} = this
+                contentEl.empty()
+                this.contentEl.removeEventListener("keydown", this.eventInput) 
+				
+				if (this.result && this.result.startsWith("http")) {
+					let file = this.app.workspace.getActiveFile()
+					if (file instanceof TFile) {
+						this.app.fileManager.processFrontMatter(file, fm => {
+							fm[propName] = this.result
+						})
+					}
+				}
+            } 
+        }
+
+		new ImageLinkPrompt(this.app).open()
+	}
+
+
+
+
 
 	async selectBannerImage() {
 		let propName = this.settings.bannerProperty
@@ -581,7 +650,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			
 			let files = this.app.vault.getFiles()
 
-			let formats = ["avif", "bmp", "gif", "jpeg", "jpg", ".png", "svg", "webp"]
+			let formats = ["avif", "bmp", "gif", "jpeg", "jpg", "png", "svg", "webp"]
 
 			files = files.filter(f => formats.find(e => e == f.extension))
 			
@@ -686,7 +755,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 			let coverFolder = this.settings.coversFolder
 			let files = this.app.vault.getFiles()
-			let formats = ["avif", "bmp", "gif", "jpeg", "jpg", ".png", "svg", "webp"]
+			let formats = ["avif", "bmp", "gif", "jpeg", "jpg", "png", "svg", "webp"]
 			files = files.filter(f => formats.find(e => e == f.extension))
 			
 			let coverFiles = files
