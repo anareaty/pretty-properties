@@ -27,8 +27,9 @@ import MenuManager from 'src/MenuManager';
 import { i18n } from './localization';
 import PPSettingTab from './settings';
 import { PPPluginSettings, DEFAULT_SETTINGS } from './settings';
-import { ImageSuggestModal } from './modal';
+import { LocalImageSuggestModal } from './modals';
 import Emojilib from "emojilib";
+import { ImageLinkPrompt } from './modals';
 
 
 
@@ -194,7 +195,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
             id: "select-banner-image",
             name: i18n.t("SELECT_BANNER_IMAGE"),
             callback: async () => {
-                this.selectBannerImage()
+                this.selectImage(this.settings.bannerProperty, this.settings.bannersFolder, "banner")
             }
         })
 
@@ -226,7 +227,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 					}
 
 					if (propName) {
-						this.selectCoverImage(propName)
+						this.selectImage(propName, this.settings.coversFolder, "cover")
 					}
 				}
 			}
@@ -264,6 +265,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 		let targetNode = view.containerEl;
 		let observer = new MutationObserver((mutations) => {
+
+			console.log(mutations)
 
 			
 
@@ -307,23 +310,21 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				}
 			}
 
-			if (type == "markdown" || type == "file-properties") {
-				if (multiSelectMutation) {
-					this.addClassestoProperties(view)
-				}
-				if (progressMutation) {
-					this.updateViewProgress(view)
-				}
+			if (multiSelectMutation) {
+				this.addClassestoProperties(view)
+				this.updateBaseLeafPills(leaf)
+			}
+			if (progressMutation) {
+				this.updateViewProgress(view)
+				this.updateBaseLeafProgress(leaf)
+			}
+		
+
+			if (baseMutation) {
+				this.updateBaseLeafPills(leaf)
+				this.updateBaseLeafProgress(leaf)
 			}
 
-			else if (type == "bases") {
-				if (baseMutation || multiSelectMutation) {
-					this.updateBaseLeafPills(leaf)
-				}
-				if (baseMutation || progressMutation) {
-					this.updateBaseLeafProgress(leaf)
-				}
-			}
 		});
 		observer.observe(targetNode, { childList: true, subtree: true });
 		this.observers.push(observer)
@@ -343,7 +344,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			.setIcon('lucide-image-plus')
 			.setSection('pretty-properties')
 			.onClick(async () => {
-				this.selectBannerImage()
+				this.selectImage(this.settings.bannerProperty, this.settings.bannersFolder, "banner")
 			})
 		);
 
@@ -355,6 +356,16 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			.setSection('pretty-properties')
 			.onClick(() => {
 				if (propName) this.settings.hiddenProperties.remove(propName)
+				this.saveSettings()
+				this.updateHiddenProperties()			
+			}))
+		} else {
+			menu.addItem((item: MenuItem) => item
+			.setTitle(i18n.t("HIDE_BANNER_PROPERTY"))
+			.setIcon('lucide-eye-off')
+			.setSection('pretty-properties')
+			.onClick(() => {
+				if (propName) this.settings.hiddenProperties.push(propName)
 				this.saveSettings()
 				this.updateHiddenProperties()			
 			}))
@@ -392,6 +403,16 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				this.saveSettings()
 				this.updateHiddenProperties()			
 			}))
+		} else {
+			menu.addItem((item: MenuItem) => item
+			.setTitle(i18n.t("HIDE_ICON_PROPERTY"))
+			.setIcon('lucide-eye-off')
+			.setSection('pretty-properties')
+			.onClick(() => {
+				if (propName) this.settings.hiddenProperties.push(propName)
+				this.saveSettings()
+				this.updateHiddenProperties()			
+			}))
 		}
 
 		menu.showAtMouseEvent(e)
@@ -420,25 +441,21 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				el.append(options[key])
 			}
 			onChooseSuggestion(val: string) {
-
+				let iconProperty = plugin.settings.iconProperty
 				if (val == "image") {
-					plugin.selectIconImage()
+					plugin.selectLocalImage(iconProperty, plugin.settings.iconsFolder, "icon")
 				}
-
 				if (val == "link") {
-					plugin.promptIconLink()
+					new ImageLinkPrompt(this.app, iconProperty).open()
 				}
-
 				if (val == "svg") {
 					plugin.selectIconSvg()
 				}
-
 				if (val == "emoji") {
 					plugin.selectIconEmoji()
 				}
 			} 
 		}
-
 		new IconSuggestModal(this.app).open()
 	}
 
@@ -447,48 +464,72 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 
-	async selectIconImage() {
-		let propName = this.settings.iconProperty
+
+
+
+
+
+	async selectImage(propName: string, folder: string, shape: string) {
+		let options: any = {
+			"image": i18n.t("LOCAL_IMAGE"),
+			"link": i18n.t("EXTERNAL_IMAGE")
+		}
+		let plugin = this
+
+		class ImageSuggestModal extends SuggestModal<string> {
+			getSuggestions(query:string): string[] {
+				return Object.keys(options).filter((key) => {
+					return options[key].toLowerCase().includes(query.toLowerCase())
+				})
+			}
+			async renderSuggestion(key: string, el: Element) {
+				el.append(options[key])
+			}
+			onChooseSuggestion(val: string) {
+				if (val == "image") {
+					plugin.selectLocalImage(propName, folder, shape)
+				}
+				if (val == "link") {
+					new ImageLinkPrompt(this.app, propName).open()
+				}
+			} 
+		}
+		new ImageSuggestModal(this.app).open()
+	}
+
+
+
+
+
+
+
+
+	async selectLocalImage(propName: string, folder: string, shape: string) {
+
 		let file = this.app.workspace.getActiveFile()
 		if (file instanceof TFile) {
 
-			let iconFolder = this.settings.iconsFolder
-
-			
-			
-			let files = this.app.vault.getFiles()
-
 			let formats = ["avif", "bmp", "gif", "jpeg", "jpg", "png", "svg", "webp"]
-
+			let files = this.app.vault.getFiles()
 			files = files.filter(f => formats.find(e => e == f.extension))
 
-
-
-			let iconFiles = files
-			if (iconFolder) {
-				iconFiles = files.filter(f => {
-					return f.parent!.path == iconFolder || f.parent!.path.startsWith(iconFolder + "/")
+			let imageFiles = files
+			if (folder) {
+				imageFiles = files.filter(f => {
+					return f.parent!.path == folder || f.parent!.path.startsWith(folder + "/")
 				})
 			}
 
-			
-			
-			let iconPaths = iconFiles.map(f => f.path)
-			let iconNames = iconFiles.map(f => f.basename)
-			let iconPath = await this.imageSuggester(this, "icon", iconPaths, iconNames)
+			let imagePaths = imageFiles.map(f => f.path)
+			let imageNames = imageFiles.map(f => f.basename)
 
-			if (iconPath) {
-				let iconFile = this.app.vault.getAbstractFileByPath(iconPath)
-				if (iconFile instanceof TFile) {
-					let iconLink = this.app.fileManager.generateMarkdownLink(iconFile, "").replace(/^\!/, "")
-				
-					this.app.fileManager.processFrontMatter(file, fm => {
-						fm[propName] = iconLink
-					})
-				}
-			}
+			new LocalImageSuggestModal(this.app, this, propName, shape, imagePaths, imageNames).open()
+
 		}
 	}
+
+
+
 
 
 
@@ -498,9 +539,6 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 	async selectIconSvg() {
 		let propName = this.settings.iconProperty
-		
-		
-
 		let iconIds = getIconIds()
 
 		class SvgSuggestModal extends SuggestModal<string> {
@@ -527,13 +565,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				}
 			} 
 		}
-
 		new SvgSuggestModal(this.app).open()
-
-		
 	}
-
-
 
 
 	async selectIconEmoji() {
@@ -567,114 +600,16 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		}
 
 		new EmojiSuggestModal(this.app).open()
-	
-	}
-
-
-
-
-	promptIconLink() {
-		let propName = this.settings.iconProperty
-
-		class ImageLinkPrompt extends Modal {
-			result: string
-
-            constructor(app: App) {
-                super(app);
-                this.eventInput = this.eventInput.bind(this)
-				this.result = ""
-            }
-
-            eventInput(e: KeyboardEvent) {
-                if (e.key === "Enter") {
-                    e.preventDefault();
-                    this.close()
-                }
-            }
-            
-            onOpen() {
-                const {contentEl} = this
-            
-
-				let promptSetting = new Setting(contentEl)
-				.setName(i18n.t("LINK_TO_EXTERNAL_IMAGE"))
-					.addText(text => text
-						.setValue(this.result)
-						.onChange((value) => {
-							this.result = value
-						})
-					)
-
-				let buttonSetting = new Setting(contentEl)
-				.addButton(btn => btn
-					.setButtonText(i18n.t("SAVE"))
-					.setCta()
-					.onClick(() => {
-						this.close()
-					})
-				)
-			
-				promptSetting.settingEl.classList.add("prompt-setting")
-                contentEl.addEventListener("keydown", this.eventInput)
-            }
-
-            onClose() {
-                const {contentEl} = this
-                contentEl.empty()
-                this.contentEl.removeEventListener("keydown", this.eventInput) 
-				
-				if (this.result && this.result.startsWith("http")) {
-					let file = this.app.workspace.getActiveFile()
-					if (file instanceof TFile) {
-						this.app.fileManager.processFrontMatter(file, fm => {
-							fm[propName] = this.result
-						})
-					}
-				}
-            } 
-        }
-
-		new ImageLinkPrompt(this.app).open()
 	}
 
 
 
 
 
-	async selectBannerImage() {
-		let propName = this.settings.bannerProperty
-		let file = this.app.workspace.getActiveFile()
-		if (file instanceof TFile) {
 
-			let bannerFolder = this.settings.bannersFolder
-			
-			let files = this.app.vault.getFiles()
 
-			let formats = ["avif", "bmp", "gif", "jpeg", "jpg", "png", "svg", "webp"]
 
-			files = files.filter(f => formats.find(e => e == f.extension))
-			
-			let bannerFiles = files
-			if (bannerFolder) {
-				bannerFiles = files.filter(f => f.parent!.path == bannerFolder || f.parent!.path.startsWith(bannerFolder + "/"))
-			}
-			
-			let bannerPaths = bannerFiles.map(f => f.path)
-			let bannerNames = bannerFiles.map(f => f.basename)
-			let bannerPath = await this.imageSuggester(this, "banner", bannerPaths, bannerNames)
 
-			if (bannerPath) {
-				let bannerFile = this.app.vault.getAbstractFileByPath(bannerPath)
-				if (bannerFile instanceof TFile) {
-					let bannerLink = this.app.fileManager.generateMarkdownLink(bannerFile, "").replace(/^\!/, "")
-				
-					this.app.fileManager.processFrontMatter(file, fm => {
-						fm[propName] = bannerLink
-					})
-				}
-			}
-		}
-	}
 
 
 
@@ -741,58 +676,49 @@ export default class PrettyPropertiesPlugin extends Plugin {
 						if (propName) this.settings.hiddenProperties.remove(propName)
 						this.saveSettings()
 						this.updateHiddenProperties()			
-					})
-				)}
+					}))
+				} else {
+					menu.addItem((item: MenuItem) => item
+					.setTitle(i18n.t("HIDE_COVER_PROPERTY"))
+					.setIcon('lucide-eye-off')
+					.setSection('pretty-properties')
+					.onClick(() => {
+						if (propName) this.settings.hiddenProperties.push(propName)
+						this.saveSettings()
+						this.updateHiddenProperties()			
+					}))
+				}
 
 				menu.showAtMouseEvent(e)
 			}
 		}
 	}
 
-	async selectCoverImage(propName: string) {
-		let file = this.app.workspace.getActiveFile()
-		if (file instanceof TFile) {
 
-			let coverFolder = this.settings.coversFolder
-			let files = this.app.vault.getFiles()
-			let formats = ["avif", "bmp", "gif", "jpeg", "jpg", "png", "svg", "webp"]
-			files = files.filter(f => formats.find(e => e == f.extension))
-			
-			let coverFiles = files
-			if (coverFolder) {
-				coverFiles = files.filter(f => f.parent!.path == coverFolder || f.parent!.path.startsWith(coverFolder + "/"))
-			}
-
-			let coverPaths = coverFiles.map(f => f.path)
-			let coverNames = coverFiles.map(f => f.basename)
-			let coverPath = await this.imageSuggester(this, "cover", coverPaths, coverNames)
-
-			if (coverPath) {
-				let coverFile = this.app.vault.getAbstractFileByPath(coverPath)
-				if (coverFile instanceof TFile) {
-					let coverLink = this.app.fileManager.generateMarkdownLink(coverFile, "").replace(/^\!/, "")
-				
-					this.app.fileManager.processFrontMatter(file, fm => {
-						fm[propName] = coverLink
-					})
-				}
-			}
-		}
-	}
 
 	async selectCoverShape(file: TFile) {
 		let shapes = ["vertical", "horizontal", "square", "circle"]
-		let shape = await this.imageSuggester(this, "text", shapes)
-
-		if (shape) {
-			this.app.fileManager.processFrontMatter(file, fm => {
-				let cssclasses = fm.cssclasses || []
-				cssclasses = cssclasses.filter((c: string) => !shapes.find(s => c == "cover-" + s))
-				cssclasses.push("cover-" + shape)
-				fm.cssclasses = cssclasses
-			})
+		class CoverShapeSuggestModal extends SuggestModal<string> {
+			getSuggestions(query:string): string[] {
+				return shapes.filter((shape) => {
+					return shape.toLowerCase().includes(query.toLowerCase())
+				})
+			}
+			async renderSuggestion(text: string, el: Element) {
+				el.append(text)
+			}
+			onChooseSuggestion(shape: string) {
+				if (shape) {
+					this.app.fileManager.processFrontMatter(file, fm => {
+						let cssclasses = fm.cssclasses || []
+						cssclasses = cssclasses.filter((c: string) => !shapes.find(s => c == "cover-" + s))
+						cssclasses.push("cover-" + shape)
+						fm.cssclasses = cssclasses
+					})
+				}
+			} 
 		}
-
+		new CoverShapeSuggestModal(this.app).open()
 	}
 
 
@@ -834,13 +760,6 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 
-
-	async imageSuggester(plugin: PrettyPropertiesPlugin, shape: string, values: string[], names?: string[]) {
-		let data: Promise<string|undefined> = new Promise((resolve, reject) => {
-			new ImageSuggestModal(plugin.app, plugin, resolve, reject, shape, values, names).open()  
-		})
-		return data
-	}
 
 
 

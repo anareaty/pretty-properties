@@ -577,7 +577,13 @@ body {
   display: grid;
 }
 
-
-.prompt-setting input {
-  width: 100%;
+.prompt-setting .setting-item-control {
+    display: grid;
+    justify-content: stretch;
 }
+
+.prompt-setting button {
+  width: fit-content;
+  justify-self: end;
+}
+
