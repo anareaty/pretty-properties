@@ -74,4 +74,6 @@ export default {
   ICON_TOP_MARGIN_WITH_BANNER: "Верхний отступ иконки с баннером",
   GAP_AFTER_ICON_WITHOUT_BANNER: "Отступ после иконки без баннера",
   ICONS: "Иконки",
+  UNHIDE_ICON_PROPERTY: "Показать свойство иконки",
+  ICON_BACKGROUND: "Фон иконки",
 };

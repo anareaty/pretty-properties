@@ -197,6 +197,15 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 		this.addCommand({
+            id: "select-icon",
+            name: i18n.t("SELECT_ICON"),
+            callback: async () => {
+                this.selectIcon()
+            }
+        })
+
+
+		this.addCommand({
             id: "select-cover-image",
             name: i18n.t("SELECT_COVER_IMAGE"),
             callback: async () => {
@@ -1045,6 +1054,13 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			if (!iconColor) iconColor = "var(--text-normal)"
 
 
+			let iconBackground = "transparent"
+
+			if (this.settings.iconBackground) {
+				iconBackground = "var(--background-primary)"
+			}
+
+
 			let styleText = "body {\n" + 
 			"--pp-icon-size: " + this.settings.iconSize + "px;\n" +
 			"--pp-icon-top-margin: " + this.settings.iconTopMargin + "px;\n" +
@@ -1053,6 +1069,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			"--pp-banner-icon-gap: " + this.settings.bannerIconGap + "px;\n" +
 			"--pp-icon-left-margin: " + this.settings.iconLeftMargin + "px;\n" +
 			"--pp-icon-color: " + iconColor + ";\n" +
+			"--pp-icon-background: " + iconBackground + ";\n" +
 			"}\n"
 
 			const style = document.createElement("style")

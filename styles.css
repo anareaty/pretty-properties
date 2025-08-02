@@ -115,10 +115,18 @@
 
 .icon-image {
   container-type: inline-size;
+  background-color: var(--pp-icon-background);
+  border-radius:8px;
+  padding: 6px;
 }
 
+
+
+
+
+
 .icon-image .pp-text-icon {
-  font-size: 90cqw;
+  font-size: 80cqw;
   line-height: 1;
 }
 
@@ -392,9 +400,8 @@
 
 
 .image-suggestion-item.emoji-icon > div {
-  font-size: 90cqw;
+  font-size: 80cqw;
 }
-
 
 
 

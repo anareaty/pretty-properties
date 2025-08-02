@@ -39,6 +39,7 @@ export interface PPPluginSettings {
 	iconGap: number;
 	bannerIconGap: number;
 	iconColor: string;
+	iconBackground: boolean;
 	
 	
 }
@@ -79,7 +80,8 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	iconLeftMargin: 0,
 	iconGap: 20,
 	bannerIconGap: 30,
-	iconColor: ""
+	iconColor: "",
+	iconBackground: false
 }
 
 
@@ -271,6 +273,18 @@ export default class PPSettingTab extends PluginSettingTab {
 				    this.plugin.updateIconStyles();
 				})
 			)
+
+
+
+			new Setting(containerEl)
+			.setName(i18n.t("ICON_BACKGROUND"))
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.iconBackground)
+				.onChange(async (value) => {
+					this.plugin.settings.iconBackground = value
+					await this.plugin.saveSettings();
+					this.plugin.updateIconStyles();
+				}));
 
 
 

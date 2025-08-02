@@ -64,6 +64,8 @@ export default {
   ICON_TOP_MARGIN_WITH_BANNER: "Icon top margin with banner",
   GAP_AFTER_ICON_WITHOUT_BANNER: "Gap after icon without banner",
   ICONS: "Icons",
+  UNHIDE_ICON_PROPERTY: "Unhide icon property",
+  ICON_BACKGROUND: "Icon background",
 
 
 
