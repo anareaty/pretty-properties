@@ -266,10 +266,6 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		let targetNode = view.containerEl;
 		let observer = new MutationObserver((mutations) => {
 
-			console.log(mutations)
-
-			
-
 			let baseMutation
 			let multiSelectMutation
 			let progressMutation
@@ -323,6 +319,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			if (baseMutation) {
 				this.updateBaseLeafPills(leaf)
 				this.updateBaseLeafProgress(leaf)
+				
 			}
 
 		});
@@ -1001,16 +998,18 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		if (this.settings.enableBanner) {
 
 			let bannerHeight
-			//@ts-ignore
-			if (this.app.isMobile) {
+			let bannerMargin 
+			if (Platform.isMobile) {
 				bannerHeight = this.settings.bannerHeightMobile
+				bannerMargin = this.settings.bannerMarginMobile
 			} else {
 				bannerHeight = this.settings.bannerHeight
+				bannerMargin = this.settings.bannerMargin
 			}
 
 			let styleText = "body {\n" + 
 			"--banner-height: " + bannerHeight + "px;\n" +
-			"--banner-margin: " + this.settings.bannerMargin + "px;\n" +
+			"--banner-margin: " + bannerMargin + "px;\n" +
 			"}\n"
 
 			if (this.settings.bannerFading) {
@@ -1038,6 +1037,20 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 		if (this.settings.enableIcon) {
 
+
+			let iconTopMargin
+			let bannerIconGap
+			if (Platform.isMobile) {
+				iconTopMargin = this.settings.iconTopMarginMobile
+				bannerIconGap = this.settings.bannerIconGapMobile
+			} else {
+				iconTopMargin = this.settings.iconTopMargin
+				bannerIconGap = this.settings.bannerIconGap
+			}
+
+
+
+
 			let iconColor = this.settings.iconColor
 			if (!iconColor) iconColor = "var(--text-normal)"
 
@@ -1051,10 +1064,10 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 			let styleText = "body {\n" + 
 			"--pp-icon-size: " + this.settings.iconSize + "px;\n" +
-			"--pp-icon-top-margin: " + this.settings.iconTopMargin + "px;\n" +
+			"--pp-icon-top-margin: " + iconTopMargin + "px;\n" +
 			"--pp-icon-top-margin-wb: " + this.settings.iconTopMarginWithoutBanner + "px;\n" +
 			"--pp-icon-gap: " + this.settings.iconGap + "px;\n" +
-			"--pp-banner-icon-gap: " + this.settings.bannerIconGap + "px;\n" +
+			"--pp-banner-icon-gap: " + bannerIconGap + "px;\n" +
 			"--pp-icon-left-margin: " + this.settings.iconLeftMargin + "px;\n" +
 			"--pp-icon-color: " + iconColor + ";\n" +
 			"--pp-icon-background: " + iconBackground + ";\n" +
@@ -1125,29 +1138,51 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 	updateBaseLeafPills(leaf: WorkspaceLeaf) {
+
+
+
+		
+
+
+
 		let baseTableContainer = leaf.view.containerEl.querySelector(".bases-table-container")
 
 		if (baseTableContainer) {
-			const updateBasePills = () => {
+
+			
+			const updateTableBasePills = () => {
 				if (baseTableContainer.classList.contains("is-loading")) {
-					setTimeout(updateBasePills, 50)
+					setTimeout(updateTableBasePills, 50)
 				} else {
 					this.addClassestoProperties(leaf.view)
 				}
 			}
 
-			updateBasePills()	
+			updateTableBasePills()	
 		}
 
-
+		
+		
+		
 		let baseCardsContainer = leaf.view.containerEl.querySelector(".bases-cards-container")
 
 		if (baseCardsContainer) {
-			const updateBasePills = () => {
-				if (baseCardsContainer.classList.contains("is-loading")) {
-					setTimeout(updateBasePills, 50)
-				} else {
-					let pills = baseCardsContainer.querySelectorAll(".bases-cards-property .value-list-element:not([data-property-pill-value])")
+
+			const updateCardsBasePills = () => {
+
+				if (baseCardsContainer!.classList.contains("is-loading")) {
+					let baseCardsContainer2 = leaf.view.containerEl.querySelector(".bases-cards-container:not(.is-loading")
+
+					if (!baseCardsContainer2) {
+						setTimeout(updateCardsBasePills, 50)
+					} else {
+						baseCardsContainer = baseCardsContainer2
+					}
+				} 
+				
+				if (!baseCardsContainer!.classList.contains("is-loading")) {
+					let pills = baseCardsContainer!.querySelectorAll(".bases-cards-property .value-list-element:not([data-property-pill-value])")
+
 					for (let pill of pills) {
 						if (pill instanceof HTMLElement) {
 							let value = pill.innerText
@@ -1156,7 +1191,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 					}
 				}
 			}
-			updateBasePills()
+
+			updateCardsBasePills()
 		}
 	}
 
@@ -1222,11 +1258,20 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 		if (baseCardsContainer) {
 			const updateProgress = () => {
-				if (baseCardsContainer.classList.contains("is-loading")) {
-					
-					setTimeout(updateProgress, 50)
-				} else {
-					let progressEls = baseCardsContainer.querySelectorAll(".bases-cards-property[data-property*='formula.pp_progress']")
+
+				if (baseCardsContainer!.classList.contains("is-loading")) {
+					let baseCardsContainer2 = leaf.view.containerEl.querySelector(".bases-cards-container:not(.is-loading")
+
+					if (!baseCardsContainer2) {
+						setTimeout(updateProgress, 50)
+					} else {
+						baseCardsContainer = baseCardsContainer2
+					}
+				} 
+				
+				
+				if (!baseCardsContainer!.classList.contains("is-loading")) {
+					let progressEls = baseCardsContainer!.querySelectorAll(".bases-cards-property[data-property*='formula.pp_progress']")
 					for (let progressEl of progressEls) {
 						if (progressEl instanceof HTMLElement) {
 							let oldProgress = progressEl.querySelector(".metadata-progress-wrapper")

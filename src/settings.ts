@@ -16,6 +16,7 @@ export interface PPPluginSettings {
     bannerHeight: number;
     bannerHeightMobile: number;
     bannerMargin: number;
+	bannerMarginMobile: number;
     bannerFading: boolean;
     coverVerticalWidth: number;
     coverHorizontalWidth: number;
@@ -34,10 +35,12 @@ export interface PPPluginSettings {
 	showHiddenSettings: boolean;
 	iconSize: number;
 	iconTopMargin: number;
+	iconTopMarginMobile: number;
 	iconTopMarginWithoutBanner: number;
 	iconLeftMargin: number;
 	iconGap: number;
 	bannerIconGap: number;
+	bannerIconGapMobile: number;
 	iconColor: string;
 	iconBackground: boolean;
 	
@@ -58,6 +61,7 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
     bannerHeight: 150, 
     bannerHeightMobile: 100,
     bannerMargin: -20,
+	bannerMarginMobile: 0,
     bannerFading: true,
     coverVerticalWidth: 200,
     coverHorizontalWidth: 300,
@@ -76,10 +80,12 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	iconsFolder: "",
 	iconSize: 70,
 	iconTopMargin: 70,
+	iconTopMarginMobile: 44,
 	iconTopMarginWithoutBanner: -10,
 	iconLeftMargin: 0,
-	iconGap: 20,
-	bannerIconGap: 30,
+	iconGap: 10,
+	bannerIconGap: 0,
+	bannerIconGapMobile: 20,
 	iconColor: "",
 	iconBackground: false
 }
@@ -190,6 +196,22 @@ export default class PPSettingTab extends PluginSettingTab {
 
 
 			new Setting(containerEl)
+			.setName(i18n.t("GAP_AFTER_BANNER_MOBILE"))
+			.setDesc(i18n.t("CAN_BE_POSITIVE_OR_NEGATIVE"))
+			.addText(text => {
+				text.inputEl.type = "number"
+				text.setValue(this.plugin.settings.bannerMarginMobile.toString())
+				.setPlaceholder('-20')
+				.onChange(async (value) => {
+					if (!value) value = "0"
+					this.plugin.settings.bannerMarginMobile = Number(value);
+					await this.plugin.saveSettings();
+				    this.plugin.updateBannerStyles();
+				})
+			});
+
+
+			new Setting(containerEl)
 			.setName(i18n.t("GAP_AFTER_BANNER_WITH_ICON"))
 			.setDesc(i18n.t("CAN_BE_POSITIVE_OR_NEGATIVE"))
 			.addText(text => {
@@ -199,6 +221,23 @@ export default class PPSettingTab extends PluginSettingTab {
 				.onChange(async (value) => {
 					if (!value) value = "0"
 					this.plugin.settings.bannerIconGap = Number(value);
+					await this.plugin.saveSettings();
+				    this.plugin.updateIconStyles();
+				})
+			});
+
+
+
+			new Setting(containerEl)
+			.setName(i18n.t("GAP_AFTER_BANNER_WITH_ICON_MOBILE"))
+			.setDesc(i18n.t("CAN_BE_POSITIVE_OR_NEGATIVE"))
+			.addText(text => {
+				text.inputEl.type = "number"
+				text.setValue(this.plugin.settings.bannerIconGapMobile.toString())
+				.setPlaceholder('-20')
+				.onChange(async (value) => {
+					if (!value) value = "0"
+					this.plugin.settings.bannerIconGapMobile = Number(value);
 					await this.plugin.saveSettings();
 				    this.plugin.updateIconStyles();
 				})
@@ -335,6 +374,22 @@ export default class PPSettingTab extends PluginSettingTab {
 				.onChange(async (value) => {
 					if (!value) value = "0"
 					this.plugin.settings.iconTopMargin = Number(value);
+					await this.plugin.saveSettings();
+				    this.plugin.updateIconStyles();
+				})
+			});
+
+
+			new Setting(containerEl)
+			.setName(i18n.t("ICON_TOP_MARGIN_WITH_BANNER_MOBILE"))
+			.setDesc(i18n.t("CAN_BE_POSITIVE_OR_NEGATIVE"))
+			.addText(text => {
+				text.inputEl.type = "number"
+				text.setValue(this.plugin.settings.iconTopMarginMobile.toString())
+				.setPlaceholder('100')
+				.onChange(async (value) => {
+					if (!value) value = "0"
+					this.plugin.settings.iconTopMarginMobile = Number(value);
 					await this.plugin.saveSettings();
 				    this.plugin.updateIconStyles();
 				})

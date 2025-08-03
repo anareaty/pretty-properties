@@ -37,6 +37,7 @@
 }
 
 
+
 .cm-scroller:has(.icon-image:not(:empty)) .cm-sizer,
 .markdown-preview-view:has(.icon-image:not(:empty)) .markdown-preview-sizer {
   margin-top: calc(var(--pp-icon-size) + var(--pp-icon-top-margin-wb) + var(--pp-icon-gap));
@@ -45,8 +46,10 @@
 
 .cm-scroller:has(.banner-image:not(:empty)):has(.icon-image:not(:empty)) .cm-sizer,
 .markdown-preview-view:has(.banner-image:not(:empty)):has(.icon-image:not(:empty)) .markdown-preview-sizer {
-  margin-top: calc(var(--banner-height) + var(--banner-margin) + var(--pp-banner-icon-gap));
+  margin-top: calc(var(--banner-height) + var(--pp-banner-icon-gap));
 }
+
+
 
 
 
@@ -98,6 +101,8 @@
 .markdown-preview-view:has(.banner-image:not(:empty)) .icon-image {
   margin-top: var(--pp-icon-top-margin);
 }
+
+
 
 
 
