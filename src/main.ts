@@ -831,11 +831,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 						.setIcon("lucide-image-plus")
 						.setSection("pretty-properties")
 						.onClick(async () => {
-							this.selectImage(
-								propName,
-								this.settings.coversFolder,
-								"cover"
-							);
+							if (propName) this.selectImage(propName, this.settings.coversFolder, "cover");
 						})
 				);
 
@@ -855,7 +851,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 						.setIcon("image-off")
 						.setSection("pretty-properties")
 						.onClick(async () => {
-							this.removeProperty(propName);
+							if (propName) this.removeProperty(propName);
 						})
 				);
 
@@ -1458,7 +1454,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 			if (baseTableContainer) {
 				const updateTableBasePills = () => {
-					if (baseTableContainer.classList.contains("is-loading")) {
+					if (baseTableContainer!.classList.contains("is-loading")) {
 						if (
 							!containerEl.querySelector(
 								".bases-table-container:not(.is-loading"
@@ -1515,7 +1511,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 			if (baseTableContainer) {
 				const updateProgress = () => {
-					if (baseTableContainer.classList.contains("is-loading")) {
+					if (baseTableContainer!.classList.contains("is-loading")) {
 						if (
 							!containerEl.querySelector(
 								".bases-table-container:not(.is-loading"
