@@ -28,7 +28,7 @@ You can right-click on existing banner or call command to open menu to select ba
 
 ### Icon
 
-You can add icons alongside tha banner or just on their own. To do this add a link or some text to the "icon" property. For the icon ou can use images, built-in Lucide icons or any symbols, including emoji:
+You can add icons alongside tha banner or just on their own. To do this add a link or some text to the "icon" property. For the icon you can use images, built-in Lucide icons or any symbols, including emoji:
 - add internal or external link to add image;
 - add the name of lucide icon, for example "star", to add svg icon;
 - if you add any other text, the first symbol will be shown as icon.
