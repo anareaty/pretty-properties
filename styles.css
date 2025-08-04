@@ -2,12 +2,6 @@
 /* BANNERS */
 
 
-.banner-image:not(:empty) {
-    position: absolute;
-    width: 100%;
-    top: 0;
-    left: 0;
-    right: 0;
 
 .banner-image:not(:empty) {
     position: absolute;
@@ -597,3 +591,4 @@ body {
   width: fit-content;
   justify-self: end;
 }
+

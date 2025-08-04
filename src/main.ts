@@ -825,15 +825,6 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			if (propName) {
 				let menu = new Menu();
 
-				let menu = new Menu()
-
-				menu.addItem((item: MenuItem) => item
-					.setTitle(i18n.t("SELECT_COVER_IMAGE"))
-					.setIcon('lucide-image-plus')
-					.setSection('pretty-properties')
-					.onClick(async () => {
-						if (propName) this.selectCoverImage(propName)
-					})
 				menu.addItem((item: MenuItem) =>
 					item
 						.setTitle(i18n.t("SELECT_COVER_IMAGE"))
@@ -848,13 +839,6 @@ export default class PrettyPropertiesPlugin extends Plugin {
 						})
 				);
 
-				menu.addItem((item: MenuItem) => item
-					.setTitle(i18n.t("SELECT_COVER_SHAPE"))
-					.setIcon('lucide-shapes')
-					.setSection('pretty-properties')
-					.onClick(async () => {
-						if (file instanceof TFile) this.selectCoverShape(file)
-					})
 				menu.addItem((item: MenuItem) =>
 					item
 						.setTitle(i18n.t("SELECT_COVER_SHAPE"))
