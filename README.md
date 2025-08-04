@@ -84,7 +84,7 @@ When bases support option is enabled, properties colors would also shown in base
 Unfortunately currently there is no way to properly add progress bars to base properties directly, but there is a workaround using formulas:
 
 1. Create formula property with a name starting with "pp_progress" (you can later change the display name to anything you want).
-2. Add the formula that will result in string containing og two digits parted by slash, like "5/10". For example, if you have two number properties "max" and "value", you can use a formula like this: 
+2. Add the formula that will result in string consisting of two digits parted by slash, like "5/10". For example, if you have two number properties "max" and "value", you can use a formula like this: 
 ```
 if(note["max"], if(note["value"], note["value"], 0) + "/" + note["max"], " ")
 ```
