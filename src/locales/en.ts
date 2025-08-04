@@ -84,6 +84,7 @@ export default {
   SQUARE: "square",
   CIRCLE: "circle",
   BASES_SUPPORT: "Bases support (experimental)",
+  RELOAD_FILES_TO_APPLY_CHANGES: "Reload opened base files to apply changes",
 
 
 

@@ -886,6 +886,7 @@ export default class PPSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName(i18n.t("BASES_SUPPORT"))
+			.setDesc(i18n.t("RELOAD_FILES_TO_APPLY_CHANGES"))
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.enableBases)
 				.onChange(async (value) => {

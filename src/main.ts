@@ -46,6 +46,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		this.updateBannerStyles();
 		this.updateIconStyles();
 		this.updateCoverStyles();
+		this.updateBaseStyles()
 
 		this.observers = [];
 
@@ -63,26 +64,27 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 		this.registerEvent(
 			this.app.workspace.on("layout-change", async () => {
-				const mdLeafs = this.app.workspace.getLeavesOfType("markdown");
-				const baseLeafs = this.app.workspace.getLeavesOfType("bases");
-				const propLeafs =
-					this.app.workspace.getLeavesOfType("file-properties");
-
+				
 				this.observers.forEach((obs) => {
 					obs.disconnect();
 				});
 				this.observers = [];
 
+				const mdLeafs = this.app.workspace.getLeavesOfType("markdown");
 				for (let leaf of mdLeafs) {
 					this.startObservingLeaf(leaf, "markdown");
 				}
 
-				for (let leaf of baseLeafs) {
-					this.startObservingLeaf(leaf, "bases");
-				}
-
+				const propLeafs = this.app.workspace.getLeavesOfType("file-properties");
 				for (let leaf of propLeafs) {
 					this.startObservingLeaf(leaf, "file-properties");
+				}
+
+				if (this.settings.enableBases) {
+					const baseLeafs = this.app.workspace.getLeavesOfType("bases");
+					for (let leaf of baseLeafs) {
+						this.startObservingLeaf(leaf, "bases");
+					}
 				}
 			})
 		);
@@ -366,14 +368,6 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 	startObservingLeaf(leaf: WorkspaceLeaf, type: string) {
 		let view = leaf.view;
-
-		if (view instanceof FileView) {
-			this.addClassestoProperties(view);
-			this.updateBaseLeafPills(leaf);
-			this.updateViewProgress(view);
-			this.updateBaseLeafProgress(leaf);
-		}
-
 		let targetNode = view.containerEl;
 		let observer = new MutationObserver((mutations) => {
 			let baseMutation;
@@ -1471,216 +1465,220 @@ export default class PrettyPropertiesPlugin extends Plugin {
 	}
 
 	updateBaseLeafPills(leaf: WorkspaceLeaf) {
-		let containerEl = leaf.view.containerEl;
+		if (this.settings.enableBases) {
+			let containerEl = leaf.view.containerEl;
 
-		let baseTableContainer = containerEl.querySelector(
-			".bases-table-container"
-		);
+			let baseTableContainer = containerEl.querySelector(
+				".bases-table-container"
+			);
 
-		if (baseTableContainer) {
-			const updateTableBasePills = () => {
-				if (baseTableContainer.classList.contains("is-loading")) {
-					if (
-						!containerEl.querySelector(
-							".bases-table-container:not(.is-loading"
-						)
-					) {
-						setTimeout(updateTableBasePills, 50);
-						return;
+			if (baseTableContainer) {
+				const updateTableBasePills = () => {
+					if (baseTableContainer.classList.contains("is-loading")) {
+						if (
+							!containerEl.querySelector(
+								".bases-table-container:not(.is-loading"
+							)
+						) {
+							setTimeout(updateTableBasePills, 50);
+							return;
+						}
 					}
-				}
-				this.addClassestoProperties(leaf.view);
-			};
-			updateTableBasePills();
-		}
+					this.addClassestoProperties(leaf.view);
+				};
+				updateTableBasePills();
+			}
 
-		let baseCardsContainer = containerEl.querySelector(
-			".bases-cards-container"
-		);
+			let baseCardsContainer = containerEl.querySelector(
+				".bases-cards-container"
+			);
 
-		if (baseCardsContainer) {
-			const updateCardsBasePills = () => {
-				if (baseCardsContainer!.classList.contains("is-loading")) {
-					if (
-						!containerEl.querySelector(
-							".bases-cards-container:not(.is-loading"
-						)
-					) {
-						setTimeout(updateCardsBasePills, 50);
-						return;
+			if (baseCardsContainer) {
+				const updateCardsBasePills = () => {
+					if (baseCardsContainer!.classList.contains("is-loading")) {
+						if (
+							!containerEl.querySelector(
+								".bases-cards-container:not(.is-loading"
+							)
+						) {
+							setTimeout(updateCardsBasePills, 50);
+							return;
+						}
 					}
-				}
 
-				let pills = containerEl.querySelectorAll(
-					".bases-cards-property .value-list-element:not([data-property-pill-value])"
-				);
-				for (let pill of pills) {
-					if (pill instanceof HTMLElement) {
-						let value = pill.innerText;
-						pill.setAttribute("data-property-pill-value", value);
+					let pills = containerEl.querySelectorAll(
+						".bases-cards-property .value-list-element:not([data-property-pill-value])"
+					);
+					for (let pill of pills) {
+						if (pill instanceof HTMLElement) {
+							let value = pill.innerText;
+							pill.setAttribute("data-property-pill-value", value);
+						}
 					}
-				}
-			};
-			updateCardsBasePills();
+				};
+				updateCardsBasePills();
+			}
 		}
 	}
 
 	updateBaseLeafProgress(leaf: WorkspaceLeaf) {
-		let containerEl = leaf.view.containerEl;
+		if (this.settings.enableBases) {
+			let containerEl = leaf.view.containerEl;
 
-		let baseTableContainer = containerEl.querySelector(
-			".bases-table-container"
-		);
+			let baseTableContainer = containerEl.querySelector(
+				".bases-table-container"
+			);
 
-		if (baseTableContainer) {
-			const updateProgress = () => {
-				if (baseTableContainer.classList.contains("is-loading")) {
-					if (
-						!containerEl.querySelector(
-							".bases-table-container:not(.is-loading"
-						)
-					) {
-						setTimeout(updateProgress, 50);
-						return;
-					}
-				}
-
-				let progressEls = containerEl.querySelectorAll(
-					".bases-td[data-property*='formula.pp_progress']"
-				);
-				for (let progressEl of progressEls) {
-					if (progressEl instanceof HTMLElement) {
-						let oldProgress = progressEl.querySelector(
-							".metadata-progress-wrapper"
-						);
-						if (oldProgress) {
-							oldProgress.remove();
-							progressEl.classList.remove("has-progress-bar");
+			if (baseTableContainer) {
+				const updateProgress = () => {
+					if (baseTableContainer.classList.contains("is-loading")) {
+						if (
+							!containerEl.querySelector(
+								".bases-table-container:not(.is-loading"
+							)
+						) {
+							setTimeout(updateProgress, 50);
+							return;
 						}
+					}
 
-						let valueEl = progressEl.querySelector(
-							".bases-rendered-value"
-						);
-						if (valueEl instanceof HTMLElement) {
-							let valueString = valueEl.innerText;
-							if (valueString) {
-								let valueParts =
-									valueString.match(/(\d+)(\/)(\d+)/);
-								if (valueParts) {
-									let progressWrapper =
-										document.createElement("div");
-									progressWrapper.classList.add(
-										"metadata-progress-wrapper"
-									);
-									let progress =
-										document.createElement("progress");
-									progress.classList.add("metadata-progress");
-									progress.value = Number(valueParts[1]);
-									progress.max = Number(valueParts[3]);
+					let progressEls = containerEl.querySelectorAll(
+						".bases-td[data-property*='formula.pp_progress']"
+					);
+					for (let progressEl of progressEls) {
+						if (progressEl instanceof HTMLElement) {
+							let oldProgress = progressEl.querySelector(
+								".metadata-progress-wrapper"
+							);
+							if (oldProgress) {
+								oldProgress.remove();
+								progressEl.classList.remove("has-progress-bar");
+							}
 
-									let percent =
-										" " +
-										Math.round(
-											(progress.value * 100) /
-												progress.max
-										) +
-										" %";
-									setTooltip(progress, percent, {
-										delay: 500,
-										placement: "top",
-									});
+							let valueEl = progressEl.querySelector(
+								".bases-rendered-value"
+							);
+							if (valueEl instanceof HTMLElement) {
+								let valueString = valueEl.innerText;
+								if (valueString) {
+									let valueParts =
+										valueString.match(/(\d+)(\/)(\d+)/);
+									if (valueParts) {
+										let progressWrapper =
+											document.createElement("div");
+										progressWrapper.classList.add(
+											"metadata-progress-wrapper"
+										);
+										let progress =
+											document.createElement("progress");
+										progress.classList.add("metadata-progress");
+										progress.value = Number(valueParts[1]);
+										progress.max = Number(valueParts[3]);
 
-									progressWrapper.append(progress);
-									progressEl.classList.add(
-										"has-progress-bar"
-									);
+										let percent =
+											" " +
+											Math.round(
+												(progress.value * 100) /
+													progress.max
+											) +
+											" %";
+										setTooltip(progress, percent, {
+											delay: 500,
+											placement: "top",
+										});
 
-									progressEl.prepend(progressWrapper);
+										progressWrapper.append(progress);
+										progressEl.classList.add(
+											"has-progress-bar"
+										);
+
+										progressEl.prepend(progressWrapper);
+									}
 								}
 							}
 						}
 					}
-				}
-			};
-			updateProgress();
-		}
+				};
+				updateProgress();
+			}
 
-		let baseCardsContainer = containerEl.querySelector(
-			".bases-cards-container"
-		);
+			let baseCardsContainer = containerEl.querySelector(
+				".bases-cards-container"
+			);
 
-		if (baseCardsContainer) {
-			const updateProgress = () => {
-				if (baseCardsContainer!.classList.contains("is-loading")) {
-					if (
-						!containerEl.querySelector(
-							".bases-cards-container:not(.is-loading"
-						)
-					) {
-						setTimeout(updateProgress, 50);
-						return;
-					}
-				}
-
-				let progressEls = containerEl.querySelectorAll(
-					".bases-cards-property[data-property*='formula.pp_progress']"
-				);
-				for (let progressEl of progressEls) {
-					if (progressEl instanceof HTMLElement) {
-						let oldProgress = progressEl.querySelector(
-							".metadata-progress-wrapper"
-						);
-						if (oldProgress) {
-							oldProgress.remove();
-							progressEl.classList.remove("has-progress-bar");
+			if (baseCardsContainer) {
+				const updateProgress = () => {
+					if (baseCardsContainer!.classList.contains("is-loading")) {
+						if (
+							!containerEl.querySelector(
+								".bases-cards-container:not(.is-loading"
+							)
+						) {
+							setTimeout(updateProgress, 50);
+							return;
 						}
+					}
 
-						let valueEl = progressEl.querySelector(
-							".bases-rendered-value"
-						);
-						if (valueEl instanceof HTMLElement) {
-							let valueString = valueEl.innerText;
-							if (valueString) {
-								let valueParts =
-									valueString.match(/(\d+)(\/)(\d+)/);
-								if (valueParts) {
-									let progressWrapper =
-										document.createElement("div");
-									progressWrapper.classList.add(
-										"metadata-progress-wrapper"
-									);
-									let progress =
-										document.createElement("progress");
-									progress.classList.add("metadata-progress");
-									progress.value = Number(valueParts[1]);
-									progress.max = Number(valueParts[3]);
+					let progressEls = containerEl.querySelectorAll(
+						".bases-cards-property[data-property*='formula.pp_progress']"
+					);
+					for (let progressEl of progressEls) {
+						if (progressEl instanceof HTMLElement) {
+							let oldProgress = progressEl.querySelector(
+								".metadata-progress-wrapper"
+							);
+							if (oldProgress) {
+								oldProgress.remove();
+								progressEl.classList.remove("has-progress-bar");
+							}
 
-									let percent =
-										" " +
-										Math.round(
-											(progress.value * 100) /
-												progress.max
-										) +
-										" %";
-									setTooltip(progress, percent, {
-										delay: 500,
-										placement: "top",
-									});
+							let valueEl = progressEl.querySelector(
+								".bases-rendered-value"
+							);
+							if (valueEl instanceof HTMLElement) {
+								let valueString = valueEl.innerText;
+								if (valueString) {
+									let valueParts =
+										valueString.match(/(\d+)(\/)(\d+)/);
+									if (valueParts) {
+										let progressWrapper =
+											document.createElement("div");
+										progressWrapper.classList.add(
+											"metadata-progress-wrapper"
+										);
+										let progress =
+											document.createElement("progress");
+										progress.classList.add("metadata-progress");
+										progress.value = Number(valueParts[1]);
+										progress.max = Number(valueParts[3]);
 
-									progressWrapper.append(progress);
-									progressEl.classList.add(
-										"has-progress-bar"
-									);
+										let percent =
+											" " +
+											Math.round(
+												(progress.value * 100) /
+													progress.max
+											) +
+											" %";
+										setTooltip(progress, percent, {
+											delay: 500,
+											placement: "top",
+										});
 
-									let label = progressEl.firstChild;
-									label?.after(progressWrapper);
+										progressWrapper.append(progress);
+										progressEl.classList.add(
+											"has-progress-bar"
+										);
+
+										let label = progressEl.firstChild;
+										label?.after(progressWrapper);
+									}
 								}
 							}
 						}
 					}
-				}
-			};
-			updateProgress();
+				};
+				updateProgress();
+			}
 		}
 	}
 
