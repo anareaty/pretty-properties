@@ -85,4 +85,12 @@ export default {
   EXTERNAL_IMAGE: "Внешнее изображение",
   LINK_TO_EXTERNAL_IMAGE: "Ссылка на внешнее изображение",
   SAVE: "Сохранить",
+  SHOW_IMAGES_MENU: "Показать меню изображений",
+  REMOVE_ICON: "Удалить иконку",
+  REMOVE_COVER: "Удалить обложку",
+  REMOVE_BANNER: "Удалить баннер",
+  VERTICAL: "вертикальная",
+  HORIZONTAL: "горизонтальная",
+  SQUARE: "квадратная",
+  CIRCLE: "круглая",
 };

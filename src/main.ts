@@ -194,8 +194,36 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		this.addCommand({
             id: "select-banner-image",
             name: i18n.t("SELECT_BANNER_IMAGE"),
-            callback: async () => {
-                this.selectImage(this.settings.bannerProperty, this.settings.bannersFolder, "banner")
+            checkCallback: (checking: boolean) => {
+				let file = this.app.workspace.getActiveFile()
+				if (file instanceof TFile && this.settings.enableBanner && this.settings.bannerProperty) {
+					if (!checking) {
+						this.selectImage(this.settings.bannerProperty, this.settings.bannersFolder, "banner")
+					}
+					return true
+				}
+				return false
+            }
+        })
+
+
+
+		this.addCommand({
+            id: "remove-banner",
+            name: i18n.t("REMOVE_BANNER"),
+			checkCallback: (checking: boolean) => {
+				let file = this.app.workspace.getActiveFile()
+				if (file instanceof TFile && this.settings.enableBanner && this.settings.bannerProperty) {
+					let banner = this.getCurrentProperty(this.settings.bannerProperty)
+					if (banner) {
+						if (!checking) {
+							this.removeProperty(this.settings.bannerProperty)
+						}
+						return true
+					}
+					return false
+				}
+				return false
             }
         })
 
@@ -203,8 +231,35 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		this.addCommand({
             id: "select-icon",
             name: i18n.t("SELECT_ICON"),
-            callback: async () => {
-                this.selectIcon()
+			checkCallback: (checking: boolean) => {
+				let file = this.app.workspace.getActiveFile()
+				if (file instanceof TFile && this.settings.enableIcon && this.settings.iconProperty) {
+					if (!checking) {
+						this.selectIcon()
+					}
+					return true
+				}
+				return false
+            }
+        })
+
+
+		this.addCommand({
+            id: "remove-icon",
+            name: i18n.t("REMOVE_ICON"),
+			checkCallback: (checking: boolean) => {
+				let file = this.app.workspace.getActiveFile()
+				if (file instanceof TFile && this.settings.enableIcon && this.settings.iconProperty) {
+					let icon = this.getCurrentProperty(this.settings.iconProperty)
+					if (icon) {
+						if (!checking) {
+							this.removeProperty(this.settings.iconProperty)
+						}
+						return true
+					} 
+					return false
+				}
+				return false
             }
         })
 
@@ -212,39 +267,77 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		this.addCommand({
             id: "select-cover-image",
             name: i18n.t("SELECT_COVER_IMAGE"),
-            callback: async () => {
+			checkCallback: (checking: boolean) => {
 				let file = this.app.workspace.getActiveFile()
-
-				if (file instanceof TFile) {
-					let cache = this.app.metadataCache.getFileCache(file)
-					let frontmatter = cache!.frontmatter
-					let props = [...this.settings.extraCoverProperties]
-					props.unshift(this.settings.coverProperty)
-					let propName: string | undefined
-					for (let prop of props) {
-						propName = prop
-						if (frontmatter?.[prop] !== undefined) break
+				if (file instanceof TFile && this.settings.enableCover && this.settings.coverProperty) {
+					if (!checking) {
+						this.selectCoverImage()
 					}
-
-					if (propName) {
-						this.selectImage(propName, this.settings.coversFolder, "cover")
-					}
+					return true
 				}
-			}
+				return false
+            }
+        })
+
+
+		this.addCommand({
+            id: "remove-cover",
+            name: i18n.t("REMOVE_COVER"),
+			checkCallback: (checking: boolean) => {
+				let file = this.app.workspace.getActiveFile()
+				let currentCoverProp = this.getCurrentCoverProperty()
+				if (file instanceof TFile && this.settings.enableCover && this.settings.coverProperty && currentCoverProp) {
+					if (!checking) {
+						this.removeProperty(this.settings.coverProperty)
+						for (let extraProp of this.settings.extraCoverProperties) {
+							this.removeProperty(extraProp)
+						}
+					}
+					return true
+				}
+				return false
+            }
         })
 
 
 		this.addCommand({
             id: "select-cover-shape",
             name: i18n.t("SELECT_COVER_SHAPE"),
-            callback: async () => {
+			checkCallback: (checking: boolean) => {
 				let file = this.app.workspace.getActiveFile()
-
-				if (file instanceof TFile) {
-					this.selectCoverShape(file)
+				let currentCoverProp = this.getCurrentCoverProperty()
+				if (file instanceof TFile && this.settings.enableCover && this.settings.coverProperty && currentCoverProp) {
+					if (!checking) {
+						this.selectCoverShape()
+					}
+					return true
 				}
-			}
+				return false
+            }
         })
+
+		
+		this.addCommand({
+            id: "select-image-for-file",
+            name: i18n.t("SHOW_IMAGES_MENU"),
+			checkCallback: (checking: boolean) => {
+				let file = this.app.workspace.getActiveFile()
+				if (file instanceof TFile && (this.settings.enableBanner && this.settings.bannerProperty ||
+					this.settings.enableCover && this.settings.coverProperty ||
+					this.settings.enableIcon && this.settings.iconProperty)
+				) {
+					if (!checking) {
+						this.selectImageForFile()
+					}
+					return true
+				}
+				return false
+            }
+        })
+
+
+
+
 
 
 
@@ -261,7 +354,12 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 		let view = leaf.view
 
-		this.addClassestoProperties(view)
+		if (view instanceof FileView) {
+			this.addClassestoProperties(view)
+			this.updateBaseLeafPills(leaf)
+			this.updateViewProgress(view)
+			this.updateBaseLeafProgress(leaf)
+		}
 
 		let targetNode = view.containerEl;
 		let observer = new MutationObserver((mutations) => {
@@ -315,7 +413,6 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				this.updateBaseLeafProgress(leaf)
 			}
 		
-
 			if (baseMutation) {
 				this.updateBaseLeafPills(leaf)
 				this.updateBaseLeafProgress(leaf)
@@ -338,10 +435,19 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 		menu.addItem( (item: MenuItem) => item
 			.setTitle(i18n.t("SELECT_BANNER_IMAGE"))
-			.setIcon('lucide-image-plus')
+			.setIcon('image-plus')
 			.setSection('pretty-properties')
 			.onClick(async () => {
 				this.selectImage(this.settings.bannerProperty, this.settings.bannersFolder, "banner")
+			})
+		);
+
+		menu.addItem( (item: MenuItem) => item
+			.setTitle(i18n.t("REMOVE_BANNER"))
+			.setIcon('image-off')
+			.setSection('pretty-properties')
+			.onClick(async () => {
+				this.removeProperty(this.settings.bannerProperty)
 			})
 		);
 
@@ -386,6 +492,15 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			.setSection('pretty-properties')
 			.onClick(async () => {
 				this.selectIcon()
+			})
+		);
+
+		menu.addItem( (item: MenuItem) => item
+			.setTitle(i18n.t("REMOVE_ICON"))
+			.setIcon('image-off')
+			.setSection('pretty-properties')
+			.onClick(async () => {
+				this.removeProperty(this.settings.iconProperty)
 			})
 		);
 
@@ -458,6 +573,50 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 
+	async selectImageForFile() {
+
+		let options: any = {}
+
+		if (this.settings.enableCover && this.settings.coverProperty) {
+			options["cover"] = i18n.t("SELECT_COVER_IMAGE")
+		}
+
+		if (this.settings.enableBanner && this.settings.bannerProperty) {
+			options["banner"] = i18n.t("SELECT_BANNER_IMAGE")
+		}
+
+		if (this.settings.enableIcon && this.settings.iconProperty) {
+			options["icon"] = i18n.t("SELECT_ICON")
+		}
+
+		let plugin = this
+
+		class FileImageSuggestModal extends SuggestModal<string> {
+			getSuggestions(query:string): string[] {
+				return Object.keys(options).filter((key) => {
+					return options[key].toLowerCase().includes(query.toLowerCase())
+				})
+			}
+			async renderSuggestion(key: string, el: Element) {
+				el.append(options[key])
+			}
+			onChooseSuggestion(val: string) {
+				if (val == "cover") {
+					plugin.selectCoverImage()
+				}
+				if (val == "banner") {
+					plugin.selectImage(plugin.settings.bannerProperty, plugin.settings.bannersFolder, "banner")
+				}
+				if (val == "icon") {
+					plugin.selectIcon()
+				}
+			} 
+		}
+		new FileImageSuggestModal(this.app).open()
+	}
+
+
+
 
 
 
@@ -492,6 +651,16 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			} 
 		}
 		new ImageSuggestModal(this.app).open()
+	}
+
+
+	async removeProperty(propName: string) {
+		let file = this.app.workspace.getActiveFile()
+		if (file instanceof TFile) {
+			this.app.fileManager.processFrontMatter(file, fm => {
+				if (fm[propName]) delete fm[propName]
+			})
+		}
 	}
 
 
@@ -608,7 +777,36 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 
+	getCurrentCoverProperty() {
+		let propName: string | undefined
+		let file = this.app.workspace.getActiveFile()
+		if (file instanceof TFile) {
+			let cache = this.app.metadataCache.getFileCache(file)
+			let frontmatter = cache!.frontmatter
+			let props = [...this.settings.extraCoverProperties]
+			props.unshift(this.settings.coverProperty)
+			
+			for (let prop of props) {
+				if (frontmatter?.[prop] !== undefined) {
+					propName = prop
+					break
+				}
+			}
+		}
+		return propName
+	}
 
+
+	getCurrentProperty(propName: string) {
+		let prop: any
+		let file = this.app.workspace.getActiveFile()
+		if (file instanceof TFile) {
+			let cache = this.app.metadataCache.getFileCache(file)
+			let frontmatter = cache?.frontmatter
+			prop = frontmatter?.[propName]
+		}
+		return prop
+	}
 
 
 
@@ -624,16 +822,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		let file = this.app.workspace.getActiveFile()
 
 		if (file instanceof TFile) {
-			let cache = this.app.metadataCache.getFileCache(file)
-			let frontmatter = cache!.frontmatter
-			let props = [...this.settings.extraCoverProperties]
-			props.unshift(this.settings.coverProperty)
-			let propName: string | undefined
-			for (let prop of props) {
-				propName = prop
-				
-				if (frontmatter?.[prop] !== undefined) break
-			}
+			let propName = this.getCurrentCoverProperty()
 
 			if (propName) {
 
@@ -693,29 +882,51 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 
-	async selectCoverShape(file: TFile) {
-		let shapes = ["vertical", "horizontal", "square", "circle"]
-		class CoverShapeSuggestModal extends SuggestModal<string> {
-			getSuggestions(query:string): string[] {
-				return shapes.filter((shape) => {
-					return shape.toLowerCase().includes(query.toLowerCase())
-				})
+	async selectCoverShape() {
+		let file = this.app.workspace.getActiveFile()
+		if (file instanceof TFile) {
+			let shapes: any = {
+				"vertical": i18n.t("VERTICAL"), 
+				"horizontal": i18n.t("HORIZONTAL"), 
+				"square": i18n.t("SQUARE"), 
+				"circle": i18n.t("CIRCLE")
 			}
-			async renderSuggestion(text: string, el: Element) {
-				el.append(text)
-			}
-			onChooseSuggestion(shape: string) {
-				if (shape) {
-					this.app.fileManager.processFrontMatter(file, fm => {
-						let cssclasses = fm.cssclasses || []
-						cssclasses = cssclasses.filter((c: string) => !shapes.find(s => c == "cover-" + s))
-						cssclasses.push("cover-" + shape)
-						fm.cssclasses = cssclasses
+
+			class CoverShapeSuggestModal extends SuggestModal<string> {
+				getSuggestions(query:string): string[] {
+					return Object.keys(shapes).filter((key) => {
+						return shapes[key].toLowerCase().includes(query.toLowerCase())
 					})
 				}
-			} 
+				async renderSuggestion(key: string, el: Element) {
+					el.append(shapes[key])
+				}
+				onChooseSuggestion(key: string) {
+					if (key && file instanceof TFile) {
+						this.app.fileManager.processFrontMatter(file, fm => {
+							let cssclasses = fm.cssclasses || []
+							cssclasses = cssclasses.filter((c: string) => !Object.keys(shapes).find(s => c == "cover-" + s))
+							cssclasses.push("cover-" + key)
+							fm.cssclasses = cssclasses
+						})
+					}
+				} 
+			}
+			new CoverShapeSuggestModal(this.app).open()
 		}
-		new CoverShapeSuggestModal(this.app).open()
+	}
+
+
+
+	async selectCoverImage() {
+		let file = this.app.workspace.getActiveFile()
+		if (file instanceof TFile) {
+			let propName = this.getCurrentCoverProperty()
+			if (!propName) propName = this.settings.coverProperty
+			if (propName) {
+				this.selectImage(propName, this.settings.coversFolder, "cover")
+			}
+		}
 	}
 
 
@@ -1139,59 +1350,43 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 	updateBaseLeafPills(leaf: WorkspaceLeaf) {
 
+		let containerEl = leaf.view.containerEl
 
-
-		
-
-
-
-		let baseTableContainer = leaf.view.containerEl.querySelector(".bases-table-container")
+		let baseTableContainer = containerEl.querySelector(".bases-table-container")
 
 		if (baseTableContainer) {
-
-			
 			const updateTableBasePills = () => {
 				if (baseTableContainer.classList.contains("is-loading")) {
-					setTimeout(updateTableBasePills, 50)
-				} else {
-					this.addClassestoProperties(leaf.view)
-				}
+					if (!containerEl.querySelector(".bases-table-container:not(.is-loading")) {
+						setTimeout(updateTableBasePills, 50)
+						return 
+					} 
+				} 
+				this.addClassestoProperties(leaf.view)
 			}
-
 			updateTableBasePills()	
 		}
 
 		
-		
-		
-		let baseCardsContainer = leaf.view.containerEl.querySelector(".bases-cards-container")
+		let baseCardsContainer = containerEl.querySelector(".bases-cards-container")
 
 		if (baseCardsContainer) {
-
 			const updateCardsBasePills = () => {
-
 				if (baseCardsContainer!.classList.contains("is-loading")) {
-					let baseCardsContainer2 = leaf.view.containerEl.querySelector(".bases-cards-container:not(.is-loading")
-
-					if (!baseCardsContainer2) {
+					if (!containerEl.querySelector(".bases-cards-container:not(.is-loading")) {
 						setTimeout(updateCardsBasePills, 50)
-					} else {
-						baseCardsContainer = baseCardsContainer2
-					}
+						return 
+					} 
 				} 
 				
-				if (!baseCardsContainer!.classList.contains("is-loading")) {
-					let pills = baseCardsContainer!.querySelectorAll(".bases-cards-property .value-list-element:not([data-property-pill-value])")
-
-					for (let pill of pills) {
-						if (pill instanceof HTMLElement) {
-							let value = pill.innerText
-							pill.setAttribute("data-property-pill-value", value)
-						}
+				let pills = containerEl.querySelectorAll(".bases-cards-property .value-list-element:not([data-property-pill-value])")
+				for (let pill of pills) {
+					if (pill instanceof HTMLElement) {
+						let value = pill.innerText
+						pill.setAttribute("data-property-pill-value", value)
 					}
 				}
 			}
-
 			updateCardsBasePills()
 		}
 	}
@@ -1204,109 +1399,106 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 	updateBaseLeafProgress(leaf: WorkspaceLeaf) {
-		let baseTableContainer = leaf.view.containerEl.querySelector(".bases-table-container")
+
+		let containerEl = leaf.view.containerEl
+
+		let baseTableContainer = containerEl.querySelector(".bases-table-container")
 		
 		if (baseTableContainer) {
 			const updateProgress = () => {
 				if (baseTableContainer.classList.contains("is-loading")) {
-					setTimeout(updateProgress, 50)
-				} else {
-					let progressEls = baseTableContainer.querySelectorAll(".bases-td[data-property*='formula.pp_progress']")
-					for (let progressEl of progressEls) {
-						if (progressEl instanceof HTMLElement) {
-							let oldProgress = progressEl.querySelector(".metadata-progress-wrapper")
-							if (oldProgress) {
-								oldProgress.remove()
-								progressEl.classList.remove("has-progress-bar")
-							}
+					if (!containerEl.querySelector(".bases-table-container:not(.is-loading")) {
+						setTimeout(updateProgress, 50)
+						return 
+					}
+				} 
 
-							let valueEl = progressEl.querySelector(".bases-rendered-value")
-							if (valueEl instanceof HTMLElement) {
-								
-								let valueString = valueEl.innerText
-								if (valueString) {
-									let valueParts = valueString.match(/(\d+)(\/)(\d+)/)
-									if (valueParts) {
-										let progressWrapper = document.createElement("div")
-										progressWrapper.classList.add("metadata-progress-wrapper")
-										let progress = document.createElement("progress")
-										progress.classList.add("metadata-progress")
-										progress.value = Number(valueParts[1])
-										progress.max = Number(valueParts[3])
+				let progressEls = containerEl.querySelectorAll(".bases-td[data-property*='formula.pp_progress']")
+				for (let progressEl of progressEls) {
+					if (progressEl instanceof HTMLElement) {
+						let oldProgress = progressEl.querySelector(".metadata-progress-wrapper")
+						if (oldProgress) {
+							oldProgress.remove()
+							progressEl.classList.remove("has-progress-bar")
+						}
 
-										let percent = " " + Math.round(progress.value * 100 / progress.max) + " %"
-										setTooltip(progress, percent, {delay: 500, placement: "top"})
+						let valueEl = progressEl.querySelector(".bases-rendered-value")
+						if (valueEl instanceof HTMLElement) {
+							
+							let valueString = valueEl.innerText
+							if (valueString) {
+								let valueParts = valueString.match(/(\d+)(\/)(\d+)/)
+								if (valueParts) {
+									let progressWrapper = document.createElement("div")
+									progressWrapper.classList.add("metadata-progress-wrapper")
+									let progress = document.createElement("progress")
+									progress.classList.add("metadata-progress")
+									progress.value = Number(valueParts[1])
+									progress.max = Number(valueParts[3])
 
-										progressWrapper.append(progress)
-										progressEl.classList.add("has-progress-bar")
+									let percent = " " + Math.round(progress.value * 100 / progress.max) + " %"
+									setTooltip(progress, percent, {delay: 500, placement: "top"})
 
-										progressEl.prepend(progressWrapper)
-									}
+									progressWrapper.append(progress)
+									progressEl.classList.add("has-progress-bar")
+
+									progressEl.prepend(progressWrapper)
 								}
 							}
-							
 						}
+						
 					}
 				}
 			}
 			updateProgress()	
 		}
 
-
-
-		let baseCardsContainer = leaf.view.containerEl.querySelector(".bases-cards-container")
+		let baseCardsContainer = containerEl.querySelector(".bases-cards-container")
 
 		if (baseCardsContainer) {
 			const updateProgress = () => {
-
 				if (baseCardsContainer!.classList.contains("is-loading")) {
-					let baseCardsContainer2 = leaf.view.containerEl.querySelector(".bases-cards-container:not(.is-loading")
-
-					if (!baseCardsContainer2) {
+					if (!containerEl.querySelector(".bases-cards-container:not(.is-loading")) {
 						setTimeout(updateProgress, 50)
-					} else {
-						baseCardsContainer = baseCardsContainer2
-					}
+						return 
+					} 
 				} 
-				
-				
-				if (!baseCardsContainer!.classList.contains("is-loading")) {
-					let progressEls = baseCardsContainer!.querySelectorAll(".bases-cards-property[data-property*='formula.pp_progress']")
-					for (let progressEl of progressEls) {
-						if (progressEl instanceof HTMLElement) {
-							let oldProgress = progressEl.querySelector(".metadata-progress-wrapper")
-							if (oldProgress) {
-								oldProgress.remove()
-								progressEl.classList.remove("has-progress-bar")
-							}
 
-							let valueEl = progressEl.querySelector(".bases-rendered-value")
-							if (valueEl instanceof HTMLElement) {
-								
-								let valueString = valueEl.innerText
-								if (valueString) {
-									let valueParts = valueString.match(/(\d+)(\/)(\d+)/)
-									if (valueParts) {
-										let progressWrapper = document.createElement("div")
-										progressWrapper.classList.add("metadata-progress-wrapper")
-										let progress = document.createElement("progress")
-										progress.classList.add("metadata-progress")
-										progress.value = Number(valueParts[1])
-										progress.max = Number(valueParts[3])
+				let progressEls = containerEl.querySelectorAll(".bases-cards-property[data-property*='formula.pp_progress']")
+				for (let progressEl of progressEls) {
+					if (progressEl instanceof HTMLElement) {
+						let oldProgress = progressEl.querySelector(".metadata-progress-wrapper")
+						if (oldProgress) {
+							oldProgress.remove()
+							progressEl.classList.remove("has-progress-bar")
+						}
 
-										let percent = " " + Math.round(progress.value * 100 / progress.max) + " %"
-										setTooltip(progress, percent, {delay: 500, placement: "top"})
+						let valueEl = progressEl.querySelector(".bases-rendered-value")
+						if (valueEl instanceof HTMLElement) {
+							
+							let valueString = valueEl.innerText
+							if (valueString) {
+								let valueParts = valueString.match(/(\d+)(\/)(\d+)/)
+								if (valueParts) {
+									let progressWrapper = document.createElement("div")
+									progressWrapper.classList.add("metadata-progress-wrapper")
+									let progress = document.createElement("progress")
+									progress.classList.add("metadata-progress")
+									progress.value = Number(valueParts[1])
+									progress.max = Number(valueParts[3])
 
-										progressWrapper.append(progress)
-										progressEl.classList.add("has-progress-bar")
+									let percent = " " + Math.round(progress.value * 100 / progress.max) + " %"
+									setTooltip(progress, percent, {delay: 500, placement: "top"})
 
-										let label = progressEl.firstChild
-										label?.after(progressWrapper)
-									}
+									progressWrapper.append(progress)
+									progressEl.classList.add("has-progress-bar")
+
+									let label = progressEl.firstChild
+									label?.after(progressWrapper)
 								}
 							}
-							
 						}
+						
 					}
 				}
 			}
@@ -1343,7 +1535,6 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			}
 		}
 
-		//this.updateProgressBars(view, frontmatter)
 		this.updateViewProgress(view)
 	}
 
@@ -1417,7 +1608,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 	async updateCoverImages(view: MarkdownView, frontmatter: FrontMatterCache | undefined) {
 		//@ts-ignore
 		let mdEditor = view.metadataEditor
-		let mdContainer = mdEditor.containerEl
+		let mdContainer = mdEditor?.containerEl
 		let coverVal
 
 		let props = [...this.settings.extraCoverProperties]
@@ -1621,7 +1812,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 		//@ts-ignore
 		let mdEditor = view.metadataEditor;
-		let mdContainer = mdEditor.containerEl;
+		let mdContainer = mdEditor?.containerEl;
 
 		if (mdContainer instanceof HTMLElement) {
 			let oldProgresses = mdContainer.querySelectorAll(".metadata-property > .metadata-progress-wrapper")

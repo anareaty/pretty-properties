@@ -75,6 +75,14 @@ export default {
   EXTERNAL_IMAGE: "External image",
   LINK_TO_EXTERNAL_IMAGE: "Link to external image",
   SAVE: "Save",
+  SHOW_IMAGES_MENU: "Show images menu",
+  REMOVE_ICON: "Remove icon",
+  REMOVE_COVER: "Remove cover",
+  REMOVE_BANNER: "Remove banner",
+  VERTICAL: "vertical",
+  HORIZONTAL: "horizontal",
+  SQUARE: "square",
+  CIRCLE: "circle",
 
 
 
