@@ -43,6 +43,7 @@ export interface PPPluginSettings {
 	bannerIconGapMobile: number;
 	iconColor: string;
 	iconBackground: boolean;
+	enableBases: boolean;
 	
 	
 }
@@ -87,7 +88,8 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	bannerIconGap: 0,
 	bannerIconGapMobile: 20,
 	iconColor: "",
-	iconBackground: false
+	iconBackground: false,
+	enableBases: false
 }
 
 
@@ -880,6 +882,18 @@ export default class PPSettingTab extends PluginSettingTab {
 
 
 		new Setting(containerEl).setName(i18n.t("OTHER")).setHeading();
+
+
+		new Setting(containerEl)
+			.setName(i18n.t("BASES_SUPPORT"))
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableBases)
+				.onChange(async (value) => {
+					this.plugin.settings.enableBases = value
+					await this.plugin.saveSettings();
+					this.display();
+					this.plugin.updateBaseStyles()
+				}));
 
 
 		new Setting(containerEl)

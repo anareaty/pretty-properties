@@ -83,6 +83,7 @@ export default {
   HORIZONTAL: "horizontal",
   SQUARE: "square",
   CIRCLE: "circle",
+  BASES_SUPPORT: "Bases support (experimental)",
 
 
 

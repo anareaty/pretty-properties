@@ -1,3 +1,4 @@
+
 /* BANNERS */
 
 
@@ -48,9 +49,6 @@
 .markdown-preview-view:has(.banner-image:not(:empty)):has(.icon-image:not(:empty)) .markdown-preview-sizer {
   margin-top: calc(var(--banner-height) + var(--pp-banner-icon-gap));
 }
-
-
-
 
 
 
@@ -245,10 +243,6 @@
 }
 
 
-.bases-table-cell {
-  --tag-padding-x: 0.5em;
-  --tag-padding-y: 0;
-}
 
 
 
@@ -259,11 +253,7 @@
 
 
 
-
-.bases-td[data-property="formula.tags"] .bases-table-cell {
-  display: flex;
-}
-
+/* PROGRESS */
 
 
 
@@ -304,7 +294,7 @@
 
 
 
-
+/* SUGGESTERS */
 
 .image-suggestion-item.banner img {
   width: 100%;
@@ -414,7 +404,7 @@
 
 
 
-
+/* PILLS */
 
 
 .multi-select-pill:not(:hover, :focus, :focus-within) .multi-select-pill-remove-button svg {
@@ -427,10 +417,6 @@ body {
     --pill-focus-left-adjust: -1px;
 }
 
-
-
-
-
 body {
   --pill-background-modified: var(--pill-background);
   --pill-background-hover-modified: var(--pill-background-hover);
@@ -438,16 +424,33 @@ body {
   --tag-background-hover-modified: var(--tag-background-hover);
 }
 
+
+
+
+
+
+
+
+.pp-bases-enabled .bases-table-cell {
+  --tag-padding-x: 0.5em;
+  --tag-padding-y: 0;
+}
+
+.pp-bases-enabled .bases-td[data-property="formula.tags"] .bases-table-cell {
+  display: flex;
+}
+
+
 .metadata-property-value .multi-select-pill,
-.bases-td[data-property="formula.tags"] .value-list-element,
-.bases-cards-property[data-property="formula.tags"] .value-list-element {
+.pp-bases-enabled .bases-td[data-property="formula.tags"] .value-list-element,
+.pp-bases-enabled .bases-cards-property[data-property="formula.tags"] .value-list-element {
   --pill-padding-x: var(--tag-padding-x);
   --pill-padding-y: var(--tag-padding-y);
   
 }
 
-.bases-td[data-property="formula.tags"] .value-list-element,
-.bases-cards-property[data-property="formula.tags"] .value-list-element {
+.pp-bases-enabled .bases-td[data-property="formula.tags"] .value-list-element,
+.pp-bases-enabled .bases-cards-property[data-property="formula.tags"] .value-list-element {
     border: var(--pill-border-width) solid var(--pill-border-color);
     border-radius: var(--pill-radius);
     color: var(--pill-color);
@@ -459,9 +462,9 @@ body {
 
 
 
-.bases-td[data-property="note.tags"] .multi-select-pill,
-.bases-td[data-property="formula.tags"] .value-list-element,
-.bases-cards-property[data-property="formula.tags"] .value-list-element {
+.pp-bases-enabled .bases-td[data-property="note.tags"] .multi-select-pill,
+.pp-bases-enabled .bases-td[data-property="formula.tags"] .value-list-element,
+.pp-bases-enabled .bases-cards-property[data-property="formula.tags"] .value-list-element {
     --pill-color: var(--tag-color);
     --pill-color-hover: var(--tag-color-hover);
     --pill-color-remove: var(--tag-color);
@@ -476,7 +479,7 @@ body {
 }
 
 
-.value-list-element {
+.pp-bases-enabled .value-list-element {
   background-color: var(--pill-background);
   border-radius: var(--pill-radius);
   padding: 2px 4px !important;
@@ -484,46 +487,46 @@ body {
 }
 
 .multi-select-pill,
-.value-list-element {
+.pp-bases-enabled .value-list-element {
   --pill-background: var(--pill-background-modified) !important;
   --pill-background-hover: var(--pill-background-hover-modified) !important;
 }
 
 
 
-.bases-td.has-progress-bar .bases-rendered-value {
+.pp-bases-enabled .bases-td.has-progress-bar .bases-rendered-value {
   width: fit-content;
   min-width: fit-content;
   font-size:0;
   padding: 0;
 }
 
-.bases-td.has-progress-bar .metadata-progress-wrapper {
+.pp-bases-enabled .bases-td.has-progress-bar .metadata-progress-wrapper {
     padding-right: var(--size-4-2);
     height: var(--input-height);
 }
 
 
-.bases-cards-property .metadata-progress-wrapper {
+.pp-bases-enabled .bases-cards-property .metadata-progress-wrapper {
   padding-right: var(--size-4-2);
   width: 100%;
   max-width: 100%;
 }
 
-.bases-cards-property .metadata-progress{
+.pp-bases-enabled .bases-cards-property .metadata-progress{
   width: 100%;
 }
 
 
 
 .workspace-leaf-content[data-type="file-properties"] progress,
-.bases-view progress {
+.pp-bases-enabled .bases-view progress {
     appearance: none;
     height: 9px;
 }
 
 .workspace-leaf-content[data-type="file-properties"] progress::-webkit-progress-bar,
-.bases-view progress::-webkit-progress-bar {
+.pp-bases-enabled .bases-view progress::-webkit-progress-bar {
   background-color: var(--background-secondary);
   box-shadow: inset 0px 0px 0px 1px var(--background-modifier-border);
   border-radius: 5px;
@@ -531,11 +534,14 @@ body {
 }
 
 .workspace-leaf-content[data-type="file-properties"] progress::-webkit-progress-value,
-.bases-view progress::-webkit-progress-value {
+.pp-bases-enabled .bases-view progress::-webkit-progress-value {
   background-color: var(--color-accent-1);
 }
 
 
+
+
+/* SETTINGS */
 
 
 .setting-item-name .multi-select-pill {
@@ -591,4 +597,3 @@ body {
   width: fit-content;
   justify-self: end;
 }
-

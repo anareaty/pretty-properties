@@ -93,4 +93,5 @@ export default {
   HORIZONTAL: "горизонтальная",
   SQUARE: "квадратная",
   CIRCLE: "круглая",
+  BASES_SUPPORT: "Поддержка баз (экспериментальная функция)",
 };
