@@ -26,6 +26,12 @@
 
 
 
+
+
+
+
+
+
 .cm-scroller:has(.banner-image:not(:empty)) .cm-sizer,
 .markdown-preview-view:has(.banner-image:not(:empty)) .markdown-preview-sizer {
   margin-top: calc(var(--banner-height) + var(--banner-margin));
@@ -587,11 +593,13 @@ body {
 
 
 
-.prompt-setting {
+.prompt-setting,
+.position-setting {
   display: grid;
 }
 
-.prompt-setting .setting-item-control {
+.prompt-setting .setting-item-control,
+.position-setting .setting-item-control {
     display: grid;
     justify-content: stretch;
 }
@@ -601,3 +609,10 @@ body {
   justify-self: end;
 }
 
+.position-setting.setting-item:first-child  {
+  padding: 0.75em 0;
+}
+
+.position-setting input[type='range'] {
+  width: 100%;
+}

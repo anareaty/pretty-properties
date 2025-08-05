@@ -44,6 +44,7 @@ export interface PPPluginSettings {
 	iconColor: string;
 	iconBackground: boolean;
 	enableBases: boolean;
+	bannerPositionProperty: string;
 	
 	
 }
@@ -89,7 +90,8 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	bannerIconGapMobile: 20,
 	iconColor: "",
 	iconBackground: false,
-	enableBases: false
+	enableBases: false,
+	bannerPositionProperty: "banner_position",
 }
 
 
@@ -130,6 +132,17 @@ export default class PPSettingTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.bannerProperty)
 				.onChange(async (value) => {
 					this.plugin.settings.bannerProperty = value;
+					await this.plugin.saveSettings();
+				    this.plugin.updateElements();
+				}));
+
+			new Setting(containerEl)
+			.setName(i18n.t("BANNER_POSITION_PROPERTY"))
+			.addText(text => text
+				.setPlaceholder('banner_position')
+				.setValue(this.plugin.settings.bannerPositionProperty)
+				.onChange(async (value) => {
+					this.plugin.settings.bannerPositionProperty = value;
 					await this.plugin.saveSettings();
 				    this.plugin.updateElements();
 				}));

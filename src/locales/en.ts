@@ -85,7 +85,8 @@ export default {
   CIRCLE: "circle",
   BASES_SUPPORT: "Bases support (experimental)",
   RELOAD_FILES_TO_APPLY_CHANGES: "Reload opened base files to apply changes",
-
+  SELECT_BANNER_POSITION: "Select banner position",
+  BANNER_POSITION_PROPERTY: "Banner position property",
 
 
 

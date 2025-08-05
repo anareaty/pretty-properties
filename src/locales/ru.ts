@@ -95,4 +95,6 @@ export default {
   CIRCLE: "круглая",
   BASES_SUPPORT: "Поддержка баз (экспериментальная функция)",
   RELOAD_FILES_TO_APPLY_CHANGES: "Чтобы изменения вступили в силу, открытые файлы баз требуется перезагрузить",
+  SELECT_BANNER_POSITION: "Позиционирование баннера",
+  BANNER_POSITION_PROPERTY: "Свойство для позиционирования баннера",
 };

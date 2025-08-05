@@ -16,6 +16,9 @@ import {
 	getIconIds,
 	getIcon,
 	SuggestModal,
+	Modal,
+	App,
+	Setting
 } from "obsidian";
 import MenuManager from "src/MenuManager";
 import { i18n } from "./localization";
@@ -126,7 +129,6 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 			this.registerDomEvent(doc, "click", (e: MouseEvent) => {
 
-				console.log(e)
 				if ((e.ctrlKey || e.metaKey) && e.target instanceof HTMLElement) {
 					let value = this.getPropertyValue(e);
 					if (value !== undefined) {
@@ -456,6 +458,19 @@ export default class PrettyPropertiesPlugin extends Plugin {
 					);
 				})
 		);
+
+
+		menu.addItem((item: MenuItem) =>
+			item
+				.setTitle(i18n.t("SELECT_BANNER_POSITION"))
+				.setIcon("sliders-horizontal")
+				.setSection("pretty-properties")
+				.onClick(async () => {
+					this.selectBannerPosition()
+				})
+		);
+
+
 
 		menu.addItem((item: MenuItem) =>
 			item
@@ -891,6 +906,45 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				menu.showAtMouseEvent(e);
 			}
 		}
+	}
+
+
+
+	async selectBannerPosition() {
+		let file = this.app.workspace.getActiveFile()
+		let bannerPositionProperty = this.settings.bannerPositionProperty
+		if (file instanceof TFile && bannerPositionProperty) {
+			let cache = this.app.metadataCache.getFileCache(file);
+			let position = cache?.frontmatter?.[bannerPositionProperty] || 50
+			class PositionModal extends Modal {
+				onOpen() {
+					const {contentEl} = this
+					let positionSetting = new Setting(contentEl)
+					.addSlider(slider => slider
+						.setLimits(0, 100, 1)
+						.setValue(position)
+						.setDynamicTooltip()
+						.onChange((value) => {
+							if (file instanceof TFile) {
+								this.app.fileManager.processFrontMatter(file, fm => {
+									fm[bannerPositionProperty] = value
+								})
+							}
+						})
+					)
+
+					positionSetting.settingEl.classList.add("position-setting")
+				}
+			
+				onClose() {
+					const {contentEl} = this
+					contentEl.empty()
+				} 
+			}
+
+			new PositionModal(this.app).open()
+		}
+
 	}
 
 	async selectCoverShape() {
@@ -1874,6 +1928,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		}
 
 		let bannerVal = frontmatter?.[this.settings.bannerProperty];
+		let positionVal = frontmatter?.[this.settings.bannerPositionProperty]
 
 		if (bannerContainer instanceof HTMLElement) {
 			let oldBannerDiv = bannerContainer.querySelector(".banner-image");
@@ -1894,6 +1949,11 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				);
 				let image = bannerTemp.querySelector("img");
 				if (image) {
+					if (positionVal) {
+						
+						image.style = "object-position: center " + positionVal + "%;"
+					}
+
 					bannerDiv.append(image);
 				}
 			}
