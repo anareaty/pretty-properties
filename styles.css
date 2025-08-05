@@ -411,6 +411,8 @@ body {
     --pill-focus-left-adjust: -1px;
 }
 
+
+
 body {
   --pill-background-modified: var(--pill-background);
   --pill-background-hover-modified: var(--pill-background-hover);
@@ -453,12 +455,17 @@ body {
     line-height: var(--line-height-tight);
 }
 
-
+.multi-select-pill,
+.pp-bases-enabled .value-list-element {
+  --pill-background: var(--pill-background-modified) !important;
+  --pill-background-hover: var(--pill-background-hover-modified) !important;
+}
 
 
 .pp-bases-enabled .bases-td[data-property="note.tags"] .multi-select-pill,
 .pp-bases-enabled .bases-td[data-property="formula.tags"] .value-list-element,
-.pp-bases-enabled .bases-cards-property[data-property="formula.tags"] .value-list-element {
+.pp-bases-enabled .bases-cards-property[data-property="formula.tags"] .value-list-element,
+.metadata-property[data-property-key="tags"] .multi-select-pill{
     --pill-color: var(--tag-color);
     --pill-color-hover: var(--tag-color-hover);
     --pill-color-remove: var(--tag-color);
@@ -480,11 +487,13 @@ body {
   display: inline-block;
 }
 
-.multi-select-pill,
-.pp-bases-enabled .value-list-element {
-  --pill-background: var(--pill-background-modified) !important;
-  --pill-background-hover: var(--pill-background-hover-modified) !important;
-}
+
+
+
+
+
+
+
 
 
 

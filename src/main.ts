@@ -125,7 +125,9 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			}
 
 			this.registerDomEvent(doc, "click", (e: MouseEvent) => {
-				if (e.ctrlKey && e.target instanceof HTMLElement) {
+
+				console.log(e)
+				if ((e.ctrlKey || e.metaKey) && e.target instanceof HTMLElement) {
 					let value = this.getPropertyValue(e);
 					if (value !== undefined) {
 						let propEl = e.target.closest(".metadata-property");
