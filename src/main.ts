@@ -1950,8 +1950,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				let image = bannerTemp.querySelector("img");
 				if (image) {
 					if (positionVal) {
-						
-						image.style = "object-position: center " + positionVal + "%;"
+						image.setAttribute("style", "object-position: center " + positionVal + "%;")
 					}
 
 					bannerDiv.append(image);
