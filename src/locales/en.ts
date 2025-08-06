@@ -87,8 +87,16 @@ export default {
   RELOAD_FILES_TO_APPLY_CHANGES: "Reload opened base files to apply changes",
   SELECT_BANNER_POSITION: "Select banner position",
   BANNER_POSITION_PROPERTY: "Banner position property",
-
-
+  ADD_PADDINGS_TO_LIST_PROPERTIES: "Add paddings to list properties",
+  ADD_PADDINGS_DESC: "Paddings make colored pills look better, but may look strange on non-colored pills if default color is not set. Select the option that fits better for your theme.",
+  ALL: "all",
+  NONE: "none",
+  ONLY_COLORED: "only colored",
+  ONLY_NON_TRANSPARENT: "only non-transparent",
+  BASE_TAGS_COLOR: "Add default color to tags in bases",
+  BASE_TAGS_COLOR_DESC: "This option makes tags in bases look similar to tags in files by adding default tag color and paddings. Turn off if you want them to look the same as regular properties.",
+  STYLE_FORMULA_TAGS: "Style formula.tags like tags",
+  STYLE_FORMULA_TAGS_DESC: "Makes list values generaned by formula named \"tags\", look the same as regular tags. It includes default tags color and custom colors."
 
 };
 

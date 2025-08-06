@@ -1305,17 +1305,50 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 	updatePillColors() {
 		let styleText = "";
-		for (let prop in this.settings.propertyPillColors) {
-			styleText =
-				styleText +
-				"[data-property-pill-value='" +
-				prop +
-				"'] {" +
-				"--pill-color-rgb: var(--color-" +
-				this.settings.propertyPillColors[prop] +
+		let transparentPropsDataString = ""
+		let propertyPillColors = this.settings.propertyPillColors
+		
+		for (let prop in propertyPillColors) {
+			let color = propertyPillColors[prop]
+			styleText = styleText +
+				"[data-property-pill-value='" + prop + "'] {\n" +
+				"--pill-color-rgb: var(--color-" + color +
 				"-rgb); \n" +
 				"--pill-background-modified: rgba(var(--pill-color-rgb), 0.2); \n--pill-background-hover-modified: rgba(var(--pill-color-rgb), 0.3); \n" +
 				"--tag-background-modified: rgba(var(--pill-color-rgb), 0.2); \n--tag-background-hover-modified: rgba(var(--pill-color-rgb), 0.3);}\n";
+
+			if (this.settings.addPillPadding == "colored" && color != "none") {
+				styleText = styleText +
+					".metadata-property-value .multi-select-pill[data-property-pill-value='" + prop + "'],\n" + 
+					"[data-property*='note'] .value-list-element[data-property-pill-value='" + prop + "'],\n" +
+					"[data-property*='formula.tags'] .value-list-element[data-property-pill-value='" + prop + "']\n" +
+					" {\n" +
+					"--pill-padding-x: var(--tag-padding-x);\n}\n"
+			}
+
+			if (color == "none") {
+				transparentPropsDataString = transparentPropsDataString +
+				"[data-property-pill-value='" + prop + "'],"
+			}
+		}
+
+		if (this.settings.addPillPadding == "all") {
+			styleText = styleText +
+			"\n.metadata-property-value .multi-select-pill," +
+			"[data-property*='note'] .value-list-element," +
+			"[data-property*='formula.tags'] .value-list-element" +
+			" {\n" +
+			"--pill-padding-x: var(--tag-padding-x);\n}\n"
+		}
+
+		if (this.settings.addPillPadding == "non-transparent") {
+			transparentPropsDataString = transparentPropsDataString.slice(0, -1)
+			styleText = styleText +
+				".metadata-property-value .multi-select-pill:not(" + transparentPropsDataString + "),\n" + 
+				"[data-property*='note'] .value-list-element:not(" + transparentPropsDataString + ")," +
+				"[data-property*='formula.tags'] .value-list-element:not(" + transparentPropsDataString + ")" +
+				" {\n" +
+				"--pill-padding-x: var(--tag-padding-x);\n}\n"
 		}
 
 		let oldStyle = document.head.querySelector("style#pp-pill-colors");
@@ -1325,6 +1358,18 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		style.textContent = styleText;
 		style.id = "pp-pill-colors";
 		document.head.appendChild(style);
+
+		if (this.settings.addBaseTagColor) {
+			document.body.classList.add("pp-base-tag-color")
+		} else {
+			document.body.classList.remove("pp-base-tag-color")
+		}
+
+		if (this.settings.styleFormulaTags) {
+			document.body.classList.add("pp-style-formula-tags")
+		} else {
+			document.body.classList.remove("pp-style-formula-tags")
+		}
 	}
 
 	updateBannerStyles() {
@@ -1542,12 +1587,14 @@ export default class PrettyPropertiesPlugin extends Plugin {
 						}
 					}
 
+
 					let pills = containerEl.querySelectorAll(
 						".bases-cards-property .value-list-element:not([data-property-pill-value])"
 					);
 					for (let pill of pills) {
 						if (pill instanceof HTMLElement) {
 							let value = pill.innerText;
+							if (value.startsWith("#")) {value = value.replace("#", "")}
 							pill.setAttribute("data-property-pill-value", value);
 						}
 					}
@@ -2122,14 +2169,29 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 	async addClassestoProperties(view: View) {
 		let container = view.containerEl;
-
+	
 		let pills = container.querySelectorAll(
 			".multi-select-pill:not([data-property-pill-value])"
 		);
+
+
+		let formulaPills = container.querySelectorAll(
+			"[data-property='formula.tags'] .value-list-element:not([data-property-pill-value])"
+		);
+
 		for (let pill of pills) {
 			let content = pill.querySelector(".multi-select-pill-content");
 			if (content instanceof HTMLElement) {
 				let value = content.innerText;
+				if (value.startsWith("#")) {value = value.replace("#", "")}
+				pill.setAttribute("data-property-pill-value", value);
+			}
+		}
+
+		for (let pill of formulaPills) {
+			if (pill instanceof HTMLElement) {
+				let value = pill.innerText;
+				if (value.startsWith("#")) {value = value.replace("#", "")}
 				pill.setAttribute("data-property-pill-value", value);
 			}
 		}

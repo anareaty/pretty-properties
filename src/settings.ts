@@ -45,6 +45,9 @@ export interface PPPluginSettings {
 	iconBackground: boolean;
 	enableBases: boolean;
 	bannerPositionProperty: string;
+	addPillPadding: string;
+	addBaseTagColor: boolean;
+	styleFormulaTags: boolean;
 	
 	
 }
@@ -92,6 +95,10 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	iconBackground: false,
 	enableBases: false,
 	bannerPositionProperty: "banner_position",
+	addPillPadding: "all",
+	addBaseTagColor: true,
+	styleFormulaTags: true
+
 }
 
 
@@ -667,6 +674,51 @@ export default class PPSettingTab extends PluginSettingTab {
 
 
 		new Setting(containerEl).setName(i18n.t("PROPERTY_SETTINGS")).setHeading();
+
+		new Setting(containerEl)
+		.setName(i18n.t("ADD_PADDINGS_TO_LIST_PROPERTIES"))
+		.setDesc(i18n.t("ADD_PADDINGS_DESC"))
+		.addDropdown(drop => drop
+			.addOptions({
+				"all": i18n.t("ALL"),
+				"none": i18n.t("NONE"),
+				"colored": i18n.t("ONLY_COLORED"),
+				"non-transparent": i18n.t("ONLY_NON_TRANSPARENT")
+			})
+			.setValue(this.plugin.settings.addPillPadding)
+			.onChange((value) => {
+				this.plugin.settings.addPillPadding = value
+				this.plugin.saveSettings()
+				this.plugin.updatePillColors()
+			})
+		)
+
+
+		new Setting(containerEl)
+		.setName(i18n.t("BASE_TAGS_COLOR"))
+		.setDesc(i18n.t("BASE_TAGS_COLOR_DESC"))
+		.addToggle(toggle => {
+			toggle.setValue(this.plugin.settings.addBaseTagColor)
+			.onChange(value => {
+				this.plugin.settings.addBaseTagColor = value
+				this.plugin.saveSettings()
+				this.plugin.updatePillColors()
+			})
+		});
+
+
+		new Setting(containerEl)
+		.setName(i18n.t("STYLE_FORMULA_TAGS"))
+		.setDesc(i18n.t("STYLE_FORMULA_TAGS_DESC"))
+		.addToggle(toggle => {
+			toggle.setValue(this.plugin.settings.styleFormulaTags)
+			.onChange(value => {
+				this.plugin.settings.styleFormulaTags = value
+				this.plugin.saveSettings()
+				this.plugin.updatePillColors()
+			})
+		});
+
 
 		new Setting(containerEl)
 		.setName(i18n.t("SHOW_COLORED_PROPERTIES"))
