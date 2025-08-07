@@ -96,7 +96,12 @@ export default {
   BASE_TAGS_COLOR: "Add default color to tags in bases",
   BASE_TAGS_COLOR_DESC: "This option makes tags in bases look similar to tags in files by adding default tag color and paddings. Turn off if you want them to look the same as regular properties.",
   STYLE_FORMULA_TAGS: "Style formula.tags like tags",
-  STYLE_FORMULA_TAGS_DESC: "Makes list values generaned by formula named \"tags\", look the same as regular tags. It includes default tags color and custom colors."
+  STYLE_FORMULA_TAGS_DESC: "Makes list values generaned by formula named \"tags\", look the same as regular tags. It includes default tags color and custom colors.",
+  VERTICAL_COVER: "vertical (cover)",
+  VERTICAL_CONTAIN: "vertical (contain)",
+  HORIZONTAL_COVER: "horizontal (cover)",
+  HORIZONTAL_CONTAIN: "horizontal (contain)",
+	  
 
 };
 
