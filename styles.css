@@ -208,14 +208,31 @@
 
 
 
-.metadata-side-image.vertical img {
+.metadata-side-image.vertical-cover img,
+.metadata-side-image.vertical-contain img {
   aspect-ratio: 0.63;
-  object-fit: contain;
   object-position: top;
 }
 
-.metadata-side-image.horizontal img {
+.metadata-side-image.vertical-contain img {
+  object-fit: contain;
+}
+
+.metadata-side-image.vertical-cover img {
+  object-fit: cover;
+}
+
+
+.metadata-side-image.horizontal-cover img,
+.metadata-side-image.horizontal-contain img {
   aspect-ratio: 4/3;
+}
+
+.metadata-side-image.horizontal-contain img {
+  object-fit: contain;
+}
+
+.metadata-side-image.horizontal-cover img {
   object-fit: cover;
 }
 
