@@ -1940,7 +1940,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				} else if (cssVal && cssVal.includes("cover-circle")) {
 					coverDiv.classList.add("circle");
 				} else {
-					coverDiv.classList.add("vertical");
+					coverDiv.classList.add("vertical-cover");
 				}
 
 				let coverTemp = document.createElement("div");
