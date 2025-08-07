@@ -951,8 +951,10 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		let file = this.app.workspace.getActiveFile();
 		if (file instanceof TFile) {
 			let shapes: any = {
-				vertical: i18n.t("VERTICAL"),
-				horizontal: i18n.t("HORIZONTAL"),
+				"vertical-cover": i18n.t("VERTICAL_COVER"),
+				"vertical-contain": i18n.t("VERTICAL_CONTAIN"),
+				"horizontal-cover": i18n.t("HORIZONTAL_COVER"),
+				"horizontal-contain": i18n.t("HORIZONTAL_CONTAIN"),
 				square: i18n.t("SQUARE"),
 				circle: i18n.t("CIRCLE"),
 			};
@@ -1917,11 +1919,23 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				coverDiv = document.createElement("div");
 				coverDiv.classList.add("metadata-side-image");
 
-				if (cssVal && cssVal.includes("cover-vertical")) {
-					coverDiv.classList.add("vertical");
-				} else if (cssVal && cssVal.includes("cover-horizontal")) {
-					coverDiv.classList.add("horizontal");
-				} else if (cssVal && cssVal.includes("cover-square")) {
+				if (cssVal && (cssVal.includes("cover-vertical") ||
+							   cssVal.includes("cover-vertical-cover") 
+				)) {
+					coverDiv.classList.add("vertical-cover");
+				} 
+				else if (cssVal && cssVal.includes("cover-vertical-contain")) {
+					coverDiv.classList.add("vertical-contain");
+				}
+				else if (cssVal && cssVal.includes("cover-horizontal-contain")) {
+					coverDiv.classList.add("horizontal-contain");
+				} 
+				else if (cssVal && (cssVal.includes("cover-horizontal") || 
+									cssVal.includes("cover-horizontal-cover")
+				)) {
+					coverDiv.classList.add("horizontal-cover");
+				} 
+				else if (cssVal && cssVal.includes("cover-square")) {
 					coverDiv.classList.add("square");
 				} else if (cssVal && cssVal.includes("cover-circle")) {
 					coverDiv.classList.add("circle");
