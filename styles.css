@@ -252,7 +252,7 @@
 .metadata-side-image.circle img {
   aspect-ratio: 1;
   object-fit: cover;
-  border-radius: 50%;
+  border-radius: 50% !important;
 }
 
 
