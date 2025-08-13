@@ -977,7 +977,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 							cssclasses = cssclasses.filter(
 								(c: string) =>
 									!Object.keys(shapes).find(
-										(s) => c == "cover-" + s
+										(s) => c == "cover-" + s || c == "cover-vertical" || c == "cover-horizontal"
 									)
 							);
 							cssclasses.push("cover-" + key);

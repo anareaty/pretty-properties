@@ -193,8 +193,13 @@
   }
 
   .metadata-side-image.vertical-cover img,
-  .metadata-side-image.vertical-contain img{
+  .metadata-side-image.vertical-contain img {
     aspect-ratio: auto !important;
+    object-fit: contain !important;
+  }
+
+  .metadata-side-image.horizontal-contain img {
+    object-fit: cover !important;
   }
 
   .metadata-side-image.square img,
