@@ -111,6 +111,13 @@ export default {
   VERTICAL_CONTAIN: "вертикальная (вписать)",
   HORIZONTAL_COVER: "горизонтальная (заполнить)",
   HORIZONTAL_CONTAIN: "горизонтальная (вписать)",
+  INITIAL_DEFAULT_WIDTH: "исходная форма (ширина по умолчанию)",
+  INITIAL_WIDTH_2: "исходная форма (ширина 2)",
+  INITIAL_WIDTH_3: "исходная форма (ширина 3)",
+  DEFAULT_COVER_WIDTH: "Ширина обложки по умолчанию",
+  DEFAULT_COVER_WIDTH_2: "Ширина обложки 2",
+  DEFAULT_COVER_WIDTH_3: "Ширина обложки 3",
+  COVER_MAX_HEIGHT: "Максимальная высота обложки",
 	  
 
 };

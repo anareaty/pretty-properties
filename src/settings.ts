@@ -18,6 +18,10 @@ export interface PPPluginSettings {
     bannerMargin: number;
 	bannerMarginMobile: number;
     bannerFading: boolean;
+	coverDefaultWidth1: number;
+	coverDefaultWidth2: number;
+	coverDefaultWidth3: number;
+	coverMaxHeight: number;
     coverVerticalWidth: number;
     coverHorizontalWidth: number;
     coverSquareWidth: number;
@@ -68,6 +72,10 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
     bannerMargin: -20,
 	bannerMarginMobile: 0,
     bannerFading: true,
+	coverDefaultWidth1: 200,
+	coverDefaultWidth2: 250,
+	coverDefaultWidth3: 300,
+	coverMaxHeight: 500,
     coverVerticalWidth: 200,
     coverHorizontalWidth: 300,
     coverSquareWidth: 250,
@@ -522,6 +530,66 @@ export default class PPSettingTab extends PluginSettingTab {
 					this.display();
 				}))
 			}
+
+			new Setting(containerEl)
+			.setName(i18n.t("COVER_MAX_HEIGHT"))
+			.addText(text => {
+				text.inputEl.type = "number"
+				text.setValue(this.plugin.settings.coverMaxHeight.toString())
+				.setPlaceholder('500')
+				.onChange(async (value) => {
+					if (!value) value = "0"
+					this.plugin.settings.coverMaxHeight = Number(value);
+					await this.plugin.saveSettings();
+				    this.plugin.updateCoverStyles();
+				})
+			});
+
+			new Setting(containerEl)
+			.setName(i18n.t("DEFAULT_COVER_WIDTH"))
+			.addText(text => {
+				text.inputEl.type = "number"
+				text.setValue(this.plugin.settings.coverDefaultWidth1.toString())
+				.setPlaceholder('200')
+				.onChange(async (value) => {
+					if (!value) value = "0"
+					this.plugin.settings.coverDefaultWidth1 = Number(value);
+					await this.plugin.saveSettings();
+				    this.plugin.updateCoverStyles();
+				})
+			});
+
+			new Setting(containerEl)
+			.setName(i18n.t("DEFAULT_COVER_WIDTH_2"))
+			.addText(text => {
+				text.inputEl.type = "number"
+				text.setValue(this.plugin.settings.coverDefaultWidth2.toString())
+				.setPlaceholder('250')
+				.onChange(async (value) => {
+					if (!value) value = "0"
+					this.plugin.settings.coverDefaultWidth2 = Number(value);
+					await this.plugin.saveSettings();
+				    this.plugin.updateCoverStyles();
+				})
+			});
+
+			new Setting(containerEl)
+			.setName(i18n.t("DEFAULT_COVER_WIDTH_3"))
+			.addText(text => {
+				text.inputEl.type = "number"
+				text.setValue(this.plugin.settings.coverDefaultWidth3.toString())
+				.setPlaceholder('300')
+				.onChange(async (value) => {
+					if (!value) value = "0"
+					this.plugin.settings.coverDefaultWidth3 = Number(value);
+					await this.plugin.saveSettings();
+				    this.plugin.updateCoverStyles();
+				})
+			});
+
+
+			
+
 
 			new Setting(containerEl)
 			.setName(i18n.t("VERTICAL_COVER_WIDTH"))

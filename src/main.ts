@@ -951,6 +951,9 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		let file = this.app.workspace.getActiveFile();
 		if (file instanceof TFile) {
 			let shapes: any = {
+				"initial": i18n.t("INITIAL_DEFAULT_WIDTH"),
+				"initial-width-2": i18n.t("INITIAL_WIDTH_2"),
+				"initial-width-3": i18n.t("INITIAL_WIDTH_3"),
 				"vertical-cover": i18n.t("VERTICAL_COVER"),
 				"vertical-contain": i18n.t("VERTICAL_CONTAIN"),
 				"horizontal-cover": i18n.t("HORIZONTAL_COVER"),
@@ -1486,6 +1489,18 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				"--cover-width-vertical: " +
 				this.settings.coverVerticalWidth +
 				"px;\n" +
+				"--cover-max-height: " +
+				this.settings.coverMaxHeight +
+				"px;\n" +
+				"--cover-width-initial: " +
+				this.settings.coverDefaultWidth1 +
+				"px;\n" +
+				"--cover-width-initial-2: " +
+				this.settings.coverDefaultWidth2 +
+				"px;\n" +
+				"--cover-width-initial-3: " +
+				this.settings.coverDefaultWidth3 +
+				"px;\n" +
 				"--cover-width-square: " +
 				this.settings.coverSquareWidth +
 				"px;\n" +
@@ -1937,10 +1952,22 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				} 
 				else if (cssVal && cssVal.includes("cover-square")) {
 					coverDiv.classList.add("square");
-				} else if (cssVal && cssVal.includes("cover-circle")) {
+				} 
+				
+				else if (cssVal && cssVal.includes("cover-circle")) {
 					coverDiv.classList.add("circle");
-				} else {
-					coverDiv.classList.add("vertical-cover");
+				} 
+
+				else if (cssVal && cssVal.includes("cover-initial-width-2")) {
+					coverDiv.classList.add("initial-2");
+				}
+
+				else if (cssVal && cssVal.includes("cover-initial-width-3")) {
+					coverDiv.classList.add("initial-3");
+				}
+				
+				else {
+					coverDiv.classList.add("initial");
 				}
 
 				let coverTemp = document.createElement("div");

@@ -101,6 +101,13 @@ export default {
   VERTICAL_CONTAIN: "vertical (contain)",
   HORIZONTAL_COVER: "horizontal (cover)",
   HORIZONTAL_CONTAIN: "horizontal (contain)",
+  INITIAL_DEFAULT_WIDTH: "initial shape (default width)",
+  INITIAL_WIDTH_2: "initial shape (width 2)",
+  INITIAL_WIDTH_3: "initial shape (width 3)",
+  DEFAULT_COVER_WIDTH: "Default cover width",
+  DEFAULT_COVER_WIDTH_2: "Cover width 2",
+  DEFAULT_COVER_WIDTH_3: "Cover width 3",
+  COVER_MAX_HEIGHT: "Maximum cover height",
 	  
 
 };
