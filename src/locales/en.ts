@@ -108,6 +108,8 @@ export default {
   DEFAULT_COVER_WIDTH_2: "Cover width 2",
   DEFAULT_COVER_WIDTH_3: "Cover width 3",
   COVER_MAX_HEIGHT: "Maximum cover height",
+  ENABLE_TASKS_COUNT: "Enable task count",
+  TASKS_COUNT_DESC: "If enabled, the plugin would automatically count tasks checkboxes in the active note and periodically save the count numbers into the specified properties. This function only works in notes that already contain at least one of this properties."
 	  
 
 };

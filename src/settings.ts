@@ -52,6 +52,7 @@ export interface PPPluginSettings {
 	addPillPadding: string;
 	addBaseTagColor: boolean;
 	styleFormulaTags: boolean;
+	enableTasksCount: boolean;
 	
 	
 }
@@ -105,7 +106,8 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	bannerPositionProperty: "banner_position",
 	addPillPadding: "all",
 	addBaseTagColor: true,
-	styleFormulaTags: true
+	styleFormulaTags: true,
+	enableTasksCount: true
 
 }
 
@@ -652,89 +654,103 @@ export default class PPSettingTab extends PluginSettingTab {
 		new Setting(containerEl).setName(i18n.t("TASKS")).setHeading();
 
 			new Setting(containerEl)
-			.setName(i18n.t("ALL_TASKS_COUNT_PROPERTY"))
-			.addText(text => text
-				.setPlaceholder('banner')
-				.setValue(this.plugin.settings.allTasksCount)
-				.onChange(async (value) => {
-					this.plugin.settings.allTasksCount = value;
-					await this.plugin.saveSettings();
-				    this.plugin.updateElements();
-				}));
+				.setName(i18n.t("ENABLE_TASKS_COUNT"))
+				.setDesc(i18n.t("TASKS_COUNT_DESC"))
+				.addToggle(toggle => toggle
+					.setValue(this.plugin.settings.enableTasksCount)
+					.onChange(async (value) => {
+						this.plugin.settings.enableTasksCount = value
+						await this.plugin.saveSettings();
+						this.display();
+					}));
 
-            new Setting(containerEl)
-			.setName(i18n.t("UNCOMPLETED_TASKS_COUNT_PROPERTY"))
-			.addText(text => text
-				.setPlaceholder('banner')
-				.setValue(this.plugin.settings.uncompletedTasksCount)
-				.onChange(async (value) => {
-					this.plugin.settings.uncompletedTasksCount = value;
-					await this.plugin.saveSettings();
-				    this.plugin.updateElements();
-				}));
+			if (this.plugin.settings.enableTasksCount) {
 
-			new Setting(containerEl)
-			.setName(i18n.t("COMPLETED_TASKS_COUNT_PROPERTY"))
-			.addText(text => text
-				.setPlaceholder('banner')
-				.setValue(this.plugin.settings.completedTasksCount)
-				.onChange(async (value) => {
-					this.plugin.settings.completedTasksCount = value;
-					await this.plugin.saveSettings();
-				    this.plugin.updateElements();
-				}));
+				new Setting(containerEl)
+				.setName(i18n.t("ALL_TASKS_COUNT_PROPERTY"))
+				.addText(text => text
+					.setPlaceholder('banner')
+					.setValue(this.plugin.settings.allTasksCount)
+					.onChange(async (value) => {
+						this.plugin.settings.allTasksCount = value;
+						await this.plugin.saveSettings();
+						this.plugin.updateElements();
+					}));
 
-			
-            containerEl.createEl("p", {text: i18n.t("TASK_STATUSES_DESCRIPTION")})
+				new Setting(containerEl)
+				.setName(i18n.t("UNCOMPLETED_TASKS_COUNT_PROPERTY"))
+				.addText(text => text
+					.setPlaceholder('banner')
+					.setValue(this.plugin.settings.uncompletedTasksCount)
+					.onChange(async (value) => {
+						this.plugin.settings.uncompletedTasksCount = value;
+						await this.plugin.saveSettings();
+						this.plugin.updateElements();
+					}));
 
-			
-			
+				new Setting(containerEl)
+				.setName(i18n.t("COMPLETED_TASKS_COUNT_PROPERTY"))
+				.addText(text => text
+					.setPlaceholder('banner')
+					.setValue(this.plugin.settings.completedTasksCount)
+					.onChange(async (value) => {
+						this.plugin.settings.completedTasksCount = value;
+						await this.plugin.saveSettings();
+						this.plugin.updateElements();
+					}));
 
-            new Setting(containerEl)
-			.setName(i18n.t("UNCOMPLETED_TASKS_COUNT_STATUSES"))
-			.addText(text => text
-				.setPlaceholder('banner')
-				.setValue(this.plugin.settings.uncompletedTasksStatuses.map(s => "\"" + s + "\"").join(", "))
-				.onChange(async (value) => {
-                    let valueArr = value.split(",").map(v => {
-                        v = v.trim()
-                        let stringMatch = v.match(/(\")(.*?)(\")/)
-                        if (stringMatch) {
-                            v = stringMatch[2]
-                        }
-                        if (v.length > 1) {
-                            v = v[0]
-                        }
-                        return v
-                    }).filter(v => v != "" && !this.plugin.settings.completedTasksStatuses.includes(v))
-                    valueArr = Array.from(new Set(valueArr))
-					this.plugin.settings.uncompletedTasksStatuses = valueArr;
-					await this.plugin.saveSettings();
-				    this.plugin.updateElements();
-				}));
+				
+				containerEl.createEl("p", {text: i18n.t("TASK_STATUSES_DESCRIPTION")})
 
-            new Setting(containerEl)
-			.setName(i18n.t("COMPLETED_TASKS_COUNT_STATUSES"))
-			.addText(text => text
-				.setPlaceholder('banner')
-				.setValue(this.plugin.settings.completedTasksStatuses.map(s => "\"" + s + "\"").join(", "))
-				.onChange(async (value) => {
-                    let valueArr = value.split(",").map(v => {
-                        v = v.trim()
-                        let stringMatch = v.match(/(\")(.*?)(\")/)
-                        if (stringMatch) {
-                            v = stringMatch[2]
-                        }
-                        if (v.length > 1) {
-                            v = v[0]
-                        }
-                        return v
-                    }).filter(v => v != "" && !this.plugin.settings.uncompletedTasksStatuses.includes(v))
-                    valueArr = Array.from(new Set(valueArr))
-					this.plugin.settings.completedTasksStatuses = valueArr;
-					await this.plugin.saveSettings();
-				    this.plugin.updateElements();
-				}));
+				
+				
+
+				new Setting(containerEl)
+				.setName(i18n.t("UNCOMPLETED_TASKS_COUNT_STATUSES"))
+				.addText(text => text
+					.setPlaceholder('banner')
+					.setValue(this.plugin.settings.uncompletedTasksStatuses.map(s => "\"" + s + "\"").join(", "))
+					.onChange(async (value) => {
+						let valueArr = value.split(",").map(v => {
+							v = v.trim()
+							let stringMatch = v.match(/(\")(.*?)(\")/)
+							if (stringMatch) {
+								v = stringMatch[2]
+							}
+							if (v.length > 1) {
+								v = v[0]
+							}
+							return v
+						}).filter(v => v != "" && !this.plugin.settings.completedTasksStatuses.includes(v))
+						valueArr = Array.from(new Set(valueArr))
+						this.plugin.settings.uncompletedTasksStatuses = valueArr;
+						await this.plugin.saveSettings();
+						this.plugin.updateElements();
+					}));
+
+				new Setting(containerEl)
+				.setName(i18n.t("COMPLETED_TASKS_COUNT_STATUSES"))
+				.addText(text => text
+					.setPlaceholder('banner')
+					.setValue(this.plugin.settings.completedTasksStatuses.map(s => "\"" + s + "\"").join(", "))
+					.onChange(async (value) => {
+						let valueArr = value.split(",").map(v => {
+							v = v.trim()
+							let stringMatch = v.match(/(\")(.*?)(\")/)
+							if (stringMatch) {
+								v = stringMatch[2]
+							}
+							if (v.length > 1) {
+								v = v[0]
+							}
+							return v
+						}).filter(v => v != "" && !this.plugin.settings.uncompletedTasksStatuses.includes(v))
+						valueArr = Array.from(new Set(valueArr))
+						this.plugin.settings.completedTasksStatuses = valueArr;
+						await this.plugin.saveSettings();
+						this.plugin.updateElements();
+					}));
+			}
 
 
 		

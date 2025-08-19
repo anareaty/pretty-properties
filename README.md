@@ -12,9 +12,23 @@ Add image to the left of metadata block to save space in the note. Works great f
 
 To add image put image link into the "cover" property (must be of type "text"). You can use embeds,  wikilinks, markdown links or bare urls for external images. 
 
-Add cssclasses to the note to change the shape of the image. Currently supported classes are "cover-vertical", "cover-horizontal", "cover-square" and "cover-circle". 
+Add cssclasses to the note to change the shape and the fitting of the image. Currently supported classes:
+- "cover-initial" (default shape)
+- "cover-initial-width-2" (default shape with different width)
+- "cover-initial-width-3" (default shape with another width)
+- "cover-vertical-cover" (vertical image with object-fit "cover")
+- "cover-vertical-contain" (vertical image with object-fit "contain")
+- "cover-vertical" (legacy option, works the same as "cover-vertical-contain")
+- "cover-horizontal-cover" (horizontal image with object-fit "cover")
+- "cover-horizontal-contain" (horizontal image with object-fit "contain")
+- "cover-horizontal" (legacy option, works the same as "cover-horizontal-cover")
+- "cover-square" 
+- "cover-circle". 
 
-You can right-click on existing cover or call command to open menu to change image or cover shape. 
+You can right-click on existing cover or call command to open menu to select image or cover shape. You also can set the widths of all possible shapes in the settings.
+
+> [!NOTE]  
+> Cover shapes would look a bit different on mobile devices with small screen. This is intentional to make them look more neat in the limited space.
 
 ![person profile note](images/image-2.png)
 
@@ -24,7 +38,9 @@ You can add simple banners to your notes. To do so add the link to the "banner" 
 
 ![note with banner](images/image-3.png)
 
-You can right-click on existing banner or call command to open menu to select banner image.
+Property "banner_position" allows you to vertically position banner image. To change the position put into this property a number from 0 to 100.
+
+You can right-click on existing banner or call command to open menu to select banner image or change banner position.
 
 ### Icon
 
@@ -75,7 +91,7 @@ If you Ctrl+click on any property value, the plugin will open search for this va
 
 ## Bases support (experimental)
 
-Bases are still in beta, so this functional may change. This functional is still fragile and can have bugs.
+Bases are still new and do not have API yet, so this functional may change. This functional is still fragile and can have bugs.
 
 ![base](images/image_base.png)
 
@@ -89,6 +105,9 @@ Unfortunately currently there is no way to properly add progress bars to base pr
 if(note["max"], if(note["value"], note["value"], 0) + "/" + note["max"], " ")
 ```
 3. If everything is done correctly, formula cells will render as progress bars.
+
+> [!IMPORTANT]  
+> Bases support is turned off by default! Do not forget to enable it in the settings!
 
 ## Installation
 

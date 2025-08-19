@@ -1801,7 +1801,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			this.updateIcons(view, frontmatter);
 			this.updateBannerImages(view, frontmatter);
 
-			if (cache && frontmatter) {
+			if (cache && frontmatter && this.settings.enableTasksCount) {
 				this.updateTasksCount(view, cache);
 			}
 		}
