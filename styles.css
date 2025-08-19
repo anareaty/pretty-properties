@@ -208,28 +208,31 @@
 
 @media (max-width: 600px) {
   .metadata-side-image {
-    width: 100%;
     text-align: center;
   }
   
   .metadata-side-image img {
-    height: 200px;
+    height: 200px !important;
+	width: auto !important;
     margin: auto;
   }
 
+  .metadata-side-image.vertical img,
   .metadata-side-image.vertical-cover img,
   .metadata-side-image.vertical-contain img {
     aspect-ratio: auto !important;
-    object-fit: contain !important;
+    max-width: 150px !important;
   }
 
-  .metadata-side-image.horizontal-contain img {
-    object-fit: cover !important;
+  .metadata-side-image.horizontal img,
+  .metadata-side-image.horizontal-cover img,
+  .metadata-side-image.horizontal-contain img{
+    width: 100% !important;
   }
 
   .metadata-side-image.square img,
   .metadata-side-image.circle img {
-    width: 200px;
+    width: 200px !important;
   }
 }
 
