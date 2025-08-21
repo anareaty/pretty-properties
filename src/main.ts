@@ -99,7 +99,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 						e.target instanceof HTMLElement &&
 						e.target.closest(".multi-select-pill")
 					) {
-						this.handlePillMenu(e.target);
+						this.handlePillMenu(e, e.target);
 					}
 				});
 
@@ -116,8 +116,9 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				this.registerDomEvent(doc, "mousedown", (e: MouseEvent) => {
 					let targetEl = e.target as HTMLElement;
 					if (e.button == 2) {
-						if (targetEl.closest(".multi-select-pill")) {
-							this.handlePillMenu(targetEl);
+						
+						if (targetEl.closest(".multi-select-pill") || targetEl.closest(".metadata-input-longtext")) {
+							this.handlePillMenu(e, targetEl);
 						}
 					}
 
@@ -374,6 +375,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		let view = leaf.view;
 		let targetNode = view.containerEl;
 		let observer = new MutationObserver((mutations) => {
+
 			let baseMutation;
 			let multiSelectMutation;
 			let progressMutation;
@@ -402,7 +404,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 					if (
 						target.classList.contains("multi-select-container") ||
-						target.classList.contains("value-list-container")
+						target.classList.contains("value-list-container") ||
+						target.classList.contains("metadata-input-longtext")
 					) {
 						multiSelectMutation = true;
 						if (progressMutation) break;
@@ -1219,9 +1222,69 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		}
 	}
 
-	handlePillMenu(el: HTMLElement) {
+	handlePillMenu(e: MouseEvent, el: HTMLElement) {
 		let menuManager = new MenuManager();
+
+
 		let pillEl = el.closest(".multi-select-pill");
+		let longtextEl = el.closest(".metadata-input-longtext");
+
+		const createColorItem = (item: MenuItem, pillVal: string) => {
+			item.setTitle(i18n.t("SELECT_COLOR"))
+				.setIcon("paintbrush")
+				.setSection("pretty-properties");
+
+			//@ts-ignore
+			let sub = item.setSubmenu() as Menu;
+			let colors = [
+				"red",
+				"orange",
+				"yellow",
+				"green",
+				"cyan",
+				"blue",
+				"purple",
+				"pink",
+				"none",
+				"default",
+			];
+
+			for (let color of colors) {
+				sub.addItem((item: MenuItem) => {
+					item.setIcon("square");
+
+					if (color != "default" && color != "none") {
+						//@ts-ignore
+						item.iconEl.style =
+							"color: transparent; background-color: rgba(var(--color-" +
+							color +
+							"-rgb), 0.3);";
+					}
+
+					if (color == "none") {
+						//@ts-ignore
+						item.iconEl.style = "opacity: 0.2;";
+					}
+
+					item.setTitle(i18n.t(color)).onClick(() => {
+						if (color == "default") {
+							if (pillVal)
+								delete this.settings
+									.propertyPillColors[pillVal];
+						} else {
+							if (pillVal)
+								this.settings.propertyPillColors[
+									pillVal
+								] = color;
+						}
+
+						this.saveSettings();
+						this.updatePillColors();
+					});
+				});
+			}
+		}
+
 		if (pillEl instanceof HTMLElement) {
 			let pillVal = pillEl?.getAttribute("data-property-pill-value");
 
@@ -1230,63 +1293,41 @@ export default class PrettyPropertiesPlugin extends Plugin {
 					["clipboard"],
 					i18n.t("SELECT_COLOR"),
 					(item: MenuItem) => {
-						item.setTitle(i18n.t("SELECT_COLOR"))
-							.setIcon("paintbrush")
-							.setSection("pretty-properties");
-
-						//@ts-ignore
-						let sub = item.setSubmenu() as Menu;
-						let colors = [
-							"red",
-							"orange",
-							"yellow",
-							"green",
-							"cyan",
-							"blue",
-							"purple",
-							"pink",
-							"none",
-							"default",
-						];
-
-						for (let color of colors) {
-							sub.addItem((item: MenuItem) => {
-								item.setIcon("square");
-
-								if (color != "default" && color != "none") {
-									//@ts-ignore
-									item.iconEl.style =
-										"color: transparent; background-color: rgba(var(--color-" +
-										color +
-										"-rgb), 0.3);";
-								}
-
-								if (color == "none") {
-									//@ts-ignore
-									item.iconEl.style = "opacity: 0.2;";
-								}
-
-								item.setTitle(i18n.t(color)).onClick(() => {
-									if (color == "default") {
-										if (pillVal)
-											delete this.settings
-												.propertyPillColors[pillVal];
-									} else {
-										if (pillVal)
-											this.settings.propertyPillColors[
-												pillVal
-											] = color;
-									}
-
-									this.saveSettings();
-									this.updatePillColors();
-								});
-							});
-						}
+						createColorItem(item, pillVal)
 					}
 				);
 			}
+		} else if (longtextEl instanceof HTMLElement) {
+			let pillVal = longtextEl?.getAttribute("data-property-pill-value");
+
+			if (pillVal) {
+				if (el.closest(".markdown-source-view")) {
+					menuManager.addItemAfter(
+						["clipboard"],
+						i18n.t("SELECT_COLOR"),
+						(item: MenuItem) => {
+							createColorItem(item, pillVal)
+						}
+					);
+				} else if (el.closest("[data-type='file-properties']")) {
+					e.preventDefault()
+					let menu = new Menu()
+					menu.addItem(
+						(item: MenuItem) => {
+							createColorItem(item, pillVal)
+						}
+					);
+					
+					menu.showAtMouseEvent(e)
+					
+					
+				}
+			}
 		}
+
+
+
+
 	}
 
 	updateHiddenProperties() {
@@ -1328,7 +1369,11 @@ export default class PrettyPropertiesPlugin extends Plugin {
 					"[data-property*='note'] .value-list-element[data-property-pill-value='" + prop + "'],\n" +
 					"[data-property*='formula.tags'] .value-list-element[data-property-pill-value='" + prop + "']\n" +
 					" {\n" +
-					"--pill-padding-x: var(--tag-padding-x);\n}\n"
+					"--pill-padding-x: var(--tag-padding-x);\n}\n" + 
+					".metadata-property-value .metadata-input-longtext[data-property-pill-value='" + prop + "'],\n" + 
+					"[data-property*='note'] .bases-cards-line.bases-rendered[data-property-pill-value='" + prop + "']\n" +
+					" {\n" +
+					"--longtext-margin: var(--input-padding);\n}\n"
 			}
 
 			if (color == "none") {
@@ -1343,7 +1388,11 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			"[data-property*='note'] .value-list-element," +
 			"[data-property*='formula.tags'] .value-list-element" +
 			" {\n" +
-			"--pill-padding-x: var(--tag-padding-x);\n}\n"
+			"--pill-padding-x: var(--tag-padding-x);\n}\n" + 
+			".metadata-property-value .metadata-input-longtext,\n" + 
+			"[data-property*='note'] .bases-cards-line.bases-rendered\n" +
+			" {\n" +
+			"--longtext-margin: var(--input-padding);\n}\n"
 		}
 
 		if (this.settings.addPillPadding == "non-transparent") {
@@ -1353,7 +1402,11 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				"[data-property*='note'] .value-list-element:not(" + transparentPropsDataString + ")," +
 				"[data-property*='formula.tags'] .value-list-element:not(" + transparentPropsDataString + ")" +
 				" {\n" +
-				"--pill-padding-x: var(--tag-padding-x);\n}\n"
+				"--pill-padding-x: var(--tag-padding-x);\n}\n" + 
+				".metadata-property-value .metadata-input-longtext:not(" + transparentPropsDataString + "),\n" + 
+				"[data-property*='note'] .bases-cards-line.bases-rendered:not(" + transparentPropsDataString + ")\n" +
+				" {\n" +
+				"--longtext-margin: var(--input-padding);\n}\n"
 		}
 
 		let oldStyle = document.head.querySelector("style#pp-pill-colors");
@@ -2215,6 +2268,10 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			".multi-select-pill:not([data-property-pill-value])"
 		);
 
+		let longtexts = container.querySelectorAll(
+			".metadata-input-longtext"
+		);
+
 
 		let formulaPills = container.querySelectorAll(
 			"[data-property='formula.tags'] .value-list-element:not([data-property-pill-value])"
@@ -2226,6 +2283,20 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				let value = content.innerText;
 				if (value.startsWith("#")) {value = value.replace("#", "")}
 				pill.setAttribute("data-property-pill-value", value);
+			}
+		}
+
+
+		for (let pill of longtexts) {
+			if (pill instanceof HTMLElement) {
+
+				
+				let value = pill.innerText
+				if (value) {
+					value = value.slice(0, 200)
+					pill.setAttribute("data-property-pill-value", value)
+				}
+				
 			}
 		}
 

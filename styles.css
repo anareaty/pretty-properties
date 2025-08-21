@@ -682,3 +682,27 @@ body {
 .position-setting input[type='range'] {
   width: 100%;
 	}
+
+
+body {
+  --longtext-margin: 0;
+}
+
+.metadata-input-longtext {
+  border-radius: 4px;
+  display: block;
+  margin: var(--longtext-margin);
+  padding: 0px 8px;
+  max-width: fit-content;
+  background-color: rgba(var(--pill-color-rgb), 0.2);
+  
+}
+
+.markdown-preview-view .metadata-property-value:hover .metadata-input-longtext,
+.markdown-source-view .metadata-property-value:hover .metadata-input-longtext,
+.metadata-input-longtext:focus {
+  max-width: unset;
+  background-color: initial;
+
+}
+
