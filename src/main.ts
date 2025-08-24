@@ -15,6 +15,7 @@ import {
 	WorkspaceLeaf,
 	getIconIds,
 	getIcon,
+	setIcon, 
 	SuggestModal,
 	Modal,
 	App,
@@ -390,6 +391,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 						target.classList.contains("bases-tr") ||
 						target.classList.contains("bases-cards-container") ||
 						target.classList.contains("bases-cards-group") ||
+						target.classList.contains("bases-cards-line") ||
 						target.classList.contains("bases-cards-item")
 					) {
 						baseMutation = true;
@@ -1227,7 +1229,6 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 		let pillEl = el.closest(".multi-select-pill");
-		let longtextEl = el.closest(".metadata-input-longtext");
 
 		const createColorItem = (item: MenuItem, pillVal: string) => {
 			item.setTitle(i18n.t("SELECT_COLOR"))
@@ -1297,33 +1298,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 					}
 				);
 			}
-		} else if (longtextEl instanceof HTMLElement) {
-			let pillVal = longtextEl?.getAttribute("data-property-pill-value");
-
-			if (pillVal) {
-				if (el.closest(".markdown-source-view")) {
-					menuManager.addItemAfter(
-						["clipboard"],
-						i18n.t("SELECT_COLOR"),
-						(item: MenuItem) => {
-							createColorItem(item, pillVal)
-						}
-					);
-				} else if (el.closest("[data-type='file-properties']")) {
-					e.preventDefault()
-					let menu = new Menu()
-					menu.addItem(
-						(item: MenuItem) => {
-							createColorItem(item, pillVal)
-						}
-					);
-					
-					menu.showAtMouseEvent(e)
-					
-					
-				}
-			}
-		}
+		} 
 
 
 
@@ -1353,6 +1328,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		let styleText = "";
 		let transparentPropsDataString = ""
 		let propertyPillColors = this.settings.propertyPillColors
+		let propertyLongtextColors = this.settings.propertyLongtextColors
 		
 		for (let prop in propertyPillColors) {
 			let color = propertyPillColors[prop]
@@ -1371,7 +1347,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 					" {\n" +
 					"--pill-padding-x: var(--tag-padding-x);\n}\n" + 
 					".metadata-property-value .metadata-input-longtext[data-property-pill-value='" + prop + "'],\n" + 
-					"[data-property*='note'] .bases-cards-line.bases-rendered[data-property-pill-value='" + prop + "']\n" +
+					".bases-cards-line[data-property-pill-value='" + prop + "']\n" +
 					" {\n" +
 					"--longtext-margin: var(--input-padding);\n}\n"
 			}
@@ -1381,6 +1357,34 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				"[data-property-pill-value='" + prop + "'],"
 			}
 		}
+
+
+
+		for (let prop in propertyLongtextColors) {
+			let color = propertyLongtextColors[prop]
+			styleText = styleText +
+				"[data-property-longtext-value='" + prop + "'] {\n" +
+				"--pill-color-rgb: var(--color-" + color +
+				"-rgb); \n" +
+				"--pill-background-modified: rgba(var(--pill-color-rgb), 0.2); \n--pill-background-hover-modified: rgba(var(--pill-color-rgb), 0.3); \n" +
+				"--tag-background-modified: rgba(var(--pill-color-rgb), 0.2); \n--tag-background-hover-modified: rgba(var(--pill-color-rgb), 0.3);\n}\n";
+
+			if (this.settings.addPillPadding == "colored" && color != "none") {
+				styleText = styleText +
+					".metadata-property-value .metadata-input-longtext[data-property-longtext-value='" + prop + "'],\n" + 
+					".bases-cards-line[data-property-pill-value='" + prop + "']\n" +
+					" {\n" +
+					"--longtext-margin: var(--input-padding);\n}\n"
+			}
+
+			if (color == "none") {
+				transparentPropsDataString = transparentPropsDataString +
+				"[data-property-longtext-value='" + prop + "'],"
+			}
+		}
+
+
+
 
 		if (this.settings.addPillPadding == "all") {
 			styleText = styleText +
@@ -1659,11 +1663,11 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 					let pills = containerEl.querySelectorAll(
-						".bases-cards-property .value-list-element:not([data-property-pill-value])"
+						".bases-cards-property .value-list-element:not([data-property-pill-value]), .bases-cards-line"
 					);
 					for (let pill of pills) {
 						if (pill instanceof HTMLElement) {
-							let value = pill.innerText;
+							let value = pill.innerText.slice(0, 200).trim();
 							if (value.startsWith("#")) {value = value.replace("#", "")}
 							pill.setAttribute("data-property-pill-value", value);
 						}
@@ -1674,7 +1678,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		}
 	}
 
-	updateBaseLeafProgress(leaf: WorkspaceLeaf) {
+	async updateBaseLeafProgress(leaf: WorkspaceLeaf) {
 		if (this.settings.enableBases) {
 			let containerEl = leaf.view.containerEl;
 
@@ -1700,19 +1704,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 					);
 					for (let progressEl of progressEls) {
 						if (progressEl instanceof HTMLElement) {
-							let oldProgress = progressEl.querySelector(
-								".metadata-progress-wrapper"
-							);
-							if (oldProgress) {
-								oldProgress.remove();
-								progressEl.classList.remove("has-progress-bar");
-							}
 
-							let valueEl = progressEl.querySelector(
-								".bases-rendered-value"
-							);
-							if (valueEl instanceof HTMLElement) {
-								let valueString = valueEl.innerText;
+							const createProgress = (valueString: string | undefined) => {
 								if (valueString) {
 									let valueParts =
 										valueString.match(/(\d+)(\/)(\d+)/);
@@ -1722,6 +1715,9 @@ export default class PrettyPropertiesPlugin extends Plugin {
 										progressWrapper.classList.add(
 											"metadata-progress-wrapper"
 										);
+
+										progressWrapper.setAttribute("data-progress-value", valueString)
+
 										let progress =
 											document.createElement("progress");
 										progress.classList.add("metadata-progress");
@@ -1739,6 +1735,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 											delay: 500,
 											placement: "top",
 										});
+										
 
 										progressWrapper.append(progress);
 										progressEl.classList.add(
@@ -1749,6 +1746,30 @@ export default class PrettyPropertiesPlugin extends Plugin {
 									}
 								}
 							}
+
+							let oldProgress = progressEl.querySelector(".metadata-progress-wrapper");
+							let valueEl = progressEl.querySelector(".bases-rendered-value");
+
+							let valueString
+							if (valueEl instanceof HTMLElement) {
+								valueString = valueEl.innerText;
+							}
+
+
+							if (oldProgress instanceof HTMLElement) {
+								let oldValueString = oldProgress.getAttribute("data-progress-value")
+								if (oldValueString != valueString) {
+									oldProgress.remove();
+									progressEl.classList.remove("has-progress-bar");
+									createProgress(valueString)
+								}
+							} else {
+								createProgress(valueString)
+							}
+
+
+
+							
 						}
 					}
 				};
@@ -2293,8 +2314,82 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				
 				let value = pill.innerText
 				if (value) {
-					value = value.slice(0, 200)
-					pill.setAttribute("data-property-pill-value", value)
+					value = value.slice(0, 200).trim()
+					pill.setAttribute("data-property-longtext-value", value)
+				}
+
+				let parent = pill.parentElement
+				
+				let existingColorButton = parent?.querySelector(".longtext-color-button")
+				if (existingColorButton) existingColorButton.remove()
+		
+				if (parent) {
+					let colorButton = document.createElement("button")
+					setIcon(colorButton, "paintbrush")
+					colorButton.classList.add("longtext-color-button")
+					parent.append(colorButton)
+		
+					colorButton.onclick = (e) => {
+						
+						let pillVal = value
+						let menu = new Menu();
+						let colors = [
+							"red",
+							"orange",
+							"yellow",
+							"green",
+							"cyan",
+							"blue",
+							"purple",
+							"pink",
+							"none",
+							"default",
+						];
+
+						for (let color of colors) {
+
+							
+
+							menu.addItem((item: MenuItem) => {
+								item.setIcon("square");
+
+								if (color != "default" && color != "none") {
+									//@ts-ignore
+									item.iconEl.style =
+										"color: transparent; background-color: rgba(var(--color-" +
+										color +
+										"-rgb), 0.3);";
+								}
+
+								if (color == "none") {
+									//@ts-ignore
+									item.iconEl.style = "opacity: 0.2;";
+								}
+
+								item.setTitle(i18n.t(color)).onClick(() => {
+
+									if (color == "default") {
+										if (pillVal)
+											delete this.settings
+												.propertyLongtextColors[pillVal];
+									} else {
+										if (pillVal)
+											this.settings.propertyLongtextColors[
+												pillVal
+											] = color;
+									}
+
+									
+
+									this.saveSettings();
+									this.updatePillColors();
+								});
+							});
+						}
+			
+						menu.showAtMouseEvent(e)
+					
+					}
 				}
 				
 			}

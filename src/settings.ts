@@ -6,6 +6,7 @@ export interface PPPluginSettings {
     mySetting: string;
     hiddenProperties: string[];
     propertyPillColors: any;
+	propertyLongtextColors: any;
     enableBanner: boolean;
 	enableIcon: boolean;
     enableCover: boolean;
@@ -36,6 +37,7 @@ export interface PPPluginSettings {
 	coversFolder: string;
 	iconsFolder: string;
 	showColorSettings: boolean;
+	showTextColorSettings: boolean;
 	showHiddenSettings: boolean;
 	iconSize: number;
 	iconTopMargin: number;
@@ -61,6 +63,7 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
     mySetting: 'default',
     hiddenProperties: [],
     propertyPillColors: {},
+	propertyLongtextColors: {},
     enableBanner: true,
 	enableIcon: true,
     enableCover: true,
@@ -90,6 +93,7 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	bannersFolder: "",
 	coversFolder: "",
 	showColorSettings: false,
+	showTextColorSettings: false,
 	showHiddenSettings: false,
 	iconsFolder: "",
 	iconSize: 70,
@@ -933,6 +937,160 @@ export default class PPSettingTab extends PluginSettingTab {
 					})
 				)
 		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+		new Setting(containerEl)
+		.setName(i18n.t("SHOW_TEXT_COLORED_PROPERTIES"))
+		.addToggle(toggle => {
+			toggle.setValue(this.plugin.settings.showTextColorSettings)
+			.onChange(value => {
+				this.plugin.settings.showTextColorSettings = value
+				this.plugin.saveSettings()
+				this.display()
+			})
+		});
+
+
+		if (this.plugin.settings.showTextColorSettings) { 
+
+			let colorSettingsEl = containerEl.createEl("div")
+
+			const addColorSetting = (property: string) => {
+				let currentColor = this.plugin.settings.propertyLongtextColors[property]
+				
+				let propertyColorSetting = new Setting(colorSettingsEl)
+
+				propertyColorSetting.settingEl.classList.add("color-" + currentColor)
+
+				let pillEl = propertyColorSetting.nameEl.createEl("div", {
+					text: property,
+					cls: "metadata-input-longtext",
+					attr : {
+						"data-property-longtext-value": property
+					},
+				})
+
+				propertyColorSetting.addText(text => {
+					text.setValue(property)
+					let inputEl = text.inputEl
+					inputEl.maxLength = 200
+					inputEl.onblur = () => {
+						let value = inputEl.value.trim()
+						if (value && !this.plugin.settings.propertyLongtextColors[value]) {
+							this.plugin.settings.propertyLongtextColors[value] = this.plugin.settings.propertyLongtextColors[property]
+							delete this.plugin.settings.propertyLongtextColors[property]
+							this.plugin.saveSettings()
+							this.plugin.updatePillColors()
+							this.display()
+						}
+					}
+				})
+				.addButton(btn => btn
+					.setIcon("paintbrush")
+					.setClass("property-color-setting-button")
+					.onClick((e) => {
+						let menu = new Menu()
+						let colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink", "none"]
+
+						for (let color of colors) {
+							menu.addItem((item: MenuItem) => {
+								item.setIcon("square")
+								if (color != "default" && color != "none") {
+									//@ts-ignore
+									item.iconEl.style = "color: transparent; background-color: rgba(var(--color-" + color + "-rgb), 0.3);"
+								}
+						
+								if (color == "none") {
+									//@ts-ignore
+									item.iconEl.style = "opacity: 0.2;"
+								}
+						
+								item.setTitle(i18n.t(color))
+								.onClick(() => {
+
+									propertyColorSetting.settingEl.classList.forEach(cls => {
+										if (cls.startsWith("color")) {
+											propertyColorSetting.settingEl.classList.remove(cls)
+										}
+									})
+
+									propertyColorSetting.settingEl.classList.add("color-" + color)
+
+									this.plugin.settings.propertyLongtextColors[property] = color
+									this.plugin.saveSettings()
+									this.plugin.updatePillColors()
+
+								})
+
+								item.setChecked(color == this.plugin.settings.propertyLongtextColors[property])
+							})
+						}
+
+						menu.showAtMouseEvent(e)
+					})
+				)
+				.addButton(btn => btn
+					.setIcon("x")
+					.onClick(() => {
+						delete this.plugin.settings.propertyLongtextColors[property]
+						this.plugin.saveSettings()
+						propertyColorSetting.settingEl.remove()
+						this.plugin.updatePillColors()
+					})
+				)
+			}
+			
+			for (let property in this.plugin.settings.propertyLongtextColors) {
+				addColorSetting(property)
+			}
+
+
+			let newProperty = ""
+			let newPropertySetting = new Setting(containerEl)
+				.setName(i18n.t("ADD_TEXT_COLORED_PROPERTY"))
+				.addText(text => {
+					let inputEl = text.inputEl
+					inputEl.maxLength = 200
+					text
+					.setValue("")
+					.onChange(value => newProperty = value)
+				})
+				.addButton(btn => btn
+					.setIcon("plus")
+					.onClick(() => {
+						newProperty = newProperty.trim()
+						if (newProperty && !this.plugin.settings.propertyLongtextColors[newProperty]) {
+							this.plugin.settings.propertyLongtextColors[newProperty] = "none"
+							this.plugin.saveSettings()
+							addColorSetting(newProperty)
+							let inputSetting = newPropertySetting.components[0]
+							if (inputSetting instanceof TextComponent) {
+								inputSetting.setValue("")
+							}
+						}
+					})
+				)
+		}
+
+
+
+
+
+
+
+
+
 
 
 		

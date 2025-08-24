@@ -692,10 +692,31 @@ body {
   border-radius: 4px;
   display: block;
   margin: var(--longtext-margin);
-  padding: 0px 8px;
+  padding: 0px var(--pill-padding-x);
   max-width: fit-content;
-  background-color: rgba(var(--pill-color-rgb), 0.2);
-  
+  background-color: rgba(var(--pill-color-rgb), 0.2); 
+}
+
+.bases-table-cell .metadata-input-longtext {
+  padding: 1px var(--tag-padding-x);
+}
+
+.setting-item-name .metadata-input-longtext {
+  padding: 2px var(--tag-padding-x);
+}
+
+.bases-cards-line {
+  border-radius: 4px;
+  display: block;
+  margin: var(--longtext-margin);
+  margin-top:0;
+  margin-bottom: 0;
+  max-width: fit-content;
+  background-color: rgba(var(--pill-color-rgb), 0.2); 
+}
+
+.metadata-property-value {
+  display: block;
 }
 
 .markdown-preview-view .metadata-property-value:hover .metadata-input-longtext,
@@ -705,4 +726,33 @@ body {
   background-color: initial;
 
 }
+
+
+button.longtext-color-button {
+  margin: 2px !important;
+  border: none;
+  box-shadow: none;
+  background-color: var(--background-primary);
+  height: calc(var(--input-height) - 4px);
+  width: 2.5em;
+  display: none;
+  color: var(--text-muted);
+  padding: unset;
+  position: absolute;
+  right: 0;
+  top: 0;
+  opacity: 0.2;
+}
+
+
+
+button.longtext-color-button:hover {
+  background-color: var(--background-primary-alt);
+  opacity: 1;
+}
+
+.metadata-property-value:hover button.longtext-color-button, .longtext-color-button:active {
+  display: flex;
+}
+
 
