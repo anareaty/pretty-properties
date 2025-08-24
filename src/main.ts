@@ -2308,10 +2308,75 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		}
 
 
+		const createColorButton = async (parent: HTMLElement, value: string) => {
+			if (value) {
+				let colorButton = document.createElement("button")
+				setIcon(colorButton, "paintbrush")
+				colorButton.classList.add("longtext-color-button")
+				parent.append(colorButton)
+				colorButton.setAttribute("data-value", value)
+
+				colorButton.onclick = (e) => {
+					
+					let pillVal = value
+					let menu = new Menu();
+					let colors = [
+						"red",
+						"orange",
+						"yellow",
+						"green",
+						"cyan",
+						"blue",
+						"purple",
+						"pink",
+						"none",
+						"default",
+					];
+
+					for (let color of colors) {
+						menu.addItem((item: MenuItem) => {
+							item.setIcon("square");
+
+							if (color != "default" && color != "none") {
+								//@ts-ignore
+								item.iconEl.style =
+									"color: transparent; background-color: rgba(var(--color-" +
+									color +
+									"-rgb), 0.3);";
+							}
+
+							if (color == "none") {
+								//@ts-ignore
+								item.iconEl.style = "opacity: 0.2;";
+							}
+
+							item.setTitle(i18n.t(color)).onClick(() => {
+
+								if (color == "default") {
+									if (pillVal)
+										delete this.settings
+											.propertyLongtextColors[pillVal];
+								} else {
+									if (pillVal)
+										this.settings.propertyLongtextColors[
+											pillVal
+										] = color;
+								}
+								this.saveSettings();
+								this.updatePillColors();
+							});
+						});
+					}
+		
+					menu.showAtMouseEvent(e)
+				
+				}
+			}
+		}
+
+
 		for (let pill of longtexts) {
 			if (pill instanceof HTMLElement) {
-
-				
 				let value = pill.innerText
 				if (value) {
 					value = value.slice(0, 200).trim()
@@ -2319,79 +2384,19 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				}
 
 				let parent = pill.parentElement
-				
-				let existingColorButton = parent?.querySelector(".longtext-color-button")
-				if (existingColorButton) existingColorButton.remove()
-		
+
 				if (parent) {
-					let colorButton = document.createElement("button")
-					setIcon(colorButton, "paintbrush")
-					colorButton.classList.add("longtext-color-button")
-					parent.append(colorButton)
-		
-					colorButton.onclick = (e) => {
-						
-						let pillVal = value
-						let menu = new Menu();
-						let colors = [
-							"red",
-							"orange",
-							"yellow",
-							"green",
-							"cyan",
-							"blue",
-							"purple",
-							"pink",
-							"none",
-							"default",
-						];
-
-						for (let color of colors) {
-
-							
-
-							menu.addItem((item: MenuItem) => {
-								item.setIcon("square");
-
-								if (color != "default" && color != "none") {
-									//@ts-ignore
-									item.iconEl.style =
-										"color: transparent; background-color: rgba(var(--color-" +
-										color +
-										"-rgb), 0.3);";
-								}
-
-								if (color == "none") {
-									//@ts-ignore
-									item.iconEl.style = "opacity: 0.2;";
-								}
-
-								item.setTitle(i18n.t(color)).onClick(() => {
-
-									if (color == "default") {
-										if (pillVal)
-											delete this.settings
-												.propertyLongtextColors[pillVal];
-									} else {
-										if (pillVal)
-											this.settings.propertyLongtextColors[
-												pillVal
-											] = color;
-									}
-
-									
-
-									this.saveSettings();
-									this.updatePillColors();
-								});
-							});
+					let existingColorButton = parent?.querySelector(".longtext-color-button")
+					if (existingColorButton) {
+						let prevValue = existingColorButton.getAttribute("data-value")
+						if (prevValue != value) {
+							existingColorButton.remove()
+							createColorButton(parent, value)
 						}
-			
-						menu.showAtMouseEvent(e)
-					
+					} else {
+						createColorButton(parent, value)
 					}
 				}
-				
 			}
 		}
 
