@@ -55,6 +55,7 @@ export interface PPPluginSettings {
 	addBaseTagColor: boolean;
 	styleFormulaTags: boolean;
 	enableTasksCount: boolean;
+	enableColorButtonInBases:boolean;
 	
 	
 }
@@ -111,7 +112,8 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	addPillPadding: "all",
 	addBaseTagColor: true,
 	styleFormulaTags: true,
-	enableTasksCount: true
+	enableTasksCount: true,
+	enableColorButtonInBases: false,
 
 }
 
@@ -1198,6 +1200,18 @@ export default class PPSettingTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.enableBases)
 				.onChange(async (value) => {
 					this.plugin.settings.enableBases = value
+					await this.plugin.saveSettings();
+					this.display();
+					this.plugin.updateBaseStyles()
+				}));
+
+		new Setting(containerEl)
+			.setName(i18n.t("SHOW_COLOR_BUTTON_FOR_TEXT_IN_BASES"))
+			.setDesc(i18n.t("SHOW_COLOR_BUTTON_FOR_TEXT_IN_BASES_DESC"))
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableColorButtonInBases)
+				.onChange(async (value) => {
+					this.plugin.settings.enableColorButtonInBases = value
 					await this.plugin.saveSettings();
 					this.display();
 					this.plugin.updateBaseStyles()

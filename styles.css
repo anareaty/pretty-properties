@@ -715,9 +715,7 @@ body {
   background-color: rgba(var(--pill-color-rgb), 0.2); 
 }
 
-.metadata-property-value {
-  display: block;
-}
+
 
 .markdown-preview-view .metadata-property-value:hover .metadata-input-longtext,
 .markdown-source-view .metadata-property-value:hover .metadata-input-longtext,
@@ -755,4 +753,13 @@ button.longtext-color-button:hover {
   display: flex;
 }
 
+
+.metadata-circle-progress {
+  height: calc(100% - 8px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  --color-progress: var(--color-accent-1);
+  --color-progress-completed: var(--color-accent);
+ 
+}
 

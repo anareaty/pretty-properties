@@ -1718,24 +1718,47 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 										progressWrapper.setAttribute("data-progress-value", valueString)
 
-										let progress =
-											document.createElement("progress");
-										progress.classList.add("metadata-progress");
-										progress.value = Number(valueParts[1]);
-										progress.max = Number(valueParts[3]);
+										let value = Number(valueParts[1]);
+										let max = Number(valueParts[3]);
 
-										let percent =
-											" " +
-											Math.round(
-												(progress.value * 100) /
-													progress.max
-											) +
-											" %";
-										setTooltip(progress, percent, {
+										let progress
+										let percent = Math.round((value * 100) / max)
+										
+							
+										if (progressEl.getAttribute("data-property")?.startsWith("formula.pp_progress_circle")) {
+
+											
+											let style = `background: 
+												radial-gradient(closest-side, white 64%, transparent 65% 100%),
+												conic-gradient(var(--color-progress) ${percent}%, var(--background-secondary) 0); 
+											`
+
+											if (percent == 100) {
+												style = `background: 
+												radial-gradient(closest-side, white 64%, transparent 65% 100%),
+												conic-gradient(var(--color-progress-completed) ${percent}%, var(--background-secondary) 0); 
+											`
+											}
+
+
+											progress = document.createElement("div");
+											progress.classList.add("metadata-circle-progress");
+											progress.setAttribute("style", style)
+
+										} else {
+
+											progress = document.createElement("progress");
+											progress.classList.add("metadata-progress");
+											progress.value = value;
+											progress.max = max;
+										}
+
+										let percentString = " " + percent + " %";
+										setTooltip(progress, percentString, {
 											delay: 500,
 											placement: "top",
 										});
-										
+
 
 										progressWrapper.append(progress);
 										progressEl.classList.add(
@@ -2309,7 +2332,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 		const createColorButton = async (parent: HTMLElement, value: string) => {
-			if (value) {
+			if (value && this.settings.enableColorButtonInBases) {
 				let colorButton = document.createElement("button")
 				setIcon(colorButton, "paintbrush")
 				colorButton.classList.add("longtext-color-button")
@@ -2399,6 +2422,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				}
 			}
 		}
+
+
 
 		for (let pill of formulaPills) {
 			if (pill instanceof HTMLElement) {

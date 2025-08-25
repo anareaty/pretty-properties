@@ -111,7 +111,9 @@ export default {
   DEFAULT_COVER_WIDTH_3: "Cover width 3",
   COVER_MAX_HEIGHT: "Maximum cover height",
   ENABLE_TASKS_COUNT: "Enable task count",
-  TASKS_COUNT_DESC: "If enabled, the plugin would automatically count tasks checkboxes in the active note and periodically save the count numbers into the specified properties. This function only works in notes that already contain at least one of this properties."
+  TASKS_COUNT_DESC: "If enabled, the plugin would automatically count tasks checkboxes in the active note and periodically save the count numbers into the specified properties. This function only works in notes that already contain at least one of this properties.",
+  SHOW_COLOR_BUTTON_FOR_TEXT_IN_BASES: "Show color buttons of text properties in bases",
+  SHOW_COLOR_BUTTON_FOR_TEXT_IN_BASES_DESC: "Buttons allow to change colors of text properties but can slow down bases loading. You need to reopen the file if you change this setting"
 	  
 
 };
