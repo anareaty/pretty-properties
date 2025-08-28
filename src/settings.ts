@@ -1,4 +1,4 @@
-import { App, Notice, PluginSettingTab, Setting, Menu, MenuItem, TextComponent } from 'obsidian';
+import { App, Notice, PluginSettingTab, Setting, Menu, MenuItem, TextComponent, ColorComponent } from 'obsidian';
 import { i18n } from './localization';
 import PrettyPropertiesPlugin from "./main";
 
@@ -56,6 +56,14 @@ export interface PPPluginSettings {
 	styleFormulaTags: boolean;
 	enableTasksCount: boolean;
 	enableColorButtonInBases:boolean;
+	customDateFormat: string;
+  	customDateTimeFormat: string;
+	enableCustomDateFormat: boolean;
+	enableCustomDateFormatInBases: boolean;
+	enableRelativeDateColors: boolean;
+	datePastColor: string;
+	datePresentColor: string;
+	dateFutureColor: string;
 	
 	
 }
@@ -114,6 +122,14 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	styleFormulaTags: true,
 	enableTasksCount: true,
 	enableColorButtonInBases: false,
+	customDateFormat: "",
+    customDateTimeFormat: "",
+	enableCustomDateFormat: false,
+	enableCustomDateFormatInBases: false,
+	enableRelativeDateColors: false,
+	dateFutureColor: "",
+	datePastColor: "",
+	datePresentColor: ""
 
 }
 
@@ -1181,6 +1197,167 @@ export default class PPSettingTab extends PluginSettingTab {
 					})
 				)
 		}
+
+
+
+
+
+
+
+
+
+
+		new Setting(containerEl).setName(i18n.t("DATES")).setHeading();
+
+		new Setting(containerEl)
+		.setName(i18n.t("ENABLE_CUSTOM_DATE_FORMAT"))
+		.addToggle(toggle => toggle
+			.setValue(this.plugin.settings.enableCustomDateFormat)
+			.onChange(async (value) => {
+				this.plugin.settings.enableCustomDateFormat = value
+				await this.plugin.saveSettings();
+				this.display();
+				this.plugin.updateElements()
+			}));
+		
+		if (this.plugin.settings.enableCustomDateFormat) {
+
+			new Setting(containerEl)
+			.setName(i18n.t("CUSTOM_DATE_FORMAT"))
+			.addText(text => text
+				.setPlaceholder("DD.MM.YYYY")
+				.setValue(this.plugin.settings.customDateFormat)
+				.onChange(async (value) => {
+					this.plugin.settings.customDateFormat = value;
+					await this.plugin.saveSettings();
+					this.plugin.updateElements()
+				}));
+
+			new Setting(containerEl)
+			.setName(i18n.t("CUSTOM_DATETIME_FORMAT"))
+			.addText(text => text
+				.setPlaceholder("DD.MM.YYYY HH:mm")
+				.setValue(this.plugin.settings.customDateTimeFormat)
+				.onChange(async (value) => {
+					this.plugin.settings.customDateTimeFormat = value;
+					await this.plugin.saveSettings();
+					this.plugin.updateElements()
+				}));
+		
+		}
+
+
+		new Setting(containerEl)
+		.setName(i18n.t("ENABLE_CUSTOM_DATE_FORMAT_IN_BASES"))
+		.addToggle(toggle => toggle
+			.setValue(this.plugin.settings.enableCustomDateFormatInBases)
+			.onChange(async (value) => {
+				this.plugin.settings.enableCustomDateFormatInBases = value
+				await this.plugin.saveSettings();
+				this.display();
+				this.plugin.updateElements()
+			}));
+
+
+		new Setting(containerEl)
+		.setName(i18n.t("ENABLE_RELATIVE_DATE_COLORS"))
+		.addToggle(toggle => toggle
+			.setValue(this.plugin.settings.enableRelativeDateColors)
+			.onChange(async (value) => {
+				this.plugin.settings.enableRelativeDateColors = value
+				await this.plugin.saveSettings();
+				this.display();
+				this.plugin.updateRelativeDateColors()
+			}));
+		
+		if (this.plugin.settings.enableRelativeDateColors) {
+
+			new Setting(containerEl)
+			.setName(i18n.t("PAST_DATE_COLOR"))
+			.addColorPicker(color => color
+				.setValue(this.plugin.settings.datePastColor)
+				.onChange(async (value) => {
+					this.plugin.settings.datePastColor = value
+					await this.plugin.saveSettings();
+				    this.plugin.updateRelativeDateColors();
+				})
+			)
+
+
+			new Setting(containerEl)
+			.setName(i18n.t("PRESENT_DATE_COLOR"))
+			.addColorPicker(color => color
+				.setValue(this.plugin.settings.datePresentColor)
+				.onChange(async (value) => {
+					this.plugin.settings.datePresentColor = value
+					await this.plugin.saveSettings();
+				    this.plugin.updateRelativeDateColors();
+				})
+			)
+
+
+			let futureColorComponent: ColorComponent
+			
+			new Setting(containerEl)
+			.setName(i18n.t("FUTURE_DATE_COLOR"))
+			.addColorPicker(color => {
+				futureColorComponent = color
+				color.setValue(this.plugin.settings.dateFutureColor)
+				.onChange(async (value) => {
+					this.plugin.settings.dateFutureColor = value
+					await this.plugin.saveSettings();
+				    this.plugin.updateRelativeDateColors();
+				})
+			})
+			.addButton(btn => btn
+				.setIcon("paintbrush")
+				.setClass("property-color-setting-button")
+				.onClick((e) => {
+					let menu = new Menu()
+					let colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink", "none"]
+
+					for (let color of colors) {
+						menu.addItem((item: MenuItem) => {
+							item.setIcon("square")
+							if (color != "default" && color != "none") {
+								//@ts-ignore
+								item.iconEl.style = "color: transparent; background-color: rgba(var(--color-" + color + "-rgb), 0.3);"
+							}
+					
+							if (color == "none") {
+								//@ts-ignore
+								item.iconEl.style = "opacity: 0.2;"
+							}
+					
+							item.setTitle(i18n.t(color))
+							.onClick(() => {
+
+								this.plugin.settings.dateFutureColor = color
+								this.plugin.saveSettings()
+								this.plugin.updateRelativeDateColors()
+								
+								futureColorComponent.setValue("")
+								btn.setClass("color-" + color)
+
+							})
+
+							item.setChecked(color == this.plugin.settings.dateFutureColor)
+						})
+					}
+
+					menu.showAtMouseEvent(e)
+				})
+			)
+
+		}
+
+
+
+
+
+
+
+
 
 
 

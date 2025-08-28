@@ -711,7 +711,7 @@ body {
   margin: var(--longtext-margin);
   margin-top:0;
   margin-bottom: 0;
-  max-width: fit-content;
+  /*max-width: fit-content;*/
   background-color: rgba(var(--pill-color-rgb), 0.2); 
 }
 
@@ -763,3 +763,57 @@ button.longtext-color-button:hover {
  
 }
 
+
+
+
+
+
+
+
+/* DATES */
+
+
+.metadata-property-value.has-custom-date  input.metadata-input-text.mod-datetime {
+  padding-right: 0px;
+  width: fit-content;
+}
+
+.metadata-property-value.has-custom-date input.metadata-input-text.mod-date::-webkit-datetime-edit,
+.metadata-property-value.has-custom-date input.metadata-input-text.mod-datetime::-webkit-datetime-edit {
+  display: none;
+}
+  
+
+.is-mobile .metadata-property-value.has-custom-date  input.metadata-input-text.mod-date,
+.is-mobile .metadata-property-value.has-custom-date  input.metadata-input-text.mod-datetime {
+  font-size: 0; 
+}
+
+.custom-date {
+  font-size: var(--metadata-input-font-size);
+  margin-left: -4px;
+}
+
+
+/* Date colors */
+
+.metadata-property-value[data-relative-date="past"] .custom-date {
+  background-color: rgba(var(--color-red-rgb), 0.2);
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin-left: -4px;
+}
+
+.metadata-property-value[data-relative-date="present"] .custom-date {
+  background-color: rgba(var(--color-green-rgb), 0.2);
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin-left: -4px;
+}
+
+.metadata-property-value[data-relative-date="future"] .custom-date {
+  background-color: rgba(var(--color-blue-rgb), 0.2);
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin-left: -4px;
+}

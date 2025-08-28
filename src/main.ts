@@ -19,7 +19,8 @@ import {
 	SuggestModal,
 	Modal,
 	App,
-	Setting
+	Setting,
+	moment
 } from "obsidian";
 import MenuManager from "src/MenuManager";
 import { i18n } from "./localization";
@@ -1434,6 +1435,10 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		}
 	}
 
+
+
+	updateRelativeDateColors() {}
+
 	updateBannerStyles() {
 		let oldStyle = document.head.querySelector("style#pp-banner-styles");
 		if (oldStyle) oldStyle.remove();
@@ -2105,7 +2110,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		let mode = view.getMode();
 
 		if (mode == "preview") {
-			bannerContainer = contentEl.querySelector(".markdown-preview-view");
+			bannerContainer = contentEl.querySelector(".markdown-reading-view > .markdown-preview-view");
 		}
 
 		if (mode == "source") {
@@ -2162,7 +2167,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		let mode = view.getMode();
 
 		if (mode == "preview") {
-			iconContainer = contentEl.querySelector(".markdown-preview-view");
+			iconContainer = contentEl.querySelector(".markdown-reading-view > .markdown-preview-view");
 		}
 
 		if (mode == "source") {
@@ -2432,6 +2437,136 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				pill.setAttribute("data-property-pill-value", value);
 			}
 		}
+
+
+
+
+		let dateInputs = container.querySelectorAll(
+		".metadata-input-text.mod-date"
+		);
+
+		let dateTimeInputs = container.querySelectorAll(
+		".metadata-input-text.mod-datetime"
+		);
+
+		let customDateFormat = this.settings.customDateFormat
+		let customDateTimeFormat = this.settings.customDateTimeFormat
+
+
+
+		for (let input of dateInputs) {
+			if (input instanceof HTMLInputElement) {
+				let value = input.value;
+				let parent = input.parentElement
+
+				if (parent instanceof HTMLElement) {
+		
+					if (customDateFormat) {
+			
+					let customDate = moment(value).format(customDateFormat);
+					let existingCustomDateElement = parent.querySelector(".custom-date")
+					
+					if (existingCustomDateElement instanceof HTMLElement &&
+						existingCustomDateElement.innerText != customDate && 
+						customDate != "Invalid date") {
+			
+						existingCustomDateElement.textContent = customDate
+						parent.classList.add("has-custom-date")
+						
+					} else if (!existingCustomDateElement && customDate != "Invalid date") {
+			
+						let customDateEl = document.createElement("span")
+						customDateEl.classList.add("custom-date")
+						customDateEl.append(customDate)
+						input.after(customDateEl)
+						parent.classList.add("has-custom-date")
+			
+					} else if (existingCustomDateElement && customDate == "Invalid date") {
+			
+						existingCustomDateElement.textContent = ""
+						parent.classList.remove("has-custom-date")
+			
+					}
+					}
+			
+					if (value) {
+					let currentTime = moment().toISOString(true).slice(0, 10);
+					if (currentTime == value) {
+						parent.setAttribute("data-relative-date", "present");
+					} else if (currentTime > value) {
+						parent.setAttribute("data-relative-date", "past");
+					} else {
+						parent.setAttribute("data-relative-date", "future");
+					}
+					} else {
+					parent.setAttribute("data-relative-date", "none");
+					}
+
+				}
+			}
+		}
+
+
+		for (let input of dateTimeInputs) {
+			if (input instanceof HTMLInputElement) {
+			
+				let value = input.value;
+				let parent = input.parentElement
+				if (parent instanceof HTMLElement) {
+			
+					if (customDateTimeFormat) {
+			
+					  let customDate = moment(value).format(customDateTimeFormat);
+					  let existingCustomDateElement = parent.querySelector(".custom-date")
+					  
+					  if (existingCustomDateElement instanceof HTMLElement && 
+						existingCustomDateElement.innerText != customDate && 
+						customDate != "Invalid date") {
+			
+						existingCustomDateElement.textContent = customDate
+						parent.classList.add("has-custom-date")
+						
+					  } else if (!existingCustomDateElement && customDate != "Invalid date") {
+			
+						  let customDateEl = document.createElement("span")
+						  customDateEl.classList.add("custom-date")
+						  customDateEl.append(customDate)
+						  input.after(customDateEl)
+						  parent.classList.add("has-custom-date")
+			
+					  } else if (existingCustomDateElement && customDate == "Invalid date") {
+			
+						existingCustomDateElement.textContent = ""
+						parent.classList.remove("has-custom-date")
+			
+					  }
+					}
+			
+			
+			
+					if (value) {
+					  let currentTime = moment().toISOString(true).slice(0, 16);
+					  value = value.slice(0, 16);
+					  if (currentTime == value) {
+						parent.setAttribute("data-relative-date", "present");
+					  } else if (currentTime > value) {
+						parent.setAttribute("data-relative-date", "past");
+					  } else {
+						parent.setAttribute("data-relative-date", "future");
+					  }
+					} else {
+					  parent.setAttribute("data-relative-date", "none");
+					}
+				}
+			}
+		}
+
+
+
+
+
+
+
 	}
 
 	async loadSettings() {
