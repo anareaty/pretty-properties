@@ -34,6 +34,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 	settings: PPPluginSettings;
 	mutations: any[];
 	observers: MutationObserver[];
+	menuManager: MenuManager
 
 	async onload() {
 		let locale = "en";
@@ -44,6 +45,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		}
 
 		i18n.setLocale(locale);
+		this.menuManager = new MenuManager
 
 		await this.loadSettings();
 		this.updateHiddenProperties();
@@ -1047,7 +1049,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			let propName = propEl?.getAttribute("data-property-key");
 
 			if (propName) {
-				let menuManager = new MenuManager();
+				let menuManager = this.menuManager
+				menuManager.closeAndFlush()
 
 				if (this.settings.hiddenProperties.find((p) => p == propName)) {
 					menuManager.addItemAfter(
@@ -1226,7 +1229,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 	}
 
 	handlePillMenu(e: MouseEvent, el: HTMLElement) {
-		let menuManager = new MenuManager();
+		let menuManager = this.menuManager
+		menuManager.closeAndFlush()
 
 
 		let pillEl = el.closest(".multi-select-pill");
