@@ -50,6 +50,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		await this.loadSettings();
 		this.updateHiddenProperties();
 		this.updatePillColors();
+		this.updateRelativeDateColors()
 		this.updateBannerStyles();
 		this.updateIconStyles();
 		this.updateCoverStyles();
@@ -432,6 +433,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 			if (multiSelectMutation) {
 				this.addClassestoProperties(view);
+				this.updateDateInputs(view)
 				this.updateBaseLeafPills(leaf);
 			}
 			if (progressMutation) {
@@ -1441,7 +1443,55 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 
-	updateRelativeDateColors() {}
+	updateRelativeDateColors() {
+		let styleText = ""
+		let colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink"]
+
+		let futureColor = this.settings.dateFutureColor
+		let presentColor = this.settings.datePresentColor
+		let pastColor = this.settings.datePastColor
+		let futureColorString = ""
+		let presentColorString = ""
+		let pastColorString = ""
+
+		if (colors.find(c => c == futureColor)) {
+			futureColorString = "--date-future-color: rgba(var(--color-" + futureColor + "-rgb), 0.2);\n"
+		}
+		else {
+			futureColorString = "--date-future-color: " + futureColor + ";\n"
+		}
+
+
+		if (colors.find(c => c == presentColor)) {
+			presentColorString = "--date-present-color: rgba(var(--color-" + presentColor + "-rgb), 0.2);\n"
+		}
+		else {
+			presentColorString = "--date-present-color: " + presentColor + ";\n"
+		}
+
+
+		if (colors.find(c => c == pastColor)) {
+			pastColorString = "--date-past-color: rgba(var(--color-" + pastColor + "-rgb), 0.2);\n"
+		}
+		else {
+			pastColorString = "--date-past-color: " + pastColor + ";\n"
+		}
+
+
+		styleText = styleText + "\nbody {\n" + futureColorString + presentColorString + pastColorString + "\n}\n"
+		
+		
+
+		let oldStyle = document.head.querySelector("style#pp-date-colors");
+		if (oldStyle) oldStyle.remove();
+		const style = document.createElement("style");
+		style.textContent = styleText;
+		style.id = "pp-date-colors";
+		document.head.appendChild(style);
+	}
+
+
+
 
 	updateBannerStyles() {
 		let oldStyle = document.head.querySelector("style#pp-banner-styles");
@@ -1649,6 +1699,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 						}
 					}
 					this.addClassestoProperties(leaf.view);
+					this.updateDateInputs(leaf.view)
 				};
 				updateTableBasePills();
 			}
@@ -1893,6 +1944,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		cache?: CachedMetadata | null
 	) {
 		this.addClassestoProperties(view);
+		this.updateDateInputs(view)
 
 		if (!cache && view.file) {
 			cache = this.app.metadataCache.getFileCache(view.file);
@@ -2315,6 +2367,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 	}
 
 	async addClassestoProperties(view: View) {
+
+		
 		let container = view.containerEl;
 	
 		let pills = container.querySelectorAll(
@@ -2442,8 +2496,18 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			}
 		}
 
+	}
 
 
+
+
+
+	async updateDateInputs(view: View) {
+
+		let container = view.containerEl;
+		let type = container.getAttribute("data-type")
+
+		
 
 		let dateInputs = container.querySelectorAll(
 		".metadata-input-text.mod-date"
@@ -2464,13 +2528,79 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				let parent = input.parentElement
 
 				if (parent instanceof HTMLElement) {
-		
-					if (customDateFormat) {
-			
-					let customDate = moment(value).format(customDateFormat);
+
 					let existingCustomDateElement = parent.querySelector(".custom-date")
+		
+					if (this.settings.enableCustomDateFormat && 
+						customDateFormat && 
+						(type != "bases" || this.settings.enableCustomDateFormatInBases)) {
+			
+						let customDate = moment(value).format(customDateFormat);
+						
+						if (existingCustomDateElement instanceof HTMLElement &&
+							existingCustomDateElement.innerText != customDate && 
+							customDate != "Invalid date") {
+				
+							existingCustomDateElement.textContent = customDate
+							parent.classList.add("has-custom-date")
+							
+						} else if (!existingCustomDateElement && customDate != "Invalid date") {
+				
+							let customDateEl = document.createElement("span")
+							customDateEl.classList.add("custom-date")
+							customDateEl.append(customDate)
+							input.after(customDateEl)
+							parent.classList.add("has-custom-date")
+				
+						} else if (existingCustomDateElement && customDate == "Invalid date") {
+				
+							existingCustomDateElement.textContent = ""
+							parent.classList.remove("has-custom-date")
+				
+						}
+					} else if (existingCustomDateElement) {
+						existingCustomDateElement.textContent = ""
+						parent.classList.remove("has-custom-date")
+					}
+
+
+
 					
-					if (existingCustomDateElement instanceof HTMLElement &&
+					if (value) {
+					let currentTime = moment().toISOString(true).slice(0, 10);
+					if (currentTime == value) {
+						parent.setAttribute("data-relative-date", "present");
+					} else if (currentTime > value) {
+						parent.setAttribute("data-relative-date", "past");
+					} else {
+						parent.setAttribute("data-relative-date", "future");
+					}
+					} else {
+					parent.setAttribute("data-relative-date", "none");
+					}
+				}
+			}
+		}
+
+
+		for (let input of dateTimeInputs) {
+			if (input instanceof HTMLInputElement) {
+			
+				let value = input.value;
+				let parent = input.parentElement
+
+				if (parent instanceof HTMLElement) {
+
+					let existingCustomDateElement = parent.querySelector(".custom-date")
+			
+					if (this.settings.enableCustomDateFormat && 
+						customDateFormat && 
+						(type != "bases" || this.settings.enableCustomDateFormatInBases)) {
+			
+					let customDate = moment(value).format(customDateTimeFormat);
+					
+					
+					if (existingCustomDateElement instanceof HTMLElement && 
 						existingCustomDateElement.innerText != customDate && 
 						customDate != "Invalid date") {
 			
@@ -2491,10 +2621,16 @@ export default class PrettyPropertiesPlugin extends Plugin {
 						parent.classList.remove("has-custom-date")
 			
 					}
+					}  else if (existingCustomDateElement) {
+						existingCustomDateElement.textContent = ""
+						parent.classList.remove("has-custom-date")
 					}
 			
+			
+			
 					if (value) {
-					let currentTime = moment().toISOString(true).slice(0, 10);
+					let currentTime = moment().toISOString(true).slice(0, 16);
+					value = value.slice(0, 16);
 					if (currentTime == value) {
 						parent.setAttribute("data-relative-date", "present");
 					} else if (currentTime > value) {
@@ -2505,73 +2641,15 @@ export default class PrettyPropertiesPlugin extends Plugin {
 					} else {
 					parent.setAttribute("data-relative-date", "none");
 					}
-
 				}
 			}
 		}
-
-
-		for (let input of dateTimeInputs) {
-			if (input instanceof HTMLInputElement) {
-			
-				let value = input.value;
-				let parent = input.parentElement
-				if (parent instanceof HTMLElement) {
-			
-					if (customDateTimeFormat) {
-			
-					  let customDate = moment(value).format(customDateTimeFormat);
-					  let existingCustomDateElement = parent.querySelector(".custom-date")
-					  
-					  if (existingCustomDateElement instanceof HTMLElement && 
-						existingCustomDateElement.innerText != customDate && 
-						customDate != "Invalid date") {
-			
-						existingCustomDateElement.textContent = customDate
-						parent.classList.add("has-custom-date")
-						
-					  } else if (!existingCustomDateElement && customDate != "Invalid date") {
-			
-						  let customDateEl = document.createElement("span")
-						  customDateEl.classList.add("custom-date")
-						  customDateEl.append(customDate)
-						  input.after(customDateEl)
-						  parent.classList.add("has-custom-date")
-			
-					  } else if (existingCustomDateElement && customDate == "Invalid date") {
-			
-						existingCustomDateElement.textContent = ""
-						parent.classList.remove("has-custom-date")
-			
-					  }
-					}
-			
-			
-			
-					if (value) {
-					  let currentTime = moment().toISOString(true).slice(0, 16);
-					  value = value.slice(0, 16);
-					  if (currentTime == value) {
-						parent.setAttribute("data-relative-date", "present");
-					  } else if (currentTime > value) {
-						parent.setAttribute("data-relative-date", "past");
-					  } else {
-						parent.setAttribute("data-relative-date", "future");
-					  }
-					} else {
-					  parent.setAttribute("data-relative-date", "none");
-					}
-				}
-			}
-		}
-
-
-
-
-
-
+		
 
 	}
+
+
+
 
 	async loadSettings() {
 		this.settings = Object.assign(

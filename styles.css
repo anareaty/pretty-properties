@@ -798,22 +798,56 @@ button.longtext-color-button:hover {
 /* Date colors */
 
 .metadata-property-value[data-relative-date="past"] .custom-date {
-  background-color: rgba(var(--color-red-rgb), 0.2);
+  background-color: var(--date-past-color);
   border-radius: 4px;
   padding: 2px 4px;
   margin-left: -4px;
 }
 
 .metadata-property-value[data-relative-date="present"] .custom-date {
-  background-color: rgba(var(--color-green-rgb), 0.2);
+  background-color: var(--date-present-color);
   border-radius: 4px;
   padding: 2px 4px;
   margin-left: -4px;
 }
 
 .metadata-property-value[data-relative-date="future"] .custom-date {
-  background-color: rgba(var(--color-blue-rgb), 0.2);
+  background-color: var(--date-future-color);
   border-radius: 4px;
   padding: 2px 4px;
   margin-left: -4px;
+}
+
+
+
+.property-color-setting-button.color-red svg {
+  color: var(--color-red)
+}
+
+.property-color-setting-button.color-orange svg {
+  color: var(--color-orange)
+}
+
+.property-color-setting-button.color-yellow svg {
+  color: var(--color-yellow)
+}
+
+.property-color-setting-button.color-green svg {
+  color: var(--color-green)
+}
+
+.property-color-setting-button.color-cyan svg {
+  color: var(--color-cyan)
+}
+
+.property-color-setting-button.color-blue svg {
+  color: var(--color-blue)
+}
+
+.property-color-setting-button.color-purple svg {
+  color: var(--color-purple)
+}
+
+.property-color-setting-button.color-pink svg {
+  color: var(--color-pink)
 }

@@ -1,4 +1,4 @@
-import { App, Notice, PluginSettingTab, Setting, Menu, MenuItem, TextComponent, ColorComponent } from 'obsidian';
+import { App, Notice, PluginSettingTab, Setting, Menu, MenuItem, TextComponent, ColorComponent, ButtonComponent } from 'obsidian';
 import { i18n } from './localization';
 import PrettyPropertiesPlugin from "./main";
 
@@ -1259,44 +1259,131 @@ export default class PPSettingTab extends PluginSettingTab {
 			}));
 
 
-		new Setting(containerEl)
-		.setName(i18n.t("ENABLE_RELATIVE_DATE_COLORS"))
-		.addToggle(toggle => toggle
-			.setValue(this.plugin.settings.enableRelativeDateColors)
-			.onChange(async (value) => {
-				this.plugin.settings.enableRelativeDateColors = value
-				await this.plugin.saveSettings();
-				this.display();
-				this.plugin.updateRelativeDateColors()
-			}));
 		
-		if (this.plugin.settings.enableRelativeDateColors) {
+
+
+			let pastColorComponent: ColorComponent
+			let pastColorButton: ButtonComponent
 
 			new Setting(containerEl)
 			.setName(i18n.t("PAST_DATE_COLOR"))
-			.addColorPicker(color => color
-				.setValue(this.plugin.settings.datePastColor)
+			.addColorPicker(color => {
+				pastColorComponent = color
+				color.setValue(this.plugin.settings.datePastColor)
 				.onChange(async (value) => {
 					this.plugin.settings.datePastColor = value
 					await this.plugin.saveSettings();
 				    this.plugin.updateRelativeDateColors();
+					pastColorButton.buttonEl.classList.forEach(cls => {
+						if (cls.startsWith("color")) {
+							pastColorButton.buttonEl.classList.remove(cls)
+						}
+					})
+					pastColorButton.buttonEl.classList.add("color-" + this.plugin.settings.datePastColor)
 				})
-			)
+			})
+			.addButton(btn => {
+				pastColorButton = btn
+				btn.setIcon("paintbrush")
+				.setClass("property-color-setting-button")
+				.setClass("color-" + this.plugin.settings.datePastColor)
+				.onClick((e) => {
+					let menu = new Menu()
+					let colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink", "default"]
+
+					for (let color of colors) {
+						menu.addItem((item: MenuItem) => {
+							item.setIcon("square")
+							if (color != "default" && color != "none") {
+								//@ts-ignore
+								item.iconEl.style = "color: transparent; background-color: rgba(var(--color-" + color + "-rgb), 0.3);"
+							}
+					
+							item.setTitle(i18n.t(color))
+							.onClick(() => {
+								pastColorComponent.setValue("")
+								this.plugin.settings.datePastColor = color
+								this.plugin.saveSettings()
+								this.plugin.updateRelativeDateColors()
+
+								btn.buttonEl.classList.forEach(cls => {
+									if (cls.startsWith("color")) {
+										btn.buttonEl.classList.remove(cls)
+									}
+								})
+								btn.buttonEl.classList.add("color-" + color)
+							})
+							item.setChecked(color == this.plugin.settings.datePastColor)
+						})
+					}
+					menu.showAtMouseEvent(e)
+				})
+			})
+
+
+			let presentColorComponent: ColorComponent
+			let presentColorButton: ButtonComponent
 
 
 			new Setting(containerEl)
 			.setName(i18n.t("PRESENT_DATE_COLOR"))
-			.addColorPicker(color => color
-				.setValue(this.plugin.settings.datePresentColor)
+			.addColorPicker(color => {
+				presentColorComponent = color
+				color.setValue(this.plugin.settings.datePresentColor)
 				.onChange(async (value) => {
 					this.plugin.settings.datePresentColor = value
 					await this.plugin.saveSettings();
 				    this.plugin.updateRelativeDateColors();
+					presentColorButton.buttonEl.classList.forEach(cls => {
+						if (cls.startsWith("color")) {
+							presentColorButton.buttonEl.classList.remove(cls)
+						}
+					})
+					presentColorButton.buttonEl.classList.add("color-" + this.plugin.settings.datePresentColor)
 				})
-			)
+			})
+			.addButton(btn => {
+				presentColorButton = btn
+				btn.setIcon("paintbrush")
+				.setClass("property-color-setting-button")
+				.setClass("color-" + this.plugin.settings.datePresentColor)
+				.onClick((e) => {
+					let menu = new Menu()
+					let colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink", "default"]
+
+					for (let color of colors) {
+						menu.addItem((item: MenuItem) => {
+							item.setIcon("square")
+							if (color != "default" && color != "none") {
+								//@ts-ignore
+								item.iconEl.style = "color: transparent; background-color: rgba(var(--color-" + color + "-rgb), 0.3);"
+							}
+					
+							item.setTitle(i18n.t(color))
+							.onClick(() => {
+								presentColorComponent.setValue("")
+								this.plugin.settings.datePresentColor = color
+								this.plugin.saveSettings()
+								this.plugin.updateRelativeDateColors()
+
+								btn.buttonEl.classList.forEach(cls => {
+									if (cls.startsWith("color")) {
+										btn.buttonEl.classList.remove(cls)
+									}
+								})
+								btn.buttonEl.classList.add("color-" + color)
+							})
+							item.setChecked(color == this.plugin.settings.datePresentColor)
+						})
+					}
+					menu.showAtMouseEvent(e)
+				})
+			})
+
 
 
 			let futureColorComponent: ColorComponent
+			let futureColorButton: ButtonComponent
 			
 			new Setting(containerEl)
 			.setName(i18n.t("FUTURE_DATE_COLOR"))
@@ -1307,14 +1394,22 @@ export default class PPSettingTab extends PluginSettingTab {
 					this.plugin.settings.dateFutureColor = value
 					await this.plugin.saveSettings();
 				    this.plugin.updateRelativeDateColors();
+					futureColorButton.buttonEl.classList.forEach(cls => {
+						if (cls.startsWith("color")) {
+							futureColorButton.buttonEl.classList.remove(cls)
+						}
+					})
+					futureColorButton.buttonEl.classList.add("color-" + this.plugin.settings.dateFutureColor)
 				})
 			})
-			.addButton(btn => btn
-				.setIcon("paintbrush")
+			.addButton(btn => {
+				futureColorButton = btn
+				btn.setIcon("paintbrush")
 				.setClass("property-color-setting-button")
+				.setClass("color-" + this.plugin.settings.dateFutureColor)
 				.onClick((e) => {
 					let menu = new Menu()
-					let colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink", "none"]
+					let colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink", "default"]
 
 					for (let color of colors) {
 						menu.addItem((item: MenuItem) => {
@@ -1324,21 +1419,20 @@ export default class PPSettingTab extends PluginSettingTab {
 								item.iconEl.style = "color: transparent; background-color: rgba(var(--color-" + color + "-rgb), 0.3);"
 							}
 					
-							if (color == "none") {
-								//@ts-ignore
-								item.iconEl.style = "opacity: 0.2;"
-							}
-					
 							item.setTitle(i18n.t(color))
 							.onClick(() => {
-
+								futureColorComponent.setValue("")
 								this.plugin.settings.dateFutureColor = color
 								this.plugin.saveSettings()
 								this.plugin.updateRelativeDateColors()
-								
-								futureColorComponent.setValue("")
-								btn.setClass("color-" + color)
 
+								btn.buttonEl.classList.forEach(cls => {
+									if (cls.startsWith("color")) {
+										btn.buttonEl.classList.remove(cls)
+									}
+								})
+								btn.buttonEl.classList.add("color-" + color)
+								
 							})
 
 							item.setChecked(color == this.plugin.settings.dateFutureColor)
@@ -1347,9 +1441,9 @@ export default class PPSettingTab extends PluginSettingTab {
 
 					menu.showAtMouseEvent(e)
 				})
-			)
+			})
 
-		}
+		
 
 
 
