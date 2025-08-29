@@ -113,8 +113,16 @@ export default {
   ENABLE_TASKS_COUNT: "Enable task count",
   TASKS_COUNT_DESC: "If enabled, the plugin would automatically count tasks checkboxes in the active note and periodically save the count numbers into the specified properties. This function only works in notes that already contain at least one of this properties.",
   SHOW_COLOR_BUTTON_FOR_TEXT_IN_BASES: "Show color buttons of text properties in bases",
-  SHOW_COLOR_BUTTON_FOR_TEXT_IN_BASES_DESC: "Buttons allow to change colors of text properties but can slow down bases loading. You need to reopen the file if you change this setting"
-	  
+  SHOW_COLOR_BUTTON_FOR_TEXT_IN_BASES_DESC: "Buttons allow to change colors of text properties but can slow down bases loading. You need to reopen the file if you change this setting",
+	ENABLE_CUSTOM_DATE_FORMAT: "Enable custom date formats for date and datetime properties",
+  CUSTOM_DATE_FORMAT: "Custom date format",
+  CUSTOM_DATETIME_FORMAT: "Custom datetime format",
+  ENABLE_CUSTOM_DATE_FORMAT_IN_BASES: "Enable custom date formats in bases (can affect performance)",
+  PAST_DATE_COLOR: "Past date color",
+  PRESENT_DATE_COLOR: "Present date color",
+  FUTURE_DATE_COLOR: "Future date color",
+  DATES: "Dates",
+
 
 };
 

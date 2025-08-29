@@ -1,4 +1,4 @@
-import { App, Notice, PluginSettingTab, Setting, Menu, MenuItem, TextComponent, ColorComponent, ButtonComponent } from 'obsidian';
+import { App, Notice, PluginSettingTab, Setting, Menu, MenuItem, TextComponent, ColorComponent, ButtonComponent, moment } from 'obsidian';
 import { i18n } from './localization';
 import PrettyPropertiesPlugin from "./main";
 
@@ -858,6 +858,9 @@ export default class PPSettingTab extends PluginSettingTab {
 
 				pillEl.createEl("div", {text: property, cls: "multi-select-pill-content"})
 
+				let propertyColorComponent: ColorComponent
+				let propertyColorButton: ButtonComponent
+
 				propertyColorSetting.addText(text => {
 					text.setValue(property)
 					let inputEl = text.inputEl
@@ -872,7 +875,28 @@ export default class PPSettingTab extends PluginSettingTab {
 						}
 					}
 				})
-				.addButton(btn => btn
+				.addColorPicker(color => {
+					propertyColorComponent = color
+					color.setValue(this.plugin.settings.propertyPillColors[property])
+					.onChange(async (value) => {
+						
+						propertyColorButton.buttonEl.classList.forEach(cls => {
+							if (cls.startsWith("color")) {
+								propertyColorButton.buttonEl.classList.remove(cls)
+							}
+						})
+						propertyColorButton.buttonEl.classList.add("color-" + value)
+
+						this.plugin.settings.propertyPillColors[property] = value
+						this.plugin.saveSettings()
+						this.plugin.updatePillColors()
+					})
+				})
+				.addButton(btn => {
+					propertyColorButton = btn
+					btn.buttonEl.classList.add("color-" + this.plugin.settings.propertyPillColors[property])
+					
+					btn
 					.setIcon("paintbrush")
 					.setClass("property-color-setting-button")
 					.onClick((e) => {
@@ -895,13 +919,14 @@ export default class PPSettingTab extends PluginSettingTab {
 								item.setTitle(i18n.t(color))
 								.onClick(() => {
 
-									propertyColorSetting.settingEl.classList.forEach(cls => {
+									propertyColorComponent.setValue("")
+
+									btn.buttonEl.classList.forEach(cls => {
 										if (cls.startsWith("color")) {
-											propertyColorSetting.settingEl.classList.remove(cls)
+											propertyColorButton.buttonEl.classList.remove(cls)
 										}
 									})
-
-									propertyColorSetting.settingEl.classList.add("color-" + color)
+									btn.buttonEl.classList.add("color-" + color)
 
 									this.plugin.settings.propertyPillColors[property] = color
 									this.plugin.saveSettings()
@@ -915,7 +940,7 @@ export default class PPSettingTab extends PluginSettingTab {
 
 						menu.showAtMouseEvent(e)
 					})
-				)
+				})
 				.addButton(btn => btn
 					.setIcon("x")
 					.onClick(() => {
@@ -999,6 +1024,9 @@ export default class PPSettingTab extends PluginSettingTab {
 					},
 				})
 
+				let propertyColorComponent: ColorComponent
+				let propertyColorButton: ButtonComponent
+
 				propertyColorSetting.addText(text => {
 					text.setValue(property)
 					let inputEl = text.inputEl
@@ -1014,7 +1042,27 @@ export default class PPSettingTab extends PluginSettingTab {
 						}
 					}
 				})
-				.addButton(btn => btn
+				.addColorPicker(color => {
+					propertyColorComponent = color
+					color.setValue(this.plugin.settings.propertyLongtextColors[property])
+					.onChange(async (value) => {
+						
+						propertyColorButton.buttonEl.classList.forEach(cls => {
+							if (cls.startsWith("color")) {
+								propertyColorButton.buttonEl.classList.remove(cls)
+							}
+						})
+						propertyColorButton.buttonEl.classList.add("color-" + value)
+
+						this.plugin.settings.propertyLongtextColors[property] = value
+						this.plugin.saveSettings()
+						this.plugin.updatePillColors()
+					})
+				})
+				.addButton(btn => {
+					propertyColorButton = btn
+					btn.buttonEl.classList.add("color-" + this.plugin.settings.propertyLongtextColors[property])
+					btn
 					.setIcon("paintbrush")
 					.setClass("property-color-setting-button")
 					.onClick((e) => {
@@ -1037,13 +1085,14 @@ export default class PPSettingTab extends PluginSettingTab {
 								item.setTitle(i18n.t(color))
 								.onClick(() => {
 
-									propertyColorSetting.settingEl.classList.forEach(cls => {
+									propertyColorComponent.setValue("")
+
+									btn.buttonEl.classList.forEach(cls => {
 										if (cls.startsWith("color")) {
-											propertyColorSetting.settingEl.classList.remove(cls)
+											propertyColorButton.buttonEl.classList.remove(cls)
 										}
 									})
-
-									propertyColorSetting.settingEl.classList.add("color-" + color)
+									btn.buttonEl.classList.add("color-" + color)
 
 									this.plugin.settings.propertyLongtextColors[property] = color
 									this.plugin.saveSettings()
@@ -1057,7 +1106,7 @@ export default class PPSettingTab extends PluginSettingTab {
 
 						menu.showAtMouseEvent(e)
 					})
-				)
+				})
 				.addButton(btn => btn
 					.setIcon("x")
 					.onClick(() => {
@@ -1259,14 +1308,19 @@ export default class PPSettingTab extends PluginSettingTab {
 			}));
 
 
-		
+			let format = this.plugin.settings.customDateFormat
+			if (!format) {format = "L"}
 
+			let pastDate = moment().subtract(1, "days").format(format)
+			let presentDate = moment().format(format)
+			let futureDate = moment().add(1, "days").format(format)
 
 			let pastColorComponent: ColorComponent
 			let pastColorButton: ButtonComponent
 
-			new Setting(containerEl)
-			.setName(i18n.t("PAST_DATE_COLOR"))
+			let pastSetting = new Setting(containerEl)
+			pastSetting.controlEl.createEl("span", {text: pastDate, cls: "setting-custom-date-past"})
+			pastSetting.setName(i18n.t("PAST_DATE_COLOR"))
 			.addColorPicker(color => {
 				pastColorComponent = color
 				color.setValue(this.plugin.settings.datePastColor)
@@ -1323,10 +1377,13 @@ export default class PPSettingTab extends PluginSettingTab {
 
 			let presentColorComponent: ColorComponent
 			let presentColorButton: ButtonComponent
+			
+			
 
 
-			new Setting(containerEl)
-			.setName(i18n.t("PRESENT_DATE_COLOR"))
+			let presentSEtting = new Setting(containerEl)
+			presentSEtting.controlEl.createEl("span", {text: presentDate, cls: "setting-custom-date-present"})
+			presentSEtting.setName(i18n.t("PRESENT_DATE_COLOR"))
 			.addColorPicker(color => {
 				presentColorComponent = color
 				color.setValue(this.plugin.settings.datePresentColor)
@@ -1385,8 +1442,11 @@ export default class PPSettingTab extends PluginSettingTab {
 			let futureColorComponent: ColorComponent
 			let futureColorButton: ButtonComponent
 			
-			new Setting(containerEl)
-			.setName(i18n.t("FUTURE_DATE_COLOR"))
+			let futureSetting = new Setting(containerEl)
+
+			futureSetting.controlEl.createEl("span", {text: futureDate, cls: "setting-custom-date-future"})
+
+			futureSetting.setName(i18n.t("FUTURE_DATE_COLOR"))
 			.addColorPicker(color => {
 				futureColorComponent = color
 				color.setValue(this.plugin.settings.dateFutureColor)
@@ -1442,6 +1502,9 @@ export default class PPSettingTab extends PluginSettingTab {
 					menu.showAtMouseEvent(e)
 				})
 			})
+
+			
+
 
 		
 

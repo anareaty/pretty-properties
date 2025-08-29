@@ -1301,7 +1301,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 					["clipboard"],
 					i18n.t("SELECT_COLOR"),
 					(item: MenuItem) => {
-						createColorItem(item, pillVal)
+						if (pillVal) createColorItem(item, pillVal)
 					}
 				);
 			}
@@ -1336,16 +1336,31 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		let transparentPropsDataString = ""
 		let propertyPillColors = this.settings.propertyPillColors
 		let propertyLongtextColors = this.settings.propertyLongtextColors
+
+		let colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink", "none", "default"]
 		
 		for (let prop in propertyPillColors) {
 			let color = propertyPillColors[prop]
-			styleText = styleText +
-				"[data-property-pill-value='" + prop + "'] {\n" +
-				"--pill-color-rgb: var(--color-" + color +
-				"-rgb); \n" +
-				"--pill-background-modified: rgba(var(--pill-color-rgb), 0.2); \n--pill-background-hover-modified: rgba(var(--pill-color-rgb), 0.3); \n" +
-				"--tag-background-modified: rgba(var(--pill-color-rgb), 0.2); \n--tag-background-hover-modified: rgba(var(--pill-color-rgb), 0.3);}\n";
 
+			if (colors.find(c => c == color)) {
+				styleText = styleText +
+				"[data-property-pill-value='" + prop + "'] {\n" +
+				"--pill-color-rgb: var(--color-" + color + "-rgb); \n" +
+				"--pill-background-modified: rgba(var(--pill-color-rgb), 0.2); \n" + 
+				"--pill-background-hover-modified: rgba(var(--pill-color-rgb), 0.3); \n" +
+				"--tag-background-modified: rgba(var(--pill-color-rgb), 0.2); \n" + 
+				"--tag-background-hover-modified: rgba(var(--pill-color-rgb), 0.3);}\n";
+			} else {
+				styleText = styleText +
+				"[data-property-pill-value='" + prop + "'] {\n" +
+				"--pill-background-modified: " + color + "; \n" + 
+				"--pill-background-hover-modified: " + color + "; \n" +
+				"--tag-background-modified: " + color + "; \n" + 
+				"--tag-background-hover-modified: " + color + ";}\n";
+			}
+
+
+			
 			if (this.settings.addPillPadding == "colored" && color != "none") {
 				styleText = styleText +
 					".metadata-property-value .multi-select-pill[data-property-pill-value='" + prop + "'],\n" + 
@@ -1369,12 +1384,19 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 		for (let prop in propertyLongtextColors) {
 			let color = propertyLongtextColors[prop]
-			styleText = styleText +
+
+			if (colors.find(c => c == color)) {
+				styleText = styleText +
 				"[data-property-longtext-value='" + prop + "'] {\n" +
-				"--pill-color-rgb: var(--color-" + color +
-				"-rgb); \n" +
-				"--pill-background-modified: rgba(var(--pill-color-rgb), 0.2); \n--pill-background-hover-modified: rgba(var(--pill-color-rgb), 0.3); \n" +
-				"--tag-background-modified: rgba(var(--pill-color-rgb), 0.2); \n--tag-background-hover-modified: rgba(var(--pill-color-rgb), 0.3);\n}\n";
+				"--longtext-bg-color: rgba(var(--color-" + color + "-rgb), 0.2);\n}\n";
+			
+			} else {
+				styleText = styleText +
+				"[data-property-longtext-value='" + prop + "'] {\n" +
+				"--longtext-bg-color: " + color + ";\n}\n";
+			
+			}
+
 
 			if (this.settings.addPillPadding == "colored" && color != "none") {
 				styleText = styleText +
@@ -2370,6 +2392,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 		
 		let container = view.containerEl;
+		
 	
 		let pills = container.querySelectorAll(
 			".multi-select-pill:not([data-property-pill-value])"
@@ -2395,7 +2418,12 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 		const createColorButton = async (parent: HTMLElement, value: string) => {
-			if (value && this.settings.enableColorButtonInBases) {
+
+			
+			let isBase = parent.classList.contains("bases-table-cell")
+
+			if (value && (!isBase || this.settings.enableColorButtonInBases)) {
+				
 				let colorButton = document.createElement("button")
 				setIcon(colorButton, "paintbrush")
 				colorButton.classList.add("longtext-color-button")
@@ -2505,7 +2533,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 	async updateDateInputs(view: View) {
 
 		let container = view.containerEl;
-		let type = container.getAttribute("data-type")
+		
 
 		
 
@@ -2529,11 +2557,15 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 				if (parent instanceof HTMLElement) {
 
+					let isBase = parent.classList.contains("bases-table-cell")
+
 					let existingCustomDateElement = parent.querySelector(".custom-date")
 		
 					if (this.settings.enableCustomDateFormat && 
 						customDateFormat && 
-						(type != "bases" || this.settings.enableCustomDateFormatInBases)) {
+						(!isBase || this.settings.enableCustomDateFormatInBases)) {
+
+							
 			
 						let customDate = moment(value).format(customDateFormat);
 						
@@ -2559,6 +2591,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				
 						}
 					} else if (existingCustomDateElement) {
+						
 						existingCustomDateElement.textContent = ""
 						parent.classList.remove("has-custom-date")
 					}
@@ -2591,11 +2624,15 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 				if (parent instanceof HTMLElement) {
 
+					let isBase = parent.classList.contains("bases-table-cell")
+
 					let existingCustomDateElement = parent.querySelector(".custom-date")
 			
 					if (this.settings.enableCustomDateFormat && 
-						customDateFormat && 
-						(type != "bases" || this.settings.enableCustomDateFormatInBases)) {
+						customDateTimeFormat && 
+						(!isBase || this.settings.enableCustomDateFormatInBases)) {
+
+							
 			
 					let customDate = moment(value).format(customDateTimeFormat);
 					

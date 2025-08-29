@@ -625,38 +625,6 @@ body {
 }
 
 
-.setting-item.color-red .multi-select-pill {
-    --pill-color-rgb: var(--color-red-rgb);
-}
-
-.setting-item.color-orange .multi-select-pill {
-    --pill-color-rgb: var(--color-orange-rgb);
-}
-
-.setting-item.color-yellow .multi-select-pill {
-    --pill-color-rgb: var(--color-yellow-rgb);
-}
-
-.setting-item.color-green .multi-select-pill {
-    --pill-color-rgb: var(--color-green-rgb);
-}
-
-.setting-item.color-cyan .multi-select-pill {
-    --pill-color-rgb: var(--color-cyan-rgb);
-}
-
-.setting-item.color-blue .multi-select-pill {
-    --pill-color-rgb: var(--color-blue-rgb);
-}
-
-.setting-item.color-purple .multi-select-pill {
-    --pill-color-rgb: var(--color-purple-rgb);
-}
-
-.setting-item.color-pink .multi-select-pill {
-    --pill-color-rgb: var(--color-pink-rgb);
-}
-
 
 
 .prompt-setting,
@@ -694,7 +662,7 @@ body {
   margin: var(--longtext-margin);
   padding: 0px var(--pill-padding-x);
   max-width: fit-content;
-  background-color: rgba(var(--pill-color-rgb), 0.2); 
+  background-color: var(--longtext-bg-color); 
 }
 
 .bases-table-cell .metadata-input-longtext {
@@ -711,8 +679,7 @@ body {
   margin: var(--longtext-margin);
   margin-top:0;
   margin-bottom: 0;
-  /*max-width: fit-content;*/
-  background-color: rgba(var(--pill-color-rgb), 0.2); 
+  background-color: var(--longtext-bg-color); 
 }
 
 
@@ -773,7 +740,7 @@ button.longtext-color-button:hover {
 /* DATES */
 
 
-.metadata-property-value.has-custom-date  input.metadata-input-text.mod-datetime {
+.metadata-property-value  input.metadata-input-text.mod-datetime {
   padding-right: 0px;
   width: fit-content;
 }
@@ -791,32 +758,58 @@ button.longtext-color-button:hover {
 
 .custom-date {
   font-size: var(--metadata-input-font-size);
+  padding: 2px 4px;
   margin-left: -4px;
+  color: var(--text-normal);
 }
+
+
 
 
 /* Date colors */
 
-.metadata-property-value[data-relative-date="past"] .custom-date {
+.metadata-property-value[data-relative-date="past"] .custom-date,
+.metadata-property-value:not(.has-custom-date)[data-relative-date="past"] input.mod-date,
+.metadata-property-value:not(.has-custom-date)[data-relative-date="past"] input.mod-datetime,
+.setting-custom-date-past {
   background-color: var(--date-past-color);
   border-radius: 4px;
-  padding: 2px 4px;
-  margin-left: -4px;
+  min-height: unset;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  
 }
 
-.metadata-property-value[data-relative-date="present"] .custom-date {
+.metadata-property-value[data-relative-date="present"] .custom-date,
+.metadata-property-value:not(.has-custom-date)[data-relative-date="present"] input.mod-date,
+.metadata-property-value:not(.has-custom-date)[data-relative-date="present"] input.mod-datetime,
+.setting-custom-date-present {
   background-color: var(--date-present-color);
   border-radius: 4px;
-  padding: 2px 4px;
-  margin-left: -4px;
+  min-height: unset;
+  padding-top: 2px;
+  padding-bottom: 2px;
 }
 
-.metadata-property-value[data-relative-date="future"] .custom-date {
+.metadata-property-value[data-relative-date="future"] .custom-date,
+.metadata-property-value:not(.has-custom-date)[data-relative-date="future"] input.mod-date,
+.metadata-property-value:not(.has-custom-date)[data-relative-date="future"] input.mod-datetime,
+.setting-custom-date-future {
   background-color: var(--date-future-color);
   border-radius: 4px;
-  padding: 2px 4px;
-  margin-left: -4px;
+  min-height: unset;
+  padding-top: 2px;
+  padding-bottom: 2px;
 }
+
+
+
+.metadata-property-value:not(.has-custom-date) .custom-date {
+  display: none;
+}
+
+
+
 
 
 
