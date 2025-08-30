@@ -727,6 +727,7 @@ button.longtext-color-button:hover {
   border-radius: 50%;
   --color-progress: var(--color-accent-1);
   --color-progress-completed: var(--color-accent);
+  --color-progress-background: var(--background-primary);
  
 }
 

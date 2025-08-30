@@ -1864,13 +1864,13 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 											
 											let style = `background: 
-												radial-gradient(closest-side, white 64%, transparent 65% 100%),
+												radial-gradient(closest-side, var(--color-progress-background) 64%, transparent 65% 100%),
 												conic-gradient(var(--color-progress) ${percent}%, var(--background-secondary) 0); 
 											`
 
 											if (percent == 100) {
 												style = `background: 
-												radial-gradient(closest-side, white 64%, transparent 65% 100%),
+												radial-gradient(closest-side, var(--color-progress-background) 64%, transparent 65% 100%),
 												conic-gradient(var(--color-progress-completed) ${percent}%, var(--background-secondary) 0); 
 											`
 											}
