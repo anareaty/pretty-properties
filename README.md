@@ -97,7 +97,7 @@ You can select custom formats for the date and datetime properties. Set format i
 
 Keep in mind that the date presentation is changed by adding extra element to the property and hiding the actual input text. Because of that the text of the date will become uneditable. You can still edit the date with calendar picker. This also makes the changed date to look a little different, especially with color.
 
-Custom dates in bases are disabled by default, because they can make bases slower. You can turn them on in settings.
+Custom dates in bases are disabled by default, because they can make bases slower. You can turn them on in settings. This function is also not supported in base cards: if you want the custom date format in base cards, you should use the formula instead, because dates in cards are not editable anyway.
 
 > [!WARNING]  
 > This is an experimental feature and can work incorrectly on some devices! If you expirience some issues with custom dates, please open an issue and provide information about your OS.

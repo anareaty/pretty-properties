@@ -673,7 +673,7 @@ body {
   padding: 2px var(--tag-padding-x);
 }
 
-.bases-cards-line {
+.bases-cards-line:not(:has(.value-list-container, input)) {
   border-radius: 4px;
   display: block;
   margin: var(--longtext-margin);
