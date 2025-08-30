@@ -1384,6 +1384,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 		for (let prop in propertyLongtextColors) {
+
 			let color = propertyLongtextColors[prop]
 
 			if (colors.find(c => c == color)) {
@@ -1407,9 +1408,20 @@ export default class PrettyPropertiesPlugin extends Plugin {
 					"--longtext-margin: var(--input-padding);\n}\n"
 			}
 
+			
+
 			if (color == "none") {
 				transparentPropsDataString = transparentPropsDataString +
 				"[data-property-longtext-value='" + prop + "'],"
+			}
+
+
+			if (this.settings.addPillPadding == "non-transparent" && color != "none") {
+				styleText = styleText +
+					".metadata-property-value .metadata-input-longtext[data-property-longtext-value='" + prop + "'],\n" + 
+					".bases-cards-line[data-property-longtext-value='" + prop + "']\n" +
+					" {\n" +
+					"--longtext-margin: var(--input-padding);\n}\n"
 			}
 		}
 
@@ -1438,9 +1450,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				" {\n" +
 				"--pill-padding-x: var(--tag-padding-x);\n}\n" + 
 				".metadata-property-value .metadata-input-longtext:not(" + transparentPropsDataString + "),\n" + 
-				".bases-cards-line:not(" + transparentPropsDataString + ")\n" +
-				" {\n" +
-				"--longtext-margin: var(--input-padding);\n}\n"
+				"\n}\n"
 		}
 
 		let oldStyle = document.head.querySelector("style#pp-pill-colors");
