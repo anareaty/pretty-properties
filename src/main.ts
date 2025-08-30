@@ -1333,7 +1333,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 	updatePillColors() {
 		let styleText = "";
-		let transparentPropsDataString = ""
+		let transparentPropsDataString = ".test,"
 		let propertyPillColors = this.settings.propertyPillColors
 		let propertyLongtextColors = this.settings.propertyLongtextColors
 
@@ -1362,6 +1362,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 			
 			if (this.settings.addPillPadding == "colored" && color != "none") {
+
 				styleText = styleText +
 					".metadata-property-value .multi-select-pill[data-property-pill-value='" + prop + "'],\n" + 
 					"[data-property*='note'] .value-list-element[data-property-pill-value='" + prop + "'],\n" +
@@ -1369,7 +1370,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 					" {\n" +
 					"--pill-padding-x: var(--tag-padding-x);\n}\n" + 
 					".metadata-property-value .metadata-input-longtext[data-property-pill-value='" + prop + "'],\n" + 
-					".bases-cards-line[data-property-pill-value='" + prop + "']\n" +
+					".bases-cards-line[data-property-longtext-value='" + prop + "']\n" +
 					" {\n" +
 					"--longtext-margin: var(--input-padding);\n}\n"
 			}
@@ -1401,7 +1402,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			if (this.settings.addPillPadding == "colored" && color != "none") {
 				styleText = styleText +
 					".metadata-property-value .metadata-input-longtext[data-property-longtext-value='" + prop + "'],\n" + 
-					".bases-cards-line[data-property-pill-value='" + prop + "']\n" +
+					".bases-cards-line[data-property-longtext-value='" + prop + "']\n" +
 					" {\n" +
 					"--longtext-margin: var(--input-padding);\n}\n"
 			}
@@ -1423,7 +1424,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			" {\n" +
 			"--pill-padding-x: var(--tag-padding-x);\n}\n" + 
 			".metadata-property-value .metadata-input-longtext,\n" + 
-			"[data-property*='note'] .bases-cards-line.bases-rendered\n" +
+			".bases-cards-line\n" +
 			" {\n" +
 			"--longtext-margin: var(--input-padding);\n}\n"
 		}
@@ -1437,7 +1438,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				" {\n" +
 				"--pill-padding-x: var(--tag-padding-x);\n}\n" + 
 				".metadata-property-value .metadata-input-longtext:not(" + transparentPropsDataString + "),\n" + 
-				"[data-property*='note'] .bases-cards-line.bases-rendered:not(" + transparentPropsDataString + ")\n" +
+				".bases-cards-line:not(" + transparentPropsDataString + ")\n" +
 				" {\n" +
 				"--longtext-margin: var(--input-padding);\n}\n"
 		}
@@ -1745,13 +1746,55 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 					let pills = containerEl.querySelectorAll(
-						".bases-cards-property .value-list-element:not([data-property-pill-value]), .bases-cards-line"
+						".bases-cards-property .value-list-element:not([data-property-pill-value])"
 					);
 					for (let pill of pills) {
 						if (pill instanceof HTMLElement) {
 							let value = pill.innerText.slice(0, 200).trim();
 							if (value.startsWith("#")) {value = value.replace("#", "")}
 							pill.setAttribute("data-property-pill-value", value);
+						}
+					}
+
+
+					let longTexts = containerEl.querySelectorAll(
+						".bases-cards-line:not(:has(.value-list-container, .input))"
+					);
+					for (let pill of longTexts) {
+						if (pill instanceof HTMLElement) {
+							let value = pill.innerText.slice(0, 200).trim();
+							if (value) {
+								pill.setAttribute("data-property-longtext-value", value);
+							}
+							
+						}
+					}
+
+
+					let dateInputs = containerEl.querySelectorAll(
+						".bases-cards-property .metadata-input-text.mod-date"
+					);
+
+					for (let input of dateInputs) {
+						
+						if (input instanceof HTMLInputElement) {
+							let value = input.value;
+							let parent = input.parentElement
+
+							if (parent instanceof HTMLElement) {
+								if (value) {
+								let currentTime = moment().toISOString(true).slice(0, 10);
+								if (currentTime == value) {
+									parent.setAttribute("data-relative-date", "present");
+								} else if (currentTime > value) {
+									parent.setAttribute("data-relative-date", "past");
+								} else {
+									parent.setAttribute("data-relative-date", "future");
+								}
+								} else {
+								parent.setAttribute("data-relative-date", "none");
+								}
+							}
 						}
 					}
 				};
@@ -2391,6 +2434,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 	async addClassestoProperties(view: View) {
 
 		
+
+		
 		let container = view.containerEl;
 		
 	
@@ -2554,6 +2599,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			if (input instanceof HTMLInputElement) {
 				let value = input.value;
 				let parent = input.parentElement
+
+				
 
 				if (parent instanceof HTMLElement) {
 

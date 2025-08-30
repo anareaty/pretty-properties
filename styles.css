@@ -673,7 +673,7 @@ body {
   padding: 2px var(--tag-padding-x);
 }
 
-.bases-cards-line:not(:has(.value-list-container, input)) {
+.bases-cards-line[data-property-longtext-value] {
   border-radius: 4px;
   display: block;
   margin: var(--longtext-margin);
@@ -771,35 +771,48 @@ button.longtext-color-button:hover {
 .metadata-property-value[data-relative-date="past"] .custom-date,
 .metadata-property-value:not(.has-custom-date)[data-relative-date="past"] input.mod-date,
 .metadata-property-value:not(.has-custom-date)[data-relative-date="past"] input.mod-datetime,
+.bases-cards-line[data-relative-date="past"] input.mod-date,
+.bases-cards-line[data-relative-date="past"] input.mod-datetime,
 .setting-custom-date-past {
   background-color: var(--date-past-color);
   border-radius: 4px;
   min-height: unset;
   padding-top: 2px;
   padding-bottom: 2px;
+  text-align: center;
   
 }
 
 .metadata-property-value[data-relative-date="present"] .custom-date,
 .metadata-property-value:not(.has-custom-date)[data-relative-date="present"] input.mod-date,
 .metadata-property-value:not(.has-custom-date)[data-relative-date="present"] input.mod-datetime,
+.bases-cards-line[data-relative-date="present"] input.mod-date,
+.bases-cards-line[data-relative-date="present"] input.mod-datetime,
 .setting-custom-date-present {
   background-color: var(--date-present-color);
   border-radius: 4px;
   min-height: unset;
   padding-top: 2px;
   padding-bottom: 2px;
+  text-align: center;
 }
 
 .metadata-property-value[data-relative-date="future"] .custom-date,
 .metadata-property-value:not(.has-custom-date)[data-relative-date="future"] input.mod-date,
 .metadata-property-value:not(.has-custom-date)[data-relative-date="future"] input.mod-datetime,
+.bases-cards-line[data-relative-date="future"] input.mod-date,
+.bases-cards-line[data-relative-date="future"] input.mod-datetime,
 .setting-custom-date-future {
   background-color: var(--date-future-color);
   border-radius: 4px;
   min-height: unset;
   padding-top: 2px;
   padding-bottom: 2px;
+  text-align: center;
+}
+
+.bases-cards-line input.mod-date {
+  padding: 0 !important;
 }
 
 
