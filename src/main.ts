@@ -2625,6 +2625,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 							
 			
 						let customDate = moment(value).format(customDateFormat);
+
+						
 						
 						if (existingCustomDateElement instanceof HTMLElement &&
 							existingCustomDateElement.innerText != customDate && 
@@ -2692,6 +2694,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 							
 			
 					let customDate = moment(value).format(customDateTimeFormat);
+
+				
 					
 					
 					if (existingCustomDateElement instanceof HTMLElement && 
