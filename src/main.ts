@@ -70,6 +70,21 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			})
 		);
 
+
+
+
+		this.registerEvent(
+			this.app.workspace.on("file-open", async (file) => {
+				if (file && this.settings.enableTaskNotesIntegration) {
+					this.updateTaskNotesTasks(file)
+				}
+			})
+		);
+
+
+
+
+
 		this.registerEvent(
 			this.app.workspace.on("layout-change", async () => {
 				
@@ -2742,6 +2757,76 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				}
 			}
 		}
+		
+
+	}
+
+
+
+
+	async updateTaskNotesTasks(file: TFile) {
+
+		//@ts-ignore
+		let tn = this.app.plugins.plugins.tasknotes
+		let statuses = tn.statusManager.statuses
+		let completedStatuses = statuses.filter((s: any) => s.isCompleted)
+
+		let projectTasks = await tn.projectSubtasksService.getTasksLinkedToProject(file)
+		
+		let completedProjectTasks = projectTasks.filter(t => {
+			return completedStatuses.find((s: any) => s.value == t.status)
+		})
+
+		let inlineTasks = []
+
+		let cache = this.app.metadataCache.getFileCache(file)
+		if (cache) {
+			let links = cache.links
+			if (links) {
+				for (let link of links) {
+					let linkText = link.original
+					let taskLinkObj = await tn.taskLinkDetectionService.detectTaskLink(linkText)
+					if (taskLinkObj.isValidTaskLink) {
+						let task = taskLinkObj.taskInfo
+						inlineTasks.push(task)
+					}
+				}
+			}
+		}
+
+		let completedInlineTasks = inlineTasks.filter(t => {
+			return completedStatuses.find((s: any) => s.value == t.status)
+		})
+
+		let allTasks = [...projectTasks]
+
+		for (let task of inlineTasks) {
+			if (!allTasks.find(t => t.path == task.path)) {
+				allTasks.push(task)
+			}
+		}
+
+		let allCompletedTasks = allTasks.filter(t => {
+			return completedStatuses.find((s: any) => s.value == t.status)
+		})
+
+
+
+		this.app.fileManager.processFrontMatter(file, fm => {
+			fm.tn_tasks = allTasks.length
+			fm.tn_tasks_completed = allCompletedTasks.length
+			fm.tn_tasks_uncompleted = allTasks.length - allCompletedTasks.length
+
+			fm.tn_project_tasks = projectTasks.length
+			fm.tn_project_tasks_completed = completedProjectTasks.length
+			fm.tn_project_tasks_uncompleted = projectTasks.length - completedProjectTasks.length
+
+			fm.tn_inline_tasks = inlineTasks.length
+			fm.tn_inline_tasks_completed = completedInlineTasks.length
+			fm.tn_inline_tasks_uncompleted = inlineTasks.length - completedInlineTasks.length
+		})
+		
+
 		
 
 	}

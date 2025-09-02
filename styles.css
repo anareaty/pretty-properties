@@ -147,7 +147,7 @@
   .metadata-container:has(.metadata-side-image img) {
     --metadata-display-editing: grid;
     --metadata-display-reading: grid;
-    grid-column-gap: 15px;
+    grid-column-gap: 22px;
     grid-template-rows: auto 1fr;
   }
 }
@@ -857,4 +857,28 @@ button.longtext-color-button:hover {
 
 .property-color-setting-button.color-pink svg {
   color: var(--color-pink)
+}
+
+
+
+.pp-settings-tabs {
+  border-bottom: 1px solid var(--background-modifier-border);
+  overflow-x: scroll;
+  white-space: nowrap;
+}
+
+button.pp-settings-tab {
+  border: none;
+  box-shadow: none;
+}
+
+
+button.pp-settings-tab-selected {
+  background-color: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+
+button.pp-settings-tab:not(.pp-settings-tab-selected):hover {
+    background-color: var(--interactive-hover);
 }
