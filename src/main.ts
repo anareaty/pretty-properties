@@ -29,6 +29,7 @@ import { PPPluginSettings, DEFAULT_SETTINGS } from "./settings";
 import { LocalImageSuggestModal } from "./modals";
 import Emojilib from "emojilib";
 import { ImageLinkPrompt } from "./modals";
+import { tagFixPlugin } from "./EditorExtensions";
 
 export default class PrettyPropertiesPlugin extends Plugin {
 	settings: PPPluginSettings;
@@ -58,6 +59,9 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 		this.observers = [];
 
+
+		this.registerEditorExtension(tagFixPlugin);
+
 		this.registerEvent(
 			this.app.workspace.on("layout-change", async () => {
 				this.updateElements();
@@ -75,7 +79,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 		this.registerEvent(
 			this.app.workspace.on("file-open", async (file) => {
-				if (file && this.settings.enableTaskNotesIntegration) {
+				if (file && this.settings.enableTaskNotesCount) {
 					this.updateTaskNotesTasks(file)
 				}
 			})
@@ -1359,10 +1363,11 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 			if (colors.find(c => c == color)) {
 				styleText = styleText +
-				"[data-property-pill-value='" + prop + "'] {\n" +
+				"[data-property-pill-value='" + prop + "'], .cm-tag-" + prop + ", .tag[href='#" + prop + "'] {\n" +
 				"--pill-color-rgb: var(--color-" + color + "-rgb); \n" +
 				"--pill-background-modified: rgba(var(--pill-color-rgb), 0.2); \n" + 
 				"--pill-background-hover-modified: rgba(var(--pill-color-rgb), 0.3); \n" +
+				"--tag-color-modified: rgba(var(--pill-color-rgb), 1); \n" + 
 				"--tag-background-modified: rgba(var(--pill-color-rgb), 0.2); \n" + 
 				"--tag-background-hover-modified: rgba(var(--pill-color-rgb), 0.3);}\n";
 			} else {
@@ -2594,6 +2599,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			}
 		}
 
+
 	}
 
 
@@ -2768,63 +2774,146 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 		//@ts-ignore
 		let tn = this.app.plugins.plugins.tasknotes
-		let statuses = tn.statusManager.statuses
-		let completedStatuses = statuses.filter((s: any) => s.isCompleted)
 
-		let projectTasks = await tn.projectSubtasksService.getTasksLinkedToProject(file)
-		
-		let completedProjectTasks = projectTasks.filter(t => {
-			return completedStatuses.find((s: any) => s.value == t.status)
-		})
+		if (tn) {
+			let statuses = tn.statusManager?.statuses
+			let completedStatuses = statuses.filter((s: any) => s.isCompleted)
 
-		let inlineTasks = []
+			let projectTasks = await tn.projectSubtasksService.getTasksLinkedToProject(file)
+			
+			let completedProjectTasks = projectTasks.filter(t => {
+				return completedStatuses.find((s: any) => s.value == t.status)
+			})
 
-		let cache = this.app.metadataCache.getFileCache(file)
-		if (cache) {
-			let links = cache.links
-			if (links) {
-				for (let link of links) {
-					let linkText = link.original
-					let taskLinkObj = await tn.taskLinkDetectionService.detectTaskLink(linkText)
-					if (taskLinkObj.isValidTaskLink) {
-						let task = taskLinkObj.taskInfo
-						inlineTasks.push(task)
+			let inlineTasks = []
+
+			let tasks = []
+			let completed = []
+			let uncompleted = []
+
+			let cache = this.app.metadataCache.getFileCache(file)
+			if (cache) {
+				let links = cache.links
+				if (links) {
+					for (let link of links) {
+						let linkText = link.original
+						let taskLinkObj = await tn.taskLinkDetectionService?.detectTaskLink(linkText)
+						if (taskLinkObj?.isValidTaskLink) {
+							let task = taskLinkObj.taskInfo
+							inlineTasks.push(task)
+						}
 					}
 				}
+				
+
+
+				let listItems = cache.listItems;
+
+				if (listItems) {
+					let allTasksStatuses =
+						this.settings.completedTasksStatuses.concat(
+							this.settings.uncompletedTasksStatuses
+						);
+					tasks = listItems.filter(
+						(l) => l.task && allTasksStatuses.includes(l.task)
+					);
+
+					completed = tasks.filter(
+						(t) =>
+							t.task &&
+							this.settings.completedTasksStatuses.includes(
+								t.task
+							)
+					);
+
+					uncompleted = tasks.filter(
+						(t) =>
+							t.task &&
+							this.settings.uncompletedTasksStatuses.includes(
+								t.task
+							)
+					);
+				}
 			}
+
+			let completedInlineTasks = inlineTasks.filter(t => {
+				return completedStatuses.find((s: any) => s.value == t.status)
+			})
+
+			let allTasks = [...projectTasks]
+
+			for (let task of inlineTasks) {
+				if (!allTasks.find(t => t.path == task.path)) {
+					allTasks.push(task)
+				}
+			}
+
+			let allCompletedTasks = allTasks.filter(t => {
+				return completedStatuses.find((s: any) => s.value == t.status)
+			})
+
+
+
+			this.app.fileManager.processFrontMatter(file, fm => {
+
+				if (this.settings.allTNTasksCount && fm[this.settings.allTNTasksCount] !== undefined) {
+					fm[this.settings.allTNTasksCount] = allTasks.length
+				}
+
+				if (this.settings.completedTNTasksCount && fm[this.settings.completedTNTasksCount] !== undefined) {
+					fm[this.settings.completedTNTasksCount] = allCompletedTasks.length
+				}
+
+				if (this.settings.uncompletedTNTasksCount && fm[this.settings.uncompletedTNTasksCount] !== undefined) {
+					fm[this.settings.uncompletedTNTasksCount] = allTasks.length - allCompletedTasks.length
+				}
+
+				if (this.settings.allTNProjectTasksCount && fm[this.settings.allTNProjectTasksCount] !== undefined) {
+					fm[this.settings.allTNProjectTasksCount] = projectTasks.length
+				}
+
+				if (this.settings.completedTNProjectTasksCount && fm[this.settings.completedTNProjectTasksCount] !== undefined) {
+					fm[this.settings.completedTNProjectTasksCount] = completedProjectTasks.length
+				}
+
+				if (this.settings.uncompletedTNProjectTasksCount && fm[this.settings.uncompletedTNProjectTasksCount] !== undefined) {
+					fm[this.settings.uncompletedTNProjectTasksCount] = projectTasks.length - completedProjectTasks.length
+				}
+
+				if (this.settings.allTNInlineTasksCount && fm[this.settings.allTNInlineTasksCount] !== undefined) {
+					fm[this.settings.allTNInlineTasksCount] = inlineTasks.length
+				}
+
+				if (this.settings.completedTNInlineTasksCount && fm[this.settings.completedTNInlineTasksCount] !== undefined) {
+					fm[this.settings.completedTNInlineTasksCount] = completedInlineTasks.length
+				}
+
+				if (this.settings.uncompletedTNInlineTasksCount && fm[this.settings.uncompletedTNInlineTasksCount] !== undefined) {
+					fm[this.settings.uncompletedTNInlineTasksCount] = inlineTasks.length - completedInlineTasks.length
+				}
+
+				if (this.settings.allTNAndCheckboxTasksCount && fm[this.settings.allTNAndCheckboxTasksCount] !== undefined) {
+					fm[this.settings.allTNAndCheckboxTasksCount] = allTasks.length + tasks.length
+				}
+
+				if (this.settings.completedTNAndCheckboxTasksCount && fm[this.settings.completedTNAndCheckboxTasksCount] !== undefined) {
+					fm[this.settings.completedTNAndCheckboxTasksCount] = allCompletedTasks.length + completed.length
+				}
+
+				if (this.settings.uncompletedTNAndCheckboxTasksCount && fm[this.settings.uncompletedTNAndCheckboxTasksCount] !== undefined) {
+					fm[this.settings.uncompletedTNAndCheckboxTasksCount] = allTasks.length - allCompletedTasks.length + uncompleted.length
+				}
+
+				
+				
+
+
+			})
 		}
 
-		let completedInlineTasks = inlineTasks.filter(t => {
-			return completedStatuses.find((s: any) => s.value == t.status)
-		})
-
-		let allTasks = [...projectTasks]
-
-		for (let task of inlineTasks) {
-			if (!allTasks.find(t => t.path == task.path)) {
-				allTasks.push(task)
-			}
-		}
-
-		let allCompletedTasks = allTasks.filter(t => {
-			return completedStatuses.find((s: any) => s.value == t.status)
-		})
 
 
-
-		this.app.fileManager.processFrontMatter(file, fm => {
-			fm.tn_tasks = allTasks.length
-			fm.tn_tasks_completed = allCompletedTasks.length
-			fm.tn_tasks_uncompleted = allTasks.length - allCompletedTasks.length
-
-			fm.tn_project_tasks = projectTasks.length
-			fm.tn_project_tasks_completed = completedProjectTasks.length
-			fm.tn_project_tasks_uncompleted = projectTasks.length - completedProjectTasks.length
-
-			fm.tn_inline_tasks = inlineTasks.length
-			fm.tn_inline_tasks_completed = completedInlineTasks.length
-			fm.tn_inline_tasks_uncompleted = inlineTasks.length - completedInlineTasks.length
-		})
+		
 		
 
 		

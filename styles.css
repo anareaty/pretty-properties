@@ -475,12 +475,21 @@ body {
   --pill-background-hover-modified: var(--pill-background-hover);
   --tag-background-modified: var(--tag-background);
   --tag-background-hover-modified: var(--tag-background-hover);
+  --tag-color-modified: var(--tag-color);
 }
 
 
 
+ .metadata-property[data-property-key="tags"] .multi-select-pill[style*="--tag-background"] {
+  --pill-background: var(--tag-background) !important;
+  --pill-background-hover: var(--tag-background-hover) !important;
+}
 
-
+ .cm-hashtag[style*="--tag-background"],
+ a.tag[style*="--tag-background"] {
+  background-color: var(--tag-background);
+  color: var(--tag-color);
+ }
 
 
 
@@ -537,7 +546,7 @@ body {
 .pp-bases-enabled.pp-base-tag-color .bases-view [data-property="note.tags"] .value-list-element,
 .pp-bases-enabled.pp-base-tag-color.pp-style-formula-tags .bases-view [data-property="formula.tags"] .value-list-element,
 .metadata-property[data-property-key="tags"] .multi-select-pill{
-    --pill-color: var(--tag-color);
+    --pill-color: var(--tag-color-modified);
     --pill-color-hover: var(--tag-color-hover);
     --pill-color-remove: var(--tag-color);
     --pill-color-remove-hover: var(--tag-color-hover);
@@ -882,3 +891,12 @@ button.pp-settings-tab-selected {
 button.pp-settings-tab:not(.pp-settings-tab-selected):hover {
     background-color: var(--interactive-hover);
 }
+
+
+
+
+.cm-hashtag, a.tag {
+    color: var(--tag-color-modified);
+    background-color: var(--tag-background-modified);
+}
+

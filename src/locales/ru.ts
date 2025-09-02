@@ -132,5 +132,24 @@ export default {
   PRESENT_DATE_COLOR: "Цвет текущей даты",
   FUTURE_DATE_COLOR: "Цвет будущей даты",
   DATES: "Даты",
+  TASKNOTES_INTEGRATION: "Интеграция с плагином TaskNotes",
+  TASKNOTES_INTEGRATION_DESCRIPTION: "Вы можете сохранять подсчёт не только обычных задач в заметке, но и задач, созданных при помощи плагина TaskNotes. Вы можете сохранять число встроенных в текущую заметку задач, подзадач, с которыми заметка связана в качестве проекта либо и тех, и других сразу. Также можно сохранять общий подсчёт всех задач - как из плагина TaskNotes, так и обычных.",
+  ENABLE_TASKSNOTES_COUNT: "Включить подсчёт задач из TaskNotes",
+
+  TASKNOTES_COUNT_PROPERTY: "Свойство для подсчёта всех встроенных задач и подзадач проекта",
+  TASKNOTES_COMPLETED_COUNT_PROPERTY: "Свойство для подсчёта выполненных встроенных задач и подзадач проекта",
+  TASKNOTES_UNCOMPLETED_COUNT_PROPERTY: "Свойство для подсчёта невыполненных встроенных задач и подзадач проекта",
+  
+  TASKNOTES_PROJECT_COUNT_PROPERTY: "Свойство для подсчёта всех подзадач проекта",
+  TASKNOTES_PROJECT_COMPLETED_COUNT_PROPERTY: "Свойство для подсчёта выполненных подзадач проекта",
+  TASKNOTES_PROJECT_UNCOMPLETED_COUNT_PROPERTY: "Свойство для подсчёта невыполненных подзадач проекта",
+
+  TASKNOTES_INLINE_COUNT_PROPERTY: "Свойство для подсчёта всех встроенных задач",
+  TASKNOTES_INLINE_COMPLETED_COUNT_PROPERTY: "Свойство для подсчёта выполненных встроенных задач",
+  TASKNOTES_INLINE_UNCOMPLETED_COUNT_PROPERTY: "Свойство для подсчёта невыполненных встроенных задач",
+
+  TASKNOTES_AND_CHECKBOX_COUNT_PROPERTY: "Свойство для общего подсчёта всех задач TaskNotes и обычных задач-флажков",
+  TASKNOTES_AND_CHECKBOX_COMPLETED_COUNT_PROPERTY: "Свойство для общего подсчёта выполненных задач TaskNotes и обычных задач-флажков",
+  TASKNOTES_AND_CHECKBOX_UNCOMPLETED_COUNT_PROPERTY: "Свойство для общего подсчёта невыполненных задач TaskNotes и обычных задач-флажков",
 };
 

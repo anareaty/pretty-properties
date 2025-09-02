@@ -64,7 +64,6 @@ export interface PPPluginSettings {
 	datePastColor: string;
 	datePresentColor: string;
 	dateFutureColor: string;
-	enableTaskNotesIntegration: boolean;
 	settingsTab: string;
 	enableTaskNotesCount: boolean;
 	allTNTasksCount: string;
@@ -145,7 +144,6 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	dateFutureColor: "",
 	datePastColor: "",
 	datePresentColor: "",
-	enableTaskNotesIntegration: true,
 	settingsTab: "BANNERS",
 	enableTaskNotesCount: false,
 	allTNTasksCount: "tn_tasks",
@@ -157,9 +155,9 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	allTNInlineTasksCount: "tn_inline_tasks",
     completedTNInlineTasksCount: "tn_inline_tasks_completed",
     uncompletedTNInlineTasksCount: "tn_inline_tasks_uncompleted",
-	allTNAndCheckboxTasksCount: "all_tasks",
-    completedTNAndCheckboxTasksCount: "all_tasks_completed",
-    uncompletedTNAndCheckboxTasksCount: "all_tasks_uncompleted",
+	allTNAndCheckboxTasksCount: "tn_and_checkbox_tasks",
+    completedTNAndCheckboxTasksCount: "tn_and_checkbox_tasks_completed",
+    uncompletedTNAndCheckboxTasksCount: "tn_and_checkbox_tasks_uncompleted",
 
 }
 
@@ -740,7 +738,7 @@ export default class PPSettingTab extends PluginSettingTab {
 				new Setting(containerEl)
 				.setName(i18n.t("ALL_TASKS_COUNT_PROPERTY"))
 				.addText(text => text
-					.setPlaceholder('banner')
+					.setPlaceholder('tasks')
 					.setValue(this.plugin.settings.allTasksCount)
 					.onChange(async (value) => {
 						this.plugin.settings.allTasksCount = value;
@@ -751,7 +749,7 @@ export default class PPSettingTab extends PluginSettingTab {
 				new Setting(containerEl)
 				.setName(i18n.t("UNCOMPLETED_TASKS_COUNT_PROPERTY"))
 				.addText(text => text
-					.setPlaceholder('banner')
+					.setPlaceholder('tasks_uncompleted')
 					.setValue(this.plugin.settings.uncompletedTasksCount)
 					.onChange(async (value) => {
 						this.plugin.settings.uncompletedTasksCount = value;
@@ -762,7 +760,7 @@ export default class PPSettingTab extends PluginSettingTab {
 				new Setting(containerEl)
 				.setName(i18n.t("COMPLETED_TASKS_COUNT_PROPERTY"))
 				.addText(text => text
-					.setPlaceholder('banner')
+					.setPlaceholder('tasks_completed')
 					.setValue(this.plugin.settings.completedTasksCount)
 					.onChange(async (value) => {
 						this.plugin.settings.completedTasksCount = value;
@@ -802,7 +800,7 @@ export default class PPSettingTab extends PluginSettingTab {
 				new Setting(containerEl)
 				.setName(i18n.t("COMPLETED_TASKS_COUNT_STATUSES"))
 				.addText(text => text
-					.setPlaceholder('banner')
+					.setPlaceholder('"x"')
 					.setValue(this.plugin.settings.completedTasksStatuses.map(s => "\"" + s + "\"").join(", "))
 					.onChange(async (value) => {
 						let valueArr = value.split(",").map(v => {
@@ -824,9 +822,13 @@ export default class PPSettingTab extends PluginSettingTab {
 			}
 
 
+			new Setting(containerEl).setName(i18n.t("TASKNOTES_INTEGRATION")).setHeading();
+
+			containerEl.createEl("p", {text: i18n.t("TASKNOTES_INTEGRATION_DESCRIPTION")})
+
+
 			new Setting(containerEl)
 				.setName(i18n.t("ENABLE_TASKSNOTES_COUNT"))
-				.setDesc(i18n.t("TASKSNOTES_COUNT_DESC"))
 				.addToggle(toggle => toggle
 					.setValue(this.plugin.settings.enableTaskNotesCount)
 					.onChange(async (value) => {
@@ -835,7 +837,170 @@ export default class PPSettingTab extends PluginSettingTab {
 						this.display();
 					}));
 
+
+
+			if (this.plugin.settings.enableTaskNotesCount) {
+
+				
+
+
+				new Setting(containerEl)
+				.setName(i18n.t("TASKNOTES_PROJECT_COUNT_PROPERTY"))
+				.addText(text => text
+					.setPlaceholder('tn_project_tasks')
+					.setValue(this.plugin.settings.allTNProjectTasksCount)
+					.onChange(async (value) => {
+						this.plugin.settings.allTNProjectTasksCount = value;
+						await this.plugin.saveSettings();
+						this.plugin.updateElements();
+					}));
+
+
+				new Setting(containerEl)
+				.setName(i18n.t("TASKNOTES_PROJECT_COMPLETED_COUNT_PROPERTY"))
+				.addText(text => text
+					.setPlaceholder('tn_project_tasks_completed')
+					.setValue(this.plugin.settings.completedTNProjectTasksCount)
+					.onChange(async (value) => {
+						this.plugin.settings.completedTNProjectTasksCount = value;
+						await this.plugin.saveSettings();
+						this.plugin.updateElements();
+					}));
+
+
+				new Setting(containerEl)
+				.setName(i18n.t("TASKNOTES_PROJECT_UNCOMPLETED_COUNT_PROPERTY"))
+				.addText(text => text
+					.setPlaceholder('tn_project_tasks_uncompleted')
+					.setValue(this.plugin.settings.uncompletedTNProjectTasksCount)
+					.onChange(async (value) => {
+						this.plugin.settings.uncompletedTNProjectTasksCount = value;
+						await this.plugin.saveSettings();
+						this.plugin.updateElements();
+					}));
+
+
+				new Setting(containerEl)
+				.setName(i18n.t("TASKNOTES_INLINE_COUNT_PROPERTY"))
+				.addText(text => text
+					.setPlaceholder('tn_inline_tasks')
+					.setValue(this.plugin.settings.allTNInlineTasksCount)
+					.onChange(async (value) => {
+						this.plugin.settings.allTNInlineTasksCount = value;
+						await this.plugin.saveSettings();
+						this.plugin.updateElements();
+					}));
+
+
+				new Setting(containerEl)
+				.setName(i18n.t("TASKNOTES_INLINE_COMPLETED_COUNT_PROPERTY"))
+				.addText(text => text
+					.setPlaceholder('tn_inline_tasks_completed')
+					.setValue(this.plugin.settings.completedTNInlineTasksCount)
+					.onChange(async (value) => {
+						this.plugin.settings.completedTNInlineTasksCount = value;
+						await this.plugin.saveSettings();
+						this.plugin.updateElements();
+					}));
+
+				
+				new Setting(containerEl)
+				.setName(i18n.t("TASKNOTES_INLINE_UNCOMPLETED_COUNT_PROPERTY"))
+				.addText(text => text
+					.setPlaceholder('tn_inline_tasks_uncompleted')
+					.setValue(this.plugin.settings.uncompletedTNInlineTasksCount)
+					.onChange(async (value) => {
+						this.plugin.settings.uncompletedTNInlineTasksCount = value;
+						await this.plugin.saveSettings();
+						this.plugin.updateElements();
+					}));
+
+				
+
+
+				new Setting(containerEl)
+				.setName(i18n.t("TASKNOTES_COUNT_PROPERTY"))
+				.addText(text => text
+					.setPlaceholder('tn_tasks')
+					.setValue(this.plugin.settings.allTNTasksCount)
+					.onChange(async (value) => {
+						this.plugin.settings.allTNTasksCount = value;
+						await this.plugin.saveSettings();
+						this.plugin.updateElements();
+					}));
+
+
+				new Setting(containerEl)
+				.setName(i18n.t("TASKNOTES_COMPLETED_COUNT_PROPERTY"))
+				.addText(text => text
+					.setPlaceholder('tn_tasks_completed')
+					.setValue(this.plugin.settings.completedTNTasksCount)
+					.onChange(async (value) => {
+						this.plugin.settings.completedTNTasksCount = value;
+						await this.plugin.saveSettings();
+						this.plugin.updateElements();
+					}));
+
+
+				new Setting(containerEl)
+				.setName(i18n.t("TASKNOTES_UNCOMPLETED_COUNT_PROPERTY"))
+				.addText(text => text
+					.setPlaceholder('tn_tasks_uncompleted')
+					.setValue(this.plugin.settings.uncompletedTNTasksCount)
+					.onChange(async (value) => {
+						this.plugin.settings.uncompletedTNTasksCount = value;
+						await this.plugin.saveSettings();
+						this.plugin.updateElements();
+					}));
+
+				
+				new Setting(containerEl)
+				.setName(i18n.t("TASKNOTES_AND_CHECKBOX_COUNT_PROPERTY"))
+				.addText(text => text
+					.setPlaceholder('all_tasks')
+					.setValue(this.plugin.settings.allTNAndCheckboxTasksCount)
+					.onChange(async (value) => {
+						this.plugin.settings.allTNAndCheckboxTasksCount = value;
+						await this.plugin.saveSettings();
+						this.plugin.updateElements();
+					}));
+
+
+				new Setting(containerEl)
+				.setName(i18n.t("TASKNOTES_AND_CHECKBOX_COMPLETED_COUNT_PROPERTY"))
+				.addText(text => text
+					.setPlaceholder('all_tasks_completed')
+					.setValue(this.plugin.settings.completedTNAndCheckboxTasksCount)
+					.onChange(async (value) => {
+						this.plugin.settings.completedTNAndCheckboxTasksCount = value;
+						await this.plugin.saveSettings();
+						this.plugin.updateElements();
+					}));
+
+
+				new Setting(containerEl)
+				.setName(i18n.t("TASKNOTES_AND_CHECKBOX_UNCOMPLETED_COUNT_PROPERTY"))
+				.addText(text => text
+					.setPlaceholder('all_tasks_uncompleted')
+					.setValue(this.plugin.settings.uncompletedTNAndCheckboxTasksCount)
+					.onChange(async (value) => {
+						this.plugin.settings.uncompletedTNAndCheckboxTasksCount = value;
+						await this.plugin.saveSettings();
+						this.plugin.updateElements();
+					}));
+
+				
+				
+
+
+
+
+				
+			}
 		}
+
+
+
 
 
 		
