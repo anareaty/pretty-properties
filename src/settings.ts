@@ -65,7 +65,20 @@ export interface PPPluginSettings {
 	datePresentColor: string;
 	dateFutureColor: string;
 	enableTaskNotesIntegration: boolean;
-	settingsTab: string
+	settingsTab: string;
+	enableTaskNotesCount: boolean;
+	allTNTasksCount: string;
+    completedTNTasksCount: string;
+    uncompletedTNTasksCount: string;
+	allTNProjectTasksCount: string;
+    completedTNProjectTasksCount: string;
+    uncompletedTNProjectTasksCount: string;
+	allTNInlineTasksCount: string;
+    completedTNInlineTasksCount: string;
+    uncompletedTNInlineTasksCount: string;
+	allTNAndCheckboxTasksCount: string;
+    completedTNAndCheckboxTasksCount: string;
+    uncompletedTNAndCheckboxTasksCount: string;
 	
 	
 }
@@ -133,7 +146,20 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	datePastColor: "",
 	datePresentColor: "",
 	enableTaskNotesIntegration: true,
-	settingsTab: "BANNERS"
+	settingsTab: "BANNERS",
+	enableTaskNotesCount: false,
+	allTNTasksCount: "tn_tasks",
+    completedTNTasksCount: "tn_tasks_completed",
+    uncompletedTNTasksCount: "tn_tasks_uncompleted",
+	allTNProjectTasksCount: "tn_project_tasks",
+    completedTNProjectTasksCount: "tn_project_tasks_completed",
+    uncompletedTNProjectTasksCount: "tn_project_tasks_uncompleted",
+	allTNInlineTasksCount: "tn_inline_tasks",
+    completedTNInlineTasksCount: "tn_inline_tasks_completed",
+    uncompletedTNInlineTasksCount: "tn_inline_tasks_uncompleted",
+	allTNAndCheckboxTasksCount: "all_tasks",
+    completedTNAndCheckboxTasksCount: "all_tasks_completed",
+    uncompletedTNAndCheckboxTasksCount: "all_tasks_uncompleted",
 
 }
 
@@ -796,6 +822,19 @@ export default class PPSettingTab extends PluginSettingTab {
 						this.plugin.updateElements();
 					}));
 			}
+
+
+			new Setting(containerEl)
+				.setName(i18n.t("ENABLE_TASKSNOTES_COUNT"))
+				.setDesc(i18n.t("TASKSNOTES_COUNT_DESC"))
+				.addToggle(toggle => toggle
+					.setValue(this.plugin.settings.enableTaskNotesCount)
+					.onChange(async (value) => {
+						this.plugin.settings.enableTaskNotesCount = value
+						await this.plugin.saveSettings();
+						this.display();
+					}));
+
 		}
 
 
@@ -803,7 +842,7 @@ export default class PPSettingTab extends PluginSettingTab {
 
 		if (this.plugin.settings.settingsTab == "PROPERTY_SETTINGS") {
 
-			new Setting(containerEl).setName(i18n.t("PROPERTY_SETTINGS")).setHeading();
+			
 
 			new Setting(containerEl)
 			.setName(i18n.t("ADD_PADDINGS_TO_LIST_PROPERTIES"))
