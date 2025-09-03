@@ -20,9 +20,14 @@ class TagFixPlugin implements PluginValue {
         const endEl = beginEl?.nextElementSibling;
         if (!(endEl instanceof HTMLElement) || !endEl.hasClass('cm-hashtag-end')) return;
         const tagId = endEl.getText();
-        if (endEl.hasClass("cm-tag-" + tagId)) return
-        beginEl.classList.add("cm-tag-" + tagId)
-        endEl.classList.add("cm-tag-" + tagId)
+
+        if (!endEl.hasClass("cm-tag-" + tagId)) {
+          beginEl.classList.add("cm-tag-" + tagId)
+          endEl.classList.add("cm-tag-" + tagId)
+        }
+
+        beginEl.setAttribute("data-tag-value", tagId)
+        endEl.setAttribute("data-tag-value", tagId)
     }})
   }
 

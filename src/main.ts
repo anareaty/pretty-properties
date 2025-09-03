@@ -1363,7 +1363,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 			if (colors.find(c => c == color)) {
 				styleText = styleText +
-				"[data-property-pill-value='" + prop + "'], .cm-tag-" + prop + ", .tag[href='#" + prop + "'] {\n" +
+				"[data-property-pill-value='" + prop + "'], [data-tag-value='" + prop + "'], a.tag[href='#" + prop + "'] {\n" +
 				"--pill-color-rgb: var(--color-" + color + "-rgb); \n" +
 				"--pill-background-modified: rgba(var(--pill-color-rgb), 0.2); \n" + 
 				"--pill-background-hover-modified: rgba(var(--pill-color-rgb), 0.3); \n" +
@@ -1372,7 +1372,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				"--tag-background-hover-modified: rgba(var(--pill-color-rgb), 0.3);}\n";
 			} else {
 				styleText = styleText +
-				"[data-property-pill-value='" + prop + "'] {\n" +
+				"[data-property-pill-value='" + prop + "'], [data-tag-value='" + prop + "'], a.tag[href='#" + prop + "']  {\n" +
 				"--pill-background-modified: " + color + "; \n" + 
 				"--pill-background-hover-modified: " + color + "; \n" +
 				"--tag-background-modified: " + color + "; \n" + 
