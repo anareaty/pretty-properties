@@ -547,9 +547,9 @@ body {
 .pp-bases-enabled.pp-base-tag-color.pp-style-formula-tags .bases-view [data-property="formula.tags"] .value-list-element,
 .metadata-property[data-property-key="tags"] .multi-select-pill{
     --pill-color: var(--tag-color-modified);
-    --pill-color-hover: var(--tag-color-hover);
-    --pill-color-remove: var(--tag-color);
-    --pill-color-remove-hover: var(--tag-color-hover);
+    --pill-color-hover: var(--tag-color-modified);
+    --pill-color-remove: var(--tag-color-modified);
+    --pill-color-remove-hover: var(--tag-color-modified);
     --pill-decoration: var(--tag-decoration);
     --pill-decoration-hover: var(--tag-decoration-hover);
     --pill-background: var(--tag-background-modified) !important;
@@ -631,6 +631,7 @@ body {
 .setting-item-name .multi-select-pill {
     width: fit-content;
     padding-right: var(--pill-padding-x);
+    --pill-border-width: 0;
 }
 
 
@@ -896,7 +897,15 @@ button.pp-settings-tab:not(.pp-settings-tab-selected):hover {
 
 
 .cm-hashtag, a.tag {
-    color: var(--tag-color-modified);
-    background-color: var(--tag-background-modified);
+  --tag-color: var(--tag-color-modified);
+  --tag-color-hover: var(--tag-color-modified);
+  --tag-background: var(--tag-background-modified);
+  --tag-background-hover: var(--tag-background-hover-modified);
 }
 
+
+.cm-hashtag:hover,
+.cm-hashtag-begin:hover + .cm-hashtag-end,
+.cm-hashtag-begin:has(+.cm-hashtag-end:hover){
+  background-color: var(--tag-background-hover);
+}

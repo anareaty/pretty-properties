@@ -1075,7 +1075,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					
 					let propertyColorSetting = new Setting(colorSettingsEl)
 
-					propertyColorSetting.settingEl.classList.add("color-" + currentColor)
+					//propertyColorSetting.settingEl.classList.add("color-" + currentColor)
 
 					let pillEl = propertyColorSetting.nameEl.createEl("div", {
 						cls: "multi-select-pill",
@@ -1105,7 +1105,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					})
 					.addColorPicker(color => {
 						propertyColorComponent = color
-						color.setValue(this.plugin.settings.propertyPillColors[property])
+						color.setValueHsl(this.plugin.settings.propertyPillColors[property])
 						.onChange(async (value) => {
 							
 							propertyColorButton.buttonEl.classList.forEach(cls => {
@@ -1113,16 +1113,18 @@ export default class PPSettingTab extends PluginSettingTab {
 									propertyColorButton.buttonEl.classList.remove(cls)
 								}
 							})
-							propertyColorButton.buttonEl.classList.add("color-" + value)
+							//propertyColorButton.buttonEl.classList.add("color-" + value)
 
-							this.plugin.settings.propertyPillColors[property] = value
+							let hsl = color.getValueHsl()
+
+							this.plugin.settings.propertyPillColors[property] = hsl
 							this.plugin.saveSettings()
 							this.plugin.updatePillColors()
 						})
 					})
 					.addButton(btn => {
 						propertyColorButton = btn
-						btn.buttonEl.classList.add("color-" + this.plugin.settings.propertyPillColors[property])
+						//btn.buttonEl.classList.add("color-" + this.plugin.settings.propertyPillColors[property])
 						
 						btn
 						.setIcon("paintbrush")

@@ -29,7 +29,9 @@ import { PPPluginSettings, DEFAULT_SETTINGS } from "./settings";
 import { LocalImageSuggestModal } from "./modals";
 import Emojilib from "emojilib";
 import { ImageLinkPrompt } from "./modals";
-import { tagFixPlugin } from "./EditorExtensions";
+
+
+
 
 export default class PrettyPropertiesPlugin extends Plugin {
 	settings: PPPluginSettings;
@@ -60,7 +62,9 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		this.observers = [];
 
 
-		this.registerEditorExtension(tagFixPlugin);
+		
+
+		
 
 		this.registerEvent(
 			this.app.workspace.on("layout-change", async () => {
@@ -68,11 +72,11 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			})
 		);
 
-		this.registerEvent(
-			this.app.metadataCache.on("changed", async (file, data, cache) => {
-				this.updateElements(file);
-			})
-		);
+		
+
+		
+
+
 
 
 
@@ -115,6 +119,14 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				}
 			})
 		);
+
+
+
+
+
+
+
+
 
 		const registerDocumentEvents = (doc: Document) => {
 			if (Platform.isMobile) {
@@ -400,12 +412,21 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		let targetNode = view.containerEl;
 		let observer = new MutationObserver((mutations) => {
 
+			
+			
+
+			//console.log(mutations)
+
 			let baseMutation;
 			let multiSelectMutation;
 			let progressMutation;
+			
+
+			
 
 			for (let mutation of mutations) {
 				let target = mutation.target;
+
 				if (target instanceof HTMLElement) {
 					if (
 						target.classList.contains("bases-view") ||
@@ -418,13 +439,13 @@ export default class PrettyPropertiesPlugin extends Plugin {
 						target.classList.contains("bases-cards-item")
 					) {
 						baseMutation = true;
-						break;
+						//break;
 					}
 
 					if (target.classList.contains("metadata-properties")) {
 						multiSelectMutation = true;
 						progressMutation = true;
-						break;
+						//break;
 					}
 
 					if (
@@ -433,7 +454,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 						target.classList.contains("metadata-input-longtext")
 					) {
 						multiSelectMutation = true;
-						if (progressMutation) break;
+						//if (progressMutation) break;
 					}
 
 					let progressEl = target.closest(
@@ -445,7 +466,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 						target.classList.contains("bases-rendered-value")
 					) {
 						progressMutation = true;
-						if (multiSelectMutation) break;
+						//if (multiSelectMutation) break;
 					}
 				}
 			}
@@ -464,6 +485,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				this.updateBaseLeafPills(leaf);
 				this.updateBaseLeafProgress(leaf);
 			}
+
 		});
 		observer.observe(targetNode, { childList: true, subtree: true });
 		this.observers.push(observer);
@@ -1363,7 +1385,9 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 			if (colors.find(c => c == color)) {
 				styleText = styleText +
-				"[data-property-pill-value='" + prop + "'], [data-tag-value='" + prop + "'], a.tag[href='#" + prop + "'] {\n" +
+				"[data-property-pill-value='" + prop + "'], " +
+				".cm-tag-" + prop + ", " +
+				"a.tag[href='#" + prop + "'] {\n" +
 				"--pill-color-rgb: var(--color-" + color + "-rgb); \n" +
 				"--pill-background-modified: rgba(var(--pill-color-rgb), 0.2); \n" + 
 				"--pill-background-hover-modified: rgba(var(--pill-color-rgb), 0.3); \n" +
@@ -1371,12 +1395,51 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				"--tag-background-modified: rgba(var(--pill-color-rgb), 0.2); \n" + 
 				"--tag-background-hover-modified: rgba(var(--pill-color-rgb), 0.3);}\n";
 			} else {
+
+				let hslString = color.h + " ," + color.s + "% ," + color.l + "%"
+				let background = "hsl(" + hslString + ")"
+
+				let hslStringHover = color.h + " ," + color.s + "% ," + (color.l - 5) + "%"
+				let backgroundHover = "hsl(" + hslStringHover + ")"
+
+				let textLightness = 30
+
+				if (color.l < 80) {
+				textLightness = 20
+				}
+				if (color.l < 70) {
+				textLightness = 10
+				}
+				if (color.l < 60) {
+				textLightness = 5
+				}
+				if (color.l < 50) {
+				textLightness = 95
+				}
+				if (color.l < 40) {
+				textLightness = 90
+				}
+				if (color.l < 30) {
+				textLightness = 80
+				}
+
+				let hslStringText = color.h + " ," + color.s + "% ," + textLightness + "%"
+        		let textColor = "hsl(" + hslStringText + ")"
+				
 				styleText = styleText +
-				"[data-property-pill-value='" + prop + "'], [data-tag-value='" + prop + "'], a.tag[href='#" + prop + "']  {\n" +
-				"--pill-background-modified: " + color + "; \n" + 
-				"--pill-background-hover-modified: " + color + "; \n" +
-				"--tag-background-modified: " + color + "; \n" + 
-				"--tag-background-hover-modified: " + color + ";}\n";
+				"[data-property-pill-value='" + prop + "'], " + 
+				".cm-tag-" + prop + ", " +
+				"a.tag[href='#" + prop + "']  {\n" +
+				"--pill-background-modified: " + background + "; \n" + 
+				"--pill-background-hover-modified: " + backgroundHover + "; \n" +
+				"--tag-background-modified: " + background + "; \n" + 
+				"--tag-background-hover-modified: " + backgroundHover + "; \n" + 
+				"--tag-color-modified: " + textColor + "; \n" +
+				"--pill-color: " + textColor + " !important; \n" +
+				"--pill-color-hover: " + textColor + "; \n" +
+				"--pill-color-remove: " + textColor + "; \n" +
+				"--pill-color-remove-hover: " + textColor +
+				";}\n";
 			}
 
 
@@ -1493,6 +1556,9 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			document.body.classList.remove("pp-style-formula-tags")
 		}
 	}
+
+
+	
 
 
 
@@ -2482,6 +2548,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			"[data-property='formula.tags'] .value-list-element:not([data-property-pill-value])"
 		);
 
+
 		for (let pill of pills) {
 			let content = pill.querySelector(".multi-select-pill-content");
 			if (content instanceof HTMLElement) {
@@ -2598,6 +2665,13 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				pill.setAttribute("data-property-pill-value", value);
 			}
 		}
+
+
+		
+		
+
+
+		
 
 
 	}
