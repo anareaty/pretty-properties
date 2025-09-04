@@ -31,6 +31,20 @@ import Emojilib from "emojilib";
 import { ImageLinkPrompt } from "./modals";
 
 
+import { syntaxTree } from '@codemirror/language';
+import { RangeSetBuilder } from '@codemirror/state';
+import {
+Decoration,
+DecorationSet,
+EditorView,
+PluginSpec,
+PluginValue,
+ViewPlugin,
+ViewUpdate,
+WidgetType,
+} from '@codemirror/view';
+
+
 
 
 export default class PrettyPropertiesPlugin extends Plugin {
@@ -60,6 +74,55 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		this.updateBaseStyles()
 
 		this.observers = [];
+
+
+		class TagFixPlugin implements PluginValue {
+			decorations: DecorationSet;
+
+			constructor(view: EditorView) {
+				this.decorations = this.buildDecorations(view);
+			}
+
+			update(update: ViewUpdate) {
+				if (update.docChanged || update.viewportChanged) {
+					this.decorations = this.buildDecorations(update.view);
+				}
+			}
+
+			destroy() {}
+
+			buildDecorations(view: EditorView): DecorationSet {
+				const builder = new RangeSetBuilder<Decoration>();
+
+				for (let { from, to } of view.visibleRanges) {
+					syntaxTree(view.state).iterate({
+						from,
+						to,
+						enter(node: any) {
+						
+							if (node.type.name.includes('hashtag-end')) {
+								let tagId = view.state.doc.sliceString(node.from, node.to)
+								let deco = Decoration.mark({ attributes: {"data-tag-value": tagId} })
+								builder.add(node.from - 1, node.from, deco);
+								builder.add(node.from, node.to, deco);
+							}
+						},
+					});
+				}
+				return builder.finish();
+			}
+		}
+
+		const pluginSpec: PluginSpec<TagFixPlugin> = {
+			decorations: (value: TagFixPlugin) => value.decorations,
+		};
+
+		const tagFixPlugin = ViewPlugin.fromClass(
+			TagFixPlugin,
+			pluginSpec
+		);
+
+		this.registerEditorExtension(tagFixPlugin)
 
 
 		
@@ -411,11 +474,6 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		let view = leaf.view;
 		let targetNode = view.containerEl;
 		let observer = new MutationObserver((mutations) => {
-
-			
-			
-
-			//console.log(mutations)
 
 			let baseMutation;
 			let multiSelectMutation;
@@ -1386,6 +1444,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			if (colors.find(c => c == color)) {
 				styleText = styleText +
 				"[data-property-pill-value='" + prop + "'], " +
+				".cm-hashtag:has([data-tag-value='" + prop + "']), " +
 				".cm-tag-" + prop + ", " +
 				"a.tag[href='#" + prop + "'] {\n" +
 				"--pill-color-rgb: var(--color-" + color + "-rgb); \n" +
@@ -1429,6 +1488,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				styleText = styleText +
 				"[data-property-pill-value='" + prop + "'], " + 
 				".cm-tag-" + prop + ", " +
+				".cm-hashtag:has([data-tag-value='" + prop + "']), " +
 				"a.tag[href='#" + prop + "']  {\n" +
 				"--pill-background-modified: " + background + "; \n" + 
 				"--pill-background-hover-modified: " + backgroundHover + "; \n" +
