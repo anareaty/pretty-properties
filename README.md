@@ -8,25 +8,13 @@ This plugin makes metadata block on the top of the file more visually appealing 
 
 ### Cover image
 
-Add image to the left of metadata block to save space in the note. Works great for book notes, people profiles etc. You can change the shape and size of the image using cssclasses.
+Add image to the left of metadata block to save space in the note. Works great for book notes, people profiles etc. You can change the shape and size of the image.
 
-To add image put image link into the "cover" property (must be of type "text"). You can use embeds, wikilinks, markdown links or bare urls for external images.
+To add cover image you can use command "Select cover image" from the command pallete. Then you can select a local image from your vault or add a link to the external image. You can set specific folder to look for the local cover images.
 
-Add cssclasses to the note to change the shape and the fitting of the image. Currently supported classes:
+Adding the cover will add the "cover" property to your note. Do not delete the property, it is needed for the image to show. You can hide the property instead. You can also change this property name in the setting.
 
--   "cover-initial" (default shape)
--   "cover-initial-width-2" (default shape with different width)
--   "cover-initial-width-3" (default shape with another width)
--   "cover-vertical-cover" (vertical image with object-fit "cover")
--   "cover-vertical-contain" (vertical image with object-fit "contain")
--   "cover-vertical" (legacy option, works the same as "cover-vertical-contain")
--   "cover-horizontal-cover" (horizontal image with object-fit "cover")
--   "cover-horizontal-contain" (horizontal image with object-fit "contain")
--   "cover-horizontal" (legacy option, works the same as "cover-horizontal-cover")
--   "cover-square"
--   "cover-circle".
-
-You can right-click on existing cover or call command to open menu to select image or cover shape. You also can set the widths of all possible shapes in the settings.
+Right-click on the cover to change it's shape or select another image. You can use initial shape with 3 custom widths, vertical, horizontal, square and circle. Shapes are stored in cssclasses property. You can set the custom width for every shape.
 
 > [!NOTE]  
 > Cover shapes would look a bit different on mobile devices with small screen. This is intentional to make them look more neat in the limited space.
@@ -35,35 +23,36 @@ You can right-click on existing cover or call command to open menu to select ima
 
 ### Banner
 
-You can add simple banners to your notes. To do so add the link to the "banner" property the same way as with cover.
+You can add simple banners to your notes. To do so run command "Select banner image". It will add the "banner" property to your note. Right-click on the banner to change the banner image or it's position.  
+You can set specific folder to look for the local banner images.
 
 ![note with banner](images/image-3.png)
 
-Property "banner_position" allows you to vertically position banner image. To change the position put into this property a number from 0 to 100.
-
-You can right-click on existing banner or call command to open menu to select banner image or change banner position.
+  
 
 ### Icon
 
-You can add icons alongside tha banner or just on their own. To do this add a link or some text to the "icon" property. For the icon you can use images, built-in Lucide icons or any symbols, including emoji:
+You can add icons alongside tha banner or just on their own. To do this run the command "Select icon". This will ad the "icon" property to you note. For the icon you can use images, built-in Lucide icons or any symbols, including emoji:
 
 -   add internal or external link to add image;
 -   add the name of lucide icon, for example "star", to add svg icon;
 -   if you add any other text, the first symbol will be shown as icon.
 
-![base](images/image_icon.png)
+You can set a specific folder to look for local icon images.
 
-You can right-click on existing icon or call command to open icon suggestion menu.
+![base](images/image_icon.png)
 
 ### Hide properties
 
 If you have many properties in the note, you may want to hide some of them while keeping the others visible. This plugin makes it easy. Click on the property icon and select "Hide property" in menu. If you want to see it again, run command "Toggle reveal / hide all hidden properties". After that you will see the hidden properties and can mark them as not hidden.
 
-![property menu with hide option](images/image-4.png)
+Banner, cover and icon properties can be hidden or revealed from the menus opened by right-clicking on the banner / cover / icon image.
+
+![property menu with hide option](images/image-4.png)  
 
 ### Colorful list properties
 
-You can make you list properties stand out by assigning each item their own color. Right-click on the item pill to select color. You can also chose "none" to make the pill background transparent or reset it to default. Only basic theme colors are supported for now.
+You can make you list properties stand out by assigning each item their own color. Right-click on the item pill to select color. You can also chose "none" to make the pill background transparent or reset it to default. You can use the theme colors or select your own custom color.
 
 ![property color menu](images/image-5.png)
 
@@ -73,13 +62,23 @@ You can also add you own styling to the list properties. Each of them (even not 
 [data-property-pill-value="my-property-value"] {    /* my styles */}
 ```
 
+  
+
+### Colorful tags
+
+You can add color to tags the same way as to the list properties. If you want to see the colored tags not only in properties, but also in the note text, you need to turn this option on in the settings.
+
+By default Obsidian does not allow to style tags with non-latin characters in Live preview mode. To fix this you can turn on the option to suppirt non-latin tags. 
+
+  
+
 ### Colorful text properties
 
-You can also add color to the text properties. Hover over property value to reveal the color button. Remember, then the color assigned to the specific text, so if you edit the text the color may disappear. By default color buttons for text properties are disabled in bases, because they can make base loading a bit slower. You can turn it on in the settings.
+You can also add color to the text properties. Hover over property value to reveal the color button. Remember, then the color assigned to the specific text, so if you edit the text the color may disappear. If you don't want to see the color button, you can turn it off in the settings.
 
 ![colorful text property](images/image_long_text.png)
 
-You can edit both text and list properties colors from the settings tab. There you can select color not only from the theme colors, but also from the color picker.
+  
 
 ### Date colors
 
@@ -111,6 +110,14 @@ Add simple progress bar to any number property. By default maximum value of prog
 ### Sync tasks count to properties
 
 If you set special properties for tasks, completed tasks and uncompleted tasks and add this properties to your note, the plugin will count existing tasks in the active note and periodically save the count number to the properties. It is useful if you want to show task count in Bases or see task progress inside your note.
+
+  
+
+### TaskNotes integration
+
+Task count can also work with the task created by TaskNotes plugin. You can count both inline tasks and project tasks. You will have to set up specific properties for this in the settings.
+
+  
 
 ### Property search
 
