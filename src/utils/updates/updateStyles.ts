@@ -326,7 +326,8 @@ export const updatePillColors = (plugin: PrettyPropertiesPlugin) => {
             " {\n" +
             "--pill-padding-x: var(--tag-padding-x);\n}\n" + 
             ".metadata-property-value .metadata-input-longtext:not(" + transparentPropsDataString + "),\n" + 
-            "\n}\n"
+            " {\n" +
+            "--pill-padding-x: var(--tag-padding-x);\n}\n" 
         }
     }
 
