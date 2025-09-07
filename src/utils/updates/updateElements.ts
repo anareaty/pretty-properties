@@ -8,15 +8,21 @@ import { updateCoverImages } from "./updateCovers";
 import { updateBannerImages } from "./updateBanners";
 import { updateIcons } from "./updateIcons";
 import { updateTasksCount } from "../taskCount";
-import { updateTaskNotesTaskCount } from "../taskNotesTaskCount";
+import { updateTaskNotesTaskCount, needToUpdateTaskNotes } from "../taskNotesTaskCount";
 import { updateViewProgress } from "./updateProgress";
 
 
 export const updateElements = (plugin: PrettyPropertiesPlugin, changedFile?: TFile | null, cache?: CachedMetadata | null) => {
 
+    let updateTaskNotes = needToUpdateTaskNotes(plugin, cache)
+    
     let leaves = plugin.app.workspace.getLeavesOfType("markdown");
     for (let leaf of leaves) {
         if (leaf.view instanceof MarkdownView) {
+            if (updateTaskNotes) {
+                updateTaskNotesTaskCount(plugin, null, leaf.view)
+            }
+
             if (
                 changedFile &&
                 leaf.view.file &&
@@ -60,6 +66,8 @@ const updateLeafElements = async (
     view: MarkdownView | FileView,
     cache?: CachedMetadata | null
 ) => {
+
+    
     addClassestoProperties(view, plugin);
     updateDateInputs(view, plugin)
 
@@ -78,10 +86,6 @@ const updateLeafElements = async (
 
         if (cache && frontmatter && plugin.settings.enableTasksCount) {
             updateTasksCount(view, cache, plugin);
-        }
-
-        if (cache && frontmatter && plugin.settings.enableTaskNotesCount) {
-            updateTaskNotesTaskCount(plugin, null, view)
         }
     }
     updateViewProgress(view, plugin);

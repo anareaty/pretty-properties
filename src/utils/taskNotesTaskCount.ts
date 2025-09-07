@@ -1,8 +1,36 @@
-import { MarkdownView, View, TFile } from "obsidian"
+import { MarkdownView, View, TFile, CachedMetadata } from "obsidian"
 import PrettyPropertiesPlugin from "src/main"
 
+
+
+export const needToUpdateTaskNotes = (plugin: PrettyPropertiesPlugin, cache?: CachedMetadata | null): boolean => {
+    if (cache && plugin.settings.enableTaskNotesCount) {
+        let isTask = false
+        //@ts-ignore
+        let tn = plugin.app.plugins.plugins.tasknotes
+        if (tn) {
+            let taskIdentificationMethod = tn.settings.taskIdentificationMethod
+            if (taskIdentificationMethod == "tag") {
+                let taskTag = tn.settings.taskTag
+                if (cache.frontmatter?.tags.includes(taskTag)) {
+                    isTask = true
+                }
+            } else if (taskIdentificationMethod == "property") {
+                let taskPropertyName = tn.settings.taskPropertyName
+                let taskPropertyValue = tn.settings.taskPropertyValue
+                if (cache.frontmatter?.[taskPropertyName] == taskPropertyValue) {
+                    isTask = true
+                }
+            }
+        } 
+        return isTask
+    }
+    return false
+}
+
+
+
 export const updateTaskNotesTaskCount = async (plugin: PrettyPropertiesPlugin, file: TFile | null, view?: View) => {
-    //console.log("hhh")
 
     //@ts-ignore
     let tn = plugin.app.plugins.plugins.tasknotes
@@ -22,7 +50,6 @@ export const updateTaskNotesTaskCount = async (plugin: PrettyPropertiesPlugin, f
         })
 
         let inlineTasks = []
-
         let tasks = []
         let completed = []
         let uncompleted = []
@@ -42,33 +69,13 @@ export const updateTaskNotesTaskCount = async (plugin: PrettyPropertiesPlugin, f
             }
             
 
-
             let listItems = cache.listItems;
 
             if (listItems) {
-                let allTasksStatuses =
-                    plugin.settings.completedTasksStatuses.concat(
-                        plugin.settings.uncompletedTasksStatuses
-                    );
-                tasks = listItems.filter(
-                    (l) => l.task && allTasksStatuses.includes(l.task)
-                );
-
-                completed = tasks.filter(
-                    (t) =>
-                        t.task &&
-                        plugin.settings.completedTasksStatuses.includes(
-                            t.task
-                        )
-                );
-
-                uncompleted = tasks.filter(
-                    (t) =>
-                        t.task &&
-                        plugin.settings.uncompletedTasksStatuses.includes(
-                            t.task
-                        )
-                );
+                let allTasksStatuses = plugin.settings.completedTasksStatuses.concat(plugin.settings.uncompletedTasksStatuses);
+                tasks = listItems.filter((l) => l.task && allTasksStatuses.includes(l.task));
+                completed = tasks.filter((t) => t.task && plugin.settings.completedTasksStatuses.includes(t.task));
+                uncompleted = tasks.filter((t) => t.task && plugin.settings.uncompletedTasksStatuses.includes(t.task));
             }
         }
 
@@ -91,8 +98,6 @@ export const updateTaskNotesTaskCount = async (plugin: PrettyPropertiesPlugin, f
 
 
         plugin.app.fileManager.processFrontMatter(file, fm => {
-
-            //console.log("process")
 
             if (plugin.settings.allTNTasksCount && fm[plugin.settings.allTNTasksCount] !== undefined) {
                 fm[plugin.settings.allTNTasksCount] = allTasks.length
@@ -134,21 +139,13 @@ export const updateTaskNotesTaskCount = async (plugin: PrettyPropertiesPlugin, f
                 fm[plugin.settings.allTNAndCheckboxTasksCount] = allTasks.length + tasks.length
             }
 
-            //console.log(fm)
-
             if (plugin.settings.completedTNAndCheckboxTasksCount && fm[plugin.settings.completedTNAndCheckboxTasksCount] !== undefined) {
-                //console.log("hhh")
                 fm[plugin.settings.completedTNAndCheckboxTasksCount] = allCompletedTasks.length + completed.length
             }
 
             if (plugin.settings.uncompletedTNAndCheckboxTasksCount && fm[plugin.settings.uncompletedTNAndCheckboxTasksCount] !== undefined) {
                 fm[plugin.settings.uncompletedTNAndCheckboxTasksCount] = allTasks.length - allCompletedTasks.length + uncompleted.length
             }
-
-            
-            
-
-
         })
     }
 }

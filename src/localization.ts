@@ -1,5 +1,7 @@
+import { getLanguage } from 'obsidian';
 import en from './locales/en';
 import ru from './locales/ru';
+
 
 const locales: Record<string, any> = {
   en,
@@ -9,7 +11,10 @@ const locales: Record<string, any> = {
 export class LocalizationService {
   private currentLocale: string = 'en';
 
-  setLocale(locale: string) {
+  setLocale() {
+    let locale: string
+		if (getLanguage) locale = getLanguage();
+		else locale = window.localStorage.language;
     if (locales[locale]) this.currentLocale = locale;
   }
 

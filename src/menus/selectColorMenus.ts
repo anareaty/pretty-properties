@@ -6,7 +6,7 @@ import { updatePillColors } from "src/utils/updates/updateStyles";
 
 class ColorPickerModal extends Modal {
     plugin: PrettyPropertiesPlugin
-    propVal: string
+    propVal: string | any
     colorList: string
 
     constructor(app: App, plugin: PrettyPropertiesPlugin, propVal: string, colorList: string) {
@@ -22,9 +22,13 @@ class ColorPickerModal extends Modal {
 
         new Setting(contentEl)
         .addColorPicker(color => {
-            //@ts-ignore
-            color.setValueHsl(this.plugin.settings[this.colorList][this.propVal])
-            .onChange((value) => {
+            
+            if (this.propVal.h) {
+                //@ts-ignore
+                color.setValueHsl(this.plugin.settings[this.colorList][this.propVal])
+            }
+            
+            color.onChange((value) => {
                 let hsl = color.getValueHsl()
                 //@ts-ignore
                 this.plugin.settings[this.colorList][this.propVal] = hsl
