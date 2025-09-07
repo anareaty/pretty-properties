@@ -92,6 +92,7 @@ export interface PPPluginSettings {
 	enableColoredInlineTags: boolean;
 	nonLatinTagsSupport: boolean;
 	enableColorButton: boolean;
+	propertySearchKey: string
 	
 	
 }
@@ -175,7 +176,8 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	enableColoredProperties: true,
 	enableColoredInlineTags: false,
 	nonLatinTagsSupport: false,
-	enableColorButton: true
+	enableColorButton: true,
+	propertySearchKey: "Ctrl"
 
 }
 
@@ -190,11 +192,8 @@ export class PPSettingTab extends PluginSettingTab {
 
 	display(): void {
 		const {containerEl} = this;
-
 		containerEl.empty();
 
-
-		
 		let tabNames = ["BANNERS", "ICONS", "COVERS", "TASKS", "PROPERTY_SETTINGS", "DATES", "OTHER"]
 		let tabsEl = containerEl.createEl("div", {cls: "pp-settings-tabs"})
 		for (let tabName of tabNames) {
@@ -209,7 +208,6 @@ export class PPSettingTab extends PluginSettingTab {
 				this.display()
 			}
 		}
-
 
 		if (this.plugin.settings.settingsTab == "BANNERS") {
 			new Setting(containerEl)
@@ -341,8 +339,6 @@ export class PPSettingTab extends PluginSettingTab {
 					})
 				});
 
-
-
 				new Setting(containerEl)
 				.setName(i18n.t("GAP_AFTER_BANNER_WITH_ICON_MOBILE"))
 				.setDesc(i18n.t("CAN_BE_POSITIVE_OR_NEGATIVE"))
@@ -357,15 +353,8 @@ export class PPSettingTab extends PluginSettingTab {
 						updateIconStyles(this.plugin);
 					})
 				});
-
-				
 			}
 		}
-
-		
-		
-
-
 
 
 
@@ -381,7 +370,6 @@ export class PPSettingTab extends PluginSettingTab {
 						updateElements(this.plugin);
 						updateIconStyles(this.plugin);
 					}));
-
 
 			if (this.plugin.settings.enableIcon) {
 				new Setting(containerEl)
@@ -418,7 +406,6 @@ export class PPSettingTab extends PluginSettingTab {
 					})
 				});
 
-
 				new Setting(containerEl)
 				.setName(i18n.t("ICON_COLOR"))
 				.addColorPicker(color => color
@@ -430,8 +417,6 @@ export class PPSettingTab extends PluginSettingTab {
 					})
 				)
 
-
-
 				new Setting(containerEl)
 				.setName(i18n.t("ICON_BACKGROUND"))
 				.addToggle(toggle => toggle
@@ -441,8 +426,6 @@ export class PPSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 						updateIconStyles(this.plugin);
 					}));
-
-
 
 				new Setting(containerEl)
 				.setName(i18n.t("ICON_LEFT_MARGIN"))
@@ -459,12 +442,6 @@ export class PPSettingTab extends PluginSettingTab {
 					})
 				});
 
-				
-
-				
-
-
-
 				new Setting(containerEl)
 				.setName(i18n.t("ICON_TOP_MARGIN_WITHOUT_BANNER"))
 				.setDesc(i18n.t("CAN_BE_POSITIVE_OR_NEGATIVE"))
@@ -479,7 +456,6 @@ export class PPSettingTab extends PluginSettingTab {
 						updateIconStyles(this.plugin);
 					})
 				});
-
 
 				new Setting(containerEl)
 				.setName(i18n.t("ICON_TOP_MARGIN_WITH_BANNER"))
@@ -496,7 +472,6 @@ export class PPSettingTab extends PluginSettingTab {
 					})
 				});
 
-
 				new Setting(containerEl)
 				.setName(i18n.t("ICON_TOP_MARGIN_WITH_BANNER_MOBILE"))
 				.setDesc(i18n.t("CAN_BE_POSITIVE_OR_NEGATIVE"))
@@ -512,7 +487,6 @@ export class PPSettingTab extends PluginSettingTab {
 					})
 				});
 
-
 				new Setting(containerEl)
 				.setName(i18n.t("GAP_AFTER_ICON_WITHOUT_BANNER"))
 				.setDesc(i18n.t("CAN_BE_POSITIVE_OR_NEGATIVE"))
@@ -527,17 +501,8 @@ export class PPSettingTab extends PluginSettingTab {
 						updateIconStyles(this.plugin);
 					})
 				});
-
-
-				
-
-				
 			}
 		}
-
-
-
-
 
 
 
@@ -553,10 +518,7 @@ export class PPSettingTab extends PluginSettingTab {
 						updateElements(this.plugin);
 						updateCoverStyles(this.plugin)
 					}));
-
 			if (this.plugin.settings.enableCover) {
-
-
 				new Setting(containerEl)
 				.setName(i18n.t("COVER_PROPERTY"))
 				.addText(text => text
@@ -577,7 +539,6 @@ export class PPSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					}));
 
-				
 				new Setting(containerEl)
 				.setName(i18n.t("ADD_EXTRA_COVER_PROPERTY"))
 				.addButton(button => button
@@ -589,7 +550,6 @@ export class PPSettingTab extends PluginSettingTab {
 							this.display();
 						}
 					}))
-
 
 				for (let i = 0; i < this.plugin.settings.extraCoverProperties.length; i++) {
 					let prop = this.plugin.settings.extraCoverProperties[i]
@@ -605,12 +565,8 @@ export class PPSettingTab extends PluginSettingTab {
 					.addButton(button => button
 					.setIcon("x")
 					.onClick(async () => {
-						
 						prop = this.plugin.settings.extraCoverProperties[i]
-						
 						this.plugin.settings.extraCoverProperties = this.plugin.settings.extraCoverProperties.filter(p => p != prop)
-						
-						
 						await this.plugin.saveSettings();
 						this.display();
 					}))
@@ -672,10 +628,6 @@ export class PPSettingTab extends PluginSettingTab {
 					})
 				});
 
-
-				
-
-
 				new Setting(containerEl)
 				.setName(i18n.t("VERTICAL_COVER_WIDTH"))
 				.addText(text => {
@@ -736,9 +688,6 @@ export class PPSettingTab extends PluginSettingTab {
 
 
 
-
-
-
 		if (this.plugin.settings.settingsTab == "TASKS") {
 			new Setting(containerEl)
 				.setName(i18n.t("ENABLE_TASKS_COUNT"))
@@ -752,7 +701,6 @@ export class PPSettingTab extends PluginSettingTab {
 					}));
 
 			if (this.plugin.settings.enableTasksCount) {
-
 				new Setting(containerEl)
 				.setName(i18n.t("ALL_TASKS_COUNT_PROPERTY"))
 				.addText(text => text
@@ -786,11 +734,7 @@ export class PPSettingTab extends PluginSettingTab {
 						updateElements(this.plugin);
 					}));
 
-				
 				containerEl.createEl("p", {text: i18n.t("TASK_STATUSES_DESCRIPTION")})
-
-				
-				
 
 				new Setting(containerEl)
 				.setName(i18n.t("UNCOMPLETED_TASKS_COUNT_STATUSES"))
@@ -839,11 +783,8 @@ export class PPSettingTab extends PluginSettingTab {
 					}));
 			}
 
-
 			new Setting(containerEl).setName(i18n.t("TASKNOTES_INTEGRATION")).setHeading();
-
 			containerEl.createEl("p", {text: i18n.t("TASKNOTES_INTEGRATION_DESCRIPTION")})
-
 
 			new Setting(containerEl)
 				.setName(i18n.t("ENABLE_TASKSNOTES_COUNT"))
@@ -855,13 +796,7 @@ export class PPSettingTab extends PluginSettingTab {
 						this.display();
 					}));
 
-
-
 			if (this.plugin.settings.enableTaskNotesCount) {
-
-				
-
-
 				new Setting(containerEl)
 				.setName(i18n.t("TASKNOTES_PROJECT_COUNT_PROPERTY"))
 				.addText(text => text
@@ -872,7 +807,6 @@ export class PPSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 						updateElements(this.plugin);
 					}));
-
 
 				new Setting(containerEl)
 				.setName(i18n.t("TASKNOTES_PROJECT_COMPLETED_COUNT_PROPERTY"))
@@ -885,7 +819,6 @@ export class PPSettingTab extends PluginSettingTab {
 						updateElements(this.plugin);
 					}));
 
-
 				new Setting(containerEl)
 				.setName(i18n.t("TASKNOTES_PROJECT_UNCOMPLETED_COUNT_PROPERTY"))
 				.addText(text => text
@@ -896,7 +829,6 @@ export class PPSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 						updateElements(this.plugin);
 					}));
-
 
 				new Setting(containerEl)
 				.setName(i18n.t("TASKNOTES_INLINE_COUNT_PROPERTY"))
@@ -909,7 +841,6 @@ export class PPSettingTab extends PluginSettingTab {
 						updateElements(this.plugin);
 					}));
 
-
 				new Setting(containerEl)
 				.setName(i18n.t("TASKNOTES_INLINE_COMPLETED_COUNT_PROPERTY"))
 				.addText(text => text
@@ -921,7 +852,6 @@ export class PPSettingTab extends PluginSettingTab {
 						updateElements(this.plugin);
 					}));
 
-				
 				new Setting(containerEl)
 				.setName(i18n.t("TASKNOTES_INLINE_UNCOMPLETED_COUNT_PROPERTY"))
 				.addText(text => text
@@ -932,9 +862,6 @@ export class PPSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 						updateElements(this.plugin);
 					}));
-
-				
-
 
 				new Setting(containerEl)
 				.setName(i18n.t("TASKNOTES_COUNT_PROPERTY"))
@@ -947,7 +874,6 @@ export class PPSettingTab extends PluginSettingTab {
 						updateElements(this.plugin);
 					}));
 
-
 				new Setting(containerEl)
 				.setName(i18n.t("TASKNOTES_COMPLETED_COUNT_PROPERTY"))
 				.addText(text => text
@@ -959,7 +885,6 @@ export class PPSettingTab extends PluginSettingTab {
 						updateElements(this.plugin);
 					}));
 
-
 				new Setting(containerEl)
 				.setName(i18n.t("TASKNOTES_UNCOMPLETED_COUNT_PROPERTY"))
 				.addText(text => text
@@ -970,7 +895,6 @@ export class PPSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 						updateElements(this.plugin);
 					}));
-
 				
 				new Setting(containerEl)
 				.setName(i18n.t("TASKNOTES_AND_CHECKBOX_COUNT_PROPERTY"))
@@ -983,7 +907,6 @@ export class PPSettingTab extends PluginSettingTab {
 						updateElements(this.plugin);
 					}));
 
-
 				new Setting(containerEl)
 				.setName(i18n.t("TASKNOTES_AND_CHECKBOX_COMPLETED_COUNT_PROPERTY"))
 				.addText(text => text
@@ -995,7 +918,6 @@ export class PPSettingTab extends PluginSettingTab {
 						updateElements(this.plugin);
 					}));
 
-
 				new Setting(containerEl)
 				.setName(i18n.t("TASKNOTES_AND_CHECKBOX_UNCOMPLETED_COUNT_PROPERTY"))
 				.addText(text => text
@@ -1006,27 +928,12 @@ export class PPSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 						updateElements(this.plugin);
 					}));
-
-				
-				
-
-
-
-
-				
 			}
 		}
 
 
 
-
-
-		
-
 		if (this.plugin.settings.settingsTab == "PROPERTY_SETTINGS") {
-
-			
-
 			new Setting(containerEl)
 			.setName(i18n.t("ADD_PADDINGS_TO_LIST_PROPERTIES"))
 			.setDesc(i18n.t("ADD_PADDINGS_DESC"))
@@ -1045,7 +952,6 @@ export class PPSettingTab extends PluginSettingTab {
 				})
 			)
 
-
 			new Setting(containerEl)
 			.setName(i18n.t("ENABLE_COLORED_PROPERTIES"))
 			.addToggle(toggle => {
@@ -1058,7 +964,6 @@ export class PPSettingTab extends PluginSettingTab {
 				})
 			});
 
-
 			new Setting(containerEl)
 			.setName(i18n.t("ENABLE_COLORED_INLINE_TAGS"))
 			.addToggle(toggle => {
@@ -1067,10 +972,8 @@ export class PPSettingTab extends PluginSettingTab {
 					this.plugin.settings.enableColoredInlineTags = value
 					this.plugin.saveSettings()
 					updatePillColors(this.plugin)
-					
 				})
 			});
-
 
 			new Setting(containerEl)
 			.setName(i18n.t("ENABLE_NON_LATIN_TAGS_SUPPORT"))
@@ -1084,7 +987,6 @@ export class PPSettingTab extends PluginSettingTab {
 				})
 			});
 
-
 			new Setting(containerEl)
 			.setName(i18n.t("BASE_TAGS_COLOR"))
 			.setDesc(i18n.t("BASE_TAGS_COLOR_DESC"))
@@ -1096,7 +998,6 @@ export class PPSettingTab extends PluginSettingTab {
 					updatePillColors(this.plugin)
 				})
 			});
-
 
 			new Setting(containerEl)
 			.setName(i18n.t("STYLE_FORMULA_TAGS"))
@@ -1110,8 +1011,6 @@ export class PPSettingTab extends PluginSettingTab {
 				})
 			});
 
-
-
 			new Setting(containerEl)
 				.setName(i18n.t("SHOW_COLOR_BUTTON_FOR_TEXT"))
 				.addToggle(toggle => toggle
@@ -1122,9 +1021,6 @@ export class PPSettingTab extends PluginSettingTab {
 						this.display();
 						updateElements(this.plugin);
 					}));
-
-
-
 
 			new Setting(containerEl)
 				.setName(i18n.t("SHOW_COLOR_BUTTON_FOR_TEXT_IN_BASES"))
@@ -1138,7 +1034,6 @@ export class PPSettingTab extends PluginSettingTab {
 						updateBaseStyles(this.plugin)
 					}));
 
-
 			new Setting(containerEl)
 			.setName(i18n.t("SHOW_COLORED_PROPERTIES"))
 			.addToggle(toggle => {
@@ -1150,14 +1045,10 @@ export class PPSettingTab extends PluginSettingTab {
 				})
 			});
 
-
 			if (this.plugin.settings.showColorSettings) { 
-
 				let colorSettingsEl = containerEl.createEl("div")
 
 				const addColorSetting = (property: string) => {
-					let currentColor = this.plugin.settings.propertyPillColors[property]
-					
 					
 					let propertyColorSetting = new Setting(colorSettingsEl)
 
@@ -1169,7 +1060,6 @@ export class PPSettingTab extends PluginSettingTab {
 					})
 
 					pillEl.createEl("div", {text: property, cls: "multi-select-pill-content"})
-
 					let propertyColorComponent: ColorComponent
 					let propertyColorButton: ButtonComponent
 
@@ -1191,7 +1081,6 @@ export class PPSettingTab extends PluginSettingTab {
 						propertyColorComponent = color
 						color.setValueHsl(this.plugin.settings.propertyPillColors[property])
 						.onChange(async (value) => {
-							
 							propertyColorButton.buttonEl.classList.forEach(cls => {
 								if (cls.startsWith("color")) {
 									propertyColorButton.buttonEl.classList.remove(cls)
@@ -1199,7 +1088,6 @@ export class PPSettingTab extends PluginSettingTab {
 							})
 
 							let hsl = color.getValueHsl()
-
 							this.plugin.settings.propertyPillColors[property] = hsl
 							this.plugin.saveSettings()
 							updatePillColors(this.plugin)
@@ -1222,38 +1110,29 @@ export class PPSettingTab extends PluginSettingTab {
 							for (let color of colors) {
 								menu.addItem((item: MenuItem) => {
 									item.setIcon("square")
+									//@ts-ignore
+									let iconEl = item.iconEl
 									if (color != "default" && color != "none") {
-										//@ts-ignore
-										item.iconEl.style = "color: transparent; background-color: rgba(var(--color-" + color + "-rgb), 0.3);"
+										iconEl.style = "color: transparent; background-color: rgba(var(--color-" + color + "-rgb), 0.3);"
 									}
-							
-									if (color == "none") {
-										//@ts-ignore
-										item.iconEl.style = "opacity: 0.2;"
-									}
-							
+									if (color == "none") iconEl.style = "opacity: 0.2;"
+	
 									item.setTitle(i18n.t(color))
 									.onClick(() => {
-
 										propertyColorComponent.setValue("")
-
 										btn.buttonEl.classList.forEach(cls => {
 											if (cls.startsWith("color")) {
 												propertyColorButton.buttonEl.classList.remove(cls)
 											}
 										})
 										btn.buttonEl.classList.add("color-" + color)
-
 										this.plugin.settings.propertyPillColors[property] = color
 										this.plugin.saveSettings()
 										updatePillColors(this.plugin)
-
 									})
-
 									item.setChecked(color == this.plugin.settings.propertyPillColors[property])
 								})
 							}
-
 							menu.showAtMouseEvent(e)
 						})
 					})
@@ -1297,18 +1176,6 @@ export class PPSettingTab extends PluginSettingTab {
 					)
 			}
 
-
-
-
-
-
-
-
-
-
-
-
-
 			new Setting(containerEl)
 			.setName(i18n.t("SHOW_TEXT_COLORED_PROPERTIES"))
 			.addToggle(toggle => {
@@ -1320,24 +1187,19 @@ export class PPSettingTab extends PluginSettingTab {
 				})
 			});
 
-
 			if (this.plugin.settings.showTextColorSettings) { 
-
 				let colorSettingsEl = containerEl.createEl("div")
 
 				const addColorSetting = (property: string) => {
-					let currentColor = this.plugin.settings.propertyLongtextColors[property]
-					
 					let propertyColorSetting = new Setting(colorSettingsEl)
 
-					let pillEl = propertyColorSetting.nameEl.createEl("div", {
+					propertyColorSetting.nameEl.createEl("div", {
 						text: property,
 						cls: "metadata-input-longtext",
 						attr : {
 							"data-property-longtext-value": property
 						},
 					})
-
 					let propertyColorComponent: ColorComponent
 					let propertyColorButton: ButtonComponent
 
@@ -1360,16 +1222,13 @@ export class PPSettingTab extends PluginSettingTab {
 						propertyColorComponent = color
 						color.setValueHsl(this.plugin.settings.propertyLongtextColors[property])
 						.onChange(async (value) => {
-							
 							propertyColorButton.buttonEl.classList.forEach(cls => {
 								if (cls.startsWith("color")) {
 									propertyColorButton.buttonEl.classList.remove(cls)
 								}
 							})
 							
-
 							let hsl = color.getValueHsl()
-
 							this.plugin.settings.propertyLongtextColors[property] = hsl
 							this.plugin.saveSettings()
 							updatePillColors(this.plugin)
@@ -1380,6 +1239,7 @@ export class PPSettingTab extends PluginSettingTab {
 
 						if (typeof this.plugin.settings.propertyLongtextColors[property] == "string")
 						btn.buttonEl.classList.add("color-" + this.plugin.settings.propertyLongtextColors[property])
+						
 						btn
 						.setIcon("paintbrush")
 						.setClass("property-color-setting-button")
@@ -1390,38 +1250,29 @@ export class PPSettingTab extends PluginSettingTab {
 							for (let color of colors) {
 								menu.addItem((item: MenuItem) => {
 									item.setIcon("square")
+									//@ts-ignore
+									let iconEl = item.iconEl
 									if (color != "default" && color != "none") {
-										//@ts-ignore
-										item.iconEl.style = "color: transparent; background-color: rgba(var(--color-" + color + "-rgb), 0.3);"
+										iconEl.style = "color: transparent; background-color: rgba(var(--color-" + color + "-rgb), 0.3);"
 									}
-							
-									if (color == "none") {
-										//@ts-ignore
-										item.iconEl.style = "opacity: 0.2;"
-									}
+									if (color == "none") iconEl.style = "opacity: 0.2;"
 							
 									item.setTitle(i18n.t(color))
 									.onClick(() => {
-
 										propertyColorComponent.setValue("")
-
 										btn.buttonEl.classList.forEach(cls => {
 											if (cls.startsWith("color")) {
 												propertyColorButton.buttonEl.classList.remove(cls)
 											}
 										})
 										btn.buttonEl.classList.add("color-" + color)
-
 										this.plugin.settings.propertyLongtextColors[property] = color
 										this.plugin.saveSettings()
 										updatePillColors(this.plugin)
-
 									})
-
 									item.setChecked(color == this.plugin.settings.propertyLongtextColors[property])
 								})
 							}
-
 							menu.showAtMouseEvent(e)
 						})
 					})
@@ -1439,7 +1290,6 @@ export class PPSettingTab extends PluginSettingTab {
 				for (let property in this.plugin.settings.propertyLongtextColors) {
 					addColorSetting(property)
 				}
-
 
 				let newProperty = ""
 				let newPropertySetting = new Setting(containerEl)
@@ -1468,19 +1318,6 @@ export class PPSettingTab extends PluginSettingTab {
 					)
 			}
 
-
-
-
-
-
-
-
-
-
-
-			
-
-
 			new Setting(containerEl)
 			.setName(i18n.t("SHOW_HIDDEN_PROPERTIES_LIST"))
 			.addToggle(toggle => {
@@ -1492,18 +1329,9 @@ export class PPSettingTab extends PluginSettingTab {
 				})
 			});
 
-
-
-
-
-
-
 			if (this.plugin.settings.showHiddenSettings) { 
-
 				let hiddenSettingsEl = containerEl.createEl("div")
-
 				const addHiddenSetting = (property: string) => {
-
 					let propertyHiddenSetting = new Setting(hiddenSettingsEl)
 
 					propertyHiddenSetting.addText(text => {
@@ -1536,7 +1364,6 @@ export class PPSettingTab extends PluginSettingTab {
 					addHiddenSetting(property)
 				}
 
-
 				let newProperty = ""
 				let newPropertySetting = new Setting(containerEl)
 					.setName(i18n.t("ADD_HIDDEN_PROPERTY"))
@@ -1549,26 +1376,19 @@ export class PPSettingTab extends PluginSettingTab {
 						.onClick(() => {
 							newProperty = newProperty.trim()
 							if (newProperty && !this.plugin.settings.hiddenProperties.find(p => p == newProperty)) {
-
 								this.plugin.settings.hiddenProperties.push(newProperty)
 								this.plugin.saveSettings()
 								updateHiddenProperties(this.plugin)
 								addHiddenSetting(newProperty)
-
 								let inputSetting = newPropertySetting.components[0]
 								if (inputSetting instanceof TextComponent) {
 									inputSetting.setValue("")
 								}
 							}
-								
 						})
 					)
 			}
-
-
-
 		}
-
 
 
 
@@ -1585,7 +1405,6 @@ export class PPSettingTab extends PluginSettingTab {
 				}));
 			
 			if (this.plugin.settings.enableCustomDateFormat) {
-
 				new Setting(containerEl)
 				.setName(i18n.t("CUSTOM_DATE_FORMAT"))
 				.addText(text => text
@@ -1607,9 +1426,7 @@ export class PPSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 						updateElements(this.plugin);
 					}));
-			
 			}
-
 
 			new Setting(containerEl)
 			.setName(i18n.t("ENABLE_CUSTOM_DATE_FORMAT_IN_BASES"))
@@ -1621,7 +1438,6 @@ export class PPSettingTab extends PluginSettingTab {
 					this.display();
 					updateElements(this.plugin);
 				}));
-
 
 				let format = this.plugin.settings.customDateFormat
 				if (!format) {format = "L"}
@@ -1689,13 +1505,9 @@ export class PPSettingTab extends PluginSettingTab {
 					})
 				})
 
-
 				let presentColorComponent: ColorComponent
 				let presentColorButton: ButtonComponent
 				
-				
-
-
 				let presentSEtting = new Setting(containerEl)
 				presentSEtting.controlEl.createEl("span", {text: presentDate, cls: "setting-custom-date-present"})
 				presentSEtting.setName(i18n.t("PRESENT_DATE_COLOR"))
@@ -1752,15 +1564,11 @@ export class PPSettingTab extends PluginSettingTab {
 					})
 				})
 
-
-
 				let futureColorComponent: ColorComponent
 				let futureColorButton: ButtonComponent
 				
 				let futureSetting = new Setting(containerEl)
-
 				futureSetting.controlEl.createEl("span", {text: futureDate, cls: "setting-custom-date-future"})
-
 				futureSetting.setName(i18n.t("FUTURE_DATE_COLOR"))
 				.addColorPicker(color => {
 					futureColorComponent = color
@@ -1819,20 +1627,9 @@ export class PPSettingTab extends PluginSettingTab {
 				})
 		}
 
-			
-
-
-
-
-
-
-
-
-
 
 
 		if (this.plugin.settings.settingsTab == "OTHER") {
-
 			new Setting(containerEl)
 				.setName(i18n.t("BASES_SUPPORT"))
 				.setDesc(i18n.t("RELOAD_FILES_TO_APPLY_CHANGES"))
@@ -1844,9 +1641,6 @@ export class PPSettingTab extends PluginSettingTab {
 						this.display();
 						updateBaseStyles(this.plugin)
 					}));
-
-			
-
 
 			new Setting(containerEl)
 				.setName(i18n.t("CLEAR_SETTINGS"))
@@ -1869,11 +1663,5 @@ export class PPSettingTab extends PluginSettingTab {
 						new Notice(i18n.t("CLEAR_SETTINGS_NOTICE"))
 					}))
 		}
-
-
-
-
-	
-	
 	}
 }
