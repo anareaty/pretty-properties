@@ -127,7 +127,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 								handlePillMenu(e, targetEl, this);
 							}
 						}
-						if (targetEl.closest(".cm-hashtag")) {
+						if (targetEl.closest(".cm-hashtag") &&
+						this.settings.enableColoredInlineTags) {
 							handleTagMenu(e, targetEl, this);
 						}
 					}
