@@ -1,6 +1,16 @@
 import { App, Notice, PluginSettingTab, Setting, Menu, MenuItem, TextComponent, ColorComponent, ButtonComponent, moment } from 'obsidian';
 import { i18n } from './localization';
 import PrettyPropertiesPlugin from "./main";
+import { updateElements } from './utils/updates/updateElements';
+import { updateBaseStyles } from './utils/updates/updateStyles';
+import { 
+	updateBannerStyles, 
+	updateCoverStyles, 
+	updateIconStyles,
+	updateHiddenProperties,
+	updatePillColors,
+	updateRelativeDateColors
+} from './utils/updates/updateStyles';
 
 export interface PPPluginSettings {
     mySetting: string;
@@ -78,6 +88,10 @@ export interface PPPluginSettings {
 	allTNAndCheckboxTasksCount: string;
     completedTNAndCheckboxTasksCount: string;
     uncompletedTNAndCheckboxTasksCount: string;
+	enableColoredProperties: boolean;
+	enableColoredInlineTags: boolean;
+	nonLatinTagsSupport: boolean;
+	enableColorButton: boolean;
 	
 	
 }
@@ -158,11 +172,15 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	allTNAndCheckboxTasksCount: "tn_and_checkbox_tasks",
     completedTNAndCheckboxTasksCount: "tn_and_checkbox_tasks_completed",
     uncompletedTNAndCheckboxTasksCount: "tn_and_checkbox_tasks_uncompleted",
+	enableColoredProperties: true,
+	enableColoredInlineTags: false,
+	nonLatinTagsSupport: false,
+	enableColorButton: true
 
 }
 
 
-export default class PPSettingTab extends PluginSettingTab {
+export class PPSettingTab extends PluginSettingTab {
 	plugin: PrettyPropertiesPlugin;
 
 	constructor(app: App, plugin: PrettyPropertiesPlugin) {
@@ -202,8 +220,8 @@ export default class PPSettingTab extends PluginSettingTab {
 						this.plugin.settings.enableBanner = value
 						await this.plugin.saveSettings();
 						this.display();
-						this.plugin.updateElements();
-						this.plugin.updateBannerStyles();
+						updateElements(this.plugin);
+						updateBannerStyles(this.plugin);
 					}));
 
 			if (this.plugin.settings.enableBanner) {
@@ -215,7 +233,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.bannerProperty = value;
 						await this.plugin.saveSettings();
-						this.plugin.updateElements();
+						updateElements(this.plugin);
 					}));
 
 				new Setting(containerEl)
@@ -226,7 +244,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.bannerPositionProperty = value;
 						await this.plugin.saveSettings();
-						this.plugin.updateElements();
+						updateElements(this.plugin);
 					}));
 
 				new Setting(containerEl)
@@ -245,7 +263,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.bannerFading = value
 						await this.plugin.saveSettings();
-						this.plugin.updateBannerStyles();
+						updateBannerStyles(this.plugin);
 					}));
 
 				new Setting(containerEl)
@@ -258,7 +276,7 @@ export default class PPSettingTab extends PluginSettingTab {
 						if (!value) value = "0"
 						this.plugin.settings.bannerHeight = Number(value);
 						await this.plugin.saveSettings();
-						this.plugin.updateBannerStyles();
+						updateBannerStyles(this.plugin);
 					})
 				});
 
@@ -272,7 +290,7 @@ export default class PPSettingTab extends PluginSettingTab {
 						if (!value) value = "0"
 						this.plugin.settings.bannerHeightMobile = Number(value);
 						await this.plugin.saveSettings();
-						this.plugin.updateBannerStyles();
+						updateBannerStyles(this.plugin);
 					})
 				});
 
@@ -287,7 +305,7 @@ export default class PPSettingTab extends PluginSettingTab {
 						if (!value) value = "0"
 						this.plugin.settings.bannerMargin = Number(value);
 						await this.plugin.saveSettings();
-						this.plugin.updateBannerStyles();
+						updateBannerStyles(this.plugin);
 					})
 				});
 
@@ -303,7 +321,7 @@ export default class PPSettingTab extends PluginSettingTab {
 						if (!value) value = "0"
 						this.plugin.settings.bannerMarginMobile = Number(value);
 						await this.plugin.saveSettings();
-						this.plugin.updateBannerStyles();
+						updateBannerStyles(this.plugin);
 					})
 				});
 
@@ -319,7 +337,7 @@ export default class PPSettingTab extends PluginSettingTab {
 						if (!value) value = "0"
 						this.plugin.settings.bannerIconGap = Number(value);
 						await this.plugin.saveSettings();
-						this.plugin.updateIconStyles();
+						updateIconStyles(this.plugin);
 					})
 				});
 
@@ -336,7 +354,7 @@ export default class PPSettingTab extends PluginSettingTab {
 						if (!value) value = "0"
 						this.plugin.settings.bannerIconGapMobile = Number(value);
 						await this.plugin.saveSettings();
-						this.plugin.updateIconStyles();
+						updateIconStyles(this.plugin);
 					})
 				});
 
@@ -360,8 +378,8 @@ export default class PPSettingTab extends PluginSettingTab {
 						this.plugin.settings.enableIcon = value
 						await this.plugin.saveSettings();
 						this.display();
-						this.plugin.updateElements();
-						this.plugin.updateIconStyles();
+						updateElements(this.plugin);
+						updateIconStyles(this.plugin);
 					}));
 
 
@@ -374,7 +392,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.iconProperty = value;
 						await this.plugin.saveSettings();
-						this.plugin.updateElements();
+						updateElements(this.plugin);
 					}));
 
 				new Setting(containerEl)
@@ -396,7 +414,7 @@ export default class PPSettingTab extends PluginSettingTab {
 						if (!value) value = "0"
 						this.plugin.settings.iconSize = Number(value);
 						await this.plugin.saveSettings();
-						this.plugin.updateIconStyles();
+						updateIconStyles(this.plugin);
 					})
 				});
 
@@ -408,7 +426,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.iconColor = value
 						await this.plugin.saveSettings();
-						this.plugin.updateIconStyles();
+						updateIconStyles(this.plugin);
 					})
 				)
 
@@ -421,7 +439,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.iconBackground = value
 						await this.plugin.saveSettings();
-						this.plugin.updateIconStyles();
+						updateIconStyles(this.plugin);
 					}));
 
 
@@ -437,7 +455,7 @@ export default class PPSettingTab extends PluginSettingTab {
 						if (!value) value = "0"
 						this.plugin.settings.iconLeftMargin = Number(value);
 						await this.plugin.saveSettings();
-						this.plugin.updateIconStyles();
+						updateIconStyles(this.plugin);
 					})
 				});
 
@@ -458,7 +476,7 @@ export default class PPSettingTab extends PluginSettingTab {
 						if (!value) value = "0"
 						this.plugin.settings.iconTopMarginWithoutBanner = Number(value);
 						await this.plugin.saveSettings();
-						this.plugin.updateIconStyles();
+						updateIconStyles(this.plugin);
 					})
 				});
 
@@ -474,7 +492,7 @@ export default class PPSettingTab extends PluginSettingTab {
 						if (!value) value = "0"
 						this.plugin.settings.iconTopMargin = Number(value);
 						await this.plugin.saveSettings();
-						this.plugin.updateIconStyles();
+						updateIconStyles(this.plugin);
 					})
 				});
 
@@ -490,7 +508,7 @@ export default class PPSettingTab extends PluginSettingTab {
 						if (!value) value = "0"
 						this.plugin.settings.iconTopMarginMobile = Number(value);
 						await this.plugin.saveSettings();
-						this.plugin.updateIconStyles();
+						updateIconStyles(this.plugin);
 					})
 				});
 
@@ -506,7 +524,7 @@ export default class PPSettingTab extends PluginSettingTab {
 						if (!value) value = "0"
 						this.plugin.settings.iconGap = Number(value);
 						await this.plugin.saveSettings();
-						this.plugin.updateIconStyles();
+						updateIconStyles(this.plugin);
 					})
 				});
 
@@ -532,8 +550,8 @@ export default class PPSettingTab extends PluginSettingTab {
 						this.plugin.settings.enableCover = value
 						await this.plugin.saveSettings();
 						this.display();
-						this.plugin.updateElements()
-						this.plugin.updateCoverStyles()
+						updateElements(this.plugin);
+						updateCoverStyles(this.plugin)
 					}));
 
 			if (this.plugin.settings.enableCover) {
@@ -547,7 +565,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.coverProperty = value;
 						await this.plugin.saveSettings();
-						this.plugin.updateElements()
+						updateElements(this.plugin);
 					}));
 
 				new Setting(containerEl)
@@ -582,7 +600,7 @@ export default class PPSettingTab extends PluginSettingTab {
 						.onChange(async (value) => {
 							this.plugin.settings.extraCoverProperties[i] = value;
 							await this.plugin.saveSettings();
-							this.plugin.updateElements()
+							updateElements(this.plugin);
 						}))
 					.addButton(button => button
 					.setIcon("x")
@@ -608,7 +626,7 @@ export default class PPSettingTab extends PluginSettingTab {
 						if (!value) value = "0"
 						this.plugin.settings.coverMaxHeight = Number(value);
 						await this.plugin.saveSettings();
-						this.plugin.updateCoverStyles();
+						updateCoverStyles(this.plugin);
 					})
 				});
 
@@ -622,7 +640,7 @@ export default class PPSettingTab extends PluginSettingTab {
 						if (!value) value = "0"
 						this.plugin.settings.coverDefaultWidth1 = Number(value);
 						await this.plugin.saveSettings();
-						this.plugin.updateCoverStyles();
+						updateCoverStyles(this.plugin);
 					})
 				});
 
@@ -636,7 +654,7 @@ export default class PPSettingTab extends PluginSettingTab {
 						if (!value) value = "0"
 						this.plugin.settings.coverDefaultWidth2 = Number(value);
 						await this.plugin.saveSettings();
-						this.plugin.updateCoverStyles();
+						updateCoverStyles(this.plugin);
 					})
 				});
 
@@ -650,7 +668,7 @@ export default class PPSettingTab extends PluginSettingTab {
 						if (!value) value = "0"
 						this.plugin.settings.coverDefaultWidth3 = Number(value);
 						await this.plugin.saveSettings();
-						this.plugin.updateCoverStyles();
+						updateCoverStyles(this.plugin);
 					})
 				});
 
@@ -668,7 +686,7 @@ export default class PPSettingTab extends PluginSettingTab {
 						if (!value) value = "0"
 						this.plugin.settings.coverVerticalWidth = Number(value);
 						await this.plugin.saveSettings();
-						this.plugin.updateCoverStyles();
+						updateCoverStyles(this.plugin);
 					})
 				});
 
@@ -682,7 +700,7 @@ export default class PPSettingTab extends PluginSettingTab {
 						if (!value) value = "0"
 						this.plugin.settings.coverHorizontalWidth = Number(value);
 						await this.plugin.saveSettings();
-						this.plugin.updateCoverStyles();
+						updateCoverStyles(this.plugin);
 					})
 				});
 
@@ -696,7 +714,7 @@ export default class PPSettingTab extends PluginSettingTab {
 						if (!value) value = "0"
 						this.plugin.settings.coverSquareWidth = Number(value);
 						await this.plugin.saveSettings();
-						this.plugin.updateCoverStyles();
+						updateCoverStyles(this.plugin);
 					})
 				});
 
@@ -710,7 +728,7 @@ export default class PPSettingTab extends PluginSettingTab {
 						if (!value) value = "0"
 						this.plugin.settings.coverCircleWidth = Number(value);
 						await this.plugin.saveSettings();
-						this.plugin.updateCoverStyles();
+						updateCoverStyles(this.plugin);
 					})
 				});
 			}
@@ -743,7 +761,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.allTasksCount = value;
 						await this.plugin.saveSettings();
-						this.plugin.updateElements();
+						updateElements(this.plugin);
 					}));
 
 				new Setting(containerEl)
@@ -754,7 +772,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.uncompletedTasksCount = value;
 						await this.plugin.saveSettings();
-						this.plugin.updateElements();
+						updateElements(this.plugin);
 					}));
 
 				new Setting(containerEl)
@@ -765,7 +783,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.completedTasksCount = value;
 						await this.plugin.saveSettings();
-						this.plugin.updateElements();
+						updateElements(this.plugin);
 					}));
 
 				
@@ -794,7 +812,7 @@ export default class PPSettingTab extends PluginSettingTab {
 						valueArr = Array.from(new Set(valueArr))
 						this.plugin.settings.uncompletedTasksStatuses = valueArr;
 						await this.plugin.saveSettings();
-						this.plugin.updateElements();
+						updateElements(this.plugin);
 					}));
 
 				new Setting(containerEl)
@@ -817,7 +835,7 @@ export default class PPSettingTab extends PluginSettingTab {
 						valueArr = Array.from(new Set(valueArr))
 						this.plugin.settings.completedTasksStatuses = valueArr;
 						await this.plugin.saveSettings();
-						this.plugin.updateElements();
+						updateElements(this.plugin);
 					}));
 			}
 
@@ -852,7 +870,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.allTNProjectTasksCount = value;
 						await this.plugin.saveSettings();
-						this.plugin.updateElements();
+						updateElements(this.plugin);
 					}));
 
 
@@ -864,7 +882,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.completedTNProjectTasksCount = value;
 						await this.plugin.saveSettings();
-						this.plugin.updateElements();
+						updateElements(this.plugin);
 					}));
 
 
@@ -876,7 +894,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.uncompletedTNProjectTasksCount = value;
 						await this.plugin.saveSettings();
-						this.plugin.updateElements();
+						updateElements(this.plugin);
 					}));
 
 
@@ -888,7 +906,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.allTNInlineTasksCount = value;
 						await this.plugin.saveSettings();
-						this.plugin.updateElements();
+						updateElements(this.plugin);
 					}));
 
 
@@ -900,7 +918,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.completedTNInlineTasksCount = value;
 						await this.plugin.saveSettings();
-						this.plugin.updateElements();
+						updateElements(this.plugin);
 					}));
 
 				
@@ -912,7 +930,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.uncompletedTNInlineTasksCount = value;
 						await this.plugin.saveSettings();
-						this.plugin.updateElements();
+						updateElements(this.plugin);
 					}));
 
 				
@@ -926,7 +944,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.allTNTasksCount = value;
 						await this.plugin.saveSettings();
-						this.plugin.updateElements();
+						updateElements(this.plugin);
 					}));
 
 
@@ -938,7 +956,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.completedTNTasksCount = value;
 						await this.plugin.saveSettings();
-						this.plugin.updateElements();
+						updateElements(this.plugin);
 					}));
 
 
@@ -950,7 +968,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.uncompletedTNTasksCount = value;
 						await this.plugin.saveSettings();
-						this.plugin.updateElements();
+						updateElements(this.plugin);
 					}));
 
 				
@@ -962,7 +980,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.allTNAndCheckboxTasksCount = value;
 						await this.plugin.saveSettings();
-						this.plugin.updateElements();
+						updateElements(this.plugin);
 					}));
 
 
@@ -974,7 +992,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.completedTNAndCheckboxTasksCount = value;
 						await this.plugin.saveSettings();
-						this.plugin.updateElements();
+						updateElements(this.plugin);
 					}));
 
 
@@ -986,7 +1004,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.uncompletedTNAndCheckboxTasksCount = value;
 						await this.plugin.saveSettings();
-						this.plugin.updateElements();
+						updateElements(this.plugin);
 					}));
 
 				
@@ -1023,9 +1041,48 @@ export default class PPSettingTab extends PluginSettingTab {
 				.onChange((value) => {
 					this.plugin.settings.addPillPadding = value
 					this.plugin.saveSettings()
-					this.plugin.updatePillColors()
+					updatePillColors(this.plugin)
 				})
 			)
+
+
+			new Setting(containerEl)
+			.setName(i18n.t("ENABLE_COLORED_PROPERTIES"))
+			.addToggle(toggle => {
+				toggle.setValue(this.plugin.settings.enableColoredProperties)
+				.onChange(value => {
+					this.plugin.settings.enableColoredProperties = value
+					this.plugin.saveSettings()
+					updatePillColors(this.plugin)
+					updateElements(this.plugin);
+				})
+			});
+
+
+			new Setting(containerEl)
+			.setName(i18n.t("ENABLE_COLORED_INLINE_TAGS"))
+			.addToggle(toggle => {
+				toggle.setValue(this.plugin.settings.enableColoredInlineTags)
+				.onChange(value => {
+					this.plugin.settings.enableColoredInlineTags = value
+					this.plugin.saveSettings()
+					updatePillColors(this.plugin)
+					
+				})
+			});
+
+
+			new Setting(containerEl)
+			.setName(i18n.t("ENABLE_NON_LATIN_TAGS_SUPPORT"))
+			.setDesc(i18n.t("ENABLE_NON_LATIN_TAGS_SUPPORT_DESC"))
+			.addToggle(toggle => {
+				toggle.setValue(this.plugin.settings.nonLatinTagsSupport)
+				.onChange(value => {
+					this.plugin.settings.nonLatinTagsSupport = value
+					this.plugin.saveSettings()
+					updatePillColors(this.plugin)
+				})
+			});
 
 
 			new Setting(containerEl)
@@ -1036,7 +1093,7 @@ export default class PPSettingTab extends PluginSettingTab {
 				.onChange(value => {
 					this.plugin.settings.addBaseTagColor = value
 					this.plugin.saveSettings()
-					this.plugin.updatePillColors()
+					updatePillColors(this.plugin)
 				})
 			});
 
@@ -1049,9 +1106,37 @@ export default class PPSettingTab extends PluginSettingTab {
 				.onChange(value => {
 					this.plugin.settings.styleFormulaTags = value
 					this.plugin.saveSettings()
-					this.plugin.updatePillColors()
+					updatePillColors(this.plugin)
 				})
 			});
+
+
+
+			new Setting(containerEl)
+				.setName(i18n.t("SHOW_COLOR_BUTTON_FOR_TEXT"))
+				.addToggle(toggle => toggle
+					.setValue(this.plugin.settings.enableColorButton)
+					.onChange(async (value) => {
+						this.plugin.settings.enableColorButton = value
+						await this.plugin.saveSettings();
+						this.display();
+						updateElements(this.plugin);
+					}));
+
+
+
+
+			new Setting(containerEl)
+				.setName(i18n.t("SHOW_COLOR_BUTTON_FOR_TEXT_IN_BASES"))
+				.setDesc(i18n.t("SHOW_COLOR_BUTTON_FOR_TEXT_IN_BASES_DESC"))
+				.addToggle(toggle => toggle
+					.setValue(this.plugin.settings.enableColorButtonInBases)
+					.onChange(async (value) => {
+						this.plugin.settings.enableColorButtonInBases = value
+						await this.plugin.saveSettings();
+						this.display();
+						updateBaseStyles(this.plugin)
+					}));
 
 
 			new Setting(containerEl)
@@ -1073,9 +1158,8 @@ export default class PPSettingTab extends PluginSettingTab {
 				const addColorSetting = (property: string) => {
 					let currentColor = this.plugin.settings.propertyPillColors[property]
 					
+					
 					let propertyColorSetting = new Setting(colorSettingsEl)
-
-					//propertyColorSetting.settingEl.classList.add("color-" + currentColor)
 
 					let pillEl = propertyColorSetting.nameEl.createEl("div", {
 						cls: "multi-select-pill",
@@ -1098,7 +1182,7 @@ export default class PPSettingTab extends PluginSettingTab {
 								this.plugin.settings.propertyPillColors[value] = this.plugin.settings.propertyPillColors[property]
 								delete this.plugin.settings.propertyPillColors[property]
 								this.plugin.saveSettings()
-								this.plugin.updatePillColors()
+								updatePillColors(this.plugin)
 								this.display()
 							}
 						}
@@ -1113,18 +1197,20 @@ export default class PPSettingTab extends PluginSettingTab {
 									propertyColorButton.buttonEl.classList.remove(cls)
 								}
 							})
-							//propertyColorButton.buttonEl.classList.add("color-" + value)
 
 							let hsl = color.getValueHsl()
 
 							this.plugin.settings.propertyPillColors[property] = hsl
 							this.plugin.saveSettings()
-							this.plugin.updatePillColors()
+							updatePillColors(this.plugin)
 						})
 					})
 					.addButton(btn => {
 						propertyColorButton = btn
-						//btn.buttonEl.classList.add("color-" + this.plugin.settings.propertyPillColors[property])
+
+						if (typeof this.plugin.settings.propertyPillColors[property] == "string") {
+							btn.buttonEl.classList.add("color-" + this.plugin.settings.propertyPillColors[property])
+						}
 						
 						btn
 						.setIcon("paintbrush")
@@ -1160,7 +1246,7 @@ export default class PPSettingTab extends PluginSettingTab {
 
 										this.plugin.settings.propertyPillColors[property] = color
 										this.plugin.saveSettings()
-										this.plugin.updatePillColors()
+										updatePillColors(this.plugin)
 
 									})
 
@@ -1177,7 +1263,7 @@ export default class PPSettingTab extends PluginSettingTab {
 							delete this.plugin.settings.propertyPillColors[property]
 							this.plugin.saveSettings()
 							propertyColorSetting.settingEl.remove()
-							this.plugin.updatePillColors()
+							updatePillColors(this.plugin)
 						})
 					)
 				}
@@ -1244,8 +1330,6 @@ export default class PPSettingTab extends PluginSettingTab {
 					
 					let propertyColorSetting = new Setting(colorSettingsEl)
 
-					propertyColorSetting.settingEl.classList.add("color-" + currentColor)
-
 					let pillEl = propertyColorSetting.nameEl.createEl("div", {
 						text: property,
 						cls: "metadata-input-longtext",
@@ -1267,14 +1351,14 @@ export default class PPSettingTab extends PluginSettingTab {
 								this.plugin.settings.propertyLongtextColors[value] = this.plugin.settings.propertyLongtextColors[property]
 								delete this.plugin.settings.propertyLongtextColors[property]
 								this.plugin.saveSettings()
-								this.plugin.updatePillColors()
+								updatePillColors(this.plugin)
 								this.display()
 							}
 						}
 					})
 					.addColorPicker(color => {
 						propertyColorComponent = color
-						color.setValue(this.plugin.settings.propertyLongtextColors[property])
+						color.setValueHsl(this.plugin.settings.propertyLongtextColors[property])
 						.onChange(async (value) => {
 							
 							propertyColorButton.buttonEl.classList.forEach(cls => {
@@ -1282,15 +1366,19 @@ export default class PPSettingTab extends PluginSettingTab {
 									propertyColorButton.buttonEl.classList.remove(cls)
 								}
 							})
-							propertyColorButton.buttonEl.classList.add("color-" + value)
+							
 
-							this.plugin.settings.propertyLongtextColors[property] = value
+							let hsl = color.getValueHsl()
+
+							this.plugin.settings.propertyLongtextColors[property] = hsl
 							this.plugin.saveSettings()
-							this.plugin.updatePillColors()
+							updatePillColors(this.plugin)
 						})
 					})
 					.addButton(btn => {
 						propertyColorButton = btn
+
+						if (typeof this.plugin.settings.propertyLongtextColors[property] == "string")
 						btn.buttonEl.classList.add("color-" + this.plugin.settings.propertyLongtextColors[property])
 						btn
 						.setIcon("paintbrush")
@@ -1326,7 +1414,7 @@ export default class PPSettingTab extends PluginSettingTab {
 
 										this.plugin.settings.propertyLongtextColors[property] = color
 										this.plugin.saveSettings()
-										this.plugin.updatePillColors()
+										updatePillColors(this.plugin)
 
 									})
 
@@ -1343,7 +1431,7 @@ export default class PPSettingTab extends PluginSettingTab {
 							delete this.plugin.settings.propertyLongtextColors[property]
 							this.plugin.saveSettings()
 							propertyColorSetting.settingEl.remove()
-							this.plugin.updatePillColors()
+							updatePillColors(this.plugin)
 						})
 					)
 				}
@@ -1427,7 +1515,7 @@ export default class PPSettingTab extends PluginSettingTab {
 								this.plugin.settings.hiddenProperties.push(value)
 								this.plugin.settings.hiddenProperties = this.plugin.settings.hiddenProperties.filter(p => p != property)
 								this.plugin.saveSettings()
-								this.plugin.updateHiddenProperties()
+								updateHiddenProperties(this.plugin)
 								this.display()
 							}
 						}
@@ -1439,7 +1527,7 @@ export default class PPSettingTab extends PluginSettingTab {
 							this.plugin.settings.hiddenProperties = this.plugin.settings.hiddenProperties.filter(p => p != property)
 							this.plugin.saveSettings()
 							propertyHiddenSetting.settingEl.remove()
-							this.plugin.updateHiddenProperties()
+							updateHiddenProperties(this.plugin)
 						})
 					)
 				}
@@ -1464,7 +1552,7 @@ export default class PPSettingTab extends PluginSettingTab {
 
 								this.plugin.settings.hiddenProperties.push(newProperty)
 								this.plugin.saveSettings()
-								this.plugin.updateHiddenProperties()
+								updateHiddenProperties(this.plugin)
 								addHiddenSetting(newProperty)
 
 								let inputSetting = newPropertySetting.components[0]
@@ -1493,7 +1581,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					this.plugin.settings.enableCustomDateFormat = value
 					await this.plugin.saveSettings();
 					this.display();
-					this.plugin.updateElements()
+					updateElements(this.plugin);
 				}));
 			
 			if (this.plugin.settings.enableCustomDateFormat) {
@@ -1506,7 +1594,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.customDateFormat = value;
 						await this.plugin.saveSettings();
-						this.plugin.updateElements()
+						updateElements(this.plugin);
 					}));
 
 				new Setting(containerEl)
@@ -1517,7 +1605,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.customDateTimeFormat = value;
 						await this.plugin.saveSettings();
-						this.plugin.updateElements()
+						updateElements(this.plugin);
 					}));
 			
 			}
@@ -1531,7 +1619,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					this.plugin.settings.enableCustomDateFormatInBases = value
 					await this.plugin.saveSettings();
 					this.display();
-					this.plugin.updateElements()
+					updateElements(this.plugin);
 				}));
 
 
@@ -1554,7 +1642,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.datePastColor = value
 						await this.plugin.saveSettings();
-						this.plugin.updateRelativeDateColors();
+						updateRelativeDateColors(this.plugin);
 						pastColorButton.buttonEl.classList.forEach(cls => {
 							if (cls.startsWith("color")) {
 								pastColorButton.buttonEl.classList.remove(cls)
@@ -1585,7 +1673,7 @@ export default class PPSettingTab extends PluginSettingTab {
 									pastColorComponent.setValue("")
 									this.plugin.settings.datePastColor = color
 									this.plugin.saveSettings()
-									this.plugin.updateRelativeDateColors()
+									updateRelativeDateColors(this.plugin)
 
 									btn.buttonEl.classList.forEach(cls => {
 										if (cls.startsWith("color")) {
@@ -1617,7 +1705,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.datePresentColor = value
 						await this.plugin.saveSettings();
-						this.plugin.updateRelativeDateColors();
+						updateRelativeDateColors(this.plugin);
 						presentColorButton.buttonEl.classList.forEach(cls => {
 							if (cls.startsWith("color")) {
 								presentColorButton.buttonEl.classList.remove(cls)
@@ -1648,7 +1736,7 @@ export default class PPSettingTab extends PluginSettingTab {
 									presentColorComponent.setValue("")
 									this.plugin.settings.datePresentColor = color
 									this.plugin.saveSettings()
-									this.plugin.updateRelativeDateColors()
+									updateRelativeDateColors(this.plugin)
 
 									btn.buttonEl.classList.forEach(cls => {
 										if (cls.startsWith("color")) {
@@ -1680,7 +1768,7 @@ export default class PPSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.dateFutureColor = value
 						await this.plugin.saveSettings();
-						this.plugin.updateRelativeDateColors();
+						updateRelativeDateColors(this.plugin);
 						futureColorButton.buttonEl.classList.forEach(cls => {
 							if (cls.startsWith("color")) {
 								futureColorButton.buttonEl.classList.remove(cls)
@@ -1711,7 +1799,7 @@ export default class PPSettingTab extends PluginSettingTab {
 									futureColorComponent.setValue("")
 									this.plugin.settings.dateFutureColor = color
 									this.plugin.saveSettings()
-									this.plugin.updateRelativeDateColors()
+									updateRelativeDateColors(this.plugin)
 
 									btn.buttonEl.classList.forEach(cls => {
 										if (cls.startsWith("color")) {
@@ -1754,20 +1842,10 @@ export default class PPSettingTab extends PluginSettingTab {
 						this.plugin.settings.enableBases = value
 						await this.plugin.saveSettings();
 						this.display();
-						this.plugin.updateBaseStyles()
+						updateBaseStyles(this.plugin)
 					}));
 
-			new Setting(containerEl)
-				.setName(i18n.t("SHOW_COLOR_BUTTON_FOR_TEXT_IN_BASES"))
-				.setDesc(i18n.t("SHOW_COLOR_BUTTON_FOR_TEXT_IN_BASES_DESC"))
-				.addToggle(toggle => toggle
-					.setValue(this.plugin.settings.enableColorButtonInBases)
-					.onChange(async (value) => {
-						this.plugin.settings.enableColorButtonInBases = value
-						await this.plugin.saveSettings();
-						this.display();
-						this.plugin.updateBaseStyles()
-					}));
+			
 
 
 			new Setting(containerEl)
@@ -1781,12 +1859,12 @@ export default class PPSettingTab extends PluginSettingTab {
 						this.plugin.settings.propertyPillColors = {}
 						this.plugin.settings.hiddenProperties = []
 						await this.plugin.saveSettings();
-						this.plugin.updateElements()
-						this.plugin.updateHiddenProperties()
-						this.plugin.updatePillColors()
-						this.plugin.updateBannerStyles()
-						this.plugin.updateIconStyles()
-						this.plugin.updateCoverStyles()
+						updateElements(this.plugin);
+						updateHiddenProperties(this.plugin)
+						updatePillColors(this.plugin)
+						updateBannerStyles(this.plugin)
+						updateIconStyles(this.plugin)
+						updateCoverStyles(this.plugin)
 						this.display();
 						new Notice(i18n.t("CLEAR_SETTINGS_NOTICE"))
 					}))

@@ -1,0 +1,88 @@
+import { TFile, CachedMetadata, MarkdownView, FileView } from "obsidian";
+import PrettyPropertiesPlugin from "src/main";
+import { updateBaseLeafPills } from "./updateBasePills";
+import { updateBaseLeafProgress } from "./updateBaseProgress";
+import { addClassestoProperties } from "./updatePills";
+import { updateDateInputs } from "./updateDates";
+import { updateCoverImages } from "./updateCovers";
+import { updateBannerImages } from "./updateBanners";
+import { updateIcons } from "./updateIcons";
+import { updateTasksCount } from "../taskCount";
+import { updateTaskNotesTaskCount } from "../taskNotesTaskCount";
+import { updateViewProgress } from "./updateProgress";
+
+
+export const updateElements = (plugin: PrettyPropertiesPlugin, changedFile?: TFile | null, cache?: CachedMetadata | null) => {
+
+    let leaves = plugin.app.workspace.getLeavesOfType("markdown");
+    for (let leaf of leaves) {
+        if (leaf.view instanceof MarkdownView) {
+            if (
+                changedFile &&
+                leaf.view.file &&
+                leaf.view.file.path != changedFile.path
+            ) {
+                continue;
+            }
+            updateLeafElements(plugin, leaf.view, cache);
+        }
+    }
+
+    let propLeaves = plugin.app.workspace.getLeavesOfType("file-properties");
+    for (let leaf of propLeaves) {
+        if (leaf.view instanceof FileView) {
+            if (
+                changedFile &&
+                leaf.view.file &&
+                leaf.view.file.path != changedFile.path
+            ) {
+                continue;
+            }
+            updateLeafElements(plugin, leaf.view, cache);
+        }
+    }
+
+    let baseLeaves = plugin.app.workspace.getLeavesOfType("bases");
+    for (let leaf of baseLeaves) {
+        if (leaf.view instanceof FileView) {
+            updateBaseLeafPills(leaf, plugin);
+            updateBaseLeafProgress(leaf, plugin);
+        }
+    }
+}
+
+
+
+
+
+const updateLeafElements = async (
+    plugin: PrettyPropertiesPlugin,
+    view: MarkdownView | FileView,
+    cache?: CachedMetadata | null
+) => {
+    addClassestoProperties(view, plugin);
+    updateDateInputs(view, plugin)
+
+    if (!cache && view.file) {
+        cache = plugin.app.metadataCache.getFileCache(view.file);
+    }
+    let frontmatter;
+    if (cache) {
+        frontmatter = cache.frontmatter;
+    }
+
+    if (view instanceof MarkdownView) {
+        updateCoverImages(view, frontmatter, plugin);
+        updateIcons(view, frontmatter, plugin);
+        updateBannerImages(view, frontmatter, plugin);
+
+        if (cache && frontmatter && plugin.settings.enableTasksCount) {
+            updateTasksCount(view, cache, plugin);
+        }
+
+        if (cache && frontmatter && plugin.settings.enableTaskNotesCount) {
+            updateTaskNotesTaskCount(plugin, null, view)
+        }
+    }
+    updateViewProgress(view, plugin);
+}

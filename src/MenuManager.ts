@@ -31,13 +31,6 @@ export default class MenuManager {
 		for (const action of actions) action();
 	}
 
-
-
-	
-
-
-
-
 	/**
 	 * Add a menu item.
 	 */
@@ -72,30 +65,18 @@ export default class MenuManager {
 			}
 
 			if (existingItem) return this
-			
-
 			if (typeof preSections === 'string') preSections = [preSections];
 
 			this.menu.addItem(item => {
-
-			
-
-
 				callback(item);
-
-
-
 
 				// @ts-expect-error (Private API)
 				const section: string = item.section;
 				// @ts-expect-error (Private API)
 				const sections: string[] = this.menu?.sections ?? [];
-
-				
-
 				let index = 0;
 				for (const preSection of preSections) {
-					
+			
 					if (sections.includes(preSection)) {
 						index = sections.lastIndexOf(preSection) + 1;
 						break;
@@ -110,9 +91,6 @@ export default class MenuManager {
 		}
 		return this;
 	}
-
-
-	
 
 	/**
 	 * Add a separator.

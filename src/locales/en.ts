@@ -141,6 +141,11 @@ export default {
   TASKNOTES_AND_CHECKBOX_COUNT_PROPERTY: "Property to count all TaskNotes tasks and checkbox tasks",
   TASKNOTES_AND_CHECKBOX_COMPLETED_COUNT_PROPERTY: "Property to count completed TaskNotes tasks and checkbox tasks",
   TASKNOTES_AND_CHECKBOX_UNCOMPLETED_COUNT_PROPERTY: "Property to count uncompleted TaskNotes tasks and checkbox tasks",
+  ENABLE_COLORED_PROPERTIES: "Enable colored properties",
+  ENABLE_COLORED_INLINE_TAGS: "Enable colored inline tags",
+  ENABLE_NON_LATIN_TAGS_SUPPORT: "Enable non-latin tags styling support",
+  ENABLE_NON_LATIN_TAGS_SUPPORT_DESC: "Enable if you use tags with non-latin characters and want to see them colored in live preview (need to reload).",
+  SHOW_COLOR_BUTTON_FOR_TEXT: "Show color buttons when hovering over text properties"
 
 
 

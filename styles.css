@@ -664,6 +664,7 @@ body {
 
 body {
   --longtext-margin: 0;
+  --metadata-input-text-color-modified: var(--metadata-input-text-color);
 }
 
 .metadata-input-longtext {
@@ -674,6 +675,15 @@ body {
   max-width: fit-content;
   background-color: var(--longtext-bg-color); 
 }
+
+
+.metadata-property-value:not(:hover) .metadata-input-longtext,
+.setting-item .metadata-input-longtext {
+    color: var(--metadata-input-text-color-modified);
+}
+
+
+
 
 .bases-table-cell .metadata-input-longtext {
   padding: 1px var(--tag-padding-x);
@@ -908,4 +918,40 @@ button.pp-settings-tab:not(.pp-settings-tab-selected):hover {
 .cm-hashtag-begin:hover + .cm-hashtag-end,
 .cm-hashtag-begin:has(+.cm-hashtag-end:hover){
   background-color: var(--tag-background-hover);
+}
+
+
+
+.menu-item-custom-color svg {
+  background: conic-gradient(var(--color-red), var(--color-yellow), var(--color-green), var(--color-blue), var(--color-purple), var(--color-red));
+	color: transparent;
+}
+
+
+.color-picker-modal {
+  width: fit-content;
+}
+
+.color-picker-modal .setting-item-info {
+  display: none;
+}
+
+
+.color-picker-modal input {
+  height: 80px;
+  width: 80px;
+}
+
+.color-picker-modal input::-webkit-color-swatch  {
+border-radius: 50%;
+height: 100% !important;
+}
+
+
+
+
+
+
+.metadata-property-value:has(.internal-link, .external-link):hover button.longtext-color-button {
+    display: none;
 }
