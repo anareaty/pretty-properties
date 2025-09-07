@@ -27,8 +27,6 @@ import { startObservingLeaf } from "./utils/observer";
 import { getPropertyValue } from "./utils/propertyUtils";
 
 
-
-
 export default class PrettyPropertiesPlugin extends Plugin {
 	settings: PPPluginSettings;
 	mutations: any[];
