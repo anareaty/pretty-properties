@@ -2,7 +2,7 @@ import { TFile, Modal, Setting, App } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 
 
-class PositionModal extends Modal {
+export class BannerPositionModal extends Modal {
     file: TFile
     position: number
     bannerPositionProperty: string
@@ -35,13 +35,4 @@ class PositionModal extends Modal {
         const {contentEl} = this
         contentEl.empty()
     } 
-}
-
-
-export const selectBannerPosition = async(plugin: PrettyPropertiesPlugin) => {
-    let file = plugin.app.workspace.getActiveFile()
-    let bannerPositionProperty = plugin.settings.bannerPositionProperty
-    if (file instanceof TFile && bannerPositionProperty) {
-        new PositionModal(plugin.app, plugin, file, bannerPositionProperty).open()
-    }
 }

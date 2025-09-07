@@ -123,6 +123,18 @@ export const updateHiddenProperties = (plugin: PrettyPropertiesPlugin) => {
 
 
 
+const getTextLightness = (color: any) => {
+    let textLightness = 30
+    if (color.l < 80) textLightness = 20
+    if (color.l < 70) textLightness = 10
+    if (color.l < 60) textLightness = 5
+    if (color.l < 50) textLightness = 95
+    if (color.l < 40) textLightness = 90
+    if (color.l < 30) textLightness = 80
+    return textLightness
+}
+
+
 export const updatePillColors = (plugin: PrettyPropertiesPlugin) => {
     let styleText = "";
     let transparentPropsDataString = ".test,"
@@ -130,6 +142,8 @@ export const updatePillColors = (plugin: PrettyPropertiesPlugin) => {
     let propertyPillColors = plugin.settings.propertyPillColors
     let propertyLongtextColors = plugin.settings.propertyLongtextColors
     let colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink", "none", "default"]
+
+    
 
     if (plugin.settings.enableColoredProperties) {
 
@@ -144,13 +158,7 @@ export const updatePillColors = (plugin: PrettyPropertiesPlugin) => {
                 "--pill-background-hover-modified: rgba(var(--pill-color-rgb), 0.3);}\n";
             } else {
 
-                let textLightness = 30
-                if (color.l < 80) textLightness = 20
-                if (color.l < 70) textLightness = 10
-                if (color.l < 60) textLightness = 5
-                if (color.l < 50) textLightness = 95
-                if (color.l < 40) textLightness = 90
-                if (color.l < 30) textLightness = 80
+                let textLightness = getTextLightness(color)
 
                 let hslString = color.h + " ," + color.s + "% ," + color.l + "%"
                 let hslStringHover = color.h + " ," + color.s + "% ," + (color.l - 5) + "%"
@@ -192,14 +200,6 @@ export const updatePillColors = (plugin: PrettyPropertiesPlugin) => {
 
 
 
-
-
-
-
-
-
-
-
         for (let prop in tagColors) {
             let color = tagColors[prop]
 
@@ -212,13 +212,7 @@ export const updatePillColors = (plugin: PrettyPropertiesPlugin) => {
                 "--tag-background-hover-modified: rgba(var(--tag-color-rgb), 0.3);}\n";
             } else {
 
-                let textLightness = 30
-                if (color.l < 80) textLightness = 20
-                if (color.l < 70) textLightness = 10
-                if (color.l < 60) textLightness = 5
-                if (color.l < 50) textLightness = 95
-                if (color.l < 40) textLightness = 90
-                if (color.l < 30) textLightness = 80
+                let textLightness = getTextLightness(color)
 
                 let hslString = color.h + " ," + color.s + "% ," + color.l + "%"
                 let hslStringHover = color.h + " ," + color.s + "% ," + (color.l - 5) + "%"
@@ -257,16 +251,6 @@ export const updatePillColors = (plugin: PrettyPropertiesPlugin) => {
                 "[data-property-pill-value='" + prop + "'],"
             }
         }
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -361,13 +345,7 @@ export const updatePillColors = (plugin: PrettyPropertiesPlugin) => {
                 "--tag-background-hover-modified: rgba(var(--pill-color-rgb), 0.3);}\n";
             } else {
 
-                let textLightness = 30
-                if (color.l < 80) textLightness = 20
-                if (color.l < 70) textLightness = 10
-                if (color.l < 60) textLightness = 5
-                if (color.l < 50) textLightness = 95
-                if (color.l < 40) textLightness = 90
-                if (color.l < 30) textLightness = 80
+                let textLightness = getTextLightness(color)
 
                 let hslString = color.h + " ," + color.s + "% ," + color.l + "%"
                 let hslStringHover = color.h + " ," + color.s + "% ," + (color.l - 5) + "%"
@@ -400,11 +378,6 @@ export const updatePillColors = (plugin: PrettyPropertiesPlugin) => {
     } else {
         document.body.classList.remove("pp-base-tag-color")
     }
-    if (plugin.settings.styleFormulaTags) {
-        document.body.classList.add("pp-style-formula-tags")
-    } else {
-        document.body.classList.remove("pp-style-formula-tags")
-    }
 }
 
 
@@ -420,24 +393,36 @@ export const updateRelativeDateColors = (plugin: PrettyPropertiesPlugin) => {
     let pastColorString = ""
 
     if (colors.find(c => c == futureColor)) {
-        futureColorString = "--date-future-color: rgba(var(--color-" + futureColor + "-rgb), 0.2);\n"
+        futureColorString = "--date-future-background: rgba(var(--color-" + futureColor + "-rgb), 0.2);\n"
     }
     else {
-        futureColorString = "--date-future-color: " + futureColor + ";\n"
+        let textLightness = getTextLightness(futureColor)
+        let hslString = futureColor.h + " ," + futureColor.s + "% ," + futureColor.l + "%"
+        let hslStringText = futureColor.h + " ," + futureColor.s + "% ," + textLightness + "%"
+        futureColorString = "--date-future-background: hsl(" + hslString + ");\n" +
+        "--date-future-color: hsl(" + hslStringText + ");\n"
     }
 
     if (colors.find(c => c == presentColor)) {
-        presentColorString = "--date-present-color: rgba(var(--color-" + presentColor + "-rgb), 0.2);\n"
+        presentColorString = "--date-present-background: rgba(var(--color-" + presentColor + "-rgb), 0.2);\n"
     }
     else {
-        presentColorString = "--date-present-color: " + presentColor + ";\n"
+        let textLightness = getTextLightness(presentColor)
+        let hslString = presentColor.h + " ," + presentColor.s + "% ," + presentColor.l + "%"
+        let hslStringText = presentColor.h + " ," + presentColor.s + "% ," + textLightness + "%"
+        presentColorString = "--date-present-background: hsl(" + hslString + ");\n" +
+        "--date-present-color: hsl(" + hslStringText + ");\n"
     }
 
     if (colors.find(c => c == pastColor)) {
-        pastColorString = "--date-past-color: rgba(var(--color-" + pastColor + "-rgb), 0.2);\n"
+        pastColorString = "--date-past-background: rgba(var(--color-" + pastColor + "-rgb), 0.2);\n"
     }
     else {
-        pastColorString = "--date-past-color: " + pastColor + ";\n"
+        let textLightness = getTextLightness(pastColor)
+        let hslString = pastColor.h + " ," + pastColor.s + "% ," + pastColor.l + "%"
+        let hslStringText = pastColor.h + " ," + pastColor.s + "% ," + textLightness + "%"
+        pastColorString = "--date-past-background: hsl(" + hslString + ");\n" +
+        "--date-past-color: hsl(" + hslStringText + ");\n"
     }
 
     styleText = styleText + "\nbody {\n" + futureColorString + presentColorString + pastColorString + "\n}\n"

@@ -1,9 +1,9 @@
 import { Menu, MenuItem } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
-import { i18n } from "src/localization";
+import { i18n } from "src/localization/localization";
 import { updateHiddenProperties } from "src/utils/updates/updateStyles";
-import { selectIcon } from "src/utils/iconUtils";
 import { removeProperty } from "src/utils/propertyUtils";
+import { IconSuggestModal } from "src/modals/iconSuggestModal";
 
 export const createIconMenu = (e: MouseEvent, plugin: PrettyPropertiesPlugin) => {
     let propName = plugin.settings.iconProperty;
@@ -15,7 +15,7 @@ export const createIconMenu = (e: MouseEvent, plugin: PrettyPropertiesPlugin) =>
         .setIcon("lucide-image-plus")
         .setSection("pretty-properties")
         .onClick(async () => {
-            selectIcon(plugin);
+            new IconSuggestModal(plugin.app, plugin).open();
         })
     );
 

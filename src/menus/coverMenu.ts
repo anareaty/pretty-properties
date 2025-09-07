@@ -1,11 +1,11 @@
 import { TFile, Menu, MenuItem } from "obsidian";
-import { i18n } from "src/localization";
+import { i18n } from "src/localization/localization";
 import PrettyPropertiesPlugin from "src/main";
 import { updateHiddenProperties } from "src/utils/updates/updateStyles";
-import { getCurrentCoverProperty } from "src/utils/coverUtils";
-import { selectImage } from "src/utils/imageUtils";
-import { selectCoverShape } from "src/utils/coverUtils";
+import { getCurrentCoverProperty } from "src/utils/imageUtils";
+import { selectCoverShape } from "src/utils/imageUtils";
 import { removeProperty } from "src/utils/propertyUtils";
+import { ImageSuggestModal } from "src/modals/imageSuggestModal";
 
 export const createCoverMenu = (e: MouseEvent, plugin: PrettyPropertiesPlugin) => {
     let file = plugin.app.workspace.getActiveFile();
@@ -22,7 +22,16 @@ export const createCoverMenu = (e: MouseEvent, plugin: PrettyPropertiesPlugin) =
                 .setIcon("lucide-image-plus")
                 .setSection("pretty-properties")
                 .onClick(async () => {
-                    if (propName) selectImage(propName, plugin.settings.coversFolder, "cover", plugin);
+                    if (propName) {
+                        new ImageSuggestModal(
+                            plugin.app, 
+                            plugin, 
+                            propName, 
+                            plugin.settings.coversFolder,
+                            "cover"
+                        ).open();
+                    
+                    };
                 })
             );
 

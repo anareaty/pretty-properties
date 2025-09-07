@@ -1,10 +1,10 @@
 import { Menu, MenuItem } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
-import { i18n } from "src/localization";
+import { i18n } from "src/localization/localization";
 import { updateHiddenProperties } from "src/utils/updates/updateStyles";
-import { selectBannerPosition } from "src/utils/bannerUtils";
-import { selectImage } from "src/utils/imageUtils";
+import { selectBannerPosition } from "src/utils/imageUtils";
 import { removeProperty } from "src/utils/propertyUtils";
+import { ImageSuggestModal } from "src/modals/imageSuggestModal";
 
 
 export const createBannerMenu = (e: MouseEvent, plugin: PrettyPropertiesPlugin) => {
@@ -17,12 +17,13 @@ export const createBannerMenu = (e: MouseEvent, plugin: PrettyPropertiesPlugin) 
             .setIcon("image-plus")
             .setSection("pretty-properties")
             .onClick(async () => {
-                selectImage(
-                    plugin.settings.bannerProperty,
+                new ImageSuggestModal(
+                    plugin.app, 
+                    plugin, 
+                    plugin.settings.bannerProperty, 
                     plugin.settings.bannersFolder,
-                    "banner",
-                    plugin
-                );
+                    "banner"
+                ).open();
             })
     );
 

@@ -1,14 +1,14 @@
-import PrettyPropertiesPlugin from "./main";
+import PrettyPropertiesPlugin from "src/main";
 import { TFile } from "obsidian";
-import { i18n } from "./localization";
-import { selectImage } from "./utils/imageUtils";
-import { removeProperty } from "./utils/propertyUtils";
-import { selectIcon } from "./utils/iconUtils";
-import { selectCoverImage } from "./utils/coverUtils";
-import { getCurrentProperty } from "./utils/propertyUtils";
-import { getCurrentCoverProperty } from "./utils/coverUtils";
-import { selectCoverShape } from "./utils/coverUtils";
-import { selectImageForFile } from "./utils/imageUtils";
+import { i18n } from "src/localization/localization";
+import { removeProperty } from "./propertyUtils";
+import { selectCoverImage } from "./imageUtils";
+import { getCurrentProperty } from "./propertyUtils";
+import { getCurrentCoverProperty } from "./imageUtils";
+import { selectCoverShape } from "./imageUtils";
+import { FileImageSuggestModal } from "src/modals/fileImageSuggestModal";
+import { ImageSuggestModal } from "src/modals/imageSuggestModal";
+import { IconSuggestModal } from "src/modals/iconSuggestModal";
 
 
 export function registerCommands(plugin: PrettyPropertiesPlugin) {
@@ -32,12 +32,13 @@ export function registerCommands(plugin: PrettyPropertiesPlugin) {
                 plugin.settings.bannerProperty
             ) {
                 if (!checking) {
-                    selectImage(
-                        plugin.settings.bannerProperty,
+                    new ImageSuggestModal(
+                        plugin.app, 
+                        plugin, 
+                        plugin.settings.bannerProperty, 
                         plugin.settings.bannersFolder,
-                        "banner",
-                        plugin
-                    );
+                        "banner"
+                    ).open();
                 }
                 return true;
             }
@@ -79,7 +80,7 @@ export function registerCommands(plugin: PrettyPropertiesPlugin) {
                 plugin.settings.iconProperty
             ) {
                 if (!checking) {
-                    selectIcon(plugin);
+                    new IconSuggestModal(plugin.app, plugin).open();
                 }
                 return true;
             }
@@ -190,7 +191,7 @@ export function registerCommands(plugin: PrettyPropertiesPlugin) {
                         plugin.settings.iconProperty))
             ) {
                 if (!checking) {
-                    selectImageForFile(plugin);
+                    new FileImageSuggestModal(plugin.app, plugin).open();
                 }
                 return true;
             }

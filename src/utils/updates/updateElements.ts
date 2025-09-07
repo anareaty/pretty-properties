@@ -7,8 +7,8 @@ import { updateDateInputs } from "./updateDates";
 import { updateCoverImages } from "./updateCovers";
 import { updateBannerImages } from "./updateBanners";
 import { updateIcons } from "./updateIcons";
-import { updateTasksCount } from "../taskCount";
-import { updateTaskNotesTaskCount, needToUpdateTaskNotes } from "../taskNotesTaskCount";
+import { updateTasksCount } from "../taskCount/taskCount";
+import { updateTaskNotesTaskCount, needToUpdateTaskNotes } from "../taskCount/taskNotesTaskCount";
 import { updateViewProgress } from "./updateProgress";
 
 

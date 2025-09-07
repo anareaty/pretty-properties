@@ -1,6 +1,6 @@
 import { getLanguage } from 'obsidian';
-import en from './locales/en';
-import ru from './locales/ru';
+import en from 'src/localization/locales/en';
+import ru from 'src/localization/locales/ru';
 
 
 const locales: Record<string, any> = {

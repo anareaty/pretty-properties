@@ -1,10 +1,8 @@
 import { SuggestModal, TFile, App } from "obsidian";
-import PrettyPropertiesPlugin from "src/main";
-import { i18n } from "src/localization";
-import { selectImage } from "./imageUtils";
+import { i18n } from "src/localization/localization";
 
 
-class CoverShapeSuggestModal extends SuggestModal<string> {
+export class CoverShapeSuggestModal extends SuggestModal<string> {
     shapes: any
     file: TFile
 
@@ -47,43 +45,6 @@ class CoverShapeSuggestModal extends SuggestModal<string> {
                 cssclasses.push("cover-" + key);
                 fm.cssclasses = cssclasses;
             });
-        }
-    }
-}
-
-export const selectCoverShape = async(plugin: PrettyPropertiesPlugin) => {
-    let file = plugin.app.workspace.getActiveFile();
-    if (file instanceof TFile) {
-        new CoverShapeSuggestModal(plugin.app, file).open();
-    }
-}
-
-export const getCurrentCoverProperty = (plugin: PrettyPropertiesPlugin) => {
-    let propName: string | undefined;
-    let file = plugin.app.workspace.getActiveFile();
-    if (file instanceof TFile) {
-        let cache = plugin.app.metadataCache.getFileCache(file);
-        let frontmatter = cache!.frontmatter;
-        let props = [...plugin.settings.extraCoverProperties];
-        props.unshift(plugin.settings.coverProperty);
-
-        for (let prop of props) {
-            if (frontmatter?.[prop] !== undefined) {
-                propName = prop;
-                break;
-            }
-        }
-    }
-    return propName;
-}
-
-export const selectCoverImage = async (plugin: PrettyPropertiesPlugin) => {
-    let file = plugin.app.workspace.getActiveFile();
-    if (file instanceof TFile) {
-        let propName = getCurrentCoverProperty(plugin);
-        if (!propName) propName = plugin.settings.coverProperty;
-        if (propName) {
-            selectImage(propName, plugin.settings.coversFolder, "cover", plugin);
         }
     }
 }

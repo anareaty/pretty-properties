@@ -514,8 +514,7 @@ body {
 
 
 
-.pp-bases-enabled .bases-view [data-property*="note"] .value-list-element/*,
-.pp-bases-enabled.pp-style-formula-tags .bases-view [data-property="formula.tags"] .value-list-element*/ {
+.pp-bases-enabled .bases-view [data-property*="note"] .value-list-element {
     display: inline-block;
     color: var(--pill-color);
     background-color: var(--pill-background);
@@ -544,15 +543,13 @@ body {
 }
 
 
-.pp-bases-enabled.pp-base-tag-color .bases-cards-property[data-property="note.tags"] .value-list-element/*,
-.pp-bases-enabled.pp-base-tag-color.pp-style-formula-tags .bases-cards-property[data-property="formula.tags"] .value-list-element*/ {
+.pp-bases-enabled.pp-base-tag-color .bases-cards-property[data-property="note.tags"] .value-list-element {
     padding: 0 0.4em !important;
 }
 
 
 .pp-bases-enabled.pp-base-tag-color .bases-view [data-property="note.tags"] .multi-select-pill,
 .pp-bases-enabled.pp-base-tag-color .bases-view [data-property="note.tags"] .value-list-element,
-/*.pp-bases-enabled.pp-base-tag-color.pp-style-formula-tags .bases-view [data-property="formula.tags"] .value-list-element,*/
 .metadata-property[data-property-key="tags"] .multi-select-pill,
 .setting-item .multi-select-pill[data-tag-value] {
     --pill-color: var(--tag-color-modified);
@@ -571,14 +568,6 @@ body {
 
 
 
-
-/*
-.pp-bases-enabled.pp-style-formula-tags .bases-view [data-property="formula.tags"] .value-list-element {
-  padding: 0 var(--pill-padding-x);
-}
-
-
-*/
 
 
 
@@ -786,6 +775,12 @@ button.longtext-color-button:hover {
   font-size: 0; 
 }
 
+body {
+  --date-past-color: var(--text-normal);
+  --date-present-color: var(--text-normal);
+  --date-future-color: var(--text-normal);
+}
+
 .custom-date {
   font-size: var(--metadata-input-font-size);
   padding: 2px 4px;
@@ -804,7 +799,8 @@ button.longtext-color-button:hover {
 .bases-cards-line[data-relative-date="past"] input.mod-date,
 .bases-cards-line[data-relative-date="past"] input.mod-datetime,
 .setting-custom-date-past {
-  background-color: var(--date-past-color);
+  background-color: var(--date-past-background);
+  color: var(--date-past-color);
   border-radius: 4px;
   min-height: unset;
   padding-top: 2px;
@@ -819,7 +815,8 @@ button.longtext-color-button:hover {
 .bases-cards-line[data-relative-date="present"] input.mod-date,
 .bases-cards-line[data-relative-date="present"] input.mod-datetime,
 .setting-custom-date-present {
-  background-color: var(--date-present-color);
+  background-color: var(--date-present-background);
+  color: var(--date-present-color);
   border-radius: 4px;
   min-height: unset;
   padding-top: 2px;
@@ -833,7 +830,8 @@ button.longtext-color-button:hover {
 .bases-cards-line[data-relative-date="future"] input.mod-date,
 .bases-cards-line[data-relative-date="future"] input.mod-datetime,
 .setting-custom-date-future {
-  background-color: var(--date-future-color);
+  background-color: var(--date-future-background);
+  color: var(--date-future-color);
   border-radius: 4px;
   min-height: unset;
   padding-top: 2px;

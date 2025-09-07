@@ -10,7 +10,6 @@ export const removeProperty = async (propName: string, plugin: PrettyPropertiesP
     }
 }
 
-	
 export const getCurrentProperty = (propName: string, plugin: PrettyPropertiesPlugin) => {
     let prop: any;
     let file = plugin.app.workspace.getActiveFile();

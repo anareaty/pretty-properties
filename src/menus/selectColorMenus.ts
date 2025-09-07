@@ -1,48 +1,9 @@
-import { Menu, MenuItem, Modal, App, Setting, setIcon } from "obsidian";
+import { Menu, MenuItem, setIcon } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
-import { i18n } from "src/localization";
+import { i18n } from "src/localization/localization";
 import { updatePillColors } from "src/utils/updates/updateStyles";
+import { ColorPickerModal } from "src/modals/colorPickerModal";
 
-
-class ColorPickerModal extends Modal {
-    plugin: PrettyPropertiesPlugin
-    propVal: string | any
-    colorList: string
-
-    constructor(app: App, plugin: PrettyPropertiesPlugin, propVal: string, colorList: string) {
-        super(app);
-        this.propVal = propVal
-        this.plugin = plugin
-        this.colorList = colorList
-    }
-    
-    onOpen() {
-        this.modalEl.classList.add("color-picker-modal")
-        const {contentEl} = this
-
-        new Setting(contentEl)
-        .addColorPicker(color => {
-            
-            if (this.propVal.h) {
-                //@ts-ignore
-                color.setValueHsl(this.plugin.settings[this.colorList][this.propVal])
-            }
-            
-            color.onChange((value) => {
-                let hsl = color.getValueHsl()
-                //@ts-ignore
-                this.plugin.settings[this.colorList][this.propVal] = hsl
-                this.plugin.saveSettings()
-                updatePillColors(this.plugin)
-            })
-        })
-    }
-
-    onClose() {
-        const {contentEl} = this
-        contentEl.empty()
-    } 
-}
 
 
 const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string, plugin: PrettyPropertiesPlugin) => {
@@ -106,7 +67,7 @@ const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string, plugi
             new ColorPickerModal(plugin.app, plugin, pillVal, colorList).open()
         })
         //@ts-ignore
-            item.setChecked(plugin.settings[colorList][pillVal].h !== undefined)
+            item.setChecked(plugin.settings[colorList][pillVal]?.h !== undefined)
     })
 }
 
