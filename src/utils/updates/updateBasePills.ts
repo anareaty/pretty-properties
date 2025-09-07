@@ -47,13 +47,36 @@ export const updateBaseLeafPills = (leaf: WorkspaceLeaf, plugin: PrettyPropertie
                 }
 
                 let pills = containerEl.querySelectorAll(
-                    ".bases-cards-property .value-list-element:not([data-property-pill-value])"
+                    ".bases-cards-property:not([data-property='note.tags']) .value-list-element:not([data-property-pill-value], :has(a.tag))"
                 );
                 for (let pill of pills) {
                     if (pill instanceof HTMLElement) {
                         let value = pill.innerText.slice(0, 200).trim();
                         if (value.startsWith("#")) {value = value.replace("#", "")}
                         pill.setAttribute("data-property-pill-value", value);
+                    }
+                }
+
+                let tagPills = containerEl.querySelectorAll(
+                    ".bases-cards-property[data-property='note.tags'] .value-list-element:not([data-property-pill-value], :has(a.tag))"
+                );
+                for (let pill of tagPills) {
+                    if (pill instanceof HTMLElement) {
+                        let value = pill.innerText.slice(0, 200).trim();
+                        if (value.startsWith("#")) {value = value.replace("#", "")}
+                        pill.setAttribute("data-tag-value", value);
+                    }
+                }
+
+                let formulaTagPills = containerEl.querySelectorAll(
+                    ".bases-cards-property a.tag:not([data-tag-value])"
+                );
+
+                for (let pill of formulaTagPills) {
+                    if (pill instanceof HTMLElement) {
+                        let value = pill.innerText.slice(0, 200).trim();
+                        if (value.startsWith("#")) {value = value.replace("#", "")}
+                        pill.setAttribute("data-tag-value", value);
                     }
                 }
 

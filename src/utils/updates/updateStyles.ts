@@ -126,6 +126,7 @@ export const updateHiddenProperties = (plugin: PrettyPropertiesPlugin) => {
 export const updatePillColors = (plugin: PrettyPropertiesPlugin) => {
     let styleText = "";
     let transparentPropsDataString = ".test,"
+    let tagColors = plugin.settings.tagColors
     let propertyPillColors = plugin.settings.propertyPillColors
     let propertyLongtextColors = plugin.settings.propertyLongtextColors
     let colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink", "none", "default"]
@@ -140,10 +141,7 @@ export const updatePillColors = (plugin: PrettyPropertiesPlugin) => {
                 "[data-property-pill-value='" + prop + "'] {\n" +
                 "--pill-color-rgb: var(--color-" + color + "-rgb); \n" +
                 "--pill-background-modified: rgba(var(--pill-color-rgb), 0.2); \n" + 
-                "--pill-background-hover-modified: rgba(var(--pill-color-rgb), 0.3); \n" +
-                "--tag-color-modified: rgba(var(--pill-color-rgb), 1); \n" + 
-                "--tag-background-modified: rgba(var(--pill-color-rgb), 0.2); \n" + 
-                "--tag-background-hover-modified: rgba(var(--pill-color-rgb), 0.3);}\n";
+                "--pill-background-hover-modified: rgba(var(--pill-color-rgb), 0.3);}\n";
             } else {
 
                 let textLightness = 30
@@ -165,9 +163,6 @@ export const updatePillColors = (plugin: PrettyPropertiesPlugin) => {
                 "--pill-text-hsl: " + hslStringText + " ; \n" +
                 "--pill-background-modified:  hsl(var(--pill-background-hsl)) ; \n" + 
                 "--pill-background-hover-modified:  hsl(var(--pill-background-hover-hsl)) ; \n" +
-                "--tag-background-modified:  hsl(var(--pill-background-hsl)) ; \n" + 
-                "--tag-background-hover-modified:  hsl(var(--pill-background-hover-hsl)) ; \n" + 
-                "--tag-color-modified:  hsl(var(--pill-text-hsl)) ; \n" +
                 "--pill-color:  hsl(var(--pill-text-hsl))  !important; \n" +
                 "--pill-color-hover: hsl(var(--pill-text-hsl)) ; \n" +
                 "--pill-color-remove: hsl(var(--pill-text-hsl)) ; \n" +
@@ -194,6 +189,86 @@ export const updatePillColors = (plugin: PrettyPropertiesPlugin) => {
                 "[data-property-pill-value='" + prop + "'],"
             }
         }
+
+
+
+
+
+
+
+
+
+
+
+        for (let prop in tagColors) {
+            let color = tagColors[prop]
+
+            if (colors.find(c => c == color)) {
+                styleText = styleText +
+                "[data-tag-value='" + prop + "'] {\n" +
+                "--tag-color-rgb: var(--color-" + color + "-rgb); \n" +
+                "--tag-color-modified: rgba(var(--tag-color-rgb), 1); \n" + 
+                "--tag-background-modified: rgba(var(--tag-color-rgb), 0.2); \n" + 
+                "--tag-background-hover-modified: rgba(var(--tag-color-rgb), 0.3);}\n";
+            } else {
+
+                let textLightness = 30
+                if (color.l < 80) textLightness = 20
+                if (color.l < 70) textLightness = 10
+                if (color.l < 60) textLightness = 5
+                if (color.l < 50) textLightness = 95
+                if (color.l < 40) textLightness = 90
+                if (color.l < 30) textLightness = 80
+
+                let hslString = color.h + " ," + color.s + "% ," + color.l + "%"
+                let hslStringHover = color.h + " ," + color.s + "% ," + (color.l - 5) + "%"
+                let hslStringText = color.h + " ," + color.s + "% ," + textLightness + "%"
+                
+                styleText = styleText +
+                "[data-tag-value='" + prop + "'] {\n" +
+                "--pill-background-hsl: " + hslString + "; \n" + 
+                "--pill-background-hover-hsl: " + hslStringHover + "; \n" + 
+                "--pill-text-hsl: " + hslStringText + " ; \n" +
+                "--tag-background-modified:  hsl(var(--pill-background-hsl)) ; \n" + 
+                "--tag-background-hover-modified:  hsl(var(--pill-background-hover-hsl)) ; \n" +
+                "--tag-color-modified:  hsl(var(--pill-text-hsl))  !important; \n" +
+                "--tag-color-hover: hsl(var(--pill-text-hsl)) ; \n" +
+                "--pill-color-remove: hsl(var(--pill-text-hsl)) ; \n" +
+                "--pill-color-remove-hover: hsl(var(--pill-text-hsl))" +
+                ";}\n";
+            }
+
+            if (plugin.settings.addPillPadding == "colored" && color != "none") {
+
+                styleText = styleText +
+                    ".metadata-property-value .multi-select-pill[data-property-pill-value='" + prop + "'],\n" + 
+                    "[data-property*='note'] .value-list-element[data-property-pill-value='" + prop + "'],\n" +
+                    "[data-property*='formula.tags'] .value-list-element[data-property-pill-value='" + prop + "']\n" +
+                    " {\n" +
+                    "--pill-padding-x: var(--tag-padding-x);\n}\n" + 
+                    ".metadata-property-value .metadata-input-longtext[data-property-pill-value='" + prop + "'],\n" + 
+                    ".bases-cards-line[data-property-longtext-value='" + prop + "']\n" +
+                    " {\n" +
+                    "--longtext-margin: var(--input-padding);\n}\n"
+            }
+
+            if (color == "none") {
+                transparentPropsDataString = transparentPropsDataString +
+                "[data-property-pill-value='" + prop + "'],"
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
 
         for (let prop in propertyLongtextColors) {
             let color = propertyLongtextColors[prop]
@@ -272,8 +347,8 @@ export const updatePillColors = (plugin: PrettyPropertiesPlugin) => {
     }
 
     if (plugin.settings.enableColoredInlineTags) {
-        for (let prop in propertyPillColors) {
-            let color = propertyPillColors[prop]
+        for (let prop in tagColors) {
+            let color = tagColors[prop]
 
             if (colors.find(c => c == color)) {
                 styleText = styleText +

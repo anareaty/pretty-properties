@@ -5,11 +5,17 @@ import { createColorButton } from "src/menus/selectColorMenus";
 export const addClassestoProperties = async (view: View, plugin: PrettyPropertiesPlugin) => {
 	let container = view.containerEl;
 
-	let pills = container.querySelectorAll(".multi-select-pill:not([data-property-pill-value])");
+	let pills = container.querySelectorAll(".metadata-property:not([data-property-key='tags']) .multi-select-pill:not([data-property-pill-value])");
+
+	let basePills = container.querySelectorAll(".bases-td:not([data-property='note.tags']) .multi-select-pill:not([data-property-pill-value])");
+
+	let tagPills = container.querySelectorAll(".metadata-property[data-property-key='tags'] .multi-select-pill:not([data-tag-value])");
+
+	let baseTagPills = container.querySelectorAll("[data-property='note.tags'] .multi-select-pill:not([data-tag-value])");
+
+	let baseFormulaTagPills = container.querySelectorAll(".value-list-element a.tag:not([data-property-pill-value])");
 
 	let longtexts = container.querySelectorAll(".metadata-input-longtext");
-
-	let formulaPills = container.querySelectorAll("[data-property='formula.tags'] .value-list-element:not([data-property-pill-value])");
 
 	for (let pill of pills) {
 		let content = pill.querySelector(".multi-select-pill-content");
@@ -17,6 +23,33 @@ export const addClassestoProperties = async (view: View, plugin: PrettyPropertie
 			let value = content.innerText;
 			if (value.startsWith("#")) {value = value.replace("#", "")}
 			pill.setAttribute("data-property-pill-value", value);
+		}
+	}
+
+	for (let pill of basePills) {
+		let content = pill.querySelector(".multi-select-pill-content");
+		if (content instanceof HTMLElement) {
+			let value = content.innerText;
+			if (value.startsWith("#")) {value = value.replace("#", "")}
+			pill.setAttribute("data-property-pill-value", value);
+		}
+	}
+
+	for (let pill of tagPills) {
+		let content = pill.querySelector(".multi-select-pill-content");
+		if (content instanceof HTMLElement) {
+			let value = content.innerText;
+			if (value.startsWith("#")) {value = value.replace("#", "")}
+			pill.setAttribute("data-tag-value", value);
+		}
+	}
+
+	for (let pill of baseTagPills) {
+		let content = pill.querySelector(".multi-select-pill-content");
+		if (content instanceof HTMLElement) {
+			let value = content.innerText;
+			if (value.startsWith("#")) {value = value.replace("#", "")}
+			pill.setAttribute("data-tag-value", value);
 		}
 	}
 
@@ -42,11 +75,11 @@ export const addClassestoProperties = async (view: View, plugin: PrettyPropertie
 		}
 	}
 
-	for (let pill of formulaPills) {
+	for (let pill of baseFormulaTagPills) {
 		if (pill instanceof HTMLElement) {
 			let value = pill.innerText;
 			if (value.startsWith("#")) {value = value.replace("#", "")}
-			pill.setAttribute("data-property-pill-value", value);
+			pill.setAttribute("data-tag-value", value);
 		}
 	}
 }

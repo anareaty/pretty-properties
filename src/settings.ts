@@ -92,7 +92,10 @@ export interface PPPluginSettings {
 	enableColoredInlineTags: boolean;
 	nonLatinTagsSupport: boolean;
 	enableColorButton: boolean;
-	propertySearchKey: string
+	propertySearchKey: string;
+	tagColors: any;
+	showTagColorSettings: boolean;
+
 	
 	
 }
@@ -177,7 +180,9 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	enableColoredInlineTags: false,
 	nonLatinTagsSupport: false,
 	enableColorButton: true,
-	propertySearchKey: "Ctrl"
+	propertySearchKey: "Ctrl",
+	tagColors: {},
+	showTagColorSettings: false,
 
 }
 
@@ -1175,6 +1180,178 @@ export class PPSettingTab extends PluginSettingTab {
 						})
 					)
 			}
+
+
+
+
+
+
+
+
+
+
+
+
+			new Setting(containerEl)
+			.setName(i18n.t("SHOW_COLORED_TAGS"))
+			.addToggle(toggle => {
+				toggle.setValue(this.plugin.settings.showColorSettings)
+				.onChange(value => {
+					this.plugin.settings.showTagColorSettings = value
+					this.plugin.saveSettings()
+					this.display()
+				})
+			});
+
+			if (this.plugin.settings.showTagColorSettings) { 
+				let colorSettingsEl = containerEl.createEl("div")
+
+				const addColorSetting = (property: string) => {
+					
+					let propertyColorSetting = new Setting(colorSettingsEl)
+
+					let pillEl = propertyColorSetting.nameEl.createEl("div", {
+						cls: "multi-select-pill",
+						attr : {
+							"data-tag-value": property
+						},
+					})
+
+					pillEl.createEl("div", {text: property, cls: "multi-select-pill-content"})
+					let propertyColorComponent: ColorComponent
+					let propertyColorButton: ButtonComponent
+
+					propertyColorSetting.addText(text => {
+						text.setValue(property)
+						let inputEl = text.inputEl
+						inputEl.onblur = () => {
+							let value = inputEl.value
+							if (value && !this.plugin.settings.tagColors[value]) {
+								this.plugin.settings.tagColors[value] = this.plugin.settings.tagColors[property]
+								delete this.plugin.settings.tagColors[property]
+								this.plugin.saveSettings()
+								updatePillColors(this.plugin)
+								this.display()
+							}
+						}
+					})
+					.addColorPicker(color => {
+						propertyColorComponent = color
+						color.setValueHsl(this.plugin.settings.tagColors[property])
+						.onChange(async (value) => {
+							propertyColorButton.buttonEl.classList.forEach(cls => {
+								if (cls.startsWith("color")) {
+									propertyColorButton.buttonEl.classList.remove(cls)
+								}
+							})
+
+							let hsl = color.getValueHsl()
+							this.plugin.settings.tagColors[property] = hsl
+							this.plugin.saveSettings()
+							updatePillColors(this.plugin)
+						})
+					})
+					.addButton(btn => {
+						propertyColorButton = btn
+
+						if (typeof this.plugin.settings.tagColors[property] == "string") {
+							btn.buttonEl.classList.add("color-" + this.plugin.settings.tagColors[property])
+						}
+						
+						btn
+						.setIcon("paintbrush")
+						.setClass("property-color-setting-button")
+						.onClick((e) => {
+							let menu = new Menu()
+							let colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink", "none"]
+
+							for (let color of colors) {
+								menu.addItem((item: MenuItem) => {
+									item.setIcon("square")
+									//@ts-ignore
+									let iconEl = item.iconEl
+									if (color != "default" && color != "none") {
+										iconEl.style = "color: transparent; background-color: rgba(var(--color-" + color + "-rgb), 0.3);"
+									}
+									if (color == "none") iconEl.style = "opacity: 0.2;"
+	
+									item.setTitle(i18n.t(color))
+									.onClick(() => {
+										propertyColorComponent.setValue("")
+										btn.buttonEl.classList.forEach(cls => {
+											if (cls.startsWith("color")) {
+												propertyColorButton.buttonEl.classList.remove(cls)
+											}
+										})
+										btn.buttonEl.classList.add("color-" + color)
+										this.plugin.settings.tagColors[property] = color
+										this.plugin.saveSettings()
+										updatePillColors(this.plugin)
+									})
+									item.setChecked(color == this.plugin.settings.tagColors[property])
+								})
+							}
+							menu.showAtMouseEvent(e)
+						})
+					})
+					.addButton(btn => btn
+						.setIcon("x")
+						.onClick(() => {
+							delete this.plugin.settings.tagColors[property]
+							this.plugin.saveSettings()
+							propertyColorSetting.settingEl.remove()
+							updatePillColors(this.plugin)
+						})
+					)
+				}
+				
+				for (let property in this.plugin.settings.tagColors) {
+					addColorSetting(property)
+				}
+
+
+				let newProperty = ""
+				let newPropertySetting = new Setting(containerEl)
+					.setName(i18n.t("ADD_COLORED_TAG"))
+					.addText(text => text
+						.setValue("")
+						.onChange(value => newProperty = value.replace("#", ""))
+					)
+					.addButton(btn => btn
+						.setIcon("plus")
+						.onClick(() => {
+							newProperty = newProperty.trim()
+							if (newProperty && !this.plugin.settings.tagColors[newProperty]) {
+								this.plugin.settings.tagColors[newProperty] = "none"
+								this.plugin.saveSettings()
+								addColorSetting(newProperty)
+								let inputSetting = newPropertySetting.components[0]
+								if (inputSetting instanceof TextComponent) {
+									inputSetting.setValue("")
+								}
+							}
+						})
+					)
+			}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 			new Setting(containerEl)
 			.setName(i18n.t("SHOW_TEXT_COLORED_PROPERTIES"))

@@ -146,6 +146,7 @@ export default {
   ENABLE_NON_LATIN_TAGS_SUPPORT: "Enable non-latin tags styling support",
   ENABLE_NON_LATIN_TAGS_SUPPORT_DESC: "Enable if you use tags with non-latin characters and want to see them colored in live preview (need to reload).",
   SHOW_COLOR_BUTTON_FOR_TEXT: "Show color buttons when hovering over text properties",
+  CUSTOM_COLOR: "custom color",
 
 
 

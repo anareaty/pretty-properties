@@ -514,14 +514,22 @@ body {
 
 
 
-.pp-bases-enabled .bases-view [data-property*="note"] .value-list-element,
-.pp-bases-enabled.pp-style-formula-tags .bases-view [data-property="formula.tags"] .value-list-element {
+.pp-bases-enabled .bases-view [data-property*="note"] .value-list-element/*,
+.pp-bases-enabled.pp-style-formula-tags .bases-view [data-property="formula.tags"] .value-list-element*/ {
     display: inline-block;
     color: var(--pill-color);
     background-color: var(--pill-background);
     border-radius: var(--pill-radius);
     line-height: var(--line-height-tight);
     font-weight: var(--pill-weight);
+}
+
+
+
+
+.pp-bases-enabled .bases-view [data-property*="note"] .value-list-element:hover {
+  color: var(--pill-color-hover);
+  background-color: var(--pill-background-hover);
 }
 
 
@@ -536,16 +544,17 @@ body {
 }
 
 
-.pp-bases-enabled.pp-base-tag-color .bases-cards-property[data-property="note.tags"] .value-list-element,
-.pp-bases-enabled.pp-base-tag-color.pp-style-formula-tags .bases-cards-property[data-property="formula.tags"] .value-list-element {
+.pp-bases-enabled.pp-base-tag-color .bases-cards-property[data-property="note.tags"] .value-list-element/*,
+.pp-bases-enabled.pp-base-tag-color.pp-style-formula-tags .bases-cards-property[data-property="formula.tags"] .value-list-element*/ {
     padding: 0 0.4em !important;
 }
 
 
 .pp-bases-enabled.pp-base-tag-color .bases-view [data-property="note.tags"] .multi-select-pill,
 .pp-bases-enabled.pp-base-tag-color .bases-view [data-property="note.tags"] .value-list-element,
-.pp-bases-enabled.pp-base-tag-color.pp-style-formula-tags .bases-view [data-property="formula.tags"] .value-list-element,
-.metadata-property[data-property-key="tags"] .multi-select-pill{
+/*.pp-bases-enabled.pp-base-tag-color.pp-style-formula-tags .bases-view [data-property="formula.tags"] .value-list-element,*/
+.metadata-property[data-property-key="tags"] .multi-select-pill,
+.setting-item .multi-select-pill[data-tag-value] {
     --pill-color: var(--tag-color-modified);
     --pill-color-hover: var(--tag-color-modified);
     --pill-color-remove: var(--tag-color-modified);
@@ -563,13 +572,13 @@ body {
 
 
 
-
+/*
 .pp-bases-enabled.pp-style-formula-tags .bases-view [data-property="formula.tags"] .value-list-element {
   padding: 0 var(--pill-padding-x);
 }
 
 
-
+*/
 
 
 
@@ -923,8 +932,17 @@ button.pp-settings-tab:not(.pp-settings-tab-selected):hover {
 
 
 .menu-item-custom-color svg {
-  background: conic-gradient(var(--color-red), var(--color-yellow), var(--color-green), var(--color-blue), var(--color-purple), var(--color-red));
-	color: transparent;
+  background: conic-gradient(
+    var(--color-red), 
+    var(--color-orange), 
+    var(--color-yellow), 
+    var(--color-green), 
+    var(--color-cyan),
+    var(--color-blue), 
+    var(--color-purple),
+    var(--color-red)
+  );
+  color: transparent;
 }
 
 
@@ -954,4 +972,15 @@ height: 100% !important;
 
 .metadata-property-value:has(.internal-link, .external-link):hover button.longtext-color-button {
     display: none;
+}
+
+
+.bases-cards-line {
+  --tag-padding-y: 0;
+}
+
+
+.bases-table-cell a.tag,
+.bases-cards-line a.tag {
+  font-size: 1em;
 }
