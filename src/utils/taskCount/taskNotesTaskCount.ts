@@ -12,7 +12,7 @@ export const needToUpdateTaskNotes = (plugin: PrettyPropertiesPlugin, cache?: Ca
             let taskIdentificationMethod = tn.settings.taskIdentificationMethod
             if (taskIdentificationMethod == "tag") {
                 let taskTag = tn.settings.taskTag
-                if (cache.frontmatter?.tags.includes(taskTag)) {
+                if (cache.frontmatter?.tags?.includes(taskTag)) {
                     isTask = true
                 }
             } else if (taskIdentificationMethod == "property") {
