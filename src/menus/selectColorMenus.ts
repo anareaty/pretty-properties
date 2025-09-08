@@ -111,7 +111,7 @@ export const handlePillMenu = (e: MouseEvent, el: HTMLElement, plugin: PrettyPro
     } 
 }
 
-export const handleTagMenu = (e: MouseEvent, el: HTMLElement, plugin: PrettyPropertiesPlugin) => {
+export const handleTagMenu = (e: MouseEvent | TouchEvent, el: HTMLElement, plugin: PrettyPropertiesPlugin) => {
     let menuManager = plugin.menuManager
     menuManager.closeAndFlush()
     let tag = el.closest(".cm-hashtag");
