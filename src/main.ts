@@ -116,6 +116,12 @@ export default class PrettyPropertiesPlugin extends Plugin {
 					) {
 						handlePropertyMenu(e.target, this);
 					}
+					if (e.target instanceof HTMLElement && 
+						e.target.closest(".cm-hashtag") && 
+						this.settings.enableColoredInlineTags
+					) {
+                        handleTagMenu(e, e.target, this);
+					}
 				});
 			} else {
 
