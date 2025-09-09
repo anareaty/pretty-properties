@@ -13,7 +13,6 @@ import {
 } from './utils/updates/updateStyles';
 
 export interface PPPluginSettings {
-    mySetting: string;
     hiddenProperties: string[];
     propertyPillColors: any;
 	propertyLongtextColors: any;
@@ -94,13 +93,13 @@ export interface PPPluginSettings {
 	propertySearchKey: string;
 	tagColors: any;
 	showTagColorSettings: boolean;
+	iconSizeMobile: number;
 
 	
 	
 }
 
 export const DEFAULT_SETTINGS: PPPluginSettings = {
-    mySetting: 'default',
     hiddenProperties: [],
     propertyPillColors: {},
 	propertyLongtextColors: {},
@@ -181,6 +180,7 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	propertySearchKey: "Ctrl",
 	tagColors: {},
 	showTagColorSettings: false,
+	iconSizeMobile: 60,
 
 }
 
@@ -404,6 +404,20 @@ export class PPSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						if (!value) value = "0"
 						this.plugin.settings.iconSize = Number(value);
+						await this.plugin.saveSettings();
+						updateIconStyles(this.plugin);
+					})
+				});
+
+				new Setting(containerEl)
+				.setName(i18n.t("ICON_SIZE_MOBILE"))
+				.addText(text => {
+					text.inputEl.type = "number"
+					text.setValue(this.plugin.settings.iconSizeMobile.toString())
+					.setPlaceholder('60')
+					.onChange(async (value) => {
+						if (!value) value = "0"
+						this.plugin.settings.iconSizeMobile = Number(value);
 						await this.plugin.saveSettings();
 						updateIconStyles(this.plugin);
 					})
