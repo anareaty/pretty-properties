@@ -180,7 +180,7 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	propertySearchKey: "Ctrl",
 	tagColors: {},
 	showTagColorSettings: false,
-	iconSizeMobile: 60,
+	iconSizeMobile: 70,
 
 }
 
@@ -414,7 +414,7 @@ export class PPSettingTab extends PluginSettingTab {
 				.addText(text => {
 					text.inputEl.type = "number"
 					text.setValue(this.plugin.settings.iconSizeMobile.toString())
-					.setPlaceholder('60')
+					.setPlaceholder('70')
 					.onChange(async (value) => {
 						if (!value) value = "0"
 						this.plugin.settings.iconSizeMobile = Number(value);
