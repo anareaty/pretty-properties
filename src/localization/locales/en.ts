@@ -149,7 +149,7 @@ export default {
   CUSTOM_COLOR: "custom color",
   SHOW_COLORED_TAGS: "Show colored tags",
   ADD_COLORED_TAG: "Add colored tag",
-
+  ICON_SIZE_MOBILE: "Icon size on mobile",
 
 
 
