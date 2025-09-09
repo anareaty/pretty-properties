@@ -45,12 +45,15 @@ export const updateIconStyles = (plugin: PrettyPropertiesPlugin) => {
     if (plugin.settings.enableIcon) {
         let iconTopMargin;
         let bannerIconGap;
+		let iconSize;
         if (Platform.isMobile) {
             iconTopMargin = plugin.settings.iconTopMarginMobile;
             bannerIconGap = plugin.settings.bannerIconGapMobile;
+			iconSize = plugin.settings.iconSizeMobile;
         } else {
             iconTopMargin = plugin.settings.iconTopMargin;
             bannerIconGap = plugin.settings.bannerIconGap;
+			iconSize = plugin.settings.iconSize;
         }
 
         let iconColor = plugin.settings.iconColor;
@@ -63,7 +66,7 @@ export const updateIconStyles = (plugin: PrettyPropertiesPlugin) => {
 
         let styleText = 
         "body {\n" + 
-        "--pp-icon-size: " + plugin.settings.iconSize + "px;\n" + 
+        "--pp-icon-size: " + iconSize + "px;\n" + 
         "--pp-icon-top-margin: " + iconTopMargin + "px;\n" + 
         "--pp-icon-top-margin-wb: " + plugin.settings.iconTopMarginWithoutBanner + "px;\n" + 
         "--pp-icon-gap: " + plugin.settings.iconGap + "px;\n" + 
