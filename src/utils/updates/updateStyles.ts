@@ -354,26 +354,27 @@ export const updateRelativeDateColors = (plugin: PrettyPropertiesPlugin) => {
   let futureColor = plugin.settings.dateFutureColor;
   let presentColor = plugin.settings.datePresentColor;
   let pastColor = plugin.settings.datePastColor;
-  let futureBgColor
-  let futureTextColor
-  let presentBgColor
-  let presentTextColor
-  let pastBgColor
-  let pastTextColor
 
+  let futureBgColor = ""
+  let futureTextColor = ""
+  let presentBgColor = ""
+  let presentTextColor = ""
+  let pastBgColor = ""
+  let pastTextColor = ""
+ 
   if (colors.find((c) => c == futureColor)) {
     futureBgColor = "rgba(var(--color-" + futureColor + "-rgb), 0.2)"
-  } else {
-    let textLightness = getTextLightness(futureColor);
-    let hslString = futureColor.h + " ," + futureColor.s + "% ," + futureColor.l + "%";
-    let hslStringText = futureColor.h + " ," + futureColor.s + "% ," + textLightness + "%";
-    futureBgColor = "hsl(" + hslString + ")"
-    futureTextColor = "hsl(" + hslStringText + ")"
+  } else if (futureColor.h !== undefined) {
+      let textLightness = getTextLightness(futureColor);
+      let hslString = futureColor.h + " ," + futureColor.s + "% ," + futureColor.l + "%";
+      let hslStringText = futureColor.h + " ," + futureColor.s + "% ," + textLightness + "%";
+      futureBgColor = "hsl(" + hslString + ")"
+      futureTextColor = "hsl(" + hslStringText + ")"
   }
 
   if (colors.find((c) => c == presentColor)) {
     presentBgColor = "rgba(var(--color-" + presentColor + "-rgb), 0.2)"
-  } else {
+  } else if (presentColor.h !== undefined) {
     let textLightness = getTextLightness(presentColor);
     let hslString = presentColor.h + " ," + presentColor.s + "% ," + presentColor.l + "%";
     let hslStringText = presentColor.h + " ," + presentColor.s + "% ," + textLightness + "%";
@@ -383,15 +384,14 @@ export const updateRelativeDateColors = (plugin: PrettyPropertiesPlugin) => {
 
   if (colors.find((c) => c == pastColor)) {
     pastBgColor = "rgba(var(--color-" + pastColor + "-rgb), 0.2)"
-  } else {
+  } else if (pastColor.h !== undefined) {
     let textLightness = getTextLightness(pastColor);
     let hslString = pastColor.h + " ," + pastColor.s + "% ," + pastColor.l + "%";
     let hslStringText = pastColor.h + " ," + pastColor.s + "% ," + textLightness + "%";
     pastBgColor = "hsl(" + hslString + ")"
     pastTextColor = "hsl(" + hslStringText + ")"
   }
-
-
+	
   let relativeDatesProps = {
     "--date-future-background": futureBgColor,
     "--date-future-color": futureTextColor,
@@ -401,7 +401,6 @@ export const updateRelativeDateColors = (plugin: PrettyPropertiesPlugin) => {
     "--date-past-color": pastTextColor
 
   }
-
   document.body.setCssProps(relativeDatesProps);
 }
 
