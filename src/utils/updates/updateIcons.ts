@@ -58,7 +58,10 @@ export const updateIcons = async (
 
             if (image) {
                 image.classList.add("pp-icon");
-                let iconSizer = iconDiv.createEl("div", {
+				let iconOuter = iconDiv.createEl("div", {
+                    cls: "icon-outer",
+                });
+                let iconSizer = iconOuter.createEl("div", {
                     cls: "icon-sizer",
                 });
                 let iconImage = iconSizer.createEl("div", {
