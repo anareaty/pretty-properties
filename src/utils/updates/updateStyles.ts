@@ -4,107 +4,76 @@ import { Platform } from "obsidian";
 
 
 export const updateBannerStyles = (plugin: PrettyPropertiesPlugin) => {
-    let oldStyle = document.head.querySelector("style#pp-banner-styles");
-    if (oldStyle) oldStyle.remove();
-
-    if (plugin.settings.enableBanner) {
-        let bannerHeight;
-        let bannerMargin;
-        if (Platform.isMobile) {
-            bannerHeight = plugin.settings.bannerHeightMobile;
-            bannerMargin = plugin.settings.bannerMarginMobile;
-        } else {
-            bannerHeight = plugin.settings.bannerHeight;
-            bannerMargin = plugin.settings.bannerMargin;
-        }
-
-        let styleText = 
-        "body {\n" + 
-        "--banner-height: " + bannerHeight + "px;\n" + 
-        "--banner-margin: " + bannerMargin + "px;\n" + "}\n";
-
-        if (plugin.settings.bannerFading) {
-            styleText = styleText + 
-            ".banner-image img {\n" + 
-            "--banner-fading: linear-gradient(to bottom, black 25%, transparent);\n" + "}";
-        }
-
-        const style = document.createElement("style");
-        style.textContent = styleText;
-        style.id = "pp-banner-styles";
-        document.head.appendChild(style);
+    let bannerHeight;
+    let bannerMargin;
+    if (import_obsidian.Platform.isMobile) {
+        bannerHeight = plugin.settings.bannerHeightMobile;
+        bannerMargin = plugin.settings.bannerMarginMobile;
+    } else {
+        bannerHeight = plugin.settings.bannerHeight;
+        bannerMargin = plugin.settings.bannerMargin;
     }
+    let bannerFading = "none";
+    if (plugin.settings.bannerFading) {
+        bannerFading = "linear-gradient(to bottom, black 25%, transparent)";
+    }
+    let bannerProps = {
+        "--banner-height": bannerHeight + "px",
+        "--banner-margin": bannerMargin + "px",
+        "--banner-fading": bannerFading
+    };
+    document.body.setCssProps(bannerProps);
 }
 
 
 
 export const updateIconStyles = (plugin: PrettyPropertiesPlugin) => {
-    let oldStyle = document.head.querySelector("style#pp-icon-styles");
-    if (oldStyle) oldStyle.remove();
-
-    if (plugin.settings.enableIcon) {
-        let iconTopMargin;
-        let bannerIconGap;
-		let iconSize;
-        if (Platform.isMobile) {
-            iconTopMargin = plugin.settings.iconTopMarginMobile;
-            bannerIconGap = plugin.settings.bannerIconGapMobile;
-			iconSize = plugin.settings.iconSizeMobile;
-        } else {
-            iconTopMargin = plugin.settings.iconTopMargin;
-            bannerIconGap = plugin.settings.bannerIconGap;
-			iconSize = plugin.settings.iconSize;
-        }
-
-        let iconColor = plugin.settings.iconColor;
-        if (!iconColor) iconColor = "var(--text-normal)";
-        let iconBackground = "transparent";
-
-        if (plugin.settings.iconBackground) {
-            iconBackground = "var(--background-primary)";
-        }
-
-        let styleText = 
-        "body {\n" + 
-        "--pp-icon-size: " + iconSize + "px;\n" + 
-        "--pp-icon-top-margin: " + iconTopMargin + "px;\n" + 
-        "--pp-icon-top-margin-wb: " + plugin.settings.iconTopMarginWithoutBanner + "px;\n" + 
-        "--pp-icon-gap: " + plugin.settings.iconGap + "px;\n" + 
-        "--pp-banner-icon-gap: " + bannerIconGap + "px;\n" + 
-        "--pp-icon-left-margin: " + plugin.settings.iconLeftMargin + "px;\n" + 
-        "--pp-icon-color: " + iconColor + ";\n" + 
-        "--pp-icon-background: " + iconBackground + ";\n" + "}\n";
-
-        const style = document.createElement("style");
-        style.textContent = styleText;
-        style.id = "pp-icon-styles";
-        document.head.appendChild(style);
+    let iconTopMargin;
+    let bannerIconGap;
+    let iconSize;
+    if (import_obsidian.Platform.isMobile) {
+      iconTopMargin = plugin.settings.iconTopMarginMobile;
+      bannerIconGap = plugin.settings.bannerIconGapMobile;
+      iconSize = plugin.settings.iconSizeMobile;
+    } else {
+      iconTopMargin = plugin.settings.iconTopMargin;
+      bannerIconGap = plugin.settings.bannerIconGap;
+      iconSize = plugin.settings.iconSize;
     }
+    let iconColor = plugin.settings.iconColor;
+    if (!iconColor)
+      iconColor = "var(--text-normal)";
+    let iconBackground = "transparent";
+    if (plugin.settings.iconBackground) {
+      iconBackground = "var(--background-primary)";
+    }
+    let iconProps = {
+      "--pp-icon-size": iconSize + "px",
+      "--pp-icon-top-margin": iconTopMargin + "px",
+      "--pp-icon-top-margin-wb": plugin.settings.iconTopMarginWithoutBanner + "px",
+      "--pp-icon-gap": plugin.settings.iconGap + "px",
+      "--pp-banner-icon-gap": bannerIconGap + "px",
+      "--pp-icon-left-margin": plugin.settings.iconLeftMargin + "px",
+      "--pp-icon-color": iconColor,
+      "--pp-icon-background": iconBackground
+    };
+    document.body.setCssProps(iconProps);
 }
 
 
 
 export const updateCoverStyles = (plugin: PrettyPropertiesPlugin) => {
-    let oldStyle = document.head.querySelector("style#pp-cover-styles");
-    if (oldStyle) oldStyle.remove();
-
-    if (plugin.settings.enableCover) {
-        let styleText =
-            "body {\n" +
-            "--cover-width-horizontal: " + plugin.settings.coverHorizontalWidth + "px;\n" +
-            "--cover-width-vertical: " + plugin.settings.coverVerticalWidth + "px;\n" +
-            "--cover-max-height: " + plugin.settings.coverMaxHeight + "px;\n" +
-            "--cover-width-initial: " + plugin.settings.coverDefaultWidth1 + "px;\n" +
-            "--cover-width-initial-2: " + plugin.settings.coverDefaultWidth2 + "px;\n" +
-            "--cover-width-initial-3: " + plugin.settings.coverDefaultWidth3 + "px;\n" +
-            "--cover-width-square: " + plugin.settings.coverSquareWidth + "px;\n" +
-            "--cover-width-circle: " + plugin.settings.coverCircleWidth + "px;\n" + "}\n";
-
-        const style = document.createElement("style");
-        style.textContent = styleText;
-        style.id = "pp-cover-styles";
-        document.head.appendChild(style);
+    let coverProps = {
+    "--cover-width-horizontal": plugin.settings.coverHorizontalWidth + "px",
+    "--cover-width-vertical": plugin.settings.coverVerticalWidth + "px",
+    "--cover-max-height": plugin.settings.coverMaxHeight + "px",
+    "--cover-width-initial": plugin.settings.coverDefaultWidth1 + "px",
+    "--cover-width-initial-2": plugin.settings.coverDefaultWidth2 + "px",
+    "--cover-width-initial-3": plugin.settings.coverDefaultWidth3 + "px",
+    "--cover-width-square": plugin.settings.coverSquareWidth + "px",
+    "--cover-width-circle": plugin.settings.coverCircleWidth + "px"
     }
+  document.body.setCssProps(coverProps);
 }
 
 
@@ -388,55 +357,59 @@ export const updatePillColors = (plugin: PrettyPropertiesPlugin) => {
 
 
 export const updateRelativeDateColors = (plugin: PrettyPropertiesPlugin) => {
-    let styleText = ""
-    let colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink"]
-    let futureColor = plugin.settings.dateFutureColor
-    let presentColor = plugin.settings.datePresentColor
-    let pastColor = plugin.settings.datePastColor
-    let futureColorString = ""
-    let presentColorString = ""
-    let pastColorString = ""
+  let colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink"];
+  let futureColor = plugin.settings.dateFutureColor;
+  let presentColor = plugin.settings.datePresentColor;
+  let pastColor = plugin.settings.datePastColor;
+  let futureBgColor
+  let futureTextColor
+  let presentBgColor
+  let presentTextColor
+  let pastBgColor
+  let pastTextColor
 
-    if (colors.find(c => c == futureColor)) {
-        futureColorString = "--date-future-background: rgba(var(--color-" + futureColor + "-rgb), 0.2);\n"
-    }
-    else {
-        let textLightness = getTextLightness(futureColor)
-        let hslString = futureColor.h + " ," + futureColor.s + "% ," + futureColor.l + "%"
-        let hslStringText = futureColor.h + " ," + futureColor.s + "% ," + textLightness + "%"
-        futureColorString = "--date-future-background: hsl(" + hslString + ");\n" +
-        "--date-future-color: hsl(" + hslStringText + ");\n"
-    }
+  if (colors.find((c) => c == futureColor)) {
+    futureBgColor = "rgba(var(--color-" + futureColor + "-rgb), 0.2)"
+  } else {
+    let textLightness = getTextLightness(futureColor);
+    let hslString = futureColor.h + " ," + futureColor.s + "% ," + futureColor.l + "%";
+    let hslStringText = futureColor.h + " ," + futureColor.s + "% ," + textLightness + "%";
+    futureBgColor = "hsl(" + hslString + ")"
+    futureTextColor = "hsl(" + hslStringText + ")"
+  }
 
-    if (colors.find(c => c == presentColor)) {
-        presentColorString = "--date-present-background: rgba(var(--color-" + presentColor + "-rgb), 0.2);\n"
-    }
-    else {
-        let textLightness = getTextLightness(presentColor)
-        let hslString = presentColor.h + " ," + presentColor.s + "% ," + presentColor.l + "%"
-        let hslStringText = presentColor.h + " ," + presentColor.s + "% ," + textLightness + "%"
-        presentColorString = "--date-present-background: hsl(" + hslString + ");\n" +
-        "--date-present-color: hsl(" + hslStringText + ");\n"
-    }
+  if (colors.find((c) => c == presentColor)) {
+    presentBgColor = "rgba(var(--color-" + presentColor + "-rgb), 0.2)"
+  } else {
+    let textLightness = getTextLightness(presentColor);
+    let hslString = presentColor.h + " ," + presentColor.s + "% ," + presentColor.l + "%";
+    let hslStringText = presentColor.h + " ," + presentColor.s + "% ," + textLightness + "%";
+    presentBgColor = "hsl(" + hslString + ")"
+    presentTextColor = "hsl(" + hslStringText + ")"
+  }
 
-    if (colors.find(c => c == pastColor)) {
-        pastColorString = "--date-past-background: rgba(var(--color-" + pastColor + "-rgb), 0.2);\n"
-    }
-    else {
-        let textLightness = getTextLightness(pastColor)
-        let hslString = pastColor.h + " ," + pastColor.s + "% ," + pastColor.l + "%"
-        let hslStringText = pastColor.h + " ," + pastColor.s + "% ," + textLightness + "%"
-        pastColorString = "--date-past-background: hsl(" + hslString + ");\n" +
-        "--date-past-color: hsl(" + hslStringText + ");\n"
-    }
+  if (colors.find((c) => c == pastColor)) {
+    pastBgColor = "rgba(var(--color-" + pastColor + "-rgb), 0.2)"
+  } else {
+    let textLightness = getTextLightness(pastColor);
+    let hslString = pastColor.h + " ," + pastColor.s + "% ," + pastColor.l + "%";
+    let hslStringText = pastColor.h + " ," + pastColor.s + "% ," + textLightness + "%";
+    pastBgColor = "hsl(" + hslString + ")"
+    pastTextColor = "hsl(" + hslStringText + ")"
+  }
 
-    styleText = styleText + "\nbody {\n" + futureColorString + presentColorString + pastColorString + "\n}\n"
-    let oldStyle = document.head.querySelector("style#pp-date-colors");
-    if (oldStyle) oldStyle.remove();
-    const style = document.createElement("style");
-    style.textContent = styleText;
-    style.id = "pp-date-colors";
-    document.head.appendChild(style);
+
+  let relativeDatesProps = {
+    "--date-future-background": futureBgColor,
+    "--date-future-color": futureTextColor,
+    "--date-present-background": presentBgColor,
+    "--date-present-color": presentTextColor,
+    "--date-past-background": pastBgColor,
+    "--date-past-color": pastTextColor
+
+  }
+
+  document.body.setCssProps(relativeDatesProps);
 }
 
 
