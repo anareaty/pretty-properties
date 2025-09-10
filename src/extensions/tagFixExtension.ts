@@ -58,4 +58,4 @@ const pluginSpec: PluginSpec<TagFixPlugin> = {
 export const tagFixPlugin = ViewPlugin.fromClass(
     TagFixPlugin,
     pluginSpec
-);
+)
