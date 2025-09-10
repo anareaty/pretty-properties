@@ -6,7 +6,7 @@ import { Platform } from "obsidian";
 export const updateBannerStyles = (plugin: PrettyPropertiesPlugin) => {
     let bannerHeight;
     let bannerMargin;
-    if (import_obsidian.Platform.isMobile) {
+    if (Platform.isMobile) {
         bannerHeight = plugin.settings.bannerHeightMobile;
         bannerMargin = plugin.settings.bannerMarginMobile;
     } else {
@@ -31,7 +31,7 @@ export const updateIconStyles = (plugin: PrettyPropertiesPlugin) => {
     let iconTopMargin;
     let bannerIconGap;
     let iconSize;
-    if (import_obsidian.Platform.isMobile) {
+    if (Platform.isMobile) {
       iconTopMargin = plugin.settings.iconTopMarginMobile;
       bannerIconGap = plugin.settings.bannerIconGapMobile;
       iconSize = plugin.settings.iconSizeMobile;
