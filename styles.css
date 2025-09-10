@@ -63,16 +63,17 @@
 /* ICONS */
 
 
-
-
-.cm-scroller {
-  flex-wrap: wrap;
-}
-
-
 .icon-wrapper {
     width: 100%;
-    
+    position: absolute;
+    left: 0;
+    right: 0;
+}
+
+.icon-outer {
+  padding: var(--file-margins);
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 
@@ -764,8 +765,8 @@ button.longtext-color-button:hover {
   width: fit-content;
 }
 
-.metadata-property-value.has-custom-date input.metadata-input-text.mod-date::-webkit-datetime-edit,
-.metadata-property-value.has-custom-date input.metadata-input-text.mod-datetime::-webkit-datetime-edit {
+.metadata-property-value.has-custom-date input.metadata-input-text.mod-date:not(.is-empty)::-webkit-datetime-edit,
+.metadata-property-value.has-custom-date input.metadata-input-text.mod-datetime:not(.is-empty)::-webkit-datetime-edit {
   display: none;
 }
   
@@ -982,3 +983,4 @@ height: 100% !important;
 .bases-cards-line a.tag {
   font-size: 1em;
 }
+
