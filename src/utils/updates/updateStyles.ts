@@ -4,15 +4,12 @@ import { Platform } from "obsidian";
 
 
 export const updateBannerStyles = (plugin: PrettyPropertiesPlugin) => {
-    let bannerHeight;
-    let bannerMargin;
+    let bannerHeight = plugin.settings.bannerHeight;
+    let bannerMargin = plugin.settings.bannerMargin;
     if (Platform.isMobile) {
         bannerHeight = plugin.settings.bannerHeightMobile;
         bannerMargin = plugin.settings.bannerMarginMobile;
-    } else {
-        bannerHeight = plugin.settings.bannerHeight;
-        bannerMargin = plugin.settings.bannerMargin;
-    }
+    } 
     let bannerFading = "none";
     if (plugin.settings.bannerFading) {
         bannerFading = "linear-gradient(to bottom, black 25%, transparent)";
@@ -28,18 +25,14 @@ export const updateBannerStyles = (plugin: PrettyPropertiesPlugin) => {
 
 
 export const updateIconStyles = (plugin: PrettyPropertiesPlugin) => {
-    let iconTopMargin;
-    let bannerIconGap;
-    let iconSize;
+    let iconTopMargin = plugin.settings.iconTopMargin;
+    let bannerIconGap = plugin.settings.bannerIconGap;
+    let iconSize = plugin.settings.iconSize;
     if (Platform.isMobile) {
       iconTopMargin = plugin.settings.iconTopMarginMobile;
       bannerIconGap = plugin.settings.bannerIconGapMobile;
       iconSize = plugin.settings.iconSizeMobile;
-    } else {
-      iconTopMargin = plugin.settings.iconTopMargin;
-      bannerIconGap = plugin.settings.bannerIconGap;
-      iconSize = plugin.settings.iconSize;
-    }
+    } 
     let iconColor = plugin.settings.iconColor;
     if (!iconColor)
       iconColor = "var(--text-normal)";
