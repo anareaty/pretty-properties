@@ -31,11 +31,13 @@ export const updateBannerImages = async (
                 bannerVal = "![](" + bannerVal + ")";
             if (!bannerVal.startsWith("!")) bannerVal = "!" + bannerVal;
             let bannerTemp = document.createElement("div");
+
+			let sourcePath = view.file?.path || ""
             MarkdownRenderer.render(
                 plugin.app,
                 bannerVal,
                 bannerTemp,
-                "",
+                sourcePath,
                 plugin
             );
             let image = bannerTemp.querySelector("img");
