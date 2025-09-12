@@ -59,11 +59,12 @@ export const updateCoverImages = async (
             }
 
             let coverTemp = document.createElement("div");
+			let sourcePath = view.file?.path || ""
             MarkdownRenderer.render(
                 plugin.app,
                 coverVal,
                 coverTemp,
-                "",
+                sourcePath,
                 plugin
             );
             let image = coverTemp.querySelector("img");
