@@ -72,7 +72,7 @@ export const updateCoverStyles = (plugin: PrettyPropertiesPlugin) => {
 
 
 export const updateHiddenProperties = (plugin: PrettyPropertiesPlugin) => {
-    let styleText = ""
+    let styleText = "";
     for (let prop of plugin.settings.hiddenProperties) {
         styleText = styleText +
         "body:not(.show-hidden-properties) .workspace-leaf-content[data-type='markdown'] .metadata-property[data-property-key='" + prop + "'] {display: none;}\n" +
