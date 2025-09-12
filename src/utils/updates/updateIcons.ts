@@ -38,11 +38,12 @@ export const updateIcons = async (
                     iconLink = "![](" + iconLink + ")";
                 if (!iconLink.startsWith("!")) iconLink = "!" + iconLink;
                 let iconTemp = document.createElement("div");
+				let sourcePath = view.file?.path || ""
                 MarkdownRenderer.render(
                     plugin.app,
                     iconLink,
                     iconTemp,
-                    "",
+                    sourcePath,
                     plugin
                 );
                 image = iconTemp.querySelector("img");
