@@ -1,7 +1,7 @@
 import { Menu, MenuItem } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { i18n } from "src/localization/localization";
-import { updateHiddenProperties } from "src/utils/updates/updateStyles";
+import { updateHiddenProperties } from "src/utils/updates/updateHiddenProperties";
 import { removeProperty } from "src/utils/propertyUtils";
 import { IconSuggestModal } from "src/modals/iconSuggestModal";
 

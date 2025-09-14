@@ -1,8 +1,9 @@
 import { Menu, MenuItem, setIcon } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { i18n } from "src/localization/localization";
-import { updatePillColors } from "src/utils/updates/updateStyles";
+import { updateAllPills } from "src/utils/updates/updatePills";
 import { ColorPickerModal } from "src/modals/colorPickerModal";
+
 
 
 
@@ -51,7 +52,8 @@ const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string, plugi
                 }
 
                 plugin.saveSettings();
-                updatePillColors(plugin);
+                //updatePillColors(plugin);
+                updateAllPills(plugin)
             });
             //@ts-ignore
             item.setChecked(plugin.settings[colorList][pillVal] == color)

@@ -50,3 +50,7 @@ export const getPropertyValue = (e: MouseEvent, plugin: PrettyPropertiesPlugin) 
     }
     return text;
 }
+
+
+
+

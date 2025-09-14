@@ -6,16 +6,12 @@ import {
 	updateBannerStyles, 
 	updateCoverStyles, 
 	updateIconStyles,
-	updateHiddenProperties,
-	updatePillColors,
 	updateRelativeDateColors,
-	updateBaseStyles
 } from "./utils/updates/updateStyles";
 import MenuManager from "src/utils/menuManager";
 import { i18n } from "./localization/localization";
 import { PPSettingTab, PPPluginSettings, DEFAULT_SETTINGS } from "./settings";
 import { registerCommands } from "./utils/registerCommands";
-import { tagFixPlugin } from "./extensions/tagFixExtension";
 import { createCoverMenu } from "./menus/coverMenu";
 import { createBannerMenu } from "./menus/bannerMenu";
 import { createIconMenu } from "./menus/iconMenu";
@@ -25,11 +21,18 @@ import { updateTaskNotesTaskCount } from "./utils/taskCount/taskNotesTaskCount";
 import { updateElements } from "./utils/updates/updateElements";
 import { startObservingLeaf } from "./utils/observer";
 import { getPropertyValue } from "./utils/propertyUtils";
+import { registerTagFixExtension } from "./extensions/tagFixExtension";
+import { startGlobalObserver } from "./utils/observer";
+import { updatePillPaddings } from "./utils/updates/updateStyles";
+import { updateAllPills } from "./utils/updates/updatePills";
+import { registerTagPostProcessor } from "./extensions/tagPostProcessor";
+
 
 
 export default class PrettyPropertiesPlugin extends Plugin {
 	settings: PPPluginSettings;
 	mutations: any[];
+	globalObserver: MutationObserver
 	observers: MutationObserver[];
 	menuManager: MenuManager
 
@@ -40,18 +43,20 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		this.menuManager = new MenuManager
 		this.observers = [];
 
-		updateHiddenProperties(this);
-		updatePillColors(this);
+		startGlobalObserver(this)
+
 		updateRelativeDateColors(this)
 		updateBannerStyles(this);
 		updateIconStyles(this);
 		updateCoverStyles(this);
-		updateBaseStyles(this)
+		updatePillPaddings(this)
+
 		registerCommands(this)
 
-		if (this.settings.nonLatinTagsSupport) {
-			this.registerEditorExtension(tagFixPlugin)
-		}
+		registerTagFixExtension(this)
+		registerTagPostProcessor(this)
+
+		
 		
 		this.registerEvent(
 			this.app.workspace.on("layout-change", async () => {
@@ -72,6 +77,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				}
 			})
 		);
+
+		/*
 
 		this.registerEvent(
 			this.app.workspace.on("layout-change", async () => {
@@ -95,6 +102,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				}
 			})
 		);
+
+		*/
 
 		const registerDocumentEvents = (doc: Document) => {
 			if (Platform.isMobile) {
@@ -168,6 +177,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				"contextmenu",
 				(e: MouseEvent) => {
 					let targetEl = e.target;
+
+					
 					if (targetEl instanceof Element) {
 						if (targetEl.closest(".banner-image")) {
 							e.preventDefault();
@@ -195,10 +206,23 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			})
 		);
 
+		
+		
+
 		this.addSettingTab(new PPSettingTab(this.app, this));
+
+
+		
+
+		
+		
 	}
 
-	onunload() {}
+	onunload() {
+		if (this.globalObserver instanceof MutationObserver) {
+			this.globalObserver.disconnect()
+		}
+	}
 
 	async loadSettings() {
 		this.settings = Object.assign(

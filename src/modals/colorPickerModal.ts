@@ -1,6 +1,6 @@
 import { Modal, App, Setting } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
-import { updatePillColors } from "src/utils/updates/updateStyles";
+import { updateAllPills } from "src/utils/updates/updatePills";
 
 
 export class ColorPickerModal extends Modal {
@@ -32,7 +32,7 @@ export class ColorPickerModal extends Modal {
                 //@ts-ignore
                 this.plugin.settings[this.colorList][this.propVal] = hsl
                 this.plugin.saveSettings()
-                updatePillColors(this.plugin)
+                updateAllPills(this.plugin)
             })
         })
     }

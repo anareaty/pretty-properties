@@ -1,9 +1,10 @@
 import { WorkspaceLeaf, moment } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
-import { addClassestoProperties } from "./updatePills";
 import { updateDateInputs } from "./updateDates";
 
 export const updateBaseLeafPills = (leaf: WorkspaceLeaf, plugin: PrettyPropertiesPlugin) => {
+
+    /*
     if (plugin.settings.enableBases) {
         let containerEl = leaf.view.containerEl;
 
@@ -121,4 +122,5 @@ export const updateBaseLeafPills = (leaf: WorkspaceLeaf, plugin: PrettyPropertie
             updateCardsBasePills();
         }
     }
+    */
 }

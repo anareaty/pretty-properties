@@ -1,7 +1,7 @@
 import { MenuItem } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { i18n } from "src/localization/localization";
-import { updateHiddenProperties } from "src/utils/updates/updateStyles";
+import { updateHiddenProperties } from "src/utils/updates/updateHiddenProperties";
 import { updateElements } from "src/utils/updates/updateElements";
 
 export const handlePropertyMenu = (el: HTMLElement | SVGElement, plugin: PrettyPropertiesPlugin) => {

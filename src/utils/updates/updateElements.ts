@@ -2,7 +2,6 @@ import { TFile, CachedMetadata, MarkdownView, FileView } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { updateBaseLeafPills } from "./updateBasePills";
 import { updateBaseLeafProgress } from "./updateBaseProgress";
-import { addClassestoProperties } from "./updatePills";
 import { updateDateInputs } from "./updateDates";
 import { updateCoverImages } from "./updateCovers";
 import { updateBannerImages } from "./updateBanners";
@@ -10,6 +9,9 @@ import { updateIcons } from "./updateIcons";
 import { updateTasksCount } from "../taskCount/taskCount";
 import { updateTaskNotesTaskCount, needToUpdateTaskNotes } from "../taskCount/taskNotesTaskCount";
 import { updateViewProgress } from "./updateProgress";
+import { updateHiddenProperties } from "./updateHiddenProperties";
+import { updateHiddenPropertiesForLeaf } from "./updateHiddenProperties";
+import { updateAllPills } from "./updatePills";
 
 
 export const updateElements = (plugin: PrettyPropertiesPlugin, changedFile?: TFile | null, cache?: CachedMetadata | null) => {
@@ -51,8 +53,8 @@ export const updateElements = (plugin: PrettyPropertiesPlugin, changedFile?: TFi
     let baseLeaves = plugin.app.workspace.getLeavesOfType("bases");
     for (let leaf of baseLeaves) {
         if (leaf.view instanceof FileView) {
-            updateBaseLeafPills(leaf, plugin);
-            updateBaseLeafProgress(leaf, plugin);
+            //updateBaseLeafPills(leaf, plugin);
+            //updateBaseLeafProgress(leaf, plugin);
         }
     }
 }
@@ -67,9 +69,9 @@ const updateLeafElements = async (
     cache?: CachedMetadata | null
 ) => {
 
-    
-    addClassestoProperties(view, plugin);
-    updateDateInputs(view, plugin)
+    //updateHiddenPropertiesForView(view, plugin)
+    //addClassestoProperties(view, plugin);
+    //updateDateInputs(view, plugin)
 
     if (!cache && view.file) {
         cache = plugin.app.metadataCache.getFileCache(view.file);
@@ -88,5 +90,5 @@ const updateLeafElements = async (
             updateTasksCount(view, cache, plugin);
         }
     }
-    updateViewProgress(view, plugin);
+    //updateViewProgress(view, plugin);
 }

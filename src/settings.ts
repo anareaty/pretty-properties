@@ -2,15 +2,16 @@ import { App, Notice, PluginSettingTab, Setting, Menu, MenuItem, TextComponent, 
 import { i18n } from './localization/localization';
 import PrettyPropertiesPlugin from "./main";
 import { updateElements } from './utils/updates/updateElements';
-import { updateBaseStyles } from './utils/updates/updateStyles';
+//import { updateBaseStyles } from './utils/updates/updateStyles';
 import { 
 	updateBannerStyles, 
 	updateCoverStyles, 
 	updateIconStyles,
-	updateHiddenProperties,
-	updatePillColors,
+	updatePillPaddings,
 	updateRelativeDateColors
 } from './utils/updates/updateStyles';
+import { updateHiddenProperties } from './utils/updates/updateHiddenProperties';
+import { updateAllPills } from './utils/updates/updatePills';
 
 export interface PPPluginSettings {
     hiddenProperties: string[];
@@ -965,7 +966,7 @@ export class PPSettingTab extends PluginSettingTab {
 				.onChange((value) => {
 					this.plugin.settings.addPillPadding = value
 					this.plugin.saveSettings()
-					updatePillColors(this.plugin)
+					updatePillPaddings(this.plugin)
 				})
 			)
 
@@ -976,7 +977,7 @@ export class PPSettingTab extends PluginSettingTab {
 				.onChange(value => {
 					this.plugin.settings.enableColoredProperties = value
 					this.plugin.saveSettings()
-					updatePillColors(this.plugin)
+					updateAllPills(this.plugin)
 					updateElements(this.plugin);
 				})
 			});
@@ -988,7 +989,7 @@ export class PPSettingTab extends PluginSettingTab {
 				.onChange(value => {
 					this.plugin.settings.enableColoredInlineTags = value
 					this.plugin.saveSettings()
-					updatePillColors(this.plugin)
+					updateAllPills(this.plugin)
 				})
 			});
 
@@ -1000,7 +1001,7 @@ export class PPSettingTab extends PluginSettingTab {
 				.onChange(value => {
 					this.plugin.settings.nonLatinTagsSupport = value
 					this.plugin.saveSettings()
-					updatePillColors(this.plugin)
+					updateAllPills(this.plugin)
 				})
 			});
 
@@ -1012,7 +1013,7 @@ export class PPSettingTab extends PluginSettingTab {
 				.onChange(value => {
 					this.plugin.settings.addBaseTagColor = value
 					this.plugin.saveSettings()
-					updatePillColors(this.plugin)
+					updateAllPills(this.plugin)
 				})
 			});
 
@@ -1037,7 +1038,7 @@ export class PPSettingTab extends PluginSettingTab {
 						this.plugin.settings.enableColorButtonInBases = value
 						await this.plugin.saveSettings();
 						this.display();
-						updateBaseStyles(this.plugin)
+						//updateBaseStyles(this.plugin)
 					}));
 
 			new Setting(containerEl)
@@ -1078,7 +1079,7 @@ export class PPSettingTab extends PluginSettingTab {
 								this.plugin.settings.propertyPillColors[value] = this.plugin.settings.propertyPillColors[property]
 								delete this.plugin.settings.propertyPillColors[property]
 								this.plugin.saveSettings()
-								updatePillColors(this.plugin)
+								updateAllPills(this.plugin)
 								this.display()
 							}
 						}
@@ -1096,7 +1097,7 @@ export class PPSettingTab extends PluginSettingTab {
 							let hsl = color.getValueHsl()
 							this.plugin.settings.propertyPillColors[property] = hsl
 							this.plugin.saveSettings()
-							updatePillColors(this.plugin)
+							updateAllPills(this.plugin)
 						})
 					})
 					.addButton(btn => {
@@ -1134,7 +1135,7 @@ export class PPSettingTab extends PluginSettingTab {
 										btn.buttonEl.classList.add("color-" + color)
 										this.plugin.settings.propertyPillColors[property] = color
 										this.plugin.saveSettings()
-										updatePillColors(this.plugin)
+										updateAllPills(this.plugin)
 									})
 									item.setChecked(color == this.plugin.settings.propertyPillColors[property])
 								})
@@ -1148,7 +1149,7 @@ export class PPSettingTab extends PluginSettingTab {
 							delete this.plugin.settings.propertyPillColors[property]
 							this.plugin.saveSettings()
 							propertyColorSetting.settingEl.remove()
-							updatePillColors(this.plugin)
+							updateAllPills(this.plugin)
 						})
 					)
 				}
@@ -1231,7 +1232,7 @@ export class PPSettingTab extends PluginSettingTab {
 								this.plugin.settings.tagColors[value] = this.plugin.settings.tagColors[property]
 								delete this.plugin.settings.tagColors[property]
 								this.plugin.saveSettings()
-								updatePillColors(this.plugin)
+								updateAllPills(this.plugin)
 								this.display()
 							}
 						}
@@ -1249,7 +1250,7 @@ export class PPSettingTab extends PluginSettingTab {
 							let hsl = color.getValueHsl()
 							this.plugin.settings.tagColors[property] = hsl
 							this.plugin.saveSettings()
-							updatePillColors(this.plugin)
+							updateAllPills(this.plugin)
 						})
 					})
 					.addButton(btn => {
@@ -1287,7 +1288,7 @@ export class PPSettingTab extends PluginSettingTab {
 										btn.buttonEl.classList.add("color-" + color)
 										this.plugin.settings.tagColors[property] = color
 										this.plugin.saveSettings()
-										updatePillColors(this.plugin)
+										updateAllPills(this.plugin)
 									})
 									item.setChecked(color == this.plugin.settings.tagColors[property])
 								})
@@ -1301,7 +1302,7 @@ export class PPSettingTab extends PluginSettingTab {
 							delete this.plugin.settings.tagColors[property]
 							this.plugin.saveSettings()
 							propertyColorSetting.settingEl.remove()
-							updatePillColors(this.plugin)
+							updateAllPills(this.plugin)
 						})
 					)
 				}
@@ -1391,7 +1392,7 @@ export class PPSettingTab extends PluginSettingTab {
 								this.plugin.settings.propertyLongtextColors[value] = this.plugin.settings.propertyLongtextColors[property]
 								delete this.plugin.settings.propertyLongtextColors[property]
 								this.plugin.saveSettings()
-								updatePillColors(this.plugin)
+								updateAllPills(this.plugin)
 								this.display()
 							}
 						}
@@ -1409,7 +1410,7 @@ export class PPSettingTab extends PluginSettingTab {
 							let hsl = color.getValueHsl()
 							this.plugin.settings.propertyLongtextColors[property] = hsl
 							this.plugin.saveSettings()
-							updatePillColors(this.plugin)
+							updateAllPills(this.plugin)
 						})
 					})
 					.addButton(btn => {
@@ -1446,7 +1447,7 @@ export class PPSettingTab extends PluginSettingTab {
 										btn.buttonEl.classList.add("color-" + color)
 										this.plugin.settings.propertyLongtextColors[property] = color
 										this.plugin.saveSettings()
-										updatePillColors(this.plugin)
+										updateAllPills(this.plugin)
 									})
 									item.setChecked(color == this.plugin.settings.propertyLongtextColors[property])
 								})
@@ -1460,7 +1461,7 @@ export class PPSettingTab extends PluginSettingTab {
 							delete this.plugin.settings.propertyLongtextColors[property]
 							this.plugin.saveSettings()
 							propertyColorSetting.settingEl.remove()
-							updatePillColors(this.plugin)
+							updateAllPills(this.plugin)
 						})
 					)
 				}
@@ -1842,7 +1843,7 @@ export class PPSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 						updateElements(this.plugin);
 						updateHiddenProperties(this.plugin)
-						updatePillColors(this.plugin)
+						updateAllPills(this.plugin)
 						updateBannerStyles(this.plugin)
 						updateIconStyles(this.plugin)
 						updateCoverStyles(this.plugin)

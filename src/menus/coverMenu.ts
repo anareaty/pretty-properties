@@ -1,7 +1,7 @@
 import { TFile, Menu, MenuItem } from "obsidian";
 import { i18n } from "src/localization/localization";
 import PrettyPropertiesPlugin from "src/main";
-import { updateHiddenProperties } from "src/utils/updates/updateStyles";
+import { updateHiddenProperties } from "src/utils/updates/updateHiddenProperties";
 import { getCurrentCoverProperty } from "src/utils/imageUtils";
 import { selectCoverShape } from "src/utils/imageUtils";
 import { removeProperty } from "src/utils/propertyUtils";
