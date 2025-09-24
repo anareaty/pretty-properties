@@ -6,7 +6,6 @@ import { CoverShapeSuggestModal } from "src/modals/coverShapeSuggestModal";
 import { ImageSuggestModal } from "src/modals/imageSuggestModal";
 
 
-
 export const selectLocalImage = async (propName: string, folder: string, shape: string, plugin: PrettyPropertiesPlugin) => {
     let file = plugin.app.workspace.getActiveFile();
     if (file instanceof TFile) {

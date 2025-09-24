@@ -52,7 +52,6 @@ const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string, plugi
                 }
 
                 plugin.saveSettings();
-                //updatePillColors(plugin);
                 updateAllPills(plugin)
             });
             //@ts-ignore

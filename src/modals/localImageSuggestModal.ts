@@ -1,4 +1,4 @@
-import { SuggestModal, TFile, App, Modal, Setting, MarkdownRenderer } from "obsidian";
+import { SuggestModal, TFile, App, MarkdownRenderer } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 
 

@@ -150,6 +150,7 @@ export default {
   SHOW_COLORED_TAGS: "Show colored tags",
   ADD_COLORED_TAG: "Add colored tag",
   ICON_SIZE_MOBILE: "Icon size on mobile",
+  HIDE_PROPERTIES_IN_SIDEBAR: "Also hide hidden properties in sidebar property tab",
 
 
 

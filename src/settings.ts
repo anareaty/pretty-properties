@@ -2,16 +2,18 @@ import { App, Notice, PluginSettingTab, Setting, Menu, MenuItem, TextComponent, 
 import { i18n } from './localization/localization';
 import PrettyPropertiesPlugin from "./main";
 import { updateElements } from './utils/updates/updateElements';
-//import { updateBaseStyles } from './utils/updates/updateStyles';
+
 import { 
 	updateBannerStyles, 
 	updateCoverStyles, 
 	updateIconStyles,
 	updatePillPaddings,
-	updateRelativeDateColors
+	updateRelativeDateColors,
+	updateBaseTagsStyle
 } from './utils/updates/updateStyles';
 import { updateHiddenProperties } from './utils/updates/updateHiddenProperties';
 import { updateAllPills } from './utils/updates/updatePills';
+import { updateHiddenPropertiesInPropTab } from './utils/updates/updateStyles';
 
 export interface PPPluginSettings {
     hiddenProperties: string[];
@@ -95,6 +97,8 @@ export interface PPPluginSettings {
 	tagColors: any;
 	showTagColorSettings: boolean;
 	iconSizeMobile: number;
+	hidePropertiesInPropTab: boolean;
+	
 
 	
 	
@@ -182,6 +186,7 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	tagColors: {},
 	showTagColorSettings: false,
 	iconSizeMobile: 70,
+	hidePropertiesInPropTab: false
 
 }
 
@@ -993,6 +998,7 @@ export class PPSettingTab extends PluginSettingTab {
 				})
 			});
 
+			/*
 			new Setting(containerEl)
 			.setName(i18n.t("ENABLE_NON_LATIN_TAGS_SUPPORT"))
 			.setDesc(i18n.t("ENABLE_NON_LATIN_TAGS_SUPPORT_DESC"))
@@ -1004,6 +1010,7 @@ export class PPSettingTab extends PluginSettingTab {
 					updateAllPills(this.plugin)
 				})
 			});
+			*/
 
 			new Setting(containerEl)
 			.setName(i18n.t("BASE_TAGS_COLOR"))
@@ -1013,7 +1020,7 @@ export class PPSettingTab extends PluginSettingTab {
 				.onChange(value => {
 					this.plugin.settings.addBaseTagColor = value
 					this.plugin.saveSettings()
-					updateAllPills(this.plugin)
+					updateBaseTagsStyle(this.plugin)
 				})
 			});
 
@@ -1038,8 +1045,23 @@ export class PPSettingTab extends PluginSettingTab {
 						this.plugin.settings.enableColorButtonInBases = value
 						await this.plugin.saveSettings();
 						this.display();
-						//updateBaseStyles(this.plugin)
+						
 					}));
+
+
+
+			new Setting(containerEl)
+				.setName(i18n.t("HIDE_PROPERTIES_IN_SIDEBAR"))
+				.addToggle(toggle => toggle
+					.setValue(this.plugin.settings.hidePropertiesInPropTab)
+					.onChange(async (value) => {
+						this.plugin.settings.hidePropertiesInPropTab = value
+						await this.plugin.saveSettings();
+						updateHiddenPropertiesInPropTab(this.plugin)
+					}));
+
+
+
 
 			new Setting(containerEl)
 			.setName(i18n.t("SHOW_COLORED_PROPERTIES"))
@@ -1827,7 +1849,7 @@ export class PPSettingTab extends PluginSettingTab {
 						this.plugin.settings.enableBases = value
 						await this.plugin.saveSettings();
 						this.display();
-						updateBaseStyles(this.plugin)
+						
 					}));
 
 			new Setting(containerEl)

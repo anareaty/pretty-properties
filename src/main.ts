@@ -19,44 +19,40 @@ import { handlePropertyMenu } from "./menus/propertyMenu";
 import { handlePillMenu, handleTagMenu } from "./menus/selectColorMenus";
 import { updateTaskNotesTaskCount } from "./utils/taskCount/taskNotesTaskCount";
 import { updateElements } from "./utils/updates/updateElements";
-import { startObservingLeaf } from "./utils/observer";
 import { getPropertyValue } from "./utils/propertyUtils";
 import { registerTagFixExtension } from "./extensions/tagFixExtension";
-import { startGlobalObserver } from "./utils/observer";
+import { startObserver } from "./utils/observer";
 import { updatePillPaddings } from "./utils/updates/updateStyles";
-import { updateAllPills } from "./utils/updates/updatePills";
 import { registerTagPostProcessor } from "./extensions/tagPostProcessor";
+import { updateHiddenPropertiesInPropTab, updateBaseTagsStyle } from "./utils/updates/updateStyles";
 
 
 
 export default class PrettyPropertiesPlugin extends Plugin {
 	settings: PPPluginSettings;
 	mutations: any[];
-	globalObserver: MutationObserver
-	observers: MutationObserver[];
+	observer: MutationObserver
 	menuManager: MenuManager
 
 	async onload() {
 		await this.loadSettings();
 		i18n.setLocale();
-
 		this.menuManager = new MenuManager
-		this.observers = [];
-
-		startGlobalObserver(this)
+		startObserver(this)
 
 		updateRelativeDateColors(this)
 		updateBannerStyles(this);
 		updateIconStyles(this);
 		updateCoverStyles(this);
 		updatePillPaddings(this)
+		updateHiddenPropertiesInPropTab(this)
+		updateBaseTagsStyle(this)
 
 		registerCommands(this)
 
 		registerTagFixExtension(this)
 		registerTagPostProcessor(this)
 
-		
 		
 		this.registerEvent(
 			this.app.workspace.on("layout-change", async () => {
@@ -78,32 +74,6 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			})
 		);
 
-		/*
-
-		this.registerEvent(
-			this.app.workspace.on("layout-change", async () => {
-				this.observers.forEach((obs) => {
-					obs.disconnect();
-				});
-				this.observers = [];
-				const mdLeafs = this.app.workspace.getLeavesOfType("markdown");
-				for (let leaf of mdLeafs) {
-					startObservingLeaf(leaf, "markdown", this);
-				}
-				const propLeafs = this.app.workspace.getLeavesOfType("file-properties");
-				for (let leaf of propLeafs) {
-					startObservingLeaf(leaf, "file-properties", this);
-				}
-				if (this.settings.enableBases) {
-					const baseLeafs = this.app.workspace.getLeavesOfType("bases");
-					for (let leaf of baseLeafs) {
-						startObservingLeaf(leaf, "bases", this);
-					}
-				}
-			})
-		);
-
-		*/
 
 		const registerDocumentEvents = (doc: Document) => {
 			if (Platform.isMobile) {
@@ -155,18 +125,21 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 			this.registerDomEvent(doc, "click", (e: MouseEvent) => {
 
-				//@ts-ignore
-				let searchPlugin = this.app.internalPlugins.plugins["global-search"]
+				if (e.target instanceof HTMLElement && e.target.classList.contains("internal-link")) {
+					return
+				}
 
-				if (searchPlugin.enabled && e.target instanceof HTMLElement) {
-					
+				//@ts-ignore
+				let searchPlugin = this.app.internalPlugins.getEnabledPluginById("global-search")
+
+				if (searchPlugin && e.target instanceof HTMLElement) {
 					if ((e.ctrlKey || e.metaKey)) {
 						let value = getPropertyValue(e, this);
 						if (value !== undefined) {
 							let propEl = e.target.closest(".metadata-property");
 							let prop = propEl!.getAttribute("data-property-key");
 							let search = "[" + prop + ': "' + value + '"]';
-							searchPlugin.instance.openGlobalSearch(search);
+							searchPlugin.openGlobalSearch(search);
 						}
 					}
 				}
@@ -206,21 +179,12 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			})
 		);
 
-		
-		
-
 		this.addSettingTab(new PPSettingTab(this.app, this));
-
-
-		
-
-		
-		
 	}
 
 	onunload() {
-		if (this.globalObserver instanceof MutationObserver) {
-			this.globalObserver.disconnect()
+		if (this.observer instanceof MutationObserver) {
+			this.observer.disconnect()
 		}
 	}
 

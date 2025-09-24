@@ -160,5 +160,6 @@ export default {
   SHOW_COLORED_TAGS: "Показать список цветных тэгов",
   ADD_COLORED_TAG: "Добавить цветной тэг",
   ICON_SIZE_MOBILE: "Размер иконки на мобильном",
+  HIDE_PROPERTIES_IN_SIDEBAR: "Прятать скрытые свойства также и в панели просмотра свойств"
 };
 

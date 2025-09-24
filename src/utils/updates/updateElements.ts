@@ -1,23 +1,20 @@
 import { TFile, CachedMetadata, MarkdownView, FileView } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
-import { updateBaseLeafPills } from "./updateBasePills";
-import { updateBaseLeafProgress } from "./updateBaseProgress";
-import { updateDateInputs } from "./updateDates";
 import { updateCoverImages } from "./updateCovers";
 import { updateBannerImages } from "./updateBanners";
 import { updateIcons } from "./updateIcons";
 import { updateTasksCount } from "../taskCount/taskCount";
 import { updateTaskNotesTaskCount, needToUpdateTaskNotes } from "../taskCount/taskNotesTaskCount";
-import { updateViewProgress } from "./updateProgress";
-import { updateHiddenProperties } from "./updateHiddenProperties";
-import { updateHiddenPropertiesForLeaf } from "./updateHiddenProperties";
-import { updateAllPills } from "./updatePills";
+import { updateDateInputs } from "./updateDates";
+import { updateProgressEls } from "./updateProgress";
+import { updatePills } from "./updatePills";
+import { updateHiddenPropertiesForContainer } from "./updateHiddenProperties";
+import { updateBaseProgressEls } from "./updateBaseProgress";
 
 
 export const updateElements = (plugin: PrettyPropertiesPlugin, changedFile?: TFile | null, cache?: CachedMetadata | null) => {
 
     let updateTaskNotes = needToUpdateTaskNotes(plugin, cache)
-    
     let leaves = plugin.app.workspace.getLeavesOfType("markdown");
     for (let leaf of leaves) {
         if (leaf.view instanceof MarkdownView) {
@@ -50,17 +47,18 @@ export const updateElements = (plugin: PrettyPropertiesPlugin, changedFile?: TFi
         }
     }
 
-    let baseLeaves = plugin.app.workspace.getLeavesOfType("bases");
-    for (let leaf of baseLeaves) {
-        if (leaf.view instanceof FileView) {
-            //updateBaseLeafPills(leaf, plugin);
-            //updateBaseLeafProgress(leaf, plugin);
+    
+    if (plugin.settings.enableBases) {
+        let baseLeaves = plugin.app.workspace.getLeavesOfType("bases");
+        for (let leaf of baseLeaves) {
+            if (leaf.view instanceof FileView) {
+                let container = leaf.view.containerEl;
+                updateDateInputs(container, plugin)
+            }
         }
     }
+    
 }
-
-
-
 
 
 const updateLeafElements = async (
@@ -69,9 +67,11 @@ const updateLeafElements = async (
     cache?: CachedMetadata | null
 ) => {
 
-    //updateHiddenPropertiesForView(view, plugin)
-    //addClassestoProperties(view, plugin);
-    //updateDateInputs(view, plugin)
+    let container = view.containerEl;
+    updateDateInputs(container, plugin)
+    updateProgressEls(container, plugin)
+    updatePills(container, plugin)
+    updateHiddenPropertiesForContainer(container, plugin)
 
     if (!cache && view.file) {
         cache = plugin.app.metadataCache.getFileCache(view.file);
@@ -90,5 +90,4 @@ const updateLeafElements = async (
             updateTasksCount(view, cache, plugin);
         }
     }
-    //updateViewProgress(view, plugin);
 }

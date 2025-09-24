@@ -1,4 +1,4 @@
-import { SuggestModal, TFile, App, Modal, Setting, MarkdownRenderer } from "obsidian";
+import { SuggestModal, App } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { i18n } from "src/localization/localization";
 import { ImageLinkPrompt } from "src/modals/imageLinkPrompt";

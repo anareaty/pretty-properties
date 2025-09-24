@@ -1,4 +1,4 @@
-import { SuggestModal, TFile, getIcon, getIconIds, App } from "obsidian";
+import { SuggestModal, TFile, App } from "obsidian";
 import Emojilib from "emojilib";
 import PrettyPropertiesPlugin from "src/main";
 

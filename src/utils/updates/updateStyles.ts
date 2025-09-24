@@ -1,9 +1,7 @@
 import PrettyPropertiesPlugin from "src/main";
-import { Platform, MarkdownView, FileView } from "obsidian";
-import { EditorView } from '@codemirror/view';
+import { Platform } from "obsidian";
 import { getTextLightness } from "./updatePills";
-
-
+import { updateHiddenProperties } from "./updateHiddenProperties";
 
 
 export const updateBannerStyles = (plugin: PrettyPropertiesPlugin) => {
@@ -74,9 +72,6 @@ export const updateCoverStyles = (plugin: PrettyPropertiesPlugin) => {
 
 
 
-
-
-
 export const updateRelativeDateColors = (plugin: PrettyPropertiesPlugin) => {
   let colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink"];
   let futureColor = plugin.settings.dateFutureColor;
@@ -144,5 +139,15 @@ export const updatePillPaddings = (plugin: PrettyPropertiesPlugin) => {
 
 
 
+export const updateHiddenPropertiesInPropTab = (plugin: PrettyPropertiesPlugin) => {
+  let hidden = plugin.settings.hidePropertiesInPropTab
+  document.body.classList.toggle("hidden-props-in-prop-tab", hidden)
+  updateHiddenProperties(plugin)
+}
+
+
+export const updateBaseTagsStyle = (plugin: PrettyPropertiesPlugin) => {
+  document.body.classList.toggle("base-tags-style", plugin.settings.addBaseTagColor)
+}
 
 

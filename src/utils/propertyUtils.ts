@@ -25,6 +25,11 @@ export const getCurrentProperty = (propName: string, plugin: PrettyPropertiesPlu
 export const getPropertyValue = (e: MouseEvent, plugin: PrettyPropertiesPlugin) => {
     let targetEl = e.target;
     let text;
+
+    if (targetEl instanceof HTMLElement && targetEl.classList.contains("custom-date")) {
+        targetEl = targetEl.previousSibling
+    }
+
     if (targetEl instanceof HTMLElement) {
         let valueTextEl =
             targetEl.closest(".metadata-input-longtext") ||
