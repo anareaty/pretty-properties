@@ -185,7 +185,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				},
 				true
 			);
-		};
+		}
 
 		registerDocumentEvents(document);
 
