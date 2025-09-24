@@ -193,7 +193,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			{},
 			DEFAULT_SETTINGS,
 			await this.loadData()
-		);
+		)
 	}
 
 	async saveSettings() {
