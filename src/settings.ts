@@ -98,6 +98,7 @@ export interface PPPluginSettings {
 	showTagColorSettings: boolean;
 	iconSizeMobile: number;
 	hidePropertiesInPropTab: boolean;
+	autoTasksCount: boolean
 	
 
 	
@@ -186,7 +187,8 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	tagColors: {},
 	showTagColorSettings: false,
 	iconSizeMobile: 70,
-	hidePropertiesInPropTab: false
+	hidePropertiesInPropTab: false,
+	autoTasksCount: true,
 
 }
 
@@ -952,6 +954,23 @@ export class PPSettingTab extends PluginSettingTab {
 						updateElements(this.plugin);
 					}));
 			}
+
+
+
+			if (this.plugin.settings.enableTasksCount || this.plugin.settings.enableTaskNotesCount) {
+				new Setting(containerEl)
+					.setName(i18n.t("AUTOMATIC_TASKS_COUNT"))
+					.setDesc(i18n.t("AUTOMATIC_TASKS_COUNT_DESC"))
+					.addToggle((toggle) => toggle
+					.setValue(this.plugin.settings.autoTasksCount)
+					.onChange(async (value) => {
+						this.plugin.settings.autoTasksCount = value;
+						await this.plugin.saveSettings();
+						this.display();
+					}));
+			}
+
+
 		}
 
 

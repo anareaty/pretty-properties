@@ -21,7 +21,7 @@ export const needToUpdateTaskNotes = (plugin: PrettyPropertiesPlugin, cache?: Ca
                 if (cache.frontmatter?.[taskPropertyName] == taskPropertyValue) {
                     isTask = true
                 }
-            }
+            } 
         } 
         return isTask
     }
@@ -33,13 +33,15 @@ export const needToUpdateTaskNotes = (plugin: PrettyPropertiesPlugin, cache?: Ca
 export const updateTaskNotesTaskCount = async (plugin: PrettyPropertiesPlugin, file: TFile | null, view?: View) => {
 
     //@ts-ignore
-    let tn = plugin.app.plugins.plugins.tasknotes
+    let tn = plugin.app.plugins.getPlugin("tasknotes")
+
+    
 
     if (!file && view instanceof MarkdownView) {
         file = view.file
     }
 
-    if (tn && file instanceof TFile) {
+    if (tn && tn.taskLinkDetectionService && file instanceof TFile) {
         let statuses = tn.statusManager?.statuses
         let completedStatuses = statuses.filter((s: any) => s.isCompleted)
 
@@ -57,10 +59,13 @@ export const updateTaskNotesTaskCount = async (plugin: PrettyPropertiesPlugin, f
         let cache = plugin.app.metadataCache.getFileCache(file)
         if (cache) {
             let links = cache.links
+
+            
             if (links) {
                 for (let link of links) {
                     let linkText = link.original
                     let taskLinkObj = await tn.taskLinkDetectionService?.detectTaskLink(linkText)
+
                     if (taskLinkObj?.isValidTaskLink) {
                         let task = taskLinkObj.taskInfo
                         inlineTasks.push(task)

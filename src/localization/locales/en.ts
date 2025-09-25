@@ -151,9 +151,9 @@ export default {
   ADD_COLORED_TAG: "Add colored tag",
   ICON_SIZE_MOBILE: "Icon size on mobile",
   HIDE_PROPERTIES_IN_SIDEBAR: "Also hide hidden properties in sidebar property tab",
-
-
-
+  AUTOMATIC_TASKS_COUNT: "Update all task counts automatically",
+  AUTOMATIC_TASKS_COUNT_DESC: "Cann affect performance. If disabled task counts can be only updated by command.",
+  UPDATE_TASK_COUNT: "Update task count",
 };
 
 

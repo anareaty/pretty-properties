@@ -68,7 +68,10 @@ You can also add you own styling to the list properties. Each of them (even not 
 
 You can add color to tags the same way as to the list properties. If you want to see the colored tags not only in properties, but also in the note text, you need to turn this option on in the settings.
 
-By default Obsidian does not allow to style tags with non-latin characters in Live preview mode. To fix this you can turn on the option to suppirt non-latin tags. 
+By default Obsidian does not allow to style tags with non-latin characters in Live preview mode, but this plugin makes it possible.
+
+> [!WARNING]  
+> The option to show colored tags in the note is currently conflicting with the Iconic plugin tags styling. Don't use both at the same time, or you may get inconsistent results. Also don't use it with any other plugin that changes tags.
 
   
 

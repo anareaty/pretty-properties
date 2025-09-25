@@ -62,13 +62,14 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 		this.registerEvent(
 			this.app.metadataCache.on("changed", async (file, data, cache) => {
+				console.log("changed")
 				updateElements(this, file, cache);
 			})
 		);
 
 		this.registerEvent(
 			this.app.workspace.on("file-open", async (file) => {
-				if (file && this.settings.enableTaskNotesCount) {
+				if (file && this.settings.enableTaskNotesCount && this.settings.autoTasksCount) {
 					updateTaskNotesTaskCount(this, file)
 				}
 			})

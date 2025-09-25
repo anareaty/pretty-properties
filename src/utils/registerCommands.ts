@@ -1,5 +1,5 @@
 import PrettyPropertiesPlugin from "src/main";
-import { TFile } from "obsidian";
+import { TFile, MarkdownView } from "obsidian";
 import { i18n } from "src/localization/localization";
 import { removeProperty } from "./propertyUtils";
 import { selectCoverImage } from "./imageUtils";
@@ -9,6 +9,8 @@ import { selectCoverShape } from "./imageUtils";
 import { FileImageSuggestModal } from "src/modals/fileImageSuggestModal";
 import { ImageSuggestModal } from "src/modals/imageSuggestModal";
 import { IconSuggestModal } from "src/modals/iconSuggestModal";
+import { updateTasksCount } from "./taskCount/taskCount";
+import { updateTaskNotesTaskCount } from "./taskCount/taskNotesTaskCount";
 
 
 export function registerCommands(plugin: PrettyPropertiesPlugin) {
@@ -198,6 +200,43 @@ export function registerCommands(plugin: PrettyPropertiesPlugin) {
             return false;
         },
     });
+
+
+
+    plugin.addCommand({
+        id: "update-tasks-count",
+        name: i18n.t("UPDATE_TASK_COUNT"),
+        checkCallback: (checking: boolean) => {
+          if (plugin.settings.enableTasksCount || plugin.settings.enableTaskNotesCount) {
+            if (!checking) {
+              let leaves = plugin.app.workspace.getLeavesOfType("markdown");
+              for (let leaf of leaves) {
+                if (leaf.view instanceof MarkdownView) {
+                  let view = leaf.view
+                  let file = view.file
+                  if (file instanceof TFile) {
+                    let cache = plugin.app.metadataCache.getFileCache(file)
+    
+                    if (plugin.settings.enableTaskNotesCount) {
+                        updateTaskNotesTaskCount(plugin, null, view);
+                    }
+        
+                    if (plugin.settings.enableTasksCount && cache) {
+                        updateTasksCount(view, cache, plugin);
+                    }
+                  }
+                  
+                }
+              }
+            }
+            return true;
+          }
+          return false;
+        }
+      });
+
+
+
 }
 
 
