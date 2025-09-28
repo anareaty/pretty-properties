@@ -4,9 +4,9 @@ import PrettyPropertiesPlugin from "src/main";
 export const updateHiddenProperty = async (propEl: HTMLElement, plugin: PrettyPropertiesPlugin) => {
     let propName = propEl.getAttribute("data-property-key") || ""
     if (plugin.settings.hiddenProperties.find(p => p == propName)) {
-        propEl.classList.add("hidden")
+        propEl.classList.add("pp-property-hidden")
     } else {
-        propEl.classList.remove("hidden")
+        propEl.classList.remove("pp-property-hidden")
     }
 }
 

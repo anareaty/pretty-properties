@@ -80,7 +80,14 @@ export const updateBaseProgress = async (progressEl: HTMLElement) => {
 
 					progressWrapper.append(progress);
 					progressEl.classList.add("has-progress-bar");
-					progressEl.prepend(progressWrapper);
+
+
+					if (isBaseCard) {
+						progressEl.append(progressWrapper);
+					} else {
+						progressEl.prepend(progressWrapper);
+					}
+					
 				}
 
 				

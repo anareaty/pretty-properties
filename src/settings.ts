@@ -14,6 +14,8 @@ import {
 import { updateHiddenProperties } from './utils/updates/updateHiddenProperties';
 import { updateAllPills } from './utils/updates/updatePills';
 import { updateHiddenPropertiesInPropTab } from './utils/updates/updateStyles';
+import { updateTagPaneTagsAll } from './utils/updates/updatePills';
+import { tryLoadMath, updateBaseMathEls, updateNoteMathEls } from './utils/updates/updateMath';
 
 export interface PPPluginSettings {
     hiddenProperties: string[];
@@ -99,6 +101,9 @@ export interface PPPluginSettings {
 	iconSizeMobile: number;
 	hidePropertiesInPropTab: boolean;
 	autoTasksCount: boolean
+	enableColoredTagsInTagPane: boolean;
+	mathProperties: string[];
+	enableMath: boolean;
 	
 
 	
@@ -189,6 +194,9 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	iconSizeMobile: 70,
 	hidePropertiesInPropTab: false,
 	autoTasksCount: true,
+	enableColoredTagsInTagPane: false,
+	mathProperties: [],
+	enableMath: false,
 
 }
 
@@ -1017,19 +1025,20 @@ export class PPSettingTab extends PluginSettingTab {
 				})
 			});
 
-			/*
+
+
 			new Setting(containerEl)
-			.setName(i18n.t("ENABLE_NON_LATIN_TAGS_SUPPORT"))
-			.setDesc(i18n.t("ENABLE_NON_LATIN_TAGS_SUPPORT_DESC"))
-			.addToggle(toggle => {
-				toggle.setValue(this.plugin.settings.nonLatinTagsSupport)
-				.onChange(value => {
-					this.plugin.settings.nonLatinTagsSupport = value
-					this.plugin.saveSettings()
-					updateAllPills(this.plugin)
-				})
+			.setName(i18n.t("ENABLE_COLORED_TAGS_IN_TAG_PANE"))
+			.addToggle((toggle) => {
+				toggle
+				.setValue(this.plugin.settings.enableColoredTagsInTagPane)
+				.onChange((value) => {
+					this.plugin.settings.enableColoredTagsInTagPane = value;
+					this.plugin.saveSettings();
+					updateAllPills(this.plugin);
+					updateTagPaneTagsAll(this.plugin)
+				});
 			});
-			*/
 
 			new Setting(containerEl)
 			.setName(i18n.t("BASE_TAGS_COLOR"))
@@ -1866,9 +1875,19 @@ export class PPSettingTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.enableBases)
 					.onChange(async (value) => {
 						this.plugin.settings.enableBases = value
+						await this.plugin.saveSettings();					
+					}));
+
+			new Setting(containerEl)
+				.setName(i18n.t("ENABLE_MATH"))
+				.addToggle(toggle => toggle
+					.setValue(this.plugin.settings.enableMath)
+					.onChange(async (value) => {
+						this.plugin.settings.enableMath = value
 						await this.plugin.saveSettings();
-						this.display();
-						
+						tryLoadMath(this.plugin)
+						updateNoteMathEls(document.body, this.plugin)
+						updateBaseMathEls(document.body, this.plugin)				
 					}));
 
 			new Setting(containerEl)

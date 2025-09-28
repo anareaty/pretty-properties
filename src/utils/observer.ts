@@ -12,6 +12,9 @@ import {
 import { updateProgress, updateProgressEls } from "./updates/updateProgress";
 import { updateHiddenProperty} from "./updates/updateHiddenProperties";
 import { updateHiddenPropertiesForContainer } from "./updates/updateHiddenProperties";
+import { updateBaseMath, updateBaseMathEls, updateMathForChangedEl } from "./updates/updateMath";
+import { updateTagPaneTags } from "./updates/updatePills";
+import { updateNoteMath, updateNoteMathEls } from "./updates/updateMath";
 
 
 export const startObserver = (plugin: PrettyPropertiesPlugin) => {
@@ -27,9 +30,24 @@ export const startObserver = (plugin: PrettyPropertiesPlugin) => {
 const processMutation = async (mutation: MutationRecord, plugin: PrettyPropertiesPlugin) => {
     let target = mutation.target
     let addedNodes = mutation.addedNodes
-    if (addedNodes.length == 0) return
-
+    
     if (target instanceof HTMLElement) {
+
+       if (plugin.settings.enableBases) {
+            if (target.classList.contains("bases-cards-line")) {
+                let parent = target.parentElement
+                if (parent instanceof HTMLElement) {
+                    updateBaseCardPills(parent, plugin)
+                    updateBaseProgress(parent)
+                    updateBaseMath(parent, plugin)
+                    updateDateInputs(parent, plugin)
+                } 
+                return
+            }
+        }
+
+        if (addedNodes.length == 0) return
+        
 
         if (target.classList.contains("metadata-properties")) {
             for (let node of addedNodes) {
@@ -37,6 +55,10 @@ const processMutation = async (mutation: MutationRecord, plugin: PrettyPropertie
                     updatePills(node, plugin)
                     updateDateInputs(node, plugin)
                     updateProgress(node, plugin)
+                    if (plugin.settings.enableMath) {
+                        updateNoteMath(node, plugin)
+                    }
+                    
                     updateHiddenProperty(node, plugin)
                 }
             }
@@ -51,8 +73,14 @@ const processMutation = async (mutation: MutationRecord, plugin: PrettyPropertie
 
         if (target.classList.contains("metadata-input-longtext")) {
             updateLongtext(target, plugin)
+            if (plugin.settings.enableMath) {
+                updateMathForChangedEl(target, plugin)
+            }  
             return
         }
+
+
+        
 
 
         if (plugin.settings.enableBases) {
@@ -72,6 +100,7 @@ const processMutation = async (mutation: MutationRecord, plugin: PrettyPropertie
                         updateDateInputs(node, plugin)
                         updateBaseTablePills(node, plugin)
                         updateBaseProgressEls(node)
+                        updateBaseMathEls(node, plugin)
                     }
                 }         
                 return
@@ -83,6 +112,7 @@ const processMutation = async (mutation: MutationRecord, plugin: PrettyPropertie
                         updateDateInputs(node, plugin)
                         updateBaseTablePills(node, plugin)
                         updateBaseProgress(node)
+                        updateBaseMath(node, plugin)
                     }
                 }         
                 return
@@ -92,6 +122,7 @@ const processMutation = async (mutation: MutationRecord, plugin: PrettyPropertie
                 let parent = target.parentElement
                 if (parent instanceof HTMLElement) {
                     updateBaseProgress(parent) 
+                    updateBaseMath(parent, plugin)
                     updateDateInputs(parent, plugin)
                 } 
                 return
@@ -110,6 +141,7 @@ const processMutation = async (mutation: MutationRecord, plugin: PrettyPropertie
                     if (node instanceof HTMLElement) {
                         updateBaseCardPills(node, plugin)
                         updateBaseProgressEls(node)
+                        updateBaseMathEls(node, plugin)
                         updateDateInputs(node, plugin) 
                     }
                 }
@@ -119,20 +151,12 @@ const processMutation = async (mutation: MutationRecord, plugin: PrettyPropertie
             if (target.classList.contains("bases-cards-property")) {
                 updateBaseCardPills(target, plugin)
                 updateBaseProgress(target)
+                updateBaseMath(target, plugin)
                 updateDateInputs(target, plugin)
                 return
             }
 
-            if (target.classList.contains("bases-cards-line")) {
-
-                let parent = target.parentElement
-                if (parent instanceof HTMLElement) {
-                    updateBaseCardPills(parent, plugin)
-                    updateBaseProgress(parent)
-                    updateDateInputs(parent, plugin)
-                } 
-                return
-            }
+            
         }
         
         // Hover-popover
@@ -141,8 +165,21 @@ const processMutation = async (mutation: MutationRecord, plugin: PrettyPropertie
             updatePills(target, plugin)
             updateDateInputs(target, plugin)
             updateProgressEls(target, plugin)
+            if (plugin.settings.enableMath) {
+                updateNoteMathEls(target, plugin)
+            }
             updateHiddenPropertiesForContainer(target, plugin)
             return 
+        }
+
+
+        if (plugin.settings.enableColoredTagsInTagPane && target.className == "" && target.parentElement?.classList.contains("tag-container")) {
+            for (let node of addedNodes) {
+                if (node instanceof HTMLElement) {
+                    updateTagPaneTags(target, plugin)
+                }
+            }
+            return;
         }
     }
 }

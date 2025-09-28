@@ -16,7 +16,7 @@ import { createCoverMenu } from "./menus/coverMenu";
 import { createBannerMenu } from "./menus/bannerMenu";
 import { createIconMenu } from "./menus/iconMenu";
 import { handlePropertyMenu } from "./menus/propertyMenu";
-import { handlePillMenu, handleTagMenu } from "./menus/selectColorMenus";
+import { handlePillMenu, handleTagMenu, handleTagPaneMenu } from "./menus/selectColorMenus";
 import { updateTaskNotesTaskCount } from "./utils/taskCount/taskNotesTaskCount";
 import { updateElements } from "./utils/updates/updateElements";
 import { getPropertyValue } from "./utils/propertyUtils";
@@ -25,7 +25,9 @@ import { startObserver } from "./utils/observer";
 import { updatePillPaddings } from "./utils/updates/updateStyles";
 import { registerTagPostProcessor } from "./extensions/tagPostProcessor";
 import { updateHiddenPropertiesInPropTab, updateBaseTagsStyle } from "./utils/updates/updateStyles";
-
+import { updateTagPaneTagsAll } from "./utils/updates/updatePills";
+import { tryLoadMath } from "./utils/updates/updateMath";
+import { handleBasesHeaderMenu } from "./menus/basesHeaderMenu";
 
 
 export default class PrettyPropertiesPlugin extends Plugin {
@@ -39,6 +41,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		i18n.setLocale();
 		this.menuManager = new MenuManager
 		startObserver(this)
+		tryLoadMath(this)
+		
 
 		updateRelativeDateColors(this)
 		updateBannerStyles(this);
@@ -47,6 +51,11 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		updatePillPaddings(this)
 		updateHiddenPropertiesInPropTab(this)
 		updateBaseTagsStyle(this)
+
+		if (this.settings.enableColoredTagsInTagPane) {
+			updateTagPaneTagsAll(this)
+		}
+		
 
 		registerCommands(this)
 
@@ -62,7 +71,6 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 		this.registerEvent(
 			this.app.metadataCache.on("changed", async (file, data, cache) => {
-				console.log("changed")
 				updateElements(this, file, cache);
 			})
 		);
@@ -117,6 +125,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 						this.settings.enableColoredInlineTags) {
 							handleTagMenu(e, targetEl, this);
 						}
+
 					}
 					if (targetEl.closest(".metadata-property-icon")) {
 						handlePropertyMenu(targetEl, this);
@@ -154,6 +163,13 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 					
 					if (targetEl instanceof Element) {
+						if (targetEl.closest(".pp-icon")) {
+							e.preventDefault();
+							createIconMenu(e, this);
+						}
+					}
+
+					if (targetEl instanceof HTMLElement) {
 						if (targetEl.closest(".banner-image")) {
 							e.preventDefault();
 							createBannerMenu(e, this);
@@ -162,10 +178,11 @@ export default class PrettyPropertiesPlugin extends Plugin {
 							e.preventDefault();
 							createCoverMenu(e, this);
 						}
-						if (targetEl.closest(".pp-icon")) {
-							e.preventDefault();
-							createIconMenu(e, this);
+						if (targetEl.closest(".tag-pane-tag") &&
+						this.settings.enableColoredTagsInTagPane) {
+							handleTagPaneMenu(e, targetEl, this);
 						}
+
 					}
 				},
 				true

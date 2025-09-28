@@ -134,6 +134,48 @@ export const handleTagMenu = (e: MouseEvent | TouchEvent, el: HTMLElement, plugi
 }
 
 
+
+export const handleTagPaneMenu = (e: MouseEvent | TouchEvent, el: HTMLElement, plugin: PrettyPropertiesPlugin) => {
+    //@ts-ignore
+    let menuExist = plugin.app.plugins.getPlugin("tag-wrangler")
+
+    let wrapper = el.closest(".tag-pane-tag")
+    if (wrapper instanceof HTMLElement) {
+        let tag = wrapper.querySelector("span.tree-item-inner-text")
+        let parent = wrapper.querySelector("span.tag-pane-tag-parent")
+        let parentText = ""
+        if (parent instanceof HTMLElement) {
+            parentText = parent.innerText
+        }
+        if (tag instanceof HTMLElement) {
+            let tagText = parentText + tag.innerText
+            if (tagText) {
+                if (menuExist) {
+                    let menuManager = plugin.menuManager
+                    menuManager.closeAndFlush()
+                    menuManager.addItemAfter(
+                        ["clipboard"],
+                        i18n.t("SELECT_COLOR"),
+                        (item: MenuItem) => {
+                            if (tagText) createColorMenu(item, tagText, "tagColors", plugin)
+                        }
+                    );
+                } else {
+                    let ev = e as MouseEvent
+                    let menu = new Menu();
+                    menu.addItem(
+                        (item: MenuItem) => {
+                            if (tagText) createColorMenu(item, tagText, "tagColors", plugin)
+                        }
+                    );
+                    menu.showAtMouseEvent(ev)
+                }
+            }
+        }
+    }
+}
+
+
 export const createColorButton = async (parent: HTMLElement, value: string, plugin: PrettyPropertiesPlugin) => {
     if(plugin.settings.enableColoredProperties && plugin.settings.enableColorButton) {
         let isBase = parent.classList.contains("bases-table-cell")
