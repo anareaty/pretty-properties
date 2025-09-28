@@ -154,6 +154,10 @@ export default {
   AUTOMATIC_TASKS_COUNT: "Update all task counts automatically",
   AUTOMATIC_TASKS_COUNT_DESC: "Cann affect performance. If disabled task counts can be only updated by command.",
   UPDATE_TASK_COUNT: "Update task count",
+  ENABLE_COLORED_TAGS_IN_TAG_PANE: "Show colored tags in tag pane",
+  ENABLE_MATH: "Enable rendering math expressions in properties and bases",
+  RENDER_MATH: "Render as formula",
+  NOT_RENDER_MATH: "Do not render as formula"
 };
 
 

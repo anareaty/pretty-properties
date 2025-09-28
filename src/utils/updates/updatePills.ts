@@ -1,4 +1,4 @@
-import { MarkdownView } from "obsidian";
+import { MarkdownView, WorkspaceLeaf } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { createColorButton } from "src/menus/selectColorMenus";
 
@@ -32,6 +32,10 @@ export const generateInlineStyles = (text: string, type: string, plugin: PrettyP
     if (type == "longtext") {
         colorSettings = plugin.settings.propertyLongtextColors
     }
+
+	if (type == "tag-pane-tag") {
+		colorSettings = plugin.settings.tagColors
+	}
 
     if (colorSettings) {
         let color = colorSettings[text]
@@ -79,6 +83,7 @@ export const setPillStyles = async (
 	pill.removeAttribute("data-tag-value")
 	pill.setAttribute(attributeName, value);
 	
+	
 	let styles = generateInlineStyles(value, type, plugin)
 
 	for (let className of colorClasses) {
@@ -89,7 +94,7 @@ export const setPillStyles = async (
 	if (styles.colorClass) {
 		pill.classList.add(styles.colorClass)
 		pill.setCssProps(styles.styleProps)
-	}
+	} 
 }
 
 
@@ -282,6 +287,10 @@ export const updateLongTexts = async (container: HTMLElement, plugin: PrettyProp
 export const updatePills = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
 	updateInlineTags(container, plugin)
 
+	if (plugin.settings.enableColoredTagsInTagPane) {
+		updateTagPaneTagsAll(plugin)
+	}
+
 	if (plugin.settings.enableColoredProperties) {
 		updateMultiselectPills(container, plugin)
 		updateTagPills(container, plugin)
@@ -341,5 +350,47 @@ export const updateAllPills = async (plugin: PrettyPropertiesPlugin) => {
 		let container = view.containerEl;
 		updatePills(container, plugin)
 	})
+}
+
+
+
+
+
+
+
+
+export const updateTagPaneTags = async(container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
+    let tags = container.querySelectorAll(".tag-pane-tag span.tree-item-inner-text")
+    for (let tag of tags) {
+		if (tag instanceof HTMLElement) {
+			let value = tag.innerText
+			if (!plugin.settings.enableColoredTagsInTagPane) {
+				value = ""
+			}
+			
+			let parentTag = tag.previousSibling
+			if (parentTag instanceof HTMLElement) {
+				let parentValue = parentTag.innerText
+				if (parentValue) {
+					value = parentValue + value
+					setPillStyles(parentTag, "data-tag-value", value, "tag-pane-tag", plugin);
+				}
+			}
+
+			setPillStyles(tag, "data-tag-value", value, "tag-pane-tag", plugin);
+		}
+    }
+}
+
+
+export const updateTagPaneTagsAll = async (plugin: PrettyPropertiesPlugin) => {
+	let leaves = plugin.app.workspace.getLeavesOfType("tag");
+	for (let leaf of leaves) {
+		let view = leaf.view
+		let container = view.containerEl
+		updateTagPaneTags(container, plugin)
+	}
+	
+	
 }
 
