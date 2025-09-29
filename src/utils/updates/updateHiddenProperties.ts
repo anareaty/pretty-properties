@@ -16,7 +16,7 @@ export const updateHiddenPropertiesForContainer = async (container: HTMLElement,
 
     for (let propEl of properties) {
         if (propEl instanceof HTMLElement) {
-            updateHiddenProperty(propEl, plugin)
+            updateHiddenProperty(propEl, plugin);
         }
     }
 }
