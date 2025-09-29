@@ -9,7 +9,6 @@ import { updateDateInputs } from "./updateDates";
 import { updateProgressEls } from "./updateProgress";
 import { updatePills } from "./updatePills";
 import { updateHiddenPropertiesForContainer } from "./updateHiddenProperties";
-import { updateBaseMathEls, updateNoteMathEls } from "./updateMath";
 
 
 
@@ -73,9 +72,6 @@ const updateLeafElements = async (
     let container = view.containerEl;
     updateDateInputs(container, plugin)
     updateProgressEls(container, plugin)
-    if (plugin.settings.enableMath) {
-        updateNoteMathEls(container, plugin)
-    }
     updatePills(container, plugin)
     updateHiddenPropertiesForContainer(container, plugin)
 

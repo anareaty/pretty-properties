@@ -1,6 +1,7 @@
 import {
 	Plugin,
-	Platform
+	Platform,
+	loadMathJax
 } from "obsidian";
 import { 
 	updateBannerStyles, 
@@ -26,8 +27,6 @@ import { updatePillPaddings } from "./utils/updates/updateStyles";
 import { registerTagPostProcessor } from "./extensions/tagPostProcessor";
 import { updateHiddenPropertiesInPropTab, updateBaseTagsStyle } from "./utils/updates/updateStyles";
 import { updateTagPaneTagsAll } from "./utils/updates/updatePills";
-import { tryLoadMath } from "./utils/updates/updateMath";
-import { handleBasesHeaderMenu } from "./menus/basesHeaderMenu";
 
 
 export default class PrettyPropertiesPlugin extends Plugin {
@@ -41,9 +40,11 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		i18n.setLocale();
 		this.menuManager = new MenuManager
 		startObserver(this)
-		tryLoadMath(this)
-		
 
+		if (this.settings.enableMath) {
+			loadMathJax()
+		}
+		
 		updateRelativeDateColors(this)
 		updateBannerStyles(this);
 		updateIconStyles(this);

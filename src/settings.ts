@@ -1,4 +1,4 @@
-import { App, Notice, PluginSettingTab, Setting, Menu, MenuItem, TextComponent, ColorComponent, ButtonComponent, moment } from 'obsidian';
+import { App, loadMathJax, Notice, PluginSettingTab, Setting, Menu, MenuItem, TextComponent, ColorComponent, ButtonComponent, moment } from 'obsidian';
 import { i18n } from './localization/localization';
 import PrettyPropertiesPlugin from "./main";
 import { updateElements } from './utils/updates/updateElements';
@@ -12,10 +12,10 @@ import {
 	updateBaseTagsStyle
 } from './utils/updates/updateStyles';
 import { updateHiddenProperties } from './utils/updates/updateHiddenProperties';
-import { updateAllPills } from './utils/updates/updatePills';
+import { updateAllPills, updateLongTexts } from './utils/updates/updatePills';
 import { updateHiddenPropertiesInPropTab } from './utils/updates/updateStyles';
 import { updateTagPaneTagsAll } from './utils/updates/updatePills';
-import { tryLoadMath, updateBaseMathEls, updateNoteMathEls } from './utils/updates/updateMath';
+
 
 export interface PPPluginSettings {
     hiddenProperties: string[];
@@ -1885,9 +1885,10 @@ export class PPSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.enableMath = value
 						await this.plugin.saveSettings();
-						tryLoadMath(this.plugin)
-						updateNoteMathEls(document.body, this.plugin)
-						updateBaseMathEls(document.body, this.plugin)				
+						if (this.plugin.settings.enableMath) {
+							loadMathJax()
+						}
+						updateLongTexts(document.body, this.plugin)			
 					}));
 
 			new Setting(containerEl)
