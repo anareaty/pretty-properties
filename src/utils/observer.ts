@@ -12,9 +12,7 @@ import {
 import { updateProgress, updateProgressEls } from "./updates/updateProgress";
 import { updateHiddenProperty} from "./updates/updateHiddenProperties";
 import { updateHiddenPropertiesForContainer } from "./updates/updateHiddenProperties";
-import { updateBaseMath, updateBaseMathEls, updateMathForChangedEl } from "./updates/updateMath";
 import { updateTagPaneTags } from "./updates/updatePills";
-import { updateNoteMath, updateNoteMathEls } from "./updates/updateMath";
 
 
 export const startObserver = (plugin: PrettyPropertiesPlugin) => {
@@ -39,7 +37,6 @@ const processMutation = async (mutation: MutationRecord, plugin: PrettyPropertie
                 if (parent instanceof HTMLElement) {
                     updateBaseCardPills(parent, plugin)
                     updateBaseProgress(parent)
-                    updateBaseMath(parent, plugin)
                     updateDateInputs(parent, plugin)
                 } 
                 return
@@ -54,11 +51,7 @@ const processMutation = async (mutation: MutationRecord, plugin: PrettyPropertie
                 if (node instanceof HTMLElement) {
                     updatePills(node, plugin)
                     updateDateInputs(node, plugin)
-                    updateProgress(node, plugin)
-                    if (plugin.settings.enableMath) {
-                        updateNoteMath(node, plugin)
-                    }
-                    
+                    updateProgress(node, plugin)                   
                     updateHiddenProperty(node, plugin)
                 }
             }
@@ -72,10 +65,7 @@ const processMutation = async (mutation: MutationRecord, plugin: PrettyPropertie
         }
 
         if (target.classList.contains("metadata-input-longtext")) {
-            updateLongtext(target, plugin)
-            if (plugin.settings.enableMath) {
-                updateMathForChangedEl(target, plugin)
-            }  
+            updateLongtext(target, plugin) 
             return
         }
 
@@ -100,7 +90,6 @@ const processMutation = async (mutation: MutationRecord, plugin: PrettyPropertie
                         updateDateInputs(node, plugin)
                         updateBaseTablePills(node, plugin)
                         updateBaseProgressEls(node)
-                        updateBaseMathEls(node, plugin)
                     }
                 }         
                 return
@@ -112,7 +101,6 @@ const processMutation = async (mutation: MutationRecord, plugin: PrettyPropertie
                         updateDateInputs(node, plugin)
                         updateBaseTablePills(node, plugin)
                         updateBaseProgress(node)
-                        updateBaseMath(node, plugin)
                     }
                 }         
                 return
@@ -122,7 +110,6 @@ const processMutation = async (mutation: MutationRecord, plugin: PrettyPropertie
                 let parent = target.parentElement
                 if (parent instanceof HTMLElement) {
                     updateBaseProgress(parent) 
-                    updateBaseMath(parent, plugin)
                     updateDateInputs(parent, plugin)
                 } 
                 return
@@ -141,7 +128,6 @@ const processMutation = async (mutation: MutationRecord, plugin: PrettyPropertie
                     if (node instanceof HTMLElement) {
                         updateBaseCardPills(node, plugin)
                         updateBaseProgressEls(node)
-                        updateBaseMathEls(node, plugin)
                         updateDateInputs(node, plugin) 
                     }
                 }
@@ -151,7 +137,6 @@ const processMutation = async (mutation: MutationRecord, plugin: PrettyPropertie
             if (target.classList.contains("bases-cards-property")) {
                 updateBaseCardPills(target, plugin)
                 updateBaseProgress(target)
-                updateBaseMath(target, plugin)
                 updateDateInputs(target, plugin)
                 return
             }
@@ -165,9 +150,6 @@ const processMutation = async (mutation: MutationRecord, plugin: PrettyPropertie
             updatePills(target, plugin)
             updateDateInputs(target, plugin)
             updateProgressEls(target, plugin)
-            if (plugin.settings.enableMath) {
-                updateNoteMathEls(target, plugin)
-            }
             updateHiddenPropertiesForContainer(target, plugin)
             return 
         }

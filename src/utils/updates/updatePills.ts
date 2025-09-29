@@ -1,6 +1,7 @@
 import { MarkdownView, WorkspaceLeaf } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { createColorButton } from "src/menus/selectColorMenus";
+import { finishRenderMath, loadMathJax, renderMath } from "obsidian"
 
 
 export const getTextLightness = (color: any) => {
@@ -147,36 +148,140 @@ const updateColorButton = async(parent: HTMLElement, value:string, plugin:Pretty
 
 
 export const updateLongtext = async (pill: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-	if (plugin.settings.enableColoredProperties) {
+	
+	if (plugin.settings.enableColoredProperties || plugin.settings.enableMath) {
 		let parent = pill.parentElement
+		let isBase = parent?.classList.contains("bases-table-cell") 
+		if (isBase && !plugin.settings.enableBases) {return}
 
-		let isBaseTable = parent?.classList.contains("bases-table-cell") 
-		let isBaseCard = parent?.classList.contains("bases-cards-property")
+		let text = pill.innerText
 
-		if (isBaseCard) {
-			let prop = parent?.getAttribute("data-property") || ""
-			prop = prop.replace(/^note\./, "")
-			//@ts-ignore
-			let properties = plugin.app.metadataTypeManager.getAllProperties()
-			let type = properties[prop]?.widget || properties[prop]?.type;
-			if (type != "text") return
+		let mathEl = parent?.parentElement
+		let existingMathWrapper = mathEl?.querySelector(".math-wrapper")
+		let match: any
+
+		if (plugin.settings.enableMath) {
+			match = text?.match(/^(\$\$)(.+)(\$\$)$/)
+			if (!match) {
+				match = text?.match(/^(\$)(.+)(\$)$/)
+			}
 		}
 
-		if ((!isBaseTable && !isBaseCard) || plugin.settings.enableBases) {
-			if (pill instanceof HTMLElement) {
-				let value = pill.innerText
+		if (match) {
+			//render math
 
-				if (value) {
-					value = value.slice(0, 200).trim()
+			let existingValue = existingMathWrapper?.getAttribute("data-math") || ""
+			if (existingValue == text) { return }
+			let formula = match[2]
+			let symbols = match[1]
+			existingMathWrapper?.remove()
+			let display = false
+
+			if (symbols == "$$") {
+				display = true
+			}
+			
+			let math = renderMath(formula, display)
+			finishRenderMath()
+
+			if (math) {
+                mathEl?.classList.add("has-math")
+                let mathWrapper = document.createElement("div")
+                mathWrapper.classList.add("math-wrapper")
+                mathWrapper.setAttribute("data-math", text)
+                mathWrapper.append(math)
+
+				if (isBase) {
+					mathEl?.prepend(mathWrapper)
+					mathWrapper.onclick = () => {
+						pill.focus()
+					}
+				} else {
+					let mathKeyEl = mathEl?.querySelector(".metadata-property-key");
+					mathKeyEl?.after(mathWrapper);
+				}
+            }
+
+		} else {
+			
+			existingMathWrapper?.remove()
+            mathEl?.classList.remove("has-math")
+
+			if (plugin.settings.enableColoredProperties) {
+				if (text) {
+					text = text.slice(0, 200).trim()
 				}
 
-				setPillStyles(pill, "data-property-longtext-value", value, "longtext", plugin)
+				setPillStyles(pill, "data-property-longtext-value", text, "longtext", plugin)
 
-				if ((!isBaseTable || plugin.settings.enableColorButtonInBases) && !isBaseCard) {
+				if (!isBase || plugin.settings.enableColorButtonInBases) {
 					if (parent) {
-						updateColorButton(parent, value, plugin)
+						updateColorButton(parent, text, plugin)
 					}
 				}
+			}
+		}
+	}
+}
+
+
+
+
+
+
+export const updateCardLongtext = async (pill: HTMLElement, plugin: PrettyPropertiesPlugin) => {
+
+	if (plugin.settings.enableBases && (plugin.settings.enableColoredProperties || plugin.settings.enableMath)) {
+		let parent = pill.parentElement
+		let prop = parent?.getAttribute("data-property") || ""
+		prop = prop.replace(/^note\./, "")
+		//@ts-ignore
+		let properties = plugin.app.metadataTypeManager.getAllProperties()
+		let type = properties[prop]?.widget || properties[prop]?.type;
+		if (type != "text") return
+		
+		let text = pill.innerText
+
+		let mathEl = parent
+		let existingMathWrapper = mathEl?.querySelector(".math-wrapper")
+		let match: any
+
+		if (plugin.settings.enableMath) {
+			match = text?.match(/^(\$\$)(.+)(\$\$)$/)
+			if (!match) {
+				match = text?.match(/^(\$)(.+)(\$)$/)
+			}
+		}
+
+		if (match) {
+			//render math
+			let existingValue = existingMathWrapper?.getAttribute("data-math") || ""
+			if (existingValue == text) { return }
+			let formula = match[2]
+			let symbols = match[1]
+			existingMathWrapper?.remove()
+			let display = false			
+			let math = renderMath(formula, display)
+			finishRenderMath()
+
+			if (math) {
+                mathEl?.classList.add("has-math")
+                let mathWrapper = document.createElement("div")
+                mathWrapper.classList.add("math-wrapper")
+                mathWrapper.setAttribute("data-math", text)
+                mathWrapper.append(math)
+				mathEl?.append(mathWrapper)
+            }
+		} else {
+			
+			existingMathWrapper?.remove()
+            mathEl?.classList.remove("has-math")
+
+			if (plugin.settings.enableColoredProperties) {
+				if (text) {
+					text = text.slice(0, 200).trim()
+				}
+				setPillStyles(pill, "data-property-longtext-value", text, "longtext", plugin)
 			}
 		}
 	}
@@ -263,6 +368,8 @@ export const updateInlineTags = async (container: HTMLElement, plugin: PrettyPro
 
 
 export const updateLongTexts = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
+
+	
 	let longtexts = container.querySelectorAll(".metadata-input-longtext");
 	
 	for (let pill of longtexts) {
@@ -275,7 +382,7 @@ export const updateLongTexts = async (container: HTMLElement, plugin: PrettyProp
 
 	for (let pill of cardsLongtexts) {
 		if (pill instanceof HTMLElement) {
-			updateLongtext(pill, plugin)
+			updateCardLongtext(pill, plugin)
 		}
 	}
 }

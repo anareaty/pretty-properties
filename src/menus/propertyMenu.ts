@@ -3,7 +3,6 @@ import PrettyPropertiesPlugin from "src/main";
 import { i18n } from "src/localization/localization";
 import { updateHiddenProperties } from "src/utils/updates/updateHiddenProperties";
 import { updateElements } from "src/utils/updates/updateElements";
-import { updateBaseMathEls } from "src/utils/updates/updateMath";
 
 export const handlePropertyMenu = (el: HTMLElement | SVGElement, plugin: PrettyPropertiesPlugin) => {
     
@@ -186,49 +185,6 @@ export const handlePropertyMenu = (el: HTMLElement | SVGElement, plugin: PrettyP
                             updateElements(plugin);
                         })
                 );
-            }
-
-
-            if (propertyType == "text" && plugin.settings.enableMath) {
-                if (plugin.settings.mathProperties.find((p: string) => p == propName)) {
-                    menuManager.addItemAfter(
-                        ["clipboard"],
-                        i18n.t("NOT_RENDER_MATH"),
-                        (item: MenuItem) =>
-                            item
-                            .setTitle(i18n.t("NOT_RENDER_MATH"))
-                            .setIcon("equal-not")
-                            .setSection("pretty-properties")
-                            .onClick(() => {
-                                if (propName)
-                                    plugin.settings.mathProperties.remove(
-                                        propName
-                                    );
-                                plugin.saveSettings();
-                                updateElements(plugin);
-                                updateBaseMathEls(document.body, plugin)
-                            })  
-                    );
-                } else {
-                    menuManager.addItemAfter(
-                        ["clipboard"],
-                        i18n.t("RENDER_MATH"),
-                        (item: MenuItem) =>
-                            item
-                            .setTitle(i18n.t("RENDER_MATH"))
-                            .setIcon("sigma")
-                            .setSection("pretty-properties")
-                            .onClick(() => {
-                                if (propName)
-                                    plugin.settings.mathProperties.push(
-                                        propName
-                                    );
-                                plugin.saveSettings();
-                                updateElements(plugin);
-                                updateBaseMathEls(document.body, plugin)
-                            })  
-                    );
-                }
             }
         }
     }
