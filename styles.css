@@ -854,9 +854,9 @@ a.tag.transparent-color {
 
 /* PROPERTIES */
 
-body:not(.show-hidden-properties) .workspace-leaf-content[data-type='markdown'] .metadata-property.hidden,
-body:not(.show-hidden-properties).hidden-props-in-prop-tab .workspace-leaf-content[data-type='file-properties'] .metadata-property.hidden,
-body:not(.show-hidden-properties) .hover-popover .metadata-property.hidden {
+body:not(.show-hidden-properties) .workspace-leaf-content[data-type='markdown'] .metadata-property.pp-property-hidden,
+body:not(.show-hidden-properties).hidden-props-in-prop-tab .workspace-leaf-content[data-type='file-properties'] .metadata-property.pp-property-hidden,
+body:not(.show-hidden-properties) .hover-popover .metadata-property.pp-property-hidden {
   display: none;
 }
 
