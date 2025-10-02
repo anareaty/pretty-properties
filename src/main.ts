@@ -205,6 +205,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		if (this.observer instanceof MutationObserver) {
 			this.observer.disconnect()
 		}
+		removeAll()
 	}
 
 	async loadSettings() {
