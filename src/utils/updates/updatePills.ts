@@ -238,7 +238,7 @@ export const updateCardLongtext = async (pill: HTMLElement, plugin: PrettyProper
 		//@ts-ignore
 		let properties = plugin.app.metadataTypeManager.getAllProperties()
 		let type = properties[prop]?.widget || properties[prop]?.type;
-		if (type != "text") return
+		//if (type != "text") return
 		
 		let text = pill.innerText
 
@@ -332,7 +332,7 @@ export const updateBaseTableTagPills = async (container: HTMLElement, plugin: Pr
 
 
 export const updateBaseCardMultiselectPills = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-	let baseCardsPills = container.querySelectorAll(".bases-cards-property:not([data-property='note.tags']) .value-list-element");
+	let baseCardsPills = container.querySelectorAll(".bases-cards-property .value-list-element:not(:has(.tag))");
 	for (let pill of baseCardsPills) {
 		if (pill instanceof HTMLElement) {
 			updateCardPill(pill, "multiselect-pill", plugin)
@@ -341,8 +341,20 @@ export const updateBaseCardMultiselectPills = async (container: HTMLElement, plu
 }
 
 
+export const updateBaseListMultiselectPills = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
+	let baseCardsPills = container.querySelectorAll(".bases-list-property .value-list-element:not(:has(.tag))");
+	
+	for (let pill of baseCardsPills) {
+		if (pill instanceof HTMLElement) {
+			
+			updateCardPill(pill, "multiselect-pill", plugin)
+		}
+	}
+}
+
+
 export const updateBaseCardTagPills = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-	let baseCardsTagPills = container.querySelectorAll(".bases-cards-property[data-property='note.tags'] .value-list-element");
+	let baseCardsTagPills = container.querySelectorAll(".bases-cards-property[data-property='note.tags'] .value-list-element:not(:has(.tag))");
 	for (let pill of baseCardsTagPills) {
 		if (pill instanceof HTMLElement) {
 			updateCardPill(pill, "note.tags", plugin)
@@ -385,6 +397,14 @@ export const updateLongTexts = async (container: HTMLElement, plugin: PrettyProp
 			updateCardLongtext(pill, plugin)
 		}
 	}
+
+	let listLongtexts = container.querySelectorAll(".bases-list-property .bases-rendered-value[data-property-type='text']")
+
+	for (let pill of listLongtexts) {
+		if (pill instanceof HTMLElement) {
+			updateCardLongtext(pill, plugin)
+		}
+	}
 }
 
 
@@ -408,6 +428,7 @@ export const updatePills = async (container: HTMLElement, plugin: PrettyProperti
 			updateBaseTableTagPills(container, plugin)
 			updateBaseCardMultiselectPills(container, plugin)
 			updateBaseCardTagPills(container, plugin)
+			updateBaseListMultiselectPills(container, plugin)
 		}
 	}
 }
@@ -424,6 +445,14 @@ export const updateBaseTablePills = async (container: HTMLElement, plugin: Prett
 
 export const updateBaseCardPills = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
 	updateBaseCardMultiselectPills(container, plugin)
+	updateBaseCardTagPills(container, plugin)
+	updateInlineTags(container, plugin)
+	updateLongTexts(container, plugin)
+}
+
+
+export const updateBaseListPills = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
+	updateBaseListMultiselectPills(container, plugin)
 	updateBaseCardTagPills(container, plugin)
 	updateInlineTags(container, plugin)
 	updateLongTexts(container, plugin)

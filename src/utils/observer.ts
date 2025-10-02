@@ -7,7 +7,8 @@ import {
     updatePill, 
     updateInlineTags, 
     updateLongtext, 
-    updatePills 
+    updatePills,
+    updateBaseListPills
 } from "./updates/updatePills";
 import { updateProgress, updateProgressEls } from "./updates/updateProgress";
 import { updateHiddenProperty} from "./updates/updateHiddenProperties";
@@ -28,6 +29,9 @@ export const startObserver = (plugin: PrettyPropertiesPlugin) => {
 const processMutation = async (mutation: MutationRecord, plugin: PrettyPropertiesPlugin) => {
     let target = mutation.target
     let addedNodes = mutation.addedNodes
+
+
+    //console.log(target)
     
     if (target instanceof HTMLElement) {
 
@@ -120,10 +124,26 @@ const processMutation = async (mutation: MutationRecord, plugin: PrettyPropertie
                 return
             }
 
+
+            
+            if (target.classList.contains("bases-list-container") || 
+            target.classList.contains("bases-list-group") || 
+            target.classList.contains("value-list-container")) {
+                for (let node of addedNodes) {
+                    if (node instanceof HTMLElement) {
+                        updateBaseListPills(node, plugin)
+                        updateDateInputs(node, plugin) 
+                    }
+                }
+                return
+            }
+                
+
+           
+
             if (target.classList.contains("bases-cards-container") || 
             target.classList.contains("bases-cards-group") || 
-            target.classList.contains("value-list-container") || 
-            target.classList.contains("bases-cards-item")) {
+            target.classList.contains("value-list-container")) {
                 for (let node of addedNodes) {
                     if (node instanceof HTMLElement) {
                         updateBaseCardPills(node, plugin)
@@ -133,6 +153,22 @@ const processMutation = async (mutation: MutationRecord, plugin: PrettyPropertie
                 }
                 return
             }
+
+
+            if (target.classList.contains("bases-cards-item")) {
+                
+                for (let node of addedNodes) {
+                    if (node instanceof HTMLElement) {
+                        
+                        updateBaseCardPills(node, plugin)
+                        updateBaseProgress(node)
+                        updateDateInputs(node, plugin) 
+                    }
+                }
+                return
+            }
+
+
 
             if (target.classList.contains("bases-cards-property")) {
                 updateBaseCardPills(target, plugin)

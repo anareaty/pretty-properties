@@ -615,6 +615,8 @@ body {
 .metadata-property-value:not(.has-custom-date)[data-relative-date="past"] input.mod-datetime,
 .bases-cards-line[data-relative-date="past"] input.mod-date,
 .bases-cards-line[data-relative-date="past"] input.mod-datetime,
+.bases-rendered-value[data-relative-date="past"] input.mod-date,
+.bases-rendered-value[data-relative-date="past"] input.mod-datetime,
 .setting-custom-date-past {
   background-color: var(--date-past-background);
   color: var(--date-past-color);
@@ -631,6 +633,8 @@ body {
 .metadata-property-value:not(.has-custom-date)[data-relative-date="present"] input.mod-datetime,
 .bases-cards-line[data-relative-date="present"] input.mod-date,
 .bases-cards-line[data-relative-date="present"] input.mod-datetime,
+.bases-rendered-value[data-relative-date="present"] input.mod-date,
+.bases-rendered-value[data-relative-date="present"] input.mod-datetime,
 .setting-custom-date-present {
   background-color: var(--date-present-background);
   color: var(--date-present-color);
@@ -646,6 +650,8 @@ body {
 .metadata-property-value:not(.has-custom-date)[data-relative-date="future"] input.mod-datetime,
 .bases-cards-line[data-relative-date="future"] input.mod-date,
 .bases-cards-line[data-relative-date="future"] input.mod-datetime,
+.bases-rendered-value[data-relative-date="future"] input.mod-date,
+.bases-rendered-value[data-relative-date="future"] input.mod-datetime,
 .setting-custom-date-future {
   background-color: var(--date-future-background);
   color: var(--date-future-color);
@@ -656,7 +662,10 @@ body {
   text-align: center;
 }
 
-.bases-cards-line input.mod-date {
+.bases-cards-line input.mod-date,
+.bases-cards-line input.mod-datetime,
+.bases-rendered-value input.mod-date,
+.bases-rendered-value input.mod-datetime {
   padding: 0 !important;
 }
 
@@ -780,7 +789,8 @@ height: 100% !important;
 }
 
 
-.bases-cards-line {
+.bases-cards-line,
+.bases-list-item {
   --tag-padding-y: 0;
 }
 
@@ -848,7 +858,7 @@ a.tag.transparent-color {
   --tag-padding-y: 0;
 }
 
-.pp-bases-enabled .bases-view [data-property*="note"] .value-list-element {
+.pp-bases-enabled .bases-view [data-property*="note"] .value-list-element:not(:has(.tag)) {
     --pill-padding-y: 0;
     padding: var(--pill-padding-y) var(--pill-padding-x);
 }
@@ -865,7 +875,8 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.pp-property-
   display: none;
 }
 
-.bases-view .bases-cards-property[data-property*="note"] .value-list-element {
+.bases-view .bases-cards-property[data-property*="note"] .value-list-element:not(:has(.tag)),
+.bases-view .bases-list-property [data-property-type="multitext"] .value-list-element:not(:has(.tag)) {
     display: inline-block;
     color: var(--pill-color);
     background-color: var(--pill-background);
@@ -876,7 +887,7 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.pp-property-
 }
 
 .base-tags-style .bases-view [data-property="note.tags"] .multi-select-pill:not(.theme-color, .custom-color, .transparent-color),
-.base-tags-style .bases-view [data-property="note.tags"] .value-list-element:not(.theme-color, .custom-color, .transparent-color) {
+.base-tags-style .bases-view [data-property="note.tags"] .value-list-element:not(.theme-color, .custom-color, .transparent-color, :has(.tag)) {
     --pill-color: var(--tag-color);
     --pill-color-hover: var(--tag-color);
     --pill-color-remove: var(--tag-color);
@@ -925,11 +936,11 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.pp-property-
 }
 
 .pp-pill-padding-all .multi-select-pill,
-.pp-pill-padding-all .bases-view [data-property*="note"] .value-list-element,
+.pp-pill-padding-all .bases-view [data-property*="note"] .value-list-element:not(:has(.tag)),
 .pp-pill-padding-colored .theme-color,
 .pp-pill-padding-colored .custom-color,
 .pp-pill-padding-non-transparent .multi-select-pill:not(.transparent-color),
-.pp-pill-padding-non-transparent .value-list-element:not(.transparent-color) {
+.pp-pill-padding-non-transparent .value-list-element:not(.transparent-color, :has(.tag)) {
   --pill-padding-x: var(--tag-padding-x);
 }
 
@@ -950,12 +961,14 @@ body {
 }
 
 .metadata-input-longtext.theme-color:not(:hover),
-.bases-cards-line.theme-color:not(:hover) {
+.bases-cards-line.theme-color,
+.bases-rendered-value.theme-color {
   background-color: rgba(var(--pp-color-rgb), 0.2);
 }
 
 .metadata-input-longtext.custom-color:not(:hover),
-.bases-cards-line.custom-color:not(:hover) {
+.bases-cards-line.custom-color,
+.bases-rendered-value.custom-color {
   background-color: hsl(var(--pp-background-hsl));
   color: hsl(var(--pp-text-hsl));
 }
@@ -965,6 +978,13 @@ body {
   border-radius: 4px;
   display: block;
   margin: var(--longtext-margin);
+  padding: 0px var(--pill-padding-x);
+  max-width: fit-content;
+}
+
+.bases-rendered-value[data-property-longtext-value]{
+  border-radius: 4px;
+  display: inline-block;
   padding: 0px var(--pill-padding-x);
   max-width: fit-content;
 }
@@ -1048,8 +1068,16 @@ button.longtext-color-button:hover {
   padding-bottom: 0;
 }
 
-.has-math .bases-cards-line {
+.has-math .bases-cards-line,
+.has-math .bases-rendered-value {
   display: none;
+}
+
+
+
+
+.bases-list-property .math-wrapper {
+  display: inline-block;
 }
 
 
@@ -1117,4 +1145,6 @@ button.longtext-color-button:hover {
 .has-math:focus-within .math-wrapper {
   display: none;
 }
+
+
 
