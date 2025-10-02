@@ -470,7 +470,7 @@
 
 
 .has-progress-bar .bases-cards-line {
-  display: none;
+  display: none !important;
 }
 
 
