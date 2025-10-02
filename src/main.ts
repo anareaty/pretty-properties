@@ -27,7 +27,7 @@ import { updatePillPaddings } from "./utils/updates/updateStyles";
 import { registerTagPostProcessor } from "./extensions/tagPostProcessor";
 import { updateHiddenPropertiesInPropTab, updateBaseTagsStyle } from "./utils/updates/updateStyles";
 import { updateTagPaneTagsAll } from "./utils/updates/updatePills";
-
+import { removeAll } from "./utils/remove";
 
 export default class PrettyPropertiesPlugin extends Plugin {
 	settings: PPPluginSettings;
@@ -52,6 +52,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		updatePillPaddings(this)
 		updateHiddenPropertiesInPropTab(this)
 		updateBaseTagsStyle(this)
+		updateElements(this)
 
 		if (this.settings.enableColoredTagsInTagPane) {
 			updateTagPaneTagsAll(this)
