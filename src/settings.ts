@@ -23,6 +23,7 @@ export interface PPPluginSettings {
     hiddenProperties: string[];
     propertyPillColors: any;
 	propertyLongtextColors: any;
+	tagColors: any;
     enableBanner: boolean;
 	enableIcon: boolean;
     enableCover: boolean;
@@ -98,7 +99,7 @@ export interface PPPluginSettings {
 	nonLatinTagsSupport: boolean;
 	enableColorButton: boolean;
 	propertySearchKey: string;
-	tagColors: any;
+	
 	showTagColorSettings: boolean;
 	iconSizeMobile: number;
 	hidePropertiesInPropTab: boolean;
@@ -106,6 +107,8 @@ export interface PPPluginSettings {
 	enableColoredTagsInTagPane: boolean;
 	mathProperties: string[];
 	enableMath: boolean;
+	dataVersion: number;
+	dateColors: any;
 	
 
 	
@@ -116,6 +119,7 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
     hiddenProperties: [],
     propertyPillColors: {},
 	propertyLongtextColors: {},
+	tagColors: {},
     enableBanner: true,
 	enableIcon: true,
     enableCover: true,
@@ -191,7 +195,7 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	nonLatinTagsSupport: false,
 	enableColorButton: true,
 	propertySearchKey: "Ctrl",
-	tagColors: {},
+	
 	showTagColorSettings: false,
 	iconSizeMobile: 70,
 	hidePropertiesInPropTab: false,
@@ -199,6 +203,21 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	enableColoredTagsInTagPane: false,
 	mathProperties: [],
 	enableMath: false,
+	dataVersion: 0,
+	dateColors: {
+		past: {
+			pillColor: "default",
+			textColor: "default"
+		},
+		present: {
+			pillColor: "default",
+			textColor: "default"
+		},
+		future: {
+			pillColor: "default",
+			textColor: "default"
+		}
+	}
 
 }
 
@@ -1177,7 +1196,7 @@ export class PPSettingTab extends PluginSettingTab {
 						.onClick(() => {
 							newProperty = newProperty.trim()
 							if (newProperty && !this.plugin.settings.propertyPillColors[newProperty]) {
-								this.plugin.settings.propertyPillColors[newProperty] = "none"
+								this.plugin.settings.propertyPillColors[newProperty] = {}
 								this.plugin.saveSettings()
 								addColorSetting(newProperty)
 								let inputSetting = newPropertySetting.components[0]
@@ -1285,7 +1304,7 @@ export class PPSettingTab extends PluginSettingTab {
 						.onClick(() => {
 							newProperty = newProperty.trim()
 							if (newProperty && !this.plugin.settings.tagColors[newProperty]) {
-								this.plugin.settings.tagColors[newProperty] = "none"
+								this.plugin.settings.tagColors[newProperty] = {}
 								this.plugin.saveSettings()
 								addColorSetting(newProperty)
 								let inputSetting = newPropertySetting.components[0]
@@ -1357,22 +1376,22 @@ export class PPSettingTab extends PluginSettingTab {
 							}
 						}
 					})
+
 					.addButton((btn) => {
 						btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
 						  let menu = new Menu();
 						  setColorMenuItems(menu, property, "propertyLongtextColors", "pillColor", this.plugin);
 						  menu.showAtMouseEvent(e);
 						});
-					  })
-			
-			
-					  .addButton((btn) => {
+					})
+					.addButton((btn) => {
 						btn.setIcon("type").setClass("property-color-setting-button").onClick((e) => {
-						  let menu = new Menu();
-						  setColorMenuItems(menu, property, "propertyLongtextColors", "textColor", this.plugin);
-						  menu.showAtMouseEvent(e);
+							let menu = new Menu();
+							setColorMenuItems(menu, property, "propertyLongtextColors", "textColor", this.plugin);
+							menu.showAtMouseEvent(e);
 						});
-					  })
+					})
+
 					.addButton(btn => btn
 						.setIcon("x")
 						.onClick(() => {
@@ -1403,7 +1422,7 @@ export class PPSettingTab extends PluginSettingTab {
 						.onClick(() => {
 							newProperty = newProperty.trim()
 							if (newProperty && !this.plugin.settings.propertyLongtextColors[newProperty]) {
-								this.plugin.settings.propertyLongtextColors[newProperty] = "none"
+								this.plugin.settings.propertyLongtextColors[newProperty] = {}
 								this.plugin.saveSettings()
 								addColorSetting(newProperty)
 								let inputSetting = newPropertySetting.components[0]
@@ -1549,62 +1568,22 @@ export class PPSettingTab extends PluginSettingTab {
 				let pastSetting = new Setting(containerEl)
 				pastSetting.controlEl.createEl("span", {text: pastDate, cls: "setting-custom-date-past"})
 				pastSetting.setName(i18n.t("PAST_DATE_COLOR"))
-				.addColorPicker(color => {
-					pastColorComponent = color
-					color.setValueHsl(this.plugin.settings.datePastColor)
-					.onChange(async (value) => {
-						pastColorButton.buttonEl.classList.forEach(cls => {
-							if (cls.startsWith("color")) {
-								pastColorButton.buttonEl.classList.remove(cls)
-							}
-						})
 
-						let hsl = color.getValueHsl()
-						this.plugin.settings.datePastColor = hsl
-						await this.plugin.saveSettings();
-						updateRelativeDateColors(this.plugin);
-					})
+				.addButton((btn) => {
+					btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
+						let menu = new Menu();
+						setColorMenuItems(menu, "past", "dateColors", "pillColor", this.plugin);
+						menu.showAtMouseEvent(e);
+					});
 				})
-				.addButton(btn => {
-					pastColorButton = btn
-
-					if (typeof this.plugin.settings.datePastColor == "string") {
-						btn.buttonEl.classList.add("color-" + this.plugin.settings.datePastColor)
-					}
-
-					btn.setIcon("paintbrush")
-					.setClass("property-color-setting-button")
-					.onClick((e) => {
-						let menu = new Menu()
-						let colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink", "default"]
-
-						for (let color of colors) {
-							menu.addItem((item: MenuItem) => {
-								item.setIcon("square")
-								if (color != "default" && color != "none") {
-									//@ts-ignore
-									item.iconEl.style = "color: transparent; background-color: rgba(var(--color-" + color + "-rgb), 0.3);"
-								}
-						
-								item.setTitle(i18n.t(color))
-								.onClick(() => {
-									pastColorComponent.setValue("")
-									btn.buttonEl.classList.forEach(cls => {
-										if (cls.startsWith("color")) {
-											btn.buttonEl.classList.remove(cls)
-										}
-									})
-									btn.buttonEl.classList.add("color-" + color)
-									this.plugin.settings.datePastColor = color
-									this.plugin.saveSettings()
-									updateRelativeDateColors(this.plugin)
-								})
-								item.setChecked(color == this.plugin.settings.datePastColor)
-							})
-						}
-						menu.showAtMouseEvent(e)
-					})
+				.addButton((btn) => {
+					btn.setIcon("type").setClass("property-color-setting-button").onClick((e) => {
+						let menu = new Menu();
+						setColorMenuItems(menu, "past", "dateColors", "textColor", this.plugin);
+						menu.showAtMouseEvent(e);
+					});
 				})
+
 
 				let presentColorComponent: ColorComponent
 				let presentColorButton: ButtonComponent
@@ -1612,61 +1591,19 @@ export class PPSettingTab extends PluginSettingTab {
 				let presentSEtting = new Setting(containerEl)
 				presentSEtting.controlEl.createEl("span", {text: presentDate, cls: "setting-custom-date-present"})
 				presentSEtting.setName(i18n.t("PRESENT_DATE_COLOR"))
-				.addColorPicker(color => {
-					presentColorComponent = color
-					color.setValue(this.plugin.settings.datePresentColor)
-					.onChange(async (value) => {
-						presentColorButton.buttonEl.classList.forEach(cls => {
-							if (cls.startsWith("color")) {
-								presentColorButton.buttonEl.classList.remove(cls)
-							}
-						})
-
-						let hsl = color.getValueHsl()
-						this.plugin.settings.datePresentColor = hsl
-						await this.plugin.saveSettings();
-						updateRelativeDateColors(this.plugin);
-					})
+				.addButton((btn) => {
+					btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
+						let menu = new Menu();
+						setColorMenuItems(menu, "present", "dateColors", "pillColor", this.plugin);
+						menu.showAtMouseEvent(e);
+					});
 				})
-				.addButton(btn => {
-					presentColorButton = btn
-
-					if (typeof this.plugin.settings.datePresentColor == "string") {
-						btn.buttonEl.classList.add("color-" + this.plugin.settings.datePresentColor)
-					}
-
-					btn.setIcon("paintbrush")
-					.setClass("property-color-setting-button")
-					.onClick((e) => {
-						let menu = new Menu()
-						let colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink", "default"]
-
-						for (let color of colors) {
-							menu.addItem((item: MenuItem) => {
-								item.setIcon("square")
-								if (color != "default" && color != "none") {
-									//@ts-ignore
-									item.iconEl.style = "color: transparent; background-color: rgba(var(--color-" + color + "-rgb), 0.3);"
-								}
-						
-								item.setTitle(i18n.t(color))
-								.onClick(() => {
-									presentColorComponent.setValue("")
-									btn.buttonEl.classList.forEach(cls => {
-										if (cls.startsWith("color")) {
-											btn.buttonEl.classList.remove(cls)
-										}
-									})
-									btn.buttonEl.classList.add("color-" + color)
-									this.plugin.settings.datePresentColor = color
-									this.plugin.saveSettings()
-									updateRelativeDateColors(this.plugin)
-								})
-								item.setChecked(color == this.plugin.settings.datePresentColor)
-							})
-						}
-						menu.showAtMouseEvent(e)
-					})
+				.addButton((btn) => {
+					btn.setIcon("type").setClass("property-color-setting-button").onClick((e) => {
+						let menu = new Menu();
+						setColorMenuItems(menu, "present", "dateColors", "textColor", this.plugin);
+						menu.showAtMouseEvent(e);
+					});
 				})
 
 				let futureColorComponent: ColorComponent
@@ -1675,61 +1612,19 @@ export class PPSettingTab extends PluginSettingTab {
 				let futureSetting = new Setting(containerEl)
 				futureSetting.controlEl.createEl("span", {text: futureDate, cls: "setting-custom-date-future"})
 				futureSetting.setName(i18n.t("FUTURE_DATE_COLOR"))
-				.addColorPicker(color => {
-					futureColorComponent = color
-					color.setValueHsl(this.plugin.settings.dateFutureColor)
-					.onChange(async (value) => {
-						futureColorButton.buttonEl.classList.forEach(cls => {
-							if (cls.startsWith("color")) {
-								futureColorButton.buttonEl.classList.remove(cls)
-							}
-						})
-
-						let hsl = color.getValueHsl()
-						this.plugin.settings.dateFutureColor = hsl
-						await this.plugin.saveSettings();
-						updateRelativeDateColors(this.plugin);
-					})
+				.addButton((btn) => {
+					btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
+						let menu = new Menu();
+						setColorMenuItems(menu, "future", "dateColors", "pillColor", this.plugin);
+						menu.showAtMouseEvent(e);
+					});
 				})
-				.addButton(btn => {
-					futureColorButton = btn
-
-					if (typeof this.plugin.settings.dateFutureColor == "string") {
-						btn.buttonEl.classList.add("color-" + this.plugin.settings.dateFutureColor)
-					}
-
-					btn.setIcon("paintbrush")
-					.setClass("property-color-setting-button")
-					.onClick((e) => {
-						let menu = new Menu()
-						let colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink", "default"]
-
-						for (let color of colors) {
-							menu.addItem((item: MenuItem) => {
-								item.setIcon("square")
-								if (color != "default" && color != "none") {
-									//@ts-ignore
-									item.iconEl.style = "color: transparent; background-color: rgba(var(--color-" + color + "-rgb), 0.3);"
-								}
-						
-								item.setTitle(i18n.t(color))
-								.onClick(() => {
-									futureColorComponent.setValue("")
-									btn.buttonEl.classList.forEach(cls => {
-										if (cls.startsWith("color")) {
-											btn.buttonEl.classList.remove(cls)
-										}
-									})
-									btn.buttonEl.classList.add("color-" + color)
-									this.plugin.settings.dateFutureColor = color
-									this.plugin.saveSettings()
-									updateRelativeDateColors(this.plugin)
-								})
-								item.setChecked(color == this.plugin.settings.dateFutureColor)
-							})
-						}
-						menu.showAtMouseEvent(e)
-					})
+				.addButton((btn) => {
+					btn.setIcon("type").setClass("property-color-setting-button").onClick((e) => {
+						let menu = new Menu();
+						setColorMenuItems(menu, "future", "dateColors", "textColor", this.plugin);
+						menu.showAtMouseEvent(e);
+					});
 				})
 		}
 

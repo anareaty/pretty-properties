@@ -28,6 +28,7 @@ import { registerTagPostProcessor } from "./extensions/tagPostProcessor";
 import { updateHiddenPropertiesInPropTab, updateBaseTagsStyle } from "./utils/updates/updateStyles";
 import { updateTagPaneTagsAll } from "./utils/updates/updatePills";
 import { removeAll } from "./utils/remove";
+import { updateData } from "./utils/updateData";
 
 export default class PrettyPropertiesPlugin extends Plugin {
 	settings: PPPluginSettings;
@@ -37,6 +38,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 	async onload() {
 		await this.loadSettings();
+		updateData(this)
 		i18n.setLocale();
 		this.menuManager = new MenuManager
 		startObserver(this)

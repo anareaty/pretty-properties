@@ -73,10 +73,22 @@ export const updateCoverStyles = (plugin: PrettyPropertiesPlugin) => {
 
 
 export const updateRelativeDateColors = (plugin: PrettyPropertiesPlugin) => {
+
   let colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink"];
-  let futureColor = plugin.settings.dateFutureColor;
-  let presentColor = plugin.settings.datePresentColor;
-  let pastColor = plugin.settings.datePastColor;
+
+  let future = plugin.settings.dateColors.future
+  let present= plugin.settings.dateColors.present
+  let past = plugin.settings.dateColors.past
+
+  let futureColor = future.pillColor
+  let presentColor = present.pillColor
+  let pastColor = past.pillColor
+
+  let futureBaseTextColor = future.textColor
+  let presentBaseTextColor = present.textColor
+  let pastBaseTextColor = past.textColor
+
+  
 
   let futureBgColor = ""
   let futureTextColor = ""
@@ -87,7 +99,7 @@ export const updateRelativeDateColors = (plugin: PrettyPropertiesPlugin) => {
  
   if (colors.find((c) => c == futureColor)) {
     futureBgColor = "rgba(var(--color-" + futureColor + "-rgb), 0.2)"
-  } else if (futureColor.h !== undefined) {
+  } else if (futureColor && futureColor.h !== undefined) {
       let textLightness = getTextLightness(futureColor);
       let hslString = futureColor.h + " ," + futureColor.s + "% ," + futureColor.l + "%";
       let hslStringText = futureColor.h + " ," + futureColor.s + "% ," + textLightness + "%";
@@ -97,7 +109,7 @@ export const updateRelativeDateColors = (plugin: PrettyPropertiesPlugin) => {
 
   if (colors.find((c) => c == presentColor)) {
     presentBgColor = "rgba(var(--color-" + presentColor + "-rgb), 0.2)"
-  } else if (presentColor.h !== undefined) {
+  } else if (presentColor && presentColor.h !== undefined) {
     let textLightness = getTextLightness(presentColor);
     let hslString = presentColor.h + " ," + presentColor.s + "% ," + presentColor.l + "%";
     let hslStringText = presentColor.h + " ," + presentColor.s + "% ," + textLightness + "%";
@@ -107,12 +119,40 @@ export const updateRelativeDateColors = (plugin: PrettyPropertiesPlugin) => {
 
   if (colors.find((c) => c == pastColor)) {
     pastBgColor = "rgba(var(--color-" + pastColor + "-rgb), 0.2)"
-  } else if (pastColor.h !== undefined) {
+  } else if (pastColor && pastColor.h !== undefined) {
     let textLightness = getTextLightness(pastColor);
     let hslString = pastColor.h + " ," + pastColor.s + "% ," + pastColor.l + "%";
     let hslStringText = pastColor.h + " ," + pastColor.s + "% ," + textLightness + "%";
     pastBgColor = "hsl(" + hslString + ")"
     pastTextColor = "hsl(" + hslStringText + ")"
+  }
+
+  if (colors.find((c) => c == futureBaseTextColor)) {
+    futureTextColor = "rgb(var(--color-" + futureBaseTextColor + "-rgb))"
+  } else if (futureBaseTextColor && futureBaseTextColor.h !== undefined) {
+    let hslStringText = futureBaseTextColor.h + " ," + futureBaseTextColor.s + "% ," + futureBaseTextColor.l + "%";
+    futureTextColor = "hsl(" + hslStringText + ")"
+  } else if (futureBaseTextColor == "none") {
+    futureTextColor = "var(--text-normal)"
+  }
+
+  if (colors.find((c) => c == presentBaseTextColor)) {
+    presentTextColor = "rgb(var(--color-" + presentBaseTextColor + "-rgb))"
+  } else if (presentBaseTextColor && presentBaseTextColor.h !== undefined) {
+    let hslStringText = presentBaseTextColor.h + " ," + presentBaseTextColor.s + "% ," + presentBaseTextColor.l + "%";
+    presentTextColor = "hsl(" + hslStringText + ")"
+  } else if (presentBaseTextColor == "none") {
+    presentTextColor = "var(--text-normal)"
+  }
+
+
+  if (colors.find((c) => c == pastBaseTextColor)) {
+    pastTextColor = "rgb(var(--color-" + pastBaseTextColor + "-rgb))"
+  } else if (pastBaseTextColor && pastBaseTextColor.h !== undefined) {
+    let hslStringText = pastBaseTextColor.h + " ," + pastBaseTextColor.s + "% ," + pastBaseTextColor.l + "%";
+    pastTextColor = "hsl(" + hslStringText + ")"
+  } else if (pastBaseTextColor == "none") {
+    pastTextColor = "var(--text-normal)"
   }
 	
   let relativeDatesProps = {

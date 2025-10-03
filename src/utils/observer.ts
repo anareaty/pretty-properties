@@ -48,7 +48,9 @@ const processMutation = async (mutation: MutationRecord, plugin: PrettyPropertie
         }
 
         if (addedNodes.length == 0) return
+
         
+      
 
         if (target.classList.contains("metadata-properties")) {
             for (let node of addedNodes) {
@@ -79,7 +81,7 @@ const processMutation = async (mutation: MutationRecord, plugin: PrettyPropertie
 
         if (plugin.settings.enableBases) {
 
-            if (target.classList.contains("multi-select-pill")) {
+            if (target.classList.contains("multi-select-pill") && !target.classList.contains("setting-tag-pill")) {
                 let property = target.closest(".bases-td")
                 let propName = property?.getAttribute("data-property") || ""
                 if (target instanceof HTMLElement) {

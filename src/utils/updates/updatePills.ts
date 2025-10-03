@@ -75,7 +75,7 @@ export const generateInlineStyles = (text: string, type: string, plugin: PrettyP
 	
 		  if (textColor) {
 			if (colors.find((c) => c == textColor)) {
-			  styleProps["--pp-text-color"] = "var(--color-" + textColor + "-rgb)"
+			  styleProps["--pp-text-rgb"] = "var(--color-" + textColor + "-rgb)"
 			  textColorClass = "theme-text-color";
 			  
 			} else if (textColor == "none") {
@@ -112,6 +112,7 @@ export const setPillStyles = async (
 	
 	
 	let styles = generateInlineStyles(value, type, plugin)
+
 
 	for (let className of colorClasses) {
 		pill.classList.remove(className)

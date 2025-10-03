@@ -4,6 +4,7 @@ import { i18n } from "src/localization/localization";
 import { updateAllPills } from "src/utils/updates/updatePills";
 import { ColorPickerModal } from "src/modals/colorPickerModal";
 import MenuManager from "src/utils/menuManager";
+import { updateRelativeDateColors } from "src/utils/updates/updateStyles";
 
 
 
@@ -65,9 +66,18 @@ export const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string
 
                 plugin.saveSettings();
                 updateAllPills(plugin)
+
+                if (colorList == "dateColors") {
+                    updateRelativeDateColors(plugin)
+                }
             });
             //@ts-ignore
-            item.setChecked(plugin.settings[colorList][pillVal] == color)
+            item.setChecked(plugin.settings[colorList][pillVal]?.[colorType] == color)
+
+            if (color == "default") {
+                //@ts-ignore
+                item.setChecked(plugin.settings[colorList][pillVal]?.[colorType] == color || !plugin.settings[colorList][pillVal]?.[colorType])
+            }
         });
     }
 
@@ -80,7 +90,7 @@ export const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string
             new ColorPickerModal(plugin.app, plugin, pillVal, colorList, colorType).open()
         })
         //@ts-ignore
-            item.setChecked(plugin.settings[colorList][pillVal]?.h !== undefined)
+            item.setChecked(plugin.settings[colorList][pillVal]?.[colorType]?.h !== undefined)
     })
 }
 
