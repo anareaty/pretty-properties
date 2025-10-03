@@ -3,11 +3,12 @@ import PrettyPropertiesPlugin from "src/main";
 import { i18n } from "src/localization/localization";
 import { updateAllPills } from "src/utils/updates/updatePills";
 import { ColorPickerModal } from "src/modals/colorPickerModal";
+import MenuManager from "src/utils/menuManager";
 
 
 
 
-const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string, plugin: PrettyPropertiesPlugin) => {
+export const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string, colorType: string, plugin: PrettyPropertiesPlugin) => {
 
     let colors = [
         "red",
@@ -44,11 +45,22 @@ const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string, plugi
                 
                 if (color == "default") {						
                     //@ts-ignore
-                    if (pillVal) delete plugin.settings[colorList][pillVal];
+                    if (pillVal) delete plugin.settings[colorList][pillVal]?.[colorType];
                 } else {
                     
                     //@ts-ignore
-                    if (pillVal) plugin.settings[colorList][pillVal] = color;
+                    if (pillVal) {
+                        //@ts-ignore
+                        if (!plugin.settings[colorList][pillVal]) {
+                            //@ts-ignore
+                          plugin.settings[colorList][pillVal] = {
+                            pillColor: "default",
+                            textColor: "default"
+                          }
+                        }
+                        //@ts-ignore
+                        plugin.settings[colorList][pillVal][colorType] = color;
+                    }    
                 }
 
                 plugin.saveSettings();
@@ -65,7 +77,7 @@ const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string, plugi
         //@ts-ignore
         item.iconEl.classList.add("menu-item-custom-color")
         item.onClick(() => {
-            new ColorPickerModal(plugin.app, plugin, pillVal, colorList).open()
+            new ColorPickerModal(plugin.app, plugin, pillVal, colorList, colorType).open()
         })
         //@ts-ignore
             item.setChecked(plugin.settings[colorList][pillVal]?.h !== undefined)
@@ -74,14 +86,47 @@ const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string, plugi
 
 
 
-const createColorMenu = (item: MenuItem, pillVal: string, colorList: string, plugin: PrettyPropertiesPlugin) => {
-    item.setTitle(i18n.t("SELECT_COLOR"))
-        .setIcon("paintbrush")
-        .setSection("pretty-properties");
-    //@ts-ignore
-    let sub = item.setSubmenu() as Menu;
-    setColorMenuItems(sub, pillVal, colorList, plugin)
-}
+var createColorMenu = (pillVal: string, colorList: string, colorType: string, plugin: PrettyPropertiesPlugin, menu: Menu | MenuManager) => {
+    let itemTitle = i18n.t("SELECT_COLOR")
+    let iconName = "paintbrush"
+  
+    if (colorType == "textColor") {
+      itemTitle = i18n.t("SELECT_TEXT_COLOR")
+      iconName = "type"
+    }
+  
+    if (menu instanceof MenuManager) {
+      menu.addItemAfter(
+        ["clipboard"],
+        itemTitle,
+        (item) => {
+          if (pillVal)
+            item
+              .setTitle(itemTitle)
+              .setIcon(iconName)
+              .setSection("pretty-properties");
+            let sub = item.setSubmenu();
+            setColorMenuItems(sub, pillVal, colorList, colorType, plugin);
+        }
+      );
+    } else if (menu instanceof Menu) {
+      menu.addItem(
+        (item: MenuItem) => {
+          if (pillVal)
+            item
+              .setTitle(itemTitle)
+              .setIcon(iconName)
+              .setSection("pretty-properties");
+            let sub = item.setSubmenu();
+            setColorMenuItems(sub, pillVal, colorList, colorType, plugin);
+        }
+      );
+    }
+};
+
+
+
+
 
 
 export const handlePillMenu = (e: MouseEvent, el: HTMLElement, plugin: PrettyPropertiesPlugin) => {
@@ -93,21 +138,11 @@ export const handlePillMenu = (e: MouseEvent, el: HTMLElement, plugin: PrettyPro
         let tagVal = pillEl?.getAttribute("data-tag-value");
 
         if (pillVal) {
-            menuManager.addItemAfter(
-                ["clipboard"],
-                i18n.t("SELECT_COLOR"),
-                (item: MenuItem) => {
-                    if (pillVal) createColorMenu(item, pillVal, "propertyPillColors", plugin)
-                }
-            );
+            createColorMenu(pillVal, "propertyPillColors", "pillColor", plugin, menuManager);
+            createColorMenu(pillVal, "propertyPillColors", "textColor", plugin, menuManager);
         } else if (tagVal) {
-            menuManager.addItemAfter(
-                ["clipboard"],
-                i18n.t("SELECT_COLOR"),
-                (item: MenuItem) => {
-                    if (tagVal) createColorMenu(item, tagVal, "tagColors", plugin)
-                }
-            );
+            createColorMenu(tagVal, "tagColors", "pillColor", plugin, menuManager);
+            createColorMenu(tagVal, "tagColors", "textColor", plugin, menuManager);
         }
     } 
 }
@@ -116,19 +151,14 @@ export const handleTagMenu = (e: MouseEvent | TouchEvent, el: HTMLElement, plugi
     let menuManager = plugin.menuManager
     menuManager.closeAndFlush()
     let tag = el.closest(".cm-hashtag");
-    if (tag?.classList.contains("cm-hashtag-begin")) {
-        tag = tag.nextElementSibling
+    if (tag?.classList.contains("cm-hashtag-begin") && tag?.classList.contains("cm-hashtag-inner")) {
+        tag = tag.parentElement?.nextElementSibling || null
     }
     if (tag instanceof HTMLElement) {
         let tagText = tag?.innerText
         if (tagText) {
-            menuManager.addItemAfter(
-                ["clipboard"],
-                i18n.t("SELECT_COLOR"),
-                (item: MenuItem) => {
-                    if (tagText) createColorMenu(item, tagText, "tagColors", plugin)
-                }
-            );
+            createColorMenu(tagText, "tagColors", "pillColor", plugin, menuManager);
+            createColorMenu(tagText, "tagColors", "textColor", plugin, menuManager);
         }
     }
 }
@@ -153,21 +183,13 @@ export const handleTagPaneMenu = (e: MouseEvent | TouchEvent, el: HTMLElement, p
                 if (menuExist) {
                     let menuManager = plugin.menuManager
                     menuManager.closeAndFlush()
-                    menuManager.addItemAfter(
-                        ["clipboard"],
-                        i18n.t("SELECT_COLOR"),
-                        (item: MenuItem) => {
-                            if (tagText) createColorMenu(item, tagText, "tagColors", plugin)
-                        }
-                    );
+                    createColorMenu(tagText, "tagColors", "pillColor", plugin, menuManager);
+                    createColorMenu(tagText, "tagColors", "textColor", plugin, menuManager);
                 } else {
                     let ev = e as MouseEvent
                     let menu = new Menu();
-                    menu.addItem(
-                        (item: MenuItem) => {
-                            if (tagText) createColorMenu(item, tagText, "tagColors", plugin)
-                        }
-                    );
+                    createColorMenu(tagText, "tagColors", "pillColor", plugin, menu);
+                    createColorMenu(tagText, "tagColors", "textColor", plugin, menu);
                     menu.showAtMouseEvent(ev)
                 }
             }
@@ -182,7 +204,7 @@ export const createColorButton = async (parent: HTMLElement, value: string, plug
 
         if (value && (!isBase || plugin.settings.enableColorButtonInBases)) {
             let colorButton = document.createElement("button")
-            setIcon(colorButton, "paintbrush")
+            setIcon(colorButton, "palette")
             colorButton.classList.add("longtext-color-button")
             parent.append(colorButton)
             colorButton.setAttribute("data-value", value)
@@ -190,7 +212,8 @@ export const createColorButton = async (parent: HTMLElement, value: string, plug
             colorButton.onclick = (e) => {
                 let pillVal = value
                 let menu = new Menu();
-                setColorMenuItems(menu, pillVal, "propertyLongtextColors", plugin)
+                createColorMenu(pillVal, "propertyLongtextColors", "pillColor", plugin, menu);
+                createColorMenu(pillVal, "propertyLongtextColors", "textColor", plugin, menu);
                 menu.showAtMouseEvent(e)
             }
         }

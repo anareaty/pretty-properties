@@ -50,7 +50,7 @@ export const registerTagFixExtension = (plugin: PrettyPropertiesPlugin) => {
                             if (node.type.name.includes('hashtag-end')) {
                                 let tagId = view.state.doc.sliceString(node.from, node.to)
                                 let styles = generateInlineStyles(tagId, "tag", plugin)
-                                let { styleProps, colorClass } = styles
+                                let { styleProps, colorClass, textColorClass } = styles
                                 let styleText = ""
                                 for (let key in styleProps) {
                                     styleText = styleText + key + ": " + styleProps[key] + "; "
@@ -61,7 +61,7 @@ export const registerTagFixExtension = (plugin: PrettyPropertiesPlugin) => {
                                         "data-tag-value": tagId, 
                                         style: styleText
                                     }, 
-                                    class: "cm-hashtag-inner cm-hashtag cm-hashtag-begin cm-meta cm-tag-" + tagId + " " + colorClass
+                                    class: "cm-hashtag-inner cm-hashtag cm-hashtag-begin cm-meta cm-tag-" + tagId + " " + colorClass + " " + textColorClass
                                 })
 
                                 let decoEnd = Decoration.mark({ 
@@ -69,7 +69,7 @@ export const registerTagFixExtension = (plugin: PrettyPropertiesPlugin) => {
                                         "data-tag-value": tagId, 
                                         style: styleText
                                     }, 
-                                    class: "cm-hashtag-inner cm-hashtag cm-hashtag-end cm-meta cm-tag-" + tagId + " " + colorClass
+                                    class: "cm-hashtag-inner cm-hashtag cm-hashtag-end cm-meta cm-tag-" + tagId + " " + colorClass + " " + textColorClass
                                 })
 
                                 builder.add(node.from - 1, node.from, decoBegin);

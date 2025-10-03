@@ -15,6 +15,8 @@ import { updateHiddenProperties } from './utils/updates/updateHiddenProperties';
 import { updateAllPills, updateLongTexts } from './utils/updates/updatePills';
 import { updateHiddenPropertiesInPropTab } from './utils/updates/updateStyles';
 import { updateTagPaneTagsAll } from './utils/updates/updatePills';
+import { setPillStyles } from './utils/updates/updatePills';
+import { setColorMenuItems } from './menus/selectColorMenus';
 
 
 export interface PPPluginSettings {
@@ -1110,11 +1112,9 @@ export class PPSettingTab extends PluginSettingTab {
 					let propertyColorSetting = new Setting(colorSettingsEl)
 
 					let pillEl = propertyColorSetting.nameEl.createEl("div", {
-						cls: "multi-select-pill",
-						attr : {
-							"data-property-pill-value": property
-						},
-					})
+						cls: "multi-select-pill setting-multi-select-pill"
+					})   
+					setPillStyles(pillEl, "data-property-pill-value", property, "multiselect-pill", this.plugin)
 
 					pillEl.createEl("div", {text: property, cls: "multi-select-pill-content"})
 					let propertyColorComponent: ColorComponent
@@ -1134,64 +1134,20 @@ export class PPSettingTab extends PluginSettingTab {
 							}
 						}
 					})
-					.addColorPicker(color => {
-						propertyColorComponent = color
-						color.setValueHsl(this.plugin.settings.propertyPillColors[property])
-						.onChange(async (value) => {
-							propertyColorButton.buttonEl.classList.forEach(cls => {
-								if (cls.startsWith("color")) {
-									propertyColorButton.buttonEl.classList.remove(cls)
-								}
-							})
-
-							let hsl = color.getValueHsl()
-							this.plugin.settings.propertyPillColors[property] = hsl
-							this.plugin.saveSettings()
-							updateAllPills(this.plugin)
-						})
+					.addButton((btn) => {
+						btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
+						  let menu = new Menu();
+						  setColorMenuItems(menu, property, "propertyPillColors", "pillColor", this.plugin);
+						  menu.showAtMouseEvent(e);
+						});
 					})
-					.addButton(btn => {
-						propertyColorButton = btn
-
-						if (typeof this.plugin.settings.propertyPillColors[property] == "string") {
-							btn.buttonEl.classList.add("color-" + this.plugin.settings.propertyPillColors[property])
-						}
-						
-						btn
-						.setIcon("paintbrush")
-						.setClass("property-color-setting-button")
-						.onClick((e) => {
-							let menu = new Menu()
-							let colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink", "none"]
-
-							for (let color of colors) {
-								menu.addItem((item: MenuItem) => {
-									item.setIcon("square")
-									//@ts-ignore
-									let iconEl = item.iconEl
-									if (color != "default" && color != "none") {
-										iconEl.style = "color: transparent; background-color: rgba(var(--color-" + color + "-rgb), 0.3);"
-									}
-									if (color == "none") iconEl.style = "opacity: 0.2;"
-	
-									item.setTitle(i18n.t(color))
-									.onClick(() => {
-										propertyColorComponent.setValue("")
-										btn.buttonEl.classList.forEach(cls => {
-											if (cls.startsWith("color")) {
-												propertyColorButton.buttonEl.classList.remove(cls)
-											}
-										})
-										btn.buttonEl.classList.add("color-" + color)
-										this.plugin.settings.propertyPillColors[property] = color
-										this.plugin.saveSettings()
-										updateAllPills(this.plugin)
-									})
-									item.setChecked(color == this.plugin.settings.propertyPillColors[property])
-								})
-							}
-							menu.showAtMouseEvent(e)
-						})
+			
+					  .addButton((btn) => {
+						btn.setIcon("type").setClass("property-color-setting-button").onClick((e) => {
+						  let menu = new Menu();
+						  setColorMenuItems(menu, property, "propertyPillColors", "textColor", this.plugin);
+						  menu.showAtMouseEvent(e);
+						});
 					})
 					.addButton(btn => btn
 						.setIcon("x")
@@ -1263,11 +1219,10 @@ export class PPSettingTab extends PluginSettingTab {
 					let propertyColorSetting = new Setting(colorSettingsEl)
 
 					let pillEl = propertyColorSetting.nameEl.createEl("div", {
-						cls: "multi-select-pill",
-						attr : {
-							"data-tag-value": property
-						},
+						cls: "multi-select-pill setting-tag-pill",
+						
 					})
+					setPillStyles(pillEl, "data-tag-value", property, "tag", this.plugin)
 
 					pillEl.createEl("div", {text: property, cls: "multi-select-pill-content"})
 					let propertyColorComponent: ColorComponent
@@ -1287,65 +1242,21 @@ export class PPSettingTab extends PluginSettingTab {
 							}
 						}
 					})
-					.addColorPicker(color => {
-						propertyColorComponent = color
-						color.setValueHsl(this.plugin.settings.tagColors[property])
-						.onChange(async (value) => {
-							propertyColorButton.buttonEl.classList.forEach(cls => {
-								if (cls.startsWith("color")) {
-									propertyColorButton.buttonEl.classList.remove(cls)
-								}
-							})
-
-							let hsl = color.getValueHsl()
-							this.plugin.settings.tagColors[property] = hsl
-							this.plugin.saveSettings()
-							updateAllPills(this.plugin)
-						})
-					})
-					.addButton(btn => {
-						propertyColorButton = btn
-
-						if (typeof this.plugin.settings.tagColors[property] == "string") {
-							btn.buttonEl.classList.add("color-" + this.plugin.settings.tagColors[property])
-						}
-						
-						btn
-						.setIcon("paintbrush")
-						.setClass("property-color-setting-button")
-						.onClick((e) => {
-							let menu = new Menu()
-							let colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink", "none"]
-
-							for (let color of colors) {
-								menu.addItem((item: MenuItem) => {
-									item.setIcon("square")
-									//@ts-ignore
-									let iconEl = item.iconEl
-									if (color != "default" && color != "none") {
-										iconEl.style = "color: transparent; background-color: rgba(var(--color-" + color + "-rgb), 0.3);"
-									}
-									if (color == "none") iconEl.style = "opacity: 0.2;"
-	
-									item.setTitle(i18n.t(color))
-									.onClick(() => {
-										propertyColorComponent.setValue("")
-										btn.buttonEl.classList.forEach(cls => {
-											if (cls.startsWith("color")) {
-												propertyColorButton.buttonEl.classList.remove(cls)
-											}
-										})
-										btn.buttonEl.classList.add("color-" + color)
-										this.plugin.settings.tagColors[property] = color
-										this.plugin.saveSettings()
-										updateAllPills(this.plugin)
-									})
-									item.setChecked(color == this.plugin.settings.tagColors[property])
-								})
-							}
-							menu.showAtMouseEvent(e)
-						})
-					})
+					.addButton((btn) => {
+						btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
+						  let menu = new Menu();
+						  setColorMenuItems(menu, property, "tagColors", "pillColor", this.plugin);
+						  menu.showAtMouseEvent(e);
+						});
+					  })
+			
+					  .addButton((btn) => {
+						btn.setIcon("type").setClass("property-color-setting-button").onClick((e) => {
+						  let menu = new Menu();
+						  setColorMenuItems(menu, property, "tagColors", "textColor", this.plugin);
+						  menu.showAtMouseEvent(e);
+						});
+					  })
 					.addButton(btn => btn
 						.setIcon("x")
 						.onClick(() => {
@@ -1422,13 +1333,12 @@ export class PPSettingTab extends PluginSettingTab {
 				const addColorSetting = (property: string) => {
 					let propertyColorSetting = new Setting(colorSettingsEl)
 
-					propertyColorSetting.nameEl.createEl("div", {
+					let pill = propertyColorSetting.nameEl.createEl("div", {
 						text: property,
-						cls: "metadata-input-longtext",
-						attr : {
-							"data-property-longtext-value": property
-						},
+						cls: "metadata-input-longtext setting-longtext-pill",
+						
 					})
+					setPillStyles(pill, "data-property-longtext-value", property, "longtext", this.plugin)
 					let propertyColorComponent: ColorComponent
 					let propertyColorButton: ButtonComponent
 
@@ -1447,64 +1357,22 @@ export class PPSettingTab extends PluginSettingTab {
 							}
 						}
 					})
-					.addColorPicker(color => {
-						propertyColorComponent = color
-						color.setValueHsl(this.plugin.settings.propertyLongtextColors[property])
-						.onChange(async (value) => {
-							propertyColorButton.buttonEl.classList.forEach(cls => {
-								if (cls.startsWith("color")) {
-									propertyColorButton.buttonEl.classList.remove(cls)
-								}
-							})
-							
-							let hsl = color.getValueHsl()
-							this.plugin.settings.propertyLongtextColors[property] = hsl
-							this.plugin.saveSettings()
-							updateAllPills(this.plugin)
-						})
-					})
-					.addButton(btn => {
-						propertyColorButton = btn
-
-						if (typeof this.plugin.settings.propertyLongtextColors[property] == "string")
-						btn.buttonEl.classList.add("color-" + this.plugin.settings.propertyLongtextColors[property])
-						
-						btn
-						.setIcon("paintbrush")
-						.setClass("property-color-setting-button")
-						.onClick((e) => {
-							let menu = new Menu()
-							let colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink", "none"]
-
-							for (let color of colors) {
-								menu.addItem((item: MenuItem) => {
-									item.setIcon("square")
-									//@ts-ignore
-									let iconEl = item.iconEl
-									if (color != "default" && color != "none") {
-										iconEl.style = "color: transparent; background-color: rgba(var(--color-" + color + "-rgb), 0.3);"
-									}
-									if (color == "none") iconEl.style = "opacity: 0.2;"
-							
-									item.setTitle(i18n.t(color))
-									.onClick(() => {
-										propertyColorComponent.setValue("")
-										btn.buttonEl.classList.forEach(cls => {
-											if (cls.startsWith("color")) {
-												propertyColorButton.buttonEl.classList.remove(cls)
-											}
-										})
-										btn.buttonEl.classList.add("color-" + color)
-										this.plugin.settings.propertyLongtextColors[property] = color
-										this.plugin.saveSettings()
-										updateAllPills(this.plugin)
-									})
-									item.setChecked(color == this.plugin.settings.propertyLongtextColors[property])
-								})
-							}
-							menu.showAtMouseEvent(e)
-						})
-					})
+					.addButton((btn) => {
+						btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
+						  let menu = new Menu();
+						  setColorMenuItems(menu, property, "propertyLongtextColors", "pillColor", this.plugin);
+						  menu.showAtMouseEvent(e);
+						});
+					  })
+			
+			
+					  .addButton((btn) => {
+						btn.setIcon("type").setClass("property-color-setting-button").onClick((e) => {
+						  let menu = new Menu();
+						  setColorMenuItems(menu, property, "propertyLongtextColors", "textColor", this.plugin);
+						  menu.showAtMouseEvent(e);
+						});
+					  })
 					.addButton(btn => btn
 						.setIcon("x")
 						.onClick(() => {

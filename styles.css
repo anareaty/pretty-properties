@@ -960,7 +960,7 @@ body {
   --longtext-margin: 0;
 }
 
-.metadata-input-longtext.theme-color:not(:hover),
+.metadata-input-longtext.theme-color:not(:hover, :focus),
 .bases-cards-line.theme-color,
 .bases-rendered-value.theme-color {
   background-color: rgba(var(--pp-color-rgb), 0.2);
@@ -1148,3 +1148,18 @@ button.longtext-color-button:hover {
 
 
 
+
+
+
+.theme-text-color {
+  color: rgb(var(--pp-text-color)) !important;
+}
+
+.custom-text-color {
+  color: hsl(var(--pp-text-hsl)) !important;
+}
+
+
+.none-text-color {
+  color: var(--metadata-input-text-color) !important;
+}

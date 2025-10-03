@@ -157,7 +157,8 @@ export default {
   ENABLE_COLORED_TAGS_IN_TAG_PANE: "Show colored tags in tag pane",
   ENABLE_MATH: "Enable rendering math expressions in properties and bases",
   RENDER_MATH: "Render as formula",
-  NOT_RENDER_MATH: "Do not render as formula"
+  NOT_RENDER_MATH: "Do not render as formula",
+  SELECT_TEXT_COLOR: "Select text color",
 };
 
 

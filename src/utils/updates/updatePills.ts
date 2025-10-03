@@ -20,6 +20,7 @@ export const generateInlineStyles = (text: string, type: string, plugin: PrettyP
     let colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink"];
     let colorSettings: any
     let colorClass = ""
+	let textColorClass = "";
 	let styleProps: any = {}
 
     if (type == "tag") {
@@ -39,35 +40,60 @@ export const generateInlineStyles = (text: string, type: string, plugin: PrettyP
 	}
 
     if (colorSettings) {
-        let color = colorSettings[text]
 
-        if (color) {
-            if (colors.find(c => c == color)) {
+		
 
-				styleProps = {
-					"--pp-color-rgb": "var(--color-" + color + "-rgb)"
-				}
+		let colorSetting = colorSettings[text];
 
-                colorClass = "theme-color"
-            } else if (color == "none") {
-                colorClass = "transparent-color"
-            } else {
-                let textLightness = getTextLightness(color)
-                let hslString = color.h + " ," + color.s + "% ," + color.l + "%"
-                let hslStringHover = color.h + " ," + color.s + "% ," + (color.l - 5) + "%"
-                let hslStringText = color.h + " ," + color.s + "% ," + textLightness + "%"
-
-				styleProps = {
-					"--pp-background-hsl": hslString, 
-                	"--pp-background-hover-hsl": hslStringHover,
-                	"--pp-text-hsl": hslStringText
-				}
-
-                colorClass = "custom-color"
-            }
-        }
-    }
-    return {colorClass, styleProps}
+		if (colorSetting) {
+	
+		  let color = colorSetting.pillColor
+		  let textColor = colorSetting.textColor
+	
+		  if (color) {
+			if (colors.find((c) => c == color)) {
+			  styleProps = {
+				"--pp-color-rgb": "var(--color-" + color + "-rgb)"
+			  };
+			  colorClass = "theme-color";
+			} else if (color == "none") {
+			  colorClass = "transparent-color";
+			} else {
+			  let textLightness = getTextLightness(color);
+			  let hslString = color.h + " ," + color.s + "% ," + color.l + "%";
+			  let hslStringHover = color.h + " ," + color.s + "% ," + (color.l - 5) + "%";
+			  let hslStringText = color.h + " ," + color.s + "% ," + textLightness + "%";
+			  styleProps = {
+				"--pp-background-hsl": hslString,
+				"--pp-background-hover-hsl": hslStringHover,
+				"--pp-text-hsl": hslStringText
+			  };
+			  colorClass = "custom-color";
+			}
+		  }
+	
+	
+		  if (textColor) {
+			if (colors.find((c) => c == textColor)) {
+			  styleProps["--pp-text-color"] = "var(--color-" + textColor + "-rgb)"
+			  textColorClass = "theme-text-color";
+			  
+			} else if (textColor == "none") {
+			  textColorClass = "none-text-color";
+			} else if (textColor != "default") {
+			  let hslStringText = textColor.h + " ," + textColor.s + "% ," + textColor.l + "%";
+			  styleProps["--pp-text-hsl"] = hslStringText
+			  textColorClass = "custom-text-color";
+			}
+		  }
+	
+	
+	
+		}
+	  }
+	
+	
+	  return { colorClass, textColorClass, styleProps };
 }
 
 
@@ -78,7 +104,7 @@ export const setPillStyles = async (
 	type: string,
 	plugin: PrettyPropertiesPlugin
 ) => {
-	let colorClasses = ["theme-color", "custom-color", "transparent-color", "default-color"]
+	let colorClasses = ["theme-color", "custom-color", "transparent-color", "default-color", "theme-text-color", "custom-text-color", "none-text-color", "default-text-color"];
 	
 	pill.removeAttribute("data-property-pill-value")
 	pill.removeAttribute("data-tag-value")
@@ -94,6 +120,13 @@ export const setPillStyles = async (
 
 	if (styles.colorClass) {
 		pill.classList.add(styles.colorClass)
+	}
+
+	if (styles.textColorClass) {
+	  pill.classList.add(styles.textColorClass);
+	}
+  
+	if (styles.colorClass || styles.textColorClass) {
 		pill.setCssProps(styles.styleProps)
 	} 
 }
@@ -411,6 +444,52 @@ export const updateLongTexts = async (container: HTMLElement, plugin: PrettyProp
 
 
 
+
+
+
+
+
+export const updateSettingPills = async (plugin: PrettyPropertiesPlugin) => {
+
+	let pills = document.querySelectorAll(".setting-multi-select-pill");
+	for (let pill of pills) {
+	  if (pill instanceof HTMLElement) {
+		let content = pill.querySelector(".multi-select-pill-content");
+		if (content instanceof HTMLElement) {
+			let text = content?.innerText
+			setPillStyles(pill, "data-property-pill-value", text, "multiselect-pill", plugin)
+		}
+	  }
+	}
+  
+	let tagPills = document.querySelectorAll(".setting-tag-pill");
+	for (let pill of tagPills) {
+	  if (pill instanceof HTMLElement) {
+		let content = pill.querySelector(".multi-select-pill-content");
+		if (content instanceof HTMLElement) {
+			let text = content?.innerText
+			setPillStyles(pill, "data-tag-value", text, "tag", plugin)
+		}
+		
+	  }
+	}
+  
+	let longtextPills = document.querySelectorAll(".setting-longtext-pill");
+	for (let pill of longtextPills) {
+	  if (pill instanceof HTMLElement) {
+		let text = pill.innerText
+		setPillStyles(pill, "data-property-longtext-value", text, "longtext", plugin);
+	  }
+	}
+  }
+
+
+
+
+
+
+
+
 export const updatePills = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
 	updateInlineTags(container, plugin)
 
@@ -486,6 +565,7 @@ export const updateAllPills = async (plugin: PrettyPropertiesPlugin) => {
 		let container = view.containerEl;
 		updatePills(container, plugin)
 	})
+	updateSettingPills(plugin)
 }
 
 

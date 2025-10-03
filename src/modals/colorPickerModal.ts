@@ -7,12 +7,14 @@ export class ColorPickerModal extends Modal {
     plugin: PrettyPropertiesPlugin
     propVal: string | any
     colorList: string
+    colorType: string
 
-    constructor(app: App, plugin: PrettyPropertiesPlugin, propVal: string, colorList: string) {
+    constructor(app: App, plugin: PrettyPropertiesPlugin, propVal: string, colorList: string, colorType: string) {
         super(app);
         this.propVal = propVal
         this.plugin = plugin
         this.colorList = colorList
+        this.colorType = colorType
     }
     
     onOpen() {
@@ -21,16 +23,26 @@ export class ColorPickerModal extends Modal {
 
         new Setting(contentEl)
         .addColorPicker(color => {
-            
-            if (this.propVal.h) {
+            //@ts-ignore
+            if (this.propVal && this.plugin.settings[this.colorList][this.propVal]?.[this.colorType]?.h !== undefined) {
                 //@ts-ignore
-                color.setValueHsl(this.plugin.settings[this.colorList][this.propVal])
+                color.setValueHsl(this.plugin.settings[this.colorList][this.propVal][this.colorType])
             }
             
             color.onChange((value) => {
                 let hsl = color.getValueHsl()
                 //@ts-ignore
-                this.plugin.settings[this.colorList][this.propVal] = hsl
+                if (!this.plugin.settings[this.colorList][this.propVal]) {
+                    //@ts-ignore
+                    this.plugin.settings[this.colorList][this.propVal] = {
+                      pillColor: "default",
+                      textColor: "default"
+                    }
+                  }
+
+
+                //@ts-ignore
+                this.plugin.settings[this.colorList][this.propVal][this.colorType] = hsl
                 this.plugin.saveSettings()
                 updateAllPills(this.plugin)
             })
