@@ -115,6 +115,7 @@ var createColorMenu = (pillVal: string, colorList: string, colorType: string, pl
               .setTitle(itemTitle)
               .setIcon(iconName)
               .setSection("pretty-properties");
+            //@ts-ignore
             let sub = item.setSubmenu();
             setColorMenuItems(sub, pillVal, colorList, colorType, plugin);
         }
@@ -127,6 +128,7 @@ var createColorMenu = (pillVal: string, colorList: string, colorType: string, pl
               .setTitle(itemTitle)
               .setIcon(iconName)
               .setSection("pretty-properties");
+            //@ts-ignore
             let sub = item.setSubmenu();
             setColorMenuItems(sub, pillVal, colorList, colorType, plugin);
         }
