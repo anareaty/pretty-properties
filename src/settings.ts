@@ -77,9 +77,12 @@ export interface PPPluginSettings {
 	enableCustomDateFormat: boolean;
 	enableCustomDateFormatInBases: boolean;
 	enableRelativeDateColors: boolean;
+
+	/*
 	datePastColor: any;
 	datePresentColor: any;
 	dateFutureColor: any;
+	*/
 	settingsTab: string;
 	enableTaskNotesCount: boolean;
 	allTNTasksCount: string;
@@ -173,9 +176,12 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	enableCustomDateFormat: false,
 	enableCustomDateFormatInBases: false,
 	enableRelativeDateColors: false,
+
+	/*
 	dateFutureColor: "",
 	datePastColor: "",
 	datePresentColor: "",
+	*/
 	settingsTab: "BANNERS",
 	enableTaskNotesCount: false,
 	allTNTasksCount: "tn_tasks",
