@@ -46,6 +46,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		if (this.settings.enableMath) {
 			loadMathJax()
 		}
+
+		document.body.classList.add("pp-loaded")
 		
 		updateRelativeDateColors(this)
 		updateBannerStyles(this);
@@ -208,6 +210,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		if (this.observer instanceof MutationObserver) {
 			this.observer.disconnect()
 		}
+		document.body.classList.remove("pp-loaded")
 		removeAll()
 	}
 

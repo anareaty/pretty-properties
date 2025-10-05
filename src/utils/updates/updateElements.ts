@@ -93,3 +93,39 @@ const updateLeafElements = async (
         }
     }
 }
+
+
+
+const updateImages = (plugin: PrettyPropertiesPlugin, imageUpdateFunc: any) => {
+    let leaves = plugin.app.workspace.getLeavesOfType("markdown");
+    for (let leaf of leaves) {
+        if (leaf.view instanceof MarkdownView) {
+            let view = leaf.view
+            if (view instanceof MarkdownView) {
+                if (view.file) {
+                    let cache = plugin.app.metadataCache.getFileCache(view.file);
+                    if (cache) {
+                        let frontmatter = cache.frontmatter;
+                        imageUpdateFunc(view, frontmatter, plugin);
+                    }
+                }
+            }
+        }
+    }
+}
+
+export const updateImagesOnPropertyAdded = async (propertyEl: HTMLElement, plugin: PrettyPropertiesPlugin) => {
+    let name = propertyEl.getAttribute("data-property-key")
+
+    if (name == plugin.settings.bannerProperty && plugin.settings.enableBanner) {       
+        updateImages(plugin, updateBannerImages)
+    } 
+
+    else if (name == plugin.settings.coverProperty && plugin.settings.enableCover) {       
+        updateImages(plugin, updateCoverImages)
+    }
+
+    else if (name == plugin.settings.iconProperty && plugin.settings.enableIcon) {       
+        updateImages(plugin, updateIcons)
+    }
+}

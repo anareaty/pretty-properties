@@ -14,6 +14,8 @@ import { updateProgress, updateProgressEls } from "./updates/updateProgress";
 import { updateHiddenProperty} from "./updates/updateHiddenProperties";
 import { updateHiddenPropertiesForContainer } from "./updates/updateHiddenProperties";
 import { updateTagPaneTags } from "./updates/updatePills";
+import { updateImagesOnPropertyAdded } from "./updates/updateElements";
+
 
 
 export const startObserver = (plugin: PrettyPropertiesPlugin) => {
@@ -31,7 +33,7 @@ const processMutation = async (mutation: MutationRecord, plugin: PrettyPropertie
     let addedNodes = mutation.addedNodes
 
 
-    //console.log(target)
+    
     
     if (target instanceof HTMLElement) {
 
@@ -49,12 +51,10 @@ const processMutation = async (mutation: MutationRecord, plugin: PrettyPropertie
 
         if (addedNodes.length == 0) return
 
-        
-      
-
         if (target.classList.contains("metadata-properties")) {
             for (let node of addedNodes) {
                 if (node instanceof HTMLElement) {
+                    updateImagesOnPropertyAdded(node, plugin)
                     updatePills(node, plugin)
                     updateDateInputs(node, plugin)
                     updateProgress(node, plugin)                   
