@@ -466,6 +466,15 @@ export class PPSettingTab extends PluginSettingTab {
 						updateIconStyles(this.plugin);
 					})
 				)
+				.addButton(btn => btn
+					.setIcon("rotate-ccw")
+					.onClick(async (e) => {
+						this.plugin.settings.iconColor = ""
+						this.plugin.saveSettings();
+						updateIconStyles(this.plugin);
+						this.display()
+					})
+				)
 
 				new Setting(containerEl)
 				.setName(i18n.t("ICON_COLOR_DARK"))
@@ -475,6 +484,15 @@ export class PPSettingTab extends PluginSettingTab {
 						this.plugin.settings.iconColorDark = value
 						await this.plugin.saveSettings();
 						updateIconStyles(this.plugin);
+					})
+				)
+				.addButton(btn => btn
+					.setIcon("rotate-ccw")
+					.onClick(async (e) => {
+						this.plugin.settings.iconColorDark = ""
+						this.plugin.saveSettings();
+						updateIconStyles(this.plugin);
+						this.display()
 					})
 				)
 
