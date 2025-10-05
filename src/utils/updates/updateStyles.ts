@@ -35,8 +35,12 @@ export const updateIconStyles = (plugin: PrettyPropertiesPlugin) => {
       iconSize = plugin.settings.iconSizeMobile;
     } 
     let iconColor = plugin.settings.iconColor;
-    if (!iconColor)
-      iconColor = "var(--text-normal)";
+    let iconColorDark = plugin.settings.iconColorDark;
+
+
+    if (!iconColor) iconColor = "var(--text-normal)";
+    if (!iconColorDark) iconColorDark = "var(--text-normal)";
+
     let iconBackground = "transparent";
     if (plugin.settings.iconBackground) {
       iconBackground = "var(--background-primary)";
@@ -48,7 +52,8 @@ export const updateIconStyles = (plugin: PrettyPropertiesPlugin) => {
       "--pp-icon-gap": plugin.settings.iconGap + "px",
       "--pp-banner-icon-gap": bannerIconGap + "px",
       "--pp-icon-left-margin": plugin.settings.iconLeftMargin + "px",
-      "--pp-icon-color": iconColor,
+      "--pp-icon-color-light": iconColor,
+      "--pp-icon-color-dark": iconColorDark,
       "--pp-icon-background": iconBackground
     };
     document.body.setCssProps(iconProps);

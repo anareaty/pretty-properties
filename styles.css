@@ -113,8 +113,22 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
-  color: var(--pp-icon-color);
 }
+
+
+.theme-light .icon-image img,
+.theme-light .icon-image svg,
+.theme-light .icon-image .pp-text-icon {
+  color: var(--pp-icon-color-light);
+}
+
+.theme-dark .icon-image img,
+.theme-dark .icon-image svg,
+.theme-dark .icon-image .pp-text-icon {
+  color: var(--pp-icon-color-dark);
+}
+
+
 
 .icon-image {
   container-type: inline-size;

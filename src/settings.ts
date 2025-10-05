@@ -65,6 +65,7 @@ export interface PPPluginSettings {
 	bannerIconGap: number;
 	bannerIconGapMobile: number;
 	iconColor: string;
+	iconColorDark: string;
 	iconBackground: boolean;
 	enableBases: boolean;
 	bannerPositionProperty: string;
@@ -77,12 +78,6 @@ export interface PPPluginSettings {
 	enableCustomDateFormat: boolean;
 	enableCustomDateFormatInBases: boolean;
 	enableRelativeDateColors: boolean;
-
-	/*
-	datePastColor: any;
-	datePresentColor: any;
-	dateFutureColor: any;
-	*/
 	settingsTab: string;
 	enableTaskNotesCount: boolean;
 	allTNTasksCount: string;
@@ -164,6 +159,7 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	bannerIconGap: 0,
 	bannerIconGapMobile: 20,
 	iconColor: "",
+	iconColorDark: "",
 	iconBackground: false,
 	enableBases: false,
 	bannerPositionProperty: "banner_position",
@@ -176,12 +172,6 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	enableCustomDateFormat: false,
 	enableCustomDateFormatInBases: false,
 	enableRelativeDateColors: false,
-
-	/*
-	dateFutureColor: "",
-	datePastColor: "",
-	datePresentColor: "",
-	*/
 	settingsTab: "BANNERS",
 	enableTaskNotesCount: false,
 	allTNTasksCount: "tn_tasks",
@@ -472,6 +462,17 @@ export class PPSettingTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.iconColor)
 					.onChange(async (value) => {
 						this.plugin.settings.iconColor = value
+						await this.plugin.saveSettings();
+						updateIconStyles(this.plugin);
+					})
+				)
+
+				new Setting(containerEl)
+				.setName(i18n.t("ICON_COLOR_DARK"))
+				.addColorPicker(color => color
+					.setValue(this.plugin.settings.iconColorDark)
+					.onChange(async (value) => {
+						this.plugin.settings.iconColorDark = value
 						await this.plugin.saveSettings();
 						updateIconStyles(this.plugin);
 					})
