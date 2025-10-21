@@ -19,7 +19,7 @@ export default class MenuManager {
 				}
 				return showAtPosition.call(menu, ...args);
 			}
-		});
+		})
 	}
 
 	/**
