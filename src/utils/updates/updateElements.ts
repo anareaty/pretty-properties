@@ -1,131 +1,288 @@
-import { TFile, CachedMetadata, MarkdownView, FileView } from "obsidian";
+import { TFile, CachedMetadata, MarkdownView } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
-import { updateCoverImages } from "./updateCovers";
-import { updateBannerImages } from "./updateBanners";
-import { updateIcons } from "./updateIcons";
-import { updateTasksCount } from "../taskCount/taskCount";
-import { updateTaskNotesTaskCount, needToUpdateTaskNotes } from "../taskCount/taskNotesTaskCount";
-import { updateDateInputs } from "./updateDates";
-import { updateProgressEls } from "./updateProgress";
-import { updatePills } from "./updatePills";
-import { updateHiddenPropertiesForContainer } from "./updateHiddenProperties";
+import { renderCover, updateCoverForView } from "./updateCovers";
+import { renderIcon, updateIconForView } from "./updateIcons";
+import { updateDateInput, updateDateTimeInput } from "./updateDates";
+import { updateProgress  } from "./updateProgress";
+import { updateCardLongtext, updateLongtext, updateMultiselectPill, updateSettingPills, updateTag, updateTagPaneTagsAll, updateTagPill, updateValueListElement } from "./updatePills";
+import { renderBanner, updateBannerForView } from "./updateBanners";
+import { updateBaseProgressEls } from "./updateBaseProgress";
 
 
 
-export const updateElements = (plugin: PrettyPropertiesPlugin, changedFile?: TFile | null, cache?: CachedMetadata | null) => {
 
-    let currentFile = plugin.app.workspace.getActiveFile()
-    let updateTaskNotes = needToUpdateTaskNotes(plugin, cache)
-    let leaves = plugin.app.workspace.getLeavesOfType("markdown");
-    for (let leaf of leaves) {
-        if (leaf.view instanceof MarkdownView) {
-            if (plugin.settings.autoTasksCount) {
-                if (updateTaskNotes || changedFile == currentFile) {
-                    updateTaskNotesTaskCount(plugin, null, leaf.view)
-                }
+
+export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => { 
+
+    
+   
+    let multitexts = document.querySelectorAll(".metadata-property:not([data-property-key='tags']) .multi-select-pill")
+    
+    for (let pill of multitexts) {
+        if (pill instanceof HTMLElement) updateMultiselectPill(pill, plugin) 
+    }
+    
+    let tagPills = document.querySelectorAll(".metadata-property[data-property-key='tags'] .multi-select-pill")
+    for (let pill of tagPills) {
+        if (pill instanceof HTMLElement) updateTagPill(pill, plugin)
+    }
+
+
+    let baseMultitexts = document.querySelectorAll(".bases-metadata-value[data-property-type='multitext'] .multi-select-pill")
+    
+    for (let pill of baseMultitexts) {
+        if (pill instanceof HTMLElement) updateMultiselectPill(pill, plugin) 
+    }
+
+    
+
+    let baseCardMultitexts = document.querySelectorAll(".bases-rendered-value[data-property-type='multitext'] .value-list-element:not(:has(a.tag))")
+
+    for (let pill of baseCardMultitexts) {
+        if (pill instanceof HTMLElement) updateValueListElement(pill, "data-property-pill-value", "multiselect-pill", plugin) 
+    }
+
+        
+
+    
+
+    let baseTagPills = document.querySelectorAll(".bases-metadata-value[data-property-type='tags'] .multi-select-pill")
+    
+    for (let pill of baseTagPills) {
+        if (pill instanceof HTMLElement) updateTagPill(pill, plugin) 
+    }
+
+    
+
+    
+
+    let tags = document.querySelectorAll("a.tag")
+    
+    for (let pill of tags) {
+        if (pill instanceof HTMLElement) updateTag(pill, plugin)
+    }
+
+    
+
+    let dates = document.querySelectorAll(".metadata-input.mod-date")
+    for (let input of dates) {
+        if (input instanceof HTMLInputElement) {
+            updateDateInput(input, plugin)
+            input.onchange = () => {
+                updateDateInput(input, plugin)
             }
-            if (
-                changedFile &&
-                leaf.view.file &&
-                leaf.view.file.path != changedFile.path
-            ) {
-                continue;
-            }
-            updateLeafElements(plugin, leaf.view, cache);
         }
     }
 
-    let propLeaves = plugin.app.workspace.getLeavesOfType("file-properties");
-    for (let leaf of propLeaves) {
-        if (leaf.view instanceof FileView) {
-            if (
-                changedFile &&
-                leaf.view.file &&
-                leaf.view.file.path != changedFile.path
-            ) {
-                continue;
+    let datetimes = document.querySelectorAll(".metadata-input.mod-datetime")
+    for (let input of datetimes) {
+        if (input instanceof HTMLInputElement) {
+            updateDateTimeInput(input, plugin)
+            input.onchange = () => {
+                updateDateTimeInput(input, plugin)
             }
-            updateLeafElements(plugin, leaf.view, cache);
         }
     }
 
     
-    if (plugin.settings.enableBases) {
-        let baseLeaves = plugin.app.workspace.getLeavesOfType("bases");
-        for (let leaf of baseLeaves) {
-            if (leaf.view instanceof FileView) {
-                let container = leaf.view.containerEl;
-                updateDateInputs(container, plugin)
+
+    
+
+    let longtexts = document.querySelectorAll(".metadata-input-longtext")
+
+    for (let input of longtexts) {
+        if (input instanceof HTMLElement) {
+            updateLongtext(input, plugin);
+            input.onblur = () => {
+                updateLongtext(input, plugin);
             }
         }
     }
-    
-}
 
 
-const updateLeafElements = async (
-    plugin: PrettyPropertiesPlugin,
-    view: MarkdownView | FileView,
-    cache?: CachedMetadata | null
-) => {
-
-    let container = view.containerEl;
-    updateDateInputs(container, plugin)
-    updateProgressEls(container, plugin)
-    updatePills(container, plugin)
-    updateHiddenPropertiesForContainer(container, plugin)
-
-    if (!cache && view.file) {
-        cache = plugin.app.metadataCache.getFileCache(view.file);
-    }
-    let frontmatter;
-    if (cache) {
-        frontmatter = cache.frontmatter;
-    }
-
-    if (view instanceof MarkdownView) {
-        updateCoverImages(view, frontmatter, plugin);
-        updateIcons(view, frontmatter, plugin);
-        updateBannerImages(view, frontmatter, plugin);
-
-        if (cache && frontmatter && plugin.settings.enableTasksCount && plugin.settings.autoTasksCount) {
-            updateTasksCount(view, cache, plugin);
+    let cardLongTexts = document.querySelectorAll(".bases-rendered-value[data-property-type='text']")
+    for (let el of cardLongTexts) {
+        if (el instanceof HTMLElement) {
+            updateCardLongtext(el, plugin);
         }
     }
-}
 
 
+    
 
-const updateImages = (plugin: PrettyPropertiesPlugin, imageUpdateFunc: any) => {
-    let leaves = plugin.app.workspace.getLeavesOfType("markdown");
-    for (let leaf of leaves) {
-        if (leaf.view instanceof MarkdownView) {
-            let view = leaf.view
-            if (view instanceof MarkdownView) {
-                if (view.file) {
-                    let cache = plugin.app.metadataCache.getFileCache(view.file);
-                    if (cache) {
-                        let frontmatter = cache.frontmatter;
-                        imageUpdateFunc(view, frontmatter, plugin);
+    plugin.app.workspace.iterateAllLeaves((leaf) => {
+        let view = leaf.view
+
+        //@ts-ignore
+        let file = view.file
+
+        if (file instanceof TFile) {
+            let numbers = view.containerEl.querySelectorAll("input.metadata-input-number")
+            for (let input of numbers) {
+                if (input instanceof HTMLElement) {
+                    let num = input.closest(".metadata-property")
+                    let sourcePath = file.path
+                    if (num instanceof HTMLElement) {
+                        updateProgress(num, plugin, sourcePath)
+                        input.onchange = () => {
+                            updateProgress(num, plugin, sourcePath)
+                        }
                     }
                 }
             }
         }
-    }
+
+
+        if (view instanceof MarkdownView) {
+            updateBannerForView(view, plugin);
+            updateIconForView(view, plugin);
+            updateCoverForView(view, plugin);
+
+            let state = view.getState()
+
+            if (state.mode == "source") {
+                // @ts-expect-error, not typed
+                const editorView = view.editor.cm as EditorView;
+                editorView.dispatch({
+                    userEvent: "updatePillColors"
+                })
+            }
+        }
+    })
+
+    
+    
+    updateTagPaneTagsAll(plugin)
+    updateSettingPills(plugin)
+
+
+
+    // Remove this after Obsidian v.1.10 goes public
+
+    updateBaseProgressEls()
+
+    
+
+    
 }
 
-export const updateImagesOnPropertyAdded = async (propertyEl: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-    let name = propertyEl.getAttribute("data-property-key")
 
-    if (name == plugin.settings.bannerProperty && plugin.settings.enableBanner) {       
-        updateImages(plugin, updateBannerImages)
-    } 
 
-    else if (name == plugin.settings.coverProperty && plugin.settings.enableCover) {       
-        updateImages(plugin, updateCoverImages)
+
+
+
+
+
+
+
+
+export const updateImagesForView = async (view: MarkdownView, plugin: PrettyPropertiesPlugin) => {
+    let file = view.file;
+    if (file) {
+      let cache = plugin.app.metadataCache.getFileCache(file);
+      let frontmatter = cache == null ? void 0 : cache.frontmatter;
+      let contentEl = view.contentEl;
+      let sourcePath = file.path || "";
+      
+        if (frontmatter && frontmatter[plugin.settings.bannerProperty]  && plugin.settings.enableBanner) {
+          renderBanner(contentEl, frontmatter, sourcePath, plugin);
+        } else {
+          let oldBannerDiv = contentEl?.querySelector(".banner-image");
+          oldBannerDiv?.remove();
+        }
+
+        let hasCover = false
+
+        if (frontmatter) {
+            if (frontmatter[plugin.settings.coverProperty]) {
+                hasCover = true
+            } else {
+                for (let prop of plugin.settings.extraCoverProperties) {
+                    frontmatter[prop]
+                    hasCover = true
+                    break
+                }
+            }
+        }
+
+        
+
+
+        if (frontmatter && hasCover  && plugin.settings.enableCover) {
+          renderCover(contentEl, frontmatter, sourcePath, plugin);
+        } else {
+          let oldCoverDiv = contentEl?.querySelector(".metadata-side-image");
+          oldCoverDiv?.remove();
+        }
+        if (frontmatter && frontmatter[plugin.settings.iconProperty]  && plugin.settings.enableIcon) {
+          renderIcon(contentEl, frontmatter, sourcePath, plugin);
+        } else {
+          let oldIconDiv = contentEl?.querySelector(".icon-image");
+          oldIconDiv?.remove();
+        }
     }
+  };
 
-    else if (name == plugin.settings.iconProperty && plugin.settings.enableIcon) {       
-        updateImages(plugin, updateIcons)
+
+
+
+
+
+export const updateImagesOnCacheChanged = async (file: TFile, cache: CachedMetadata, plugin: PrettyPropertiesPlugin) => {
+    let sourcePath = file.path || ""
+    let leaves = plugin.app.workspace.getLeavesOfType("markdown");
+    for (let leaf of leaves) {
+      let view = leaf.view;
+      if (view instanceof MarkdownView && view.file?.path == sourcePath) {
+        let frontmatter = cache?.frontmatter;
+        let contentEl = view.contentEl;
+      
+        if (frontmatter && frontmatter[plugin.settings.bannerProperty]  && plugin.settings.enableBanner) {
+          renderBanner(contentEl, frontmatter, sourcePath, plugin);
+        } else {
+          let oldBannerDiv = contentEl?.querySelector(".banner-image");
+          oldBannerDiv?.remove();
+        }
+
+        let hasCover = false
+
+        if (frontmatter) {
+            if (frontmatter[plugin.settings.coverProperty]) {
+                hasCover = true
+            } else {
+                for (let prop of plugin.settings.extraCoverProperties) {
+                    frontmatter[prop]
+                    hasCover = true
+                    break
+                }
+            }
+        }
+
+
+
+
+        
+
+        if (frontmatter && hasCover && plugin.settings.enableCover) {
+          renderCover(contentEl, frontmatter, sourcePath, plugin);
+        } else {
+          let oldCoverDiv = contentEl?.querySelector(".metadata-side-image");
+          oldCoverDiv?.remove();
+        }
+        if (frontmatter && frontmatter[plugin.settings.iconProperty]  && plugin.settings.enableIcon) {
+          renderIcon(contentEl, frontmatter, sourcePath, plugin);
+        } else {
+          let oldIconDiv = contentEl?.querySelector(".icon-image");
+          oldIconDiv?.remove();
+        }
+
+
+        
+
+
+
+
+
+      }
     }
-}
+  }

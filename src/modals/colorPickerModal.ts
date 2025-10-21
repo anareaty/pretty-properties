@@ -1,6 +1,6 @@
 import { Modal, App, Setting } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
-import { updateAllPills } from "src/utils/updates/updatePills";
+import { updateAllProperties } from "src/utils/updates/updateElements";
 import { updateRelativeDateColors } from "src/utils/updates/updateStyles";
 
 
@@ -45,7 +45,7 @@ export class ColorPickerModal extends Modal {
                 //@ts-ignore
                 this.plugin.settings[this.colorList][this.propVal][this.colorType] = hsl
                 this.plugin.saveSettings()
-                updateAllPills(this.plugin)
+                updateAllProperties(this.plugin)
                 if (this.colorList == "dateColors") {
                     updateRelativeDateColors(this.plugin)
                 }

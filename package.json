@@ -22,6 +22,7 @@
 		"typescript": "4.7.4"
 	},
 	"dependencies": {
-		"emojilib": "^4.0.2"
+		"emojilib": "^4.0.2",
+		"monkey-around": "3.0.0"
 	}
 }

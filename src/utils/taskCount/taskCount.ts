@@ -98,3 +98,38 @@ export const updateTasksCount = async (
         }
     }
 }
+
+
+
+export const updateTaskCountOnCacheChanged = async (file: TFile, cache: CachedMetadata, plugin: PrettyPropertiesPlugin) => {
+    if (plugin.settings.enableTasksCount && plugin.settings.autoTasksCount) {
+        let sourcePath = file.path || ""
+        let leaves = plugin.app.workspace.getLeavesOfType("markdown");
+        for (let leaf of leaves) {
+            let view = leaf.view;
+            if (view instanceof MarkdownView && view.file?.path == sourcePath) {
+                updateTasksCount(view, cache, plugin)
+            }
+        }
+    }
+}
+
+
+export const updateAllTaskCounts = async (plugin: PrettyPropertiesPlugin) => {
+
+    if (plugin.settings.enableTasksCount && plugin.settings.autoTasksCount) {
+        let leaves = plugin.app.workspace.getLeavesOfType("markdown");
+        for (let leaf of leaves) {
+            let view = leaf.view;
+            if (view instanceof MarkdownView) {
+                let file = view.file
+                if (file instanceof TFile) {
+                    let cache = plugin.app.metadataCache.getFileCache(file)
+                    if (cache) {
+                        updateTasksCount(view, cache, plugin)
+                    }
+                }
+            }
+        }
+    }
+}

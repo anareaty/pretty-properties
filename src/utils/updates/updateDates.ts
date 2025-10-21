@@ -2,7 +2,7 @@ import { moment } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 
 
-const updateDateInput = async (input: HTMLInputElement, plugin: PrettyPropertiesPlugin) => {
+export const updateDateInput = async (input: HTMLInputElement, plugin: PrettyPropertiesPlugin) => {
 	let value = input.value;
 	let parent = input.parentElement
 	let customDateFormat = plugin.settings.customDateFormat
@@ -10,13 +10,14 @@ const updateDateInput = async (input: HTMLInputElement, plugin: PrettyProperties
 	if (parent instanceof HTMLElement) {
 		let isBase = parent.classList.contains("bases-table-cell")
 		let existingCustomDateElement = parent.querySelector(".custom-date")
-		let disabled = input.disabled
+		//let disabled = input.disabled
 
 		if (plugin.settings.enableCustomDateFormat && 
 			customDateFormat && 
-			!disabled &&
+			//!disabled &&
 			(!isBase || (plugin.settings.enableBases && plugin.settings.enableCustomDateFormatInBases))) {
 
+				
 			let customDate = moment(value).format(customDateFormat);
 			
 			if (existingCustomDateElement instanceof HTMLElement &&
@@ -59,7 +60,7 @@ const updateDateInput = async (input: HTMLInputElement, plugin: PrettyProperties
 
 
 
-const updateDateTimeInput = async (input: HTMLInputElement, plugin: PrettyPropertiesPlugin) => {
+export const updateDateTimeInput = async (input: HTMLInputElement, plugin: PrettyPropertiesPlugin) => {
 	let value = input.value;
 	let parent = input.parentElement
 	let customDateTimeFormat = plugin.settings.customDateTimeFormat
@@ -115,19 +116,3 @@ const updateDateTimeInput = async (input: HTMLInputElement, plugin: PrettyProper
 
 
 
-export const updateDateInputs = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-	let dateInputs = container.querySelectorAll(".metadata-input-text.mod-date");
-	let dateTimeInputs = container.querySelectorAll(".metadata-input-text.mod-datetime");
-	
-	for (let input of dateInputs) {
-		if (input instanceof HTMLInputElement) {
-			updateDateInput(input, plugin)
-		}
-	}
-
-	for (let input of dateTimeInputs) {
-		if (input instanceof HTMLInputElement) {
-			updateDateTimeInput(input, plugin)
-		}
-	}
-}

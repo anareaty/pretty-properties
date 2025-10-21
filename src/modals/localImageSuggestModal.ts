@@ -32,6 +32,7 @@ export class LocalImageSuggestModal extends SuggestModal<string> {
         let file = this.app.vault.getAbstractFileByPath(path)
         if (file instanceof TFile) {
             let link = this.app.fileManager.generateMarkdownLink(file, "")
+            if (!link.startsWith("!")) link = "!" + link
             let image = document.createElement("div")
             await MarkdownRenderer.render(this.app, link, image, "", this.plugin)
             el.classList.add("image-suggestion-item")

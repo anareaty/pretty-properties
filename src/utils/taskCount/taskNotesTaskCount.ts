@@ -35,8 +35,6 @@ export const updateTaskNotesTaskCount = async (plugin: PrettyPropertiesPlugin, f
     //@ts-ignore
     let tn = plugin.app.plugins.getPlugin("tasknotes")
 
-    
-
     if (!file && view instanceof MarkdownView) {
         file = view.file
     }
@@ -57,8 +55,12 @@ export const updateTaskNotesTaskCount = async (plugin: PrettyPropertiesPlugin, f
         let uncompleted = []
 
         let cache = plugin.app.metadataCache.getFileCache(file)
+
+        
         if (cache) {
             let links = cache.links
+
+            
 
             
             if (links) {
@@ -84,6 +86,8 @@ export const updateTaskNotesTaskCount = async (plugin: PrettyPropertiesPlugin, f
             }
         }
 
+         
+
         let completedInlineTasks = inlineTasks.filter(t => {
             return completedStatuses.find((s: any) => s.value == t.status)
         })
@@ -101,6 +105,7 @@ export const updateTaskNotesTaskCount = async (plugin: PrettyPropertiesPlugin, f
         })
 
 
+       
 
         plugin.app.fileManager.processFrontMatter(file, fm => {
 
@@ -152,5 +157,46 @@ export const updateTaskNotesTaskCount = async (plugin: PrettyPropertiesPlugin, f
                 fm[plugin.settings.uncompletedTNAndCheckboxTasksCount] = allTasks.length - allCompletedTasks.length + uncompleted.length
             }
         })
+    }
+}
+
+
+
+export const updateTaskNotesTaskCountOnCacheChanged = async (file: TFile, cache: CachedMetadata, plugin: PrettyPropertiesPlugin) => {
+    if (plugin.settings.enableTaskNotesCount && plugin.settings.autoTasksCount) {
+        let updateTaskNotes = needToUpdateTaskNotes(plugin, cache)
+        let leaves = plugin.app.workspace.getLeavesOfType("markdown");
+        let currentFile = plugin.app.workspace.getActiveFile()
+
+        for (let leaf of leaves) {
+            if (leaf.view instanceof MarkdownView) {
+                if (updateTaskNotes || file == currentFile) {
+                    updateTaskNotesTaskCount(plugin, null, leaf.view)
+                }
+            }
+        }
+    }
+}
+
+
+
+export const updateAllTaskNotesTaskCounts = async (plugin: PrettyPropertiesPlugin) => {
+
+    
+    if (plugin.settings.enableTaskNotesCount && plugin.settings.autoTasksCount) {
+        
+        let leaves = plugin.app.workspace.getLeavesOfType("markdown");
+        for (let leaf of leaves) {
+            let view = leaf.view;
+            if (view instanceof MarkdownView) {
+                let file = view.file
+                if (file instanceof TFile) {
+                    let cache = plugin.app.metadataCache.getFileCache(file)
+                    if (cache) {
+                        updateTaskNotesTaskCount(plugin, null, leaf.view)
+                    }
+                }
+            }
+        }
     }
 }

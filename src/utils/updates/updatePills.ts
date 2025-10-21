@@ -1,4 +1,4 @@
-import { MarkdownView, WorkspaceLeaf } from "obsidian";
+import { MarkdownView } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { createColorButton } from "src/menus/selectColorMenus";
 import { finishRenderMath, loadMathJax, renderMath } from "obsidian"
@@ -133,60 +133,81 @@ export const setPillStyles = async (
 }
 
 
-export const updatePill = async (pill: HTMLElement, propName: string, plugin: PrettyPropertiesPlugin) => {
+
+
+
+
+export const updateMultiselectPill = async (pill: HTMLElement, plugin: PrettyPropertiesPlugin) => {
 	if (plugin.settings.enableColoredProperties) {
 		let content = pill.querySelector(".multi-select-pill-content");
 		if (content instanceof HTMLElement) {
 			let value = content.innerText;
-			let attributeName = "data-property-pill-value"
-			let type = "multiselect-pill"
-
-			if (propName == "tags" || propName == "note.tags") {
-				if (value.startsWith("#")) {value = value.replace("#", "")}
-				attributeName = "data-tag-value"
-				type = "tag"
-			}
-
-			setPillStyles(pill, attributeName, value, type, plugin)
+			setPillStyles(pill, "data-property-pill-value", value, "multiselect-pill", plugin);
 		}
 	}
 }
 
 
+export const updateValueListElement = async (pill: HTMLElement, dataValueString: string, styleType: string, plugin: PrettyPropertiesPlugin) => {
+	if (plugin.settings.enableColoredProperties) {
+		let value = pill.innerText;
+		setPillStyles(pill, dataValueString, value, styleType, plugin);
+	}
+}
 
-export const updateCardPill = async (pill: HTMLElement, propName: string, plugin: PrettyPropertiesPlugin) => {
-	let value = pill.innerText
 
-	if (propName == "note.tags") {
-		value = value.replace("#", "")
-		setPillStyles(pill, "data-tag-value", value, "tag", plugin)
-	} else {
-		setPillStyles(pill, "data-property-pill-value", value, "multiselect-pill", plugin)
+export const updateTagPill = async (pill: HTMLElement, plugin: PrettyPropertiesPlugin) => {
+	if (plugin.settings.enableColoredProperties) {
+		let content = pill.querySelector(".multi-select-pill-content");
+		if (content instanceof HTMLElement) {
+			let value = content.innerText;
+			if (value.startsWith("#")) {
+			value = value.replace("#", "");
+			}
+			setPillStyles(pill, "data-tag-value", value, "tag", plugin);
+		}
+	}
+}
+
+
+export const updateTag = (tag: HTMLElement, plugin: PrettyPropertiesPlugin) => {
+	let value = tag.innerText.replace("#", "")
+	let parent = tag.parentElement
+	let isBase = parent?.classList.contains("value-list-element")
+
+	if ((!isBase && plugin.settings.enableColoredInlineTags) || 
+	(isBase && plugin.settings.enableBases && plugin.settings.enableColoredProperties)) {
+		setPillStyles(tag, "data-tag-value", value, "tag", plugin)
 	}
 }
 
 
 
 
-const updateColorButton = async(parent: HTMLElement, value:string, plugin:PrettyPropertiesPlugin) => {
-	let existingColorButton = parent?.querySelector(".longtext-color-button")
-	if (existingColorButton) {
-		existingColorButton.remove()
-		createColorButton(parent, value, plugin)
-	} else {
-		createColorButton(parent, value, plugin)
+
+
+
+const updateColorButton = async(parent: HTMLElement, value:string, isBase: boolean | undefined, plugin:PrettyPropertiesPlugin) => {
+	if (!isBase || plugin.settings.enableColorButtonInBases) {
+		if (parent) {
+			createColorButton(parent, value, plugin)
+		}
 	}
 }
-
-
 
 
 export const updateLongtext = async (pill: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-	
+
 	if (plugin.settings.enableColoredProperties || plugin.settings.enableMath) {
 		let parent = pill.parentElement
 		let isBase = parent?.classList.contains("bases-table-cell") 
-		if (isBase && !plugin.settings.enableBases) {return}
+
+		let existingColorButton = parent?.querySelector(".longtext-color-button")
+		existingColorButton?.remove()
+
+		if (isBase && !plugin.settings.enableBases) {
+			return
+		}
 
 		let text = pill.innerText
 
@@ -194,7 +215,19 @@ export const updateLongtext = async (pill: HTMLElement, plugin: PrettyProperties
 		let existingMathWrapper = mathEl?.querySelector(".math-wrapper")
 		let match: any
 
+
+		
+
 		if (plugin.settings.enableMath) {
+
+			
+
+			//@ts-ignore
+			if (!window.MathJax) {
+				await loadMathJax()
+			}
+
+
 			match = text?.match(/^(\$\$)(.+)(\$\$)$/)
 			if (!match) {
 				match = text?.match(/^(\$)(.+)(\$)$/)
@@ -248,19 +281,15 @@ export const updateLongtext = async (pill: HTMLElement, plugin: PrettyProperties
 
 				setPillStyles(pill, "data-property-longtext-value", text, "longtext", plugin)
 
-				if (!isBase || plugin.settings.enableColorButtonInBases) {
-					if (parent) {
-						updateColorButton(parent, text, plugin)
-					}
+				
+				if (parent) {
+					updateColorButton(parent, text, isBase, plugin)
 				}
+				
 			}
 		}
 	}
 }
-
-
-
-
 
 
 export const updateCardLongtext = async (pill: HTMLElement, plugin: PrettyPropertiesPlugin) => {
@@ -271,7 +300,7 @@ export const updateCardLongtext = async (pill: HTMLElement, plugin: PrettyProper
 		prop = prop.replace(/^note\./, "")
 		//@ts-ignore
 		let properties = plugin.app.metadataTypeManager.getAllProperties()
-		let type = properties[prop]?.widget || properties[prop]?.type;
+		//let type = properties[prop]?.widget || properties[prop]?.type;
 		//if (type != "text") return
 		
 		let text = pill.innerText
@@ -318,99 +347,12 @@ export const updateCardLongtext = async (pill: HTMLElement, plugin: PrettyProper
 				setPillStyles(pill, "data-property-longtext-value", text, "longtext", plugin)
 			}
 		}
+
 	}
 }
 
 
 
-
-
-
-export const updateMultiselectPills = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-	let pills = container.querySelectorAll(".metadata-property:not([data-property-key='tags']) .multi-select-pill");
-	for (let pill of pills) {
-		if (pill instanceof HTMLElement) {
-			updatePill(pill, "multiselect-pill", plugin)
-		}
-	}
-}
-
-export const updateTagPills = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-	let tagPills = container.querySelectorAll(".metadata-property[data-property-key='tags'] .multi-select-pill");
-	for (let pill of tagPills) {
-		if (pill instanceof HTMLElement) {
-			updatePill(pill, "tags", plugin)
-		}
-	}
-}
-
-export const updateBaseTableMultiselectPills = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-	
-	let basePills = container.querySelectorAll(".bases-td:not([data-property='note.tags']) .multi-select-pill");
-	for (let pill of basePills) {
-		if (pill instanceof HTMLElement) {
-			updatePill(pill, "multiselect-pill", plugin)
-		}
-	}
-}
-
-
-export const updateBaseTableTagPills = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-	let baseTagPills = container.querySelectorAll("[data-property='note.tags'] .multi-select-pill");
-	for (let pill of baseTagPills) {
-		if (pill instanceof HTMLElement) {
-			updatePill(pill, "tags", plugin)
-		}
-	}
-}
-
-
-export const updateBaseCardMultiselectPills = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-	let baseCardsPills = container.querySelectorAll(".bases-cards-property .value-list-element:not(:has(.tag))");
-	for (let pill of baseCardsPills) {
-		if (pill instanceof HTMLElement) {
-			updateCardPill(pill, "multiselect-pill", plugin)
-		}
-	}
-}
-
-
-export const updateBaseListMultiselectPills = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-	let baseCardsPills = container.querySelectorAll(".bases-list-property .value-list-element:not(:has(.tag))");
-	
-	for (let pill of baseCardsPills) {
-		if (pill instanceof HTMLElement) {
-			
-			updateCardPill(pill, "multiselect-pill", plugin)
-		}
-	}
-}
-
-
-export const updateBaseCardTagPills = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-	let baseCardsTagPills = container.querySelectorAll(".bases-cards-property[data-property='note.tags'] .value-list-element:not(:has(.tag))");
-	for (let pill of baseCardsTagPills) {
-		if (pill instanceof HTMLElement) {
-			updateCardPill(pill, "note.tags", plugin)
-		}
-	}
-}
-
-export const updateInlineTags = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-	let inlineTags = container.querySelectorAll("a.tag");
-	for (let tag of inlineTags) {
-		if (tag instanceof HTMLElement) {
-			let value = tag.innerText.replace("#", "")
-			let parent = tag.parentElement
-			let isBase = parent?.classList.contains("value-list-element")
-
-			if ((!isBase && plugin.settings.enableColoredInlineTags) || 
-			(isBase && plugin.settings.enableBases && plugin.settings.enableColoredProperties)) {
-				setPillStyles(tag, "data-tag-value", value, "tag", plugin)
-			}
-		}
-	}
-}
 
 
 export const updateLongTexts = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
@@ -440,14 +382,6 @@ export const updateLongTexts = async (container: HTMLElement, plugin: PrettyProp
 		}
 	}
 }
-
-
-
-
-
-
-
-
 
 
 export const updateSettingPills = async (plugin: PrettyPropertiesPlugin) => {
@@ -482,92 +416,21 @@ export const updateSettingPills = async (plugin: PrettyPropertiesPlugin) => {
 		setPillStyles(pill, "data-property-longtext-value", text, "longtext", plugin);
 	  }
 	}
-  }
-
-
-
-
-
-
-
-
-export const updatePills = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-	updateInlineTags(container, plugin)
-
-	if (plugin.settings.enableColoredTagsInTagPane) {
-		updateTagPaneTagsAll(plugin)
-	}
-
-	if (plugin.settings.enableColoredProperties) {
-		updateMultiselectPills(container, plugin)
-		updateTagPills(container, plugin)
-		updateLongTexts(container, plugin)
-
-		if (plugin.settings.enableBases) {
-			updateBaseTableMultiselectPills(container, plugin)
-			updateBaseTableTagPills(container, plugin)
-			updateBaseCardMultiselectPills(container, plugin)
-			updateBaseCardTagPills(container, plugin)
-			updateBaseListMultiselectPills(container, plugin)
-		}
-	}
 }
 
 
 
-export const updateBaseTablePills = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-	updateBaseTableMultiselectPills(container, plugin)
-	updateBaseTableTagPills(container, plugin)
-	updateInlineTags(container, plugin)
-	updateLongTexts(container, plugin)
-}
-
-
-export const updateBaseCardPills = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-	updateBaseCardMultiselectPills(container, plugin)
-	updateBaseCardTagPills(container, plugin)
-	updateInlineTags(container, plugin)
-	updateLongTexts(container, plugin)
-}
-
-
-export const updateBaseListPills = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-	updateBaseListMultiselectPills(container, plugin)
-	updateBaseCardTagPills(container, plugin)
-	updateInlineTags(container, plugin)
-	updateLongTexts(container, plugin)
-}
-
-
-export const updateNoteContainerPills = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-	updateMultiselectPills(container, plugin)
-	updateTagPills(container, plugin)
-	updateInlineTags(container, plugin)
-	updateLongTexts(container, plugin)
-}
 
 
 
-export const updateAllPills = async (plugin: PrettyPropertiesPlugin) => {
-	plugin.app.workspace.iterateAllLeaves((leaf) => {
-		let view = leaf.view
-		let state = view.getState()
 
-		// Update tags in source mode
-		if (view instanceof MarkdownView && state.mode == "source") {
-			// @ts-expect-error, not typed
-            const editorView = view.editor.cm as EditorView;
-            editorView.dispatch({
-                userEvent: "updatePillColors"
-            })
-		}
 
-		// Update property pills
-		let container = view.containerEl;
-		updatePills(container, plugin)
-	})
-	updateSettingPills(plugin)
-}
+
+
+
+
+
+
 
 
 

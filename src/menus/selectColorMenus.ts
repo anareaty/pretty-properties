@@ -1,10 +1,10 @@
 import { Menu, MenuItem, setIcon } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { i18n } from "src/localization/localization";
-import { updateAllPills } from "src/utils/updates/updatePills";
 import { ColorPickerModal } from "src/modals/colorPickerModal";
 import MenuManager from "src/utils/menuManager";
 import { updateRelativeDateColors } from "src/utils/updates/updateStyles";
+import { updateAllProperties } from "src/utils/updates/updateElements";
 
 
 
@@ -65,7 +65,7 @@ export const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string
                 }
 
                 plugin.saveSettings();
-                updateAllPills(plugin)
+                updateAllProperties(plugin)
 
                 if (colorList == "dateColors") {
                     updateRelativeDateColors(plugin)

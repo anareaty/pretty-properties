@@ -1,23 +1,29 @@
-import { setTooltip } from "obsidian";
+import { CachedMetadata, setTooltip, TFile } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 
 
-export const updateProgress = async (propertyEl: HTMLElement, plugin: PrettyPropertiesPlugin) => {
+export const updateProgress = async (propertyEl: HTMLElement, plugin: PrettyPropertiesPlugin, sourcePath?: string) => {
+    if (propertyEl.classList.contains("bases-td")) {
+        return
+    }
+    
     let propName = propertyEl.getAttribute("data-property-key") || ""
     let progressSettings = plugin.settings.progressProperties[propName]
     let existingProgressWrapper = propertyEl.querySelector(".metadata-progress-wrapper")
-		
+	
     if (progressSettings) {
         let maxVal
         if (progressSettings.maxNumber) {
             maxVal = progressSettings.maxNumber
         } else {
             let maxProperty = progressSettings.maxProperty
-            let properties = propertyEl.parentElement
-            let maxEl = properties?.querySelector("[data-property-key=" + maxProperty+ "] .metadata-input-number")
-            if (maxEl instanceof HTMLInputElement) {
-                maxVal = maxEl.value
+
+            if (!sourcePath) {
+                sourcePath = propertyEl.getAttribute("data-source-path") || ""
             }
+
+            let cache = plugin.app.metadataCache.getCache(sourcePath)
+            maxVal = cache?.frontmatter?.[maxProperty]
         }
 
         if (maxVal) {  
@@ -67,7 +73,7 @@ export const updateProgress = async (propertyEl: HTMLElement, plugin: PrettyProp
 
                 if (propertyKeyEl instanceof HTMLElement) {
                     propertyKeyEl.after(progressWrapper);
-                }  
+                }
             }
 
         } else {
@@ -79,11 +85,29 @@ export const updateProgress = async (propertyEl: HTMLElement, plugin: PrettyProp
 }
 
 
-export const updateProgressEls = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-    let propertyEls = container.querySelectorAll(".metadata-property")
-    for (let propertyEl of propertyEls) {
-        if (propertyEl instanceof HTMLElement) {
-            updateProgress(propertyEl, plugin)
+
+
+
+
+
+export const updateAllProgressElsOnMaxChange = async (file: TFile, cache: CachedMetadata, plugin: PrettyPropertiesPlugin) => {
+    for (let prop in plugin.settings.progressProperties) {
+        let maxProperty = plugin.settings.progressProperties[prop].maxProperty
+        let maxVal = cache.frontmatter?.[maxProperty]
+        if (maxVal !== undefined) {
+            let numbers = document.querySelectorAll("input.metadata-input-number")
+            for (let input of numbers) {
+                if (input instanceof HTMLElement) {
+                    let num = input.closest(".metadata-property")
+                    let sourcePath = num?.getAttribute("data-source-path") || ""
+                    if (num instanceof HTMLElement) {
+                        updateProgress(num, plugin, sourcePath)
+                        input.onchange = () => {
+                            updateProgress(num, plugin, sourcePath)
+                        }
+                    }
+                }
+            }
         }
     }
 }

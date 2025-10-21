@@ -11,44 +11,55 @@ import {
 } from "./utils/updates/updateStyles";
 import MenuManager from "src/utils/menuManager";
 import { i18n } from "./localization/localization";
-import { PPSettingTab, PPPluginSettings, DEFAULT_SETTINGS } from "./settings";
+import { PPSettingTab, PPPluginSettings, DEFAULT_SETTINGS } from "./settings/settings";
 import { registerCommands } from "./utils/registerCommands";
 import { createCoverMenu } from "./menus/coverMenu";
 import { createBannerMenu } from "./menus/bannerMenu";
 import { createIconMenu } from "./menus/iconMenu";
 import { handlePropertyMenu } from "./menus/propertyMenu";
 import { handlePillMenu, handleTagMenu, handleTagPaneMenu } from "./menus/selectColorMenus";
-import { updateTaskNotesTaskCount } from "./utils/taskCount/taskNotesTaskCount";
-import { updateElements } from "./utils/updates/updateElements";
+import { updateTaskNotesTaskCount, updateTaskNotesTaskCountOnCacheChanged } from "./utils/taskCount/taskNotesTaskCount";
+import { updateAllProperties, updateImagesOnCacheChanged } from "./utils/updates/updateElements";
 import { getPropertyValue } from "./utils/propertyUtils";
 import { registerTagFixExtension } from "./extensions/tagFixExtension";
-import { startObserver } from "./utils/observer";
 import { updatePillPaddings } from "./utils/updates/updateStyles";
 import { registerTagPostProcessor } from "./extensions/tagPostProcessor";
 import { updateHiddenPropertiesInPropTab, updateBaseTagsStyle } from "./utils/updates/updateStyles";
-import { updateTagPaneTagsAll } from "./utils/updates/updatePills";
 import { removeAll } from "./utils/remove";
 import { updateData } from "./utils/updateData";
+import { patchPropertyWidgets } from "./patches/patchWidgets";
+import { patchTagView } from "./patches/patchTagView";
+import { patchMarkdownView } from "./patches/patchMarkdownView";
+import { patchBaseCards } from "./patches/patchBaseCards";
+import { updateAllProgressElsOnMaxChange } from "./utils/updates/updateProgress";
+import { patchBaseList } from "./patches/patchBaseList";
+import { patchBaseTable } from "./patches/patchBaseTable";
+import { updateTaskCountOnCacheChanged } from "./utils/taskCount/taskCount";
+import { unPatchWidgets } from "./patches/removePatches";
 
 export default class PrettyPropertiesPlugin extends Plugin {
 	settings: PPPluginSettings;
-	mutations: any[];
-	observer: MutationObserver
 	menuManager: MenuManager
+	patches: Record<string, any>
+
 
 	async onload() {
 		await this.loadSettings();
+		//@ts-ignore
+		if (this.settings.enableMath && !window.MathJax) {
+			await loadMathJax()
+		}
 		updateData(this)
 		i18n.setLocale();
 		this.menuManager = new MenuManager
-		startObserver(this)
+		this.patches = {}
+		patchPropertyWidgets(this)
+		patchTagView(this)
+		patchMarkdownView(this)
+		patchBaseTable(this)
+		patchBaseCards(this)
+		patchBaseList(this)
 
-		if (this.settings.enableMath) {
-			loadMathJax()
-		}
-
-		document.body.classList.add("pp-loaded")
-		
 		updateRelativeDateColors(this)
 		updateBannerStyles(this);
 		updateIconStyles(this);
@@ -56,33 +67,31 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		updatePillPaddings(this)
 		updateHiddenPropertiesInPropTab(this)
 		updateBaseTagsStyle(this)
-		updateElements(this)
 
-		if (this.settings.enableColoredTagsInTagPane) {
-			updateTagPaneTagsAll(this)
-		}
+		this.app.workspace.onLayoutReady(() => {
+			updateAllProperties(this)
+		})
 		
+
 
 		registerCommands(this)
 
 		registerTagFixExtension(this)
 		registerTagPostProcessor(this)
 
-		
-		this.registerEvent(
-			this.app.workspace.on("layout-change", async () => {
-				updateElements(this);
-			})
-		);
 
 		this.registerEvent(
 			this.app.metadataCache.on("changed", async (file, data, cache) => {
-				updateElements(this, file, cache);
+				updateImagesOnCacheChanged(file, cache, this)
+				updateAllProgressElsOnMaxChange(file, cache, this)
+				updateTaskCountOnCacheChanged(file, cache, this)
+				updateTaskNotesTaskCountOnCacheChanged(file, cache, this)
 			})
 		);
 
 		this.registerEvent(
 			this.app.workspace.on("file-open", async (file) => {
+				
 				if (file && this.settings.enableTaskNotesCount && this.settings.autoTasksCount) {
 					updateTaskNotesTaskCount(this, file)
 				}
@@ -141,9 +150,13 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 			this.registerDomEvent(doc, "click", (e: MouseEvent) => {
 
-				if (e.target instanceof HTMLElement && e.target.classList.contains("internal-link")) {
+				if (e.target instanceof HTMLElement && (
+					e.target.classList.contains("internal-link") || e.target.closest(".internal-link")
+				)) {
 					return
 				}
+
+				
 
 				//@ts-ignore
 				let searchPlugin = this.app.internalPlugins.getEnabledPluginById("global-search")
@@ -207,10 +220,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 	}
 
 	onunload() {
-		if (this.observer instanceof MutationObserver) {
-			this.observer.disconnect()
-		}
-		document.body.classList.remove("pp-loaded")
+		unPatchWidgets(this)
 		removeAll()
 	}
 

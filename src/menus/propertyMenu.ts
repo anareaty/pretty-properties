@@ -2,7 +2,7 @@ import { MenuItem } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { i18n } from "src/localization/localization";
 import { updateHiddenProperties } from "src/utils/updates/updateHiddenProperties";
-import { updateElements } from "src/utils/updates/updateElements";
+import { updateAllProperties } from "src/utils/updates/updateElements";
 
 export const handlePropertyMenu = (el: HTMLElement | SVGElement, plugin: PrettyPropertiesPlugin) => {
     
@@ -83,7 +83,7 @@ export const handlePropertyMenu = (el: HTMLElement | SVGElement, plugin: PrettyP
                                 };
                             }
                             plugin.saveSettings();
-                            updateElements(plugin);
+                            updateAllProperties(plugin);
                         })  
                 );
             } else if (plugin.settings.progressProperties[propName]) {
@@ -110,7 +110,7 @@ export const handlePropertyMenu = (el: HTMLElement | SVGElement, plugin: PrettyP
                                     ].maxNumber = 100;
                                 }
                                 plugin.saveSettings();
-                                updateElements(plugin);
+                                updateAllProperties(plugin)
                             })
                     );
                 }
@@ -159,7 +159,7 @@ export const handlePropertyMenu = (el: HTMLElement | SVGElement, plugin: PrettyP
                                             ].maxProperty = numberProp;
                                         }
                                         plugin.saveSettings();
-                                        updateElements(plugin);
+                                        updateAllProperties(plugin)
                                     });
                                 }
                             });
@@ -182,7 +182,7 @@ export const handlePropertyMenu = (el: HTMLElement | SVGElement, plugin: PrettyP
                                 ];
                             }
                             plugin.saveSettings();
-                            updateElements(plugin);
+                            updateAllProperties(plugin)
                         })
                 );
             }

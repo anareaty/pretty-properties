@@ -1,3 +1,5 @@
+// Remove this after Obsidian v.1.10 goes public
+
 import { setTooltip } from "obsidian";
 
 
@@ -110,8 +112,8 @@ export const updateBaseProgress = async (progressEl: HTMLElement) => {
 
 
 
-export const updateBaseProgressEls = async (node: HTMLElement) => {
-	let properties = node.querySelectorAll("[data-property^='formula.pp_progress']")
+export const updateBaseProgressEls = async () => {
+	let properties = document.querySelectorAll("[data-property^='formula.pp_progress']")
 
 	for (let property of properties) {
 		if (property instanceof HTMLElement) {
@@ -119,9 +121,3 @@ export const updateBaseProgressEls = async (node: HTMLElement) => {
 		}
 	}
 }
-
-
-
-
-
-

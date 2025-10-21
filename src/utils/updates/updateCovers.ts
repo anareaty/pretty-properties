@@ -1,14 +1,19 @@
 import { MarkdownView, FrontMatterCache, MarkdownRenderer } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 
-export const updateCoverImages = async (
-    view: MarkdownView,
-    frontmatter: FrontMatterCache | undefined,
-    plugin: PrettyPropertiesPlugin
-) => {
-    //@ts-ignore
-    let mdEditor = view.metadataEditor;
-    let mdContainer = mdEditor?.containerEl;
+
+export const renderCover = async (
+  contentEl: HTMLElement, 
+  frontmatter: FrontMatterCache,
+  sourcePath: string,
+  plugin: PrettyPropertiesPlugin) => {
+
+    
+
+   
+
+    let mdContainer = contentEl.querySelector(".metadata-container")
+
     let coverVal;
 
     let props = [...plugin.settings.extraCoverProperties];
@@ -18,6 +23,21 @@ export const updateCoverImages = async (
         coverVal = frontmatter?.[prop];
         if (coverVal) break;
     }
+
+    // Fix wrong property types
+
+    if (Array.isArray(coverVal)) {
+        coverVal = coverVal[0]
+    }
+
+    if (coverVal && typeof coverVal != "string") {
+        coverVal = null
+    }
+
+ 
+
+
+
     let cssVal = frontmatter?.cssclasses;
 
     if (mdContainer instanceof HTMLElement) {
@@ -59,7 +79,6 @@ export const updateCoverImages = async (
             }
 
             let coverTemp = document.createElement("div");
-			let sourcePath = view.file?.path || ""
             MarkdownRenderer.render(
                 plugin.app,
                 coverVal,
@@ -86,4 +105,34 @@ export const updateCoverImages = async (
             if (oldCoverDiv) oldCoverDiv.remove();
         }
     }
+}
+
+
+export const updateCoverForView = async (
+    view: MarkdownView,
+    plugin: PrettyPropertiesPlugin
+) => {
+
+  let file = view.file
+  if (file) {
+    let cache = plugin.app.metadataCache.getFileCache(file);
+    let frontmatter = cache?.frontmatter;
+    let contentEl = view.contentEl;
+    let sourcePath = view.file?.path || ""
+    if (frontmatter) {
+      renderCover(contentEl, frontmatter, sourcePath, plugin)
+    }
+  }
+}
+
+
+
+export const updateAllCovers = (plugin: PrettyPropertiesPlugin) => {
+  let leaves = plugin.app.workspace.getLeavesOfType("markdown");
+  for (let leaf of leaves) {
+    let view = leaf.view
+    if (view instanceof MarkdownView) {
+        updateCoverForView(view, plugin);
+    }
+  }
 }

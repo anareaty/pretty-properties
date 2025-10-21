@@ -599,6 +599,19 @@
 .metadata-property-value.has-custom-date input.metadata-input-text.mod-datetime:not(.is-empty)::-webkit-datetime-edit {
   display: none;
 }
+
+
+.bases-cards-line.has-custom-date input.metadata-input-text.mod-date,
+.bases-cards-line.has-custom-date input.metadata-input-text.mod-datetime,
+.bases-list-property .has-custom-date input.metadata-input-text.mod-date,
+.bases-list-property .has-custom-date input.metadata-input-text.mod-datetime {
+  display: none !important;
+}
+
+.bases-cards-line .custom-date,
+.bases-list-property .custom-date {
+  font-size: 1em;
+}
   
 
 .is-mobile .metadata-property-value.has-custom-date  input.metadata-input-text.mod-date,
@@ -613,12 +626,16 @@ body {
 }
 
 .custom-date {
-  /*font-size: 1em;*/
   font-size: var(--metadata-input-font-size);
   padding: 0px 4px;
   margin-left: -4px;
   color: var(--text-normal);
 }
+
+.pp-pill-padding-none .custom-date {
+  padding: 0;
+}
+
 
 
 
@@ -626,6 +643,8 @@ body {
 /* Date colors */
 
 .metadata-property-value[data-relative-date="past"] .custom-date,
+.bases-cards-line[data-relative-date="past"] .custom-date,
+.bases-list-property [data-relative-date="past"] .custom-date,
 .metadata-property-value:not(.has-custom-date)[data-relative-date="past"] input.mod-date,
 .metadata-property-value:not(.has-custom-date)[data-relative-date="past"] input.mod-datetime,
 .bases-cards-line[data-relative-date="past"] input.mod-date,
@@ -637,15 +656,13 @@ body {
   color: var(--date-past-color);
   border-radius: 4px;
   min-height: unset;
-  /*
-  padding-top: 2px;
-  padding-bottom: 2px;
-  */
   text-align: center;
   
 }
 
 .metadata-property-value[data-relative-date="present"] .custom-date,
+.bases-cards-line[data-relative-date="present"] .custom-date,
+.bases-list-property [data-relative-date="present"] .custom-date,
 .metadata-property-value:not(.has-custom-date)[data-relative-date="present"] input.mod-date,
 .metadata-property-value:not(.has-custom-date)[data-relative-date="present"] input.mod-datetime,
 .bases-cards-line[data-relative-date="present"] input.mod-date,
@@ -657,14 +674,12 @@ body {
   color: var(--date-present-color);
   border-radius: 4px;
   min-height: unset;
-  /*
-  padding-top: 2px;
-  padding-bottom: 2px;
-  */
   text-align: center;
 }
 
 .metadata-property-value[data-relative-date="future"] .custom-date,
+.bases-cards-line[data-relative-date="future"] .custom-date,
+.bases-list-property [data-relative-date="future"] .custom-date, 
 .metadata-property-value:not(.has-custom-date)[data-relative-date="future"] input.mod-date,
 .metadata-property-value:not(.has-custom-date)[data-relative-date="future"] input.mod-datetime,
 .bases-cards-line[data-relative-date="future"] input.mod-date,
@@ -676,10 +691,6 @@ body {
   color: var(--date-future-color);
   border-radius: 4px;
   min-height: unset;
-  /*
-  padding-top: 2px;
-  padding-bottom: 2px;
-  */
   text-align: center;
 }
 
@@ -688,6 +699,11 @@ body {
 .bases-rendered-value input.mod-date,
 .bases-rendered-value input.mod-datetime {
   padding: 0 !important;
+}
+
+input.mod-datetime {
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 
@@ -874,7 +890,7 @@ a.tag.transparent-color {
 }
 
 
-.pp-bases-enabled .bases-table-cell {
+.bases-table-cell {
   --tag-padding-x: 0.5em;
   --tag-padding-y: 0;
 }
@@ -904,7 +920,12 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.pp-property-
     border-radius: var(--pill-radius);
     line-height: var(--line-height-tight);
     font-weight: var(--pill-weight);
-    padding: 0 var(--tag-padding-x);
+    padding: 0 var(--pill-padding-x);
+}
+
+.bases-cards-line,
+.bases-list-property {
+  --pill-padding-x: 0;
 }
 
 .base-tags-style .bases-view [data-property="note.tags"] .multi-select-pill:not(.theme-color, .custom-color, .transparent-color),
@@ -1010,6 +1031,18 @@ body {
   max-width: fit-content;
 }
 
+
+.bases-list-property .bases-rendered-value[data-property-longtext-value] {
+  display: inline;
+}
+
+
+
+.bases-list-property {
+  --tag-size: 1em;
+}
+  
+
 .pp-pill-padding-all .metadata-input-longtext,
 .pp-pill-padding-colored .metadata-input-longtext.theme-color,
 .pp-pill-padding-colored .metadata-input-longtext.custom-color,
@@ -1079,19 +1112,28 @@ button.longtext-color-button:hover {
   padding: var(--input-padding);
 }
 
+.bases-list-property .math-wrapper {
+  padding: 0 2px;
+}
+
+.bases-list-property .custom-date,
+.bases-cards-line .custom-date {
+  margin-left: 0;
+}
+
 .math-wrapper mjx-container {
   margin: 0 !important;
 }
 
 
-.bases-cards-property .math-wrapper {
+.math-wrapper {
   padding-top: 0;
   padding-bottom: 0;
 }
 
 .has-math .bases-cards-line,
 .has-math .bases-rendered-value {
-  display: none;
+  display: none !important;
 }
 
 
@@ -1190,5 +1232,11 @@ button.longtext-color-button:hover {
   --pill-color-remove: var(--pp-text-color) !important;
   --pill-color-remove-hover: var(--pp-text-color) !important;
 }
+
+
+.custom-date:empty {
+  display: none;
+}
+
 
 

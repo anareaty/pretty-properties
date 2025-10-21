@@ -39,3 +39,35 @@ export const removeAll = async() => {
         cover.remove()
     }
 }
+
+
+export const removeColorStyles = () => {
+    let colorClasses = ["theme-color", "custom-color", "transparent-color", "default-color", "theme-text-color", "custom-text-color", "none-text-color", "default-text-color"];
+    for (let colorClass of colorClasses) {
+
+        let queryStrings = [
+            ".metadata-container ." + colorClass, 
+            ".bases-view ." + colorClass
+        ]
+
+        for (let queryString of queryStrings) {
+            let elements = document.querySelectorAll(queryString)
+            for (let el of elements) {
+                el.classList.remove(colorClass)
+            }
+        }
+    }
+}
+
+
+export const removeInlineTagsColorStyles = () => {
+    let colorClasses = ["theme-color", "custom-color", "transparent-color", "default-color", "theme-text-color", "custom-text-color", "none-text-color", "default-text-color"];
+    for (let colorClass of colorClasses) {
+        let queryString = ".markdown-preview-sizer a.tag:not(.metadata-container a.tag)"
+        let elements = document.querySelectorAll(queryString)
+        for (let el of elements) {
+            el.classList.remove(colorClass)
+        }
+    }
+}
+
