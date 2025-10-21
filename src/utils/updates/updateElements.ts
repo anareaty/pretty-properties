@@ -69,7 +69,7 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
         if (input instanceof HTMLInputElement) {
             updateDateInput(input, plugin)
             input.onchange = () => {
-                updateDateInput(input, plugin)
+                if (input instanceof HTMLInputElement) updateDateInput(input, plugin)
             }
         }
     }
@@ -79,7 +79,7 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
         if (input instanceof HTMLInputElement) {
             updateDateTimeInput(input, plugin)
             input.onchange = () => {
-                updateDateTimeInput(input, plugin)
+                if (input instanceof HTMLInputElement) updateDateTimeInput(input, plugin)
             }
         }
     }
@@ -94,7 +94,7 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
         if (input instanceof HTMLElement) {
             updateLongtext(input, plugin);
             input.onblur = () => {
-                updateLongtext(input, plugin);
+                if (input instanceof HTMLElement) updateLongtext(input, plugin);
             }
         }
     }
@@ -125,7 +125,7 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
                     if (num instanceof HTMLElement) {
                         updateProgress(num, plugin, sourcePath)
                         input.onchange = () => {
-                            updateProgress(num, plugin, sourcePath)
+                            if (num instanceof HTMLElement) updateProgress(num, plugin, sourcePath)
                         }
                     }
                 }

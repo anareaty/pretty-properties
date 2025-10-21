@@ -103,7 +103,7 @@ export const updateAllProgressElsOnMaxChange = async (file: TFile, cache: Cached
                     if (num instanceof HTMLElement) {
                         updateProgress(num, plugin, sourcePath)
                         input.onchange = () => {
-                            updateProgress(num, plugin, sourcePath)
+                            if (num instanceof HTMLElement) updateProgress(num, plugin, sourcePath)
                         }
                     }
                 }
