@@ -7,7 +7,7 @@ import { Menu, MenuItem } from 'obsidian';
  */
 export default class MenuManager {
 	private menu: Menu | null;
-	private queuedActions: (() => void)[] = [];
+	private queuedActions: (() => void)[] = []
 
 	constructor() {
 		const manager = this;
