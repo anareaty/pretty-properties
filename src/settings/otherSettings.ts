@@ -27,6 +27,17 @@ export const showOtherSettings = (settingTab: PPSettingTab) => {
                 updateLongTexts(document.body, plugin)			
             }));
 
+    /*
+    new Setting(containerEl)
+        .setName(i18n.t("ENABLE_MD"))
+        .addToggle(toggle => toggle
+            .setValue(plugin.settings.enableMarkdown)
+            .onChange(async (value) => {
+                plugin.settings.enableMarkdown = value
+                await plugin.saveSettings();
+                updateLongTexts(document.body, plugin)			
+            }));
+    */
 
     new Setting(containerEl)
         .setName(i18n.t("CLEAR_SETTINGS"))

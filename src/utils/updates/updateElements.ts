@@ -100,6 +100,7 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
     }
 
 
+
     let cardLongTexts = document.querySelectorAll(".bases-rendered-value[data-property-type='text']")
     for (let el of cardLongTexts) {
         if (el instanceof HTMLElement) {

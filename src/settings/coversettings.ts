@@ -78,6 +78,22 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
             }))
         }
 
+
+        new Setting(containerEl)
+        .setName(i18n.t("COVER_POSITION"))
+        .addDropdown(dropdown => dropdown
+            .addOptions({
+                "left": i18n.t("LEFT"),
+                "right": i18n.t("RIGHT")
+            })
+            .setValue(plugin.settings.coverPosition)
+            .onChange(async (value) => {
+                plugin.settings.coverPosition = value
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        )
+
         new Setting(containerEl)
         .setName(i18n.t("COVER_MAX_HEIGHT"))
         .addText(text => {

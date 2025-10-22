@@ -170,5 +170,8 @@ export default {
   RENDER_MATH: "Отображать в виде формулы",
   NOT_RENDER_MATH: "Не отображать в виде формулы",
   SELECT_TEXT_COLOR: "Выбрать цвет текста",
+  COVER_POSITION: "Положение обложки",
+  RIGHT: "справа",
+  LEFT: "слева",
 };
 

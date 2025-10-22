@@ -97,8 +97,10 @@ export interface PPPluginSettings {
 	enableColoredTagsInTagPane: boolean;
 	mathProperties: string[];
 	enableMath: boolean;
+	//enableMarkdown: boolean;
 	dataVersion: number;
 	dateColors: any;
+	coverPosition: string
 
 	
 
@@ -192,6 +194,7 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	enableColoredTagsInTagPane: false,
 	mathProperties: [],
 	enableMath: false,
+	//enableMarkdown: false,
 	dataVersion: 0,
 	dateColors: {
 		past: {
@@ -206,7 +209,8 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 			pillColor: "default",
 			textColor: "default"
 		}
-	}
+	},
+	coverPosition: "left"
 
 }
 

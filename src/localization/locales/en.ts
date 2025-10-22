@@ -160,6 +160,9 @@ export default {
   RENDER_MATH: "Render as formula",
   NOT_RENDER_MATH: "Do not render as formula",
   SELECT_TEXT_COLOR: "Select text color",
+  COVER_POSITION: "Cover position",
+  RIGHT: "right",
+  LEFT: "left",
 };
 
 

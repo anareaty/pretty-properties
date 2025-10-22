@@ -73,6 +73,14 @@ export const updateCoverStyles = (plugin: PrettyPropertiesPlugin) => {
     "--cover-width-circle": plugin.settings.coverCircleWidth + "px"
     }
   document.body.setCssProps(coverProps);
+
+  if (plugin.settings.coverPosition == "right") {
+    document.body.classList.remove("pp-cover-left")
+    document.body.classList.add("pp-cover-right")
+  } else {
+    document.body.classList.remove("pp-cover-right")
+    document.body.classList.add("pp-cover-left")
+  }
 }
 
 

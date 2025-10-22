@@ -1,4 +1,4 @@
-import { MarkdownView } from "obsidian";
+import { MarkdownRenderer, MarkdownView } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { createColorButton } from "src/menus/selectColorMenus";
 import { finishRenderMath, loadMathJax, renderMath } from "obsidian"
@@ -198,7 +198,7 @@ const updateColorButton = async(parent: HTMLElement, value:string, isBase: boole
 
 export const updateLongtext = async (pill: HTMLElement, plugin: PrettyPropertiesPlugin) => {
 
-	if (plugin.settings.enableColoredProperties || plugin.settings.enableMath) {
+	if (plugin.settings.enableColoredProperties || plugin.settings.enableMath /* || plugin.settings.enableMarkdown */) {
 		let parent = pill.parentElement
 		let isBase = parent?.classList.contains("bases-table-cell") 
 
@@ -211,8 +211,9 @@ export const updateLongtext = async (pill: HTMLElement, plugin: PrettyProperties
 
 		let text = pill.innerText
 
-		let mathEl = parent?.parentElement
-		let existingMathWrapper = mathEl?.querySelector(".math-wrapper")
+		let propEl = parent?.parentElement
+		let existingMathWrapper = propEl?.querySelector(".math-wrapper")
+		//let existingMdWrapper = propEl?.querySelector(".md-wrapper")
 		let match: any
 
 
@@ -252,41 +253,86 @@ export const updateLongtext = async (pill: HTMLElement, plugin: PrettyProperties
 			finishRenderMath()
 
 			if (math) {
-                mathEl?.classList.add("has-math")
+                propEl?.classList.add("has-math")
                 let mathWrapper = document.createElement("div")
                 mathWrapper.classList.add("math-wrapper")
                 mathWrapper.setAttribute("data-math", text)
                 mathWrapper.append(math)
 
 				if (isBase) {
-					mathEl?.prepend(mathWrapper)
+					propEl?.prepend(mathWrapper)
 					mathWrapper.onclick = () => {
 						pill.focus()
 					}
 				} else {
-					let mathKeyEl = mathEl?.querySelector(".metadata-property-key");
+					let mathKeyEl = propEl?.querySelector(".metadata-property-key");
 					mathKeyEl?.after(mathWrapper);
 				}
             }
 
-		} else {
+		
+		/*
+
+		// Wikilinks don't work if we render markdown this way
+		
+		} else if (plugin.settings.enableMarkdown) {
+
+			let existingMdValue = existingMdWrapper?.getAttribute("data-md") || ""
+
+			//if (existingMdValue == text) { return }
+
+			existingMdWrapper?.remove()
+
+			if (!text) return
 			
-			existingMathWrapper?.remove()
-            mathEl?.classList.remove("has-math")
+			propEl?.classList.add("has-md")
+			let mdWrapper = document.createElement("div")
+			mdWrapper.classList.add("md-wrapper")
+			mdWrapper.setAttribute("data-md", text)
+			MarkdownRenderer.render(plugin.app, text, mdWrapper, "", plugin)
+
+			if (isBase) {
+				propEl?.prepend(mdWrapper)
+				mdWrapper.onclick = () => {
+					pill.focus()
+				}
+			} else {
+				let mdKeyEl = propEl?.querySelector(".metadata-property-key");
+				mdKeyEl?.after(mdWrapper);
+			}
+
+
 
 			if (plugin.settings.enableColoredProperties) {
 				if (text) {
 					text = text.slice(0, 200).trim()
 				}
-
-				setPillStyles(pill, "data-property-longtext-value", text, "longtext", plugin)
-
+				setPillStyles(mdWrapper, "data-property-longtext-value", text, "longtext", plugin)				
+				if (parent) {
+					console.log("button")
+					updateColorButton(parent, text, isBase, plugin)
+				}
 				
+			}
+	*/
+		} else {
+			
+			existingMathWrapper?.remove()
+			//existingMdWrapper?.remove()
+			propEl?.classList.remove("has-math")
+            //propEl?.classList.remove("has-md")
+
+			if (plugin.settings.enableColoredProperties) {
+				if (text) {
+					text = text.slice(0, 200).trim()
+				}
+				setPillStyles(pill, "data-property-longtext-value", text, "longtext", plugin)
 				if (parent) {
 					updateColorButton(parent, text, isBase, plugin)
 				}
 				
 			}
+
 		}
 	}
 }
@@ -305,8 +351,8 @@ export const updateCardLongtext = async (pill: HTMLElement, plugin: PrettyProper
 		
 		let text = pill.innerText
 
-		let mathEl = parent
-		let existingMathWrapper = mathEl?.querySelector(".math-wrapper")
+		let propEl = parent
+		let existingMathWrapper = propEl?.querySelector(".math-wrapper")
 		let match: any
 
 		if (plugin.settings.enableMath) {
@@ -328,17 +374,17 @@ export const updateCardLongtext = async (pill: HTMLElement, plugin: PrettyProper
 			finishRenderMath()
 
 			if (math) {
-                mathEl?.classList.add("has-math")
+                propEl?.classList.add("has-math")
                 let mathWrapper = document.createElement("div")
                 mathWrapper.classList.add("math-wrapper")
                 mathWrapper.setAttribute("data-math", text)
                 mathWrapper.append(math)
-				mathEl?.append(mathWrapper)
+				propEl?.append(mathWrapper)
             }
 		} else {
 			
 			existingMathWrapper?.remove()
-            mathEl?.classList.remove("has-math")
+            propEl?.classList.remove("has-math")
 
 			if (plugin.settings.enableColoredProperties) {
 				if (text) {
