@@ -173,5 +173,9 @@ export default {
   COVER_POSITION: "Положение обложки",
   RIGHT: "справа",
   LEFT: "слева",
+  EXPORT_OR_IMPORT_SETTINGS: "Экспорт и импорт настроек",
+  EXPORT: "Экспорт",
+  IMPORT: "Импорт",
+  INVALID_SETTING_IMPORT_FILE: "Вы пытаетесь импортировать неподходящий файл"
 };
 

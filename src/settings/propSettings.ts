@@ -1,4 +1,4 @@
-import { Setting } from 'obsidian';
+import { loadMathJax, Setting } from 'obsidian';
 import { i18n } from 'src/localization/localization';
 import { updateAllProperties } from 'src/utils/updates/updateElements';
 import { PPSettingTab } from 'src/settings/settings';
@@ -7,7 +7,7 @@ import { showColoredListSettings } from './coloredListSettings';
 import { showColoredTagsSettings } from './coloredTagsSettings';
 import { showColoredTextSettings } from './coloredTextSettings';
 import { showHiddenSettings } from './hiddenSettings';
-import { updateTagPaneTagsAll } from 'src/utils/updates/updatePills';
+import { updateLongTexts, updateTagPaneTagsAll } from 'src/utils/updates/updatePills';
 import { removeColorStyles, removeInlineTagsColorStyles } from 'src/utils/remove';
 
 
@@ -115,6 +115,31 @@ export const showPropSettings = (settingTab: PPSettingTab) => {
             }));
 
 
+    new Setting(containerEl)
+        .setName(i18n.t("ENABLE_MATH"))
+        .addToggle(toggle => toggle
+            .setValue(plugin.settings.enableMath)
+            .onChange(async (value) => {
+                plugin.settings.enableMath = value
+                await plugin.saveSettings();
+                //@ts-ignore
+                if (plugin.settings.enableMath && !window.MathJax) {
+                    loadMathJax()
+                }
+                updateLongTexts(document.body, plugin)			
+            }));
+
+    /*
+    new Setting(containerEl)
+        .setName(i18n.t("ENABLE_MD"))
+        .addToggle(toggle => toggle
+            .setValue(plugin.settings.enableMarkdown)
+            .onChange(async (value) => {
+                plugin.settings.enableMarkdown = value
+                await plugin.saveSettings();
+                updateLongTexts(document.body, plugin)			
+            }));
+    */
 
 
     new Setting(containerEl)

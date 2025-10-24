@@ -163,6 +163,10 @@ export default {
   COVER_POSITION: "Cover position",
   RIGHT: "right",
   LEFT: "left",
+  EXPORT_OR_IMPORT_SETTINGS: "Export or import settings",
+  EXPORT: "Export",
+  IMPORT: "Import",
+  INVALID_SETTING_IMPORT_FILE: "The file you are trying to import is invalid"
 };
 
 

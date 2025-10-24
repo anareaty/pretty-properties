@@ -108,6 +108,10 @@ export interface PPPluginSettings {
 	
 }
 
+
+
+
+
 export const DEFAULT_SETTINGS: PPPluginSettings = {
     hiddenProperties: [],
     propertyPillColors: {},

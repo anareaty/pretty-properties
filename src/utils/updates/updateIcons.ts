@@ -65,9 +65,7 @@ export const renderIcon = async (
         if (!image) {
             image = document.createElement("div");
             image.classList.add("pp-text-icon");
-            let symbolArr = [...iconVal];
-            let iconSymbol = symbolArr[0];
-            image.append(iconSymbol);
+            image.append(iconVal);
         }
 
         if (image) {
