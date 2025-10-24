@@ -25,8 +25,8 @@ export const renderIcon = async (
 
 
 
-    let oldIconDivSource = iconContainerSource?.querySelector(".icon-image");
-    let oldIconDivPreview = iconContainerPreview?.querySelector(".icon-image");
+    let oldIconDivSource = iconContainerSource?.querySelector(".icon-wrapper");
+    let oldIconDivPreview = iconContainerPreview?.querySelector(".icon-wrapper");
 
     let oldIconValue = oldIconDivSource?.getAttribute("data-value") || ""
 

@@ -76,6 +76,11 @@
     position: absolute;
     left: 0;
     right: 0;
+    overflow-x: hidden;
+    overflow-y: visible;
+    padding-top: 10px;
+    margin-top: -10px;
+    height: calc(var(--pp-icon-size) + 20px);
 }
 
 .icon-outer {
