@@ -166,7 +166,14 @@ export default {
   EXPORT_OR_IMPORT_SETTINGS: "Export or import settings",
   EXPORT: "Export",
   IMPORT: "Import",
-  INVALID_SETTING_IMPORT_FILE: "The file you are trying to import is invalid"
+  INVALID_SETTING_IMPORT_FILE: "The file you are trying to import is invalid",
+  EXPORT_OPTIONS: "Export options",
+  COPY_SETTINGS_TO_CLIPBOARD: "Copy",
+  SETTINGS_ARE_COPIED_TO_CLIPBOARD: "Settings are copied to clipboard",
+  OPEN_IN_DEFAULT_APP: "Open in default app",
+  SAVE_IN_VAULT_ROOT: "Save in vault root",
+  SAVED_FILE: "Saved file",
+  DOWNLOAD_FILE: "Download"
 };
 
 

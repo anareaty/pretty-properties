@@ -176,6 +176,13 @@ export default {
   EXPORT_OR_IMPORT_SETTINGS: "Экспорт и импорт настроек",
   EXPORT: "Экспорт",
   IMPORT: "Импорт",
-  INVALID_SETTING_IMPORT_FILE: "Вы пытаетесь импортировать неподходящий файл"
+  INVALID_SETTING_IMPORT_FILE: "Вы пытаетесь импортировать неподходящий файл",
+  EXPORT_OPTIONS: "Варианты экспорта",
+  COPY_SETTINGS_TO_CLIPBOARD: "Коприровать",
+  SETTINGS_ARE_COPIED_TO_CLIPBOARD: "Настройки скопированы в буфер обмена",
+  OPEN_IN_DEFAULT_APP: "Открыть в приложении по умолчанию",
+  SAVE_IN_VAULT_ROOT: "Сохранить в хранилище",
+  SAVED_FILE: "Сохранён файл",
+  DOWNLOAD_FILE: "Скачать"
 };
 

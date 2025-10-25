@@ -1,4 +1,4 @@
-import { Setting, loadMathJax, Notice } from 'obsidian';
+import { Setting, loadMathJax, Notice, Platform, Modal } from 'obsidian';
 import { i18n } from 'src/localization/localization';
 import { DEFAULT_SETTINGS, PPSettingTab } from 'src/settings/settings';
 import { updateLongTexts } from 'src/utils/updates/updatePills';
@@ -25,13 +25,59 @@ export const showOtherSettings = (settingTab: PPSettingTab) => {
             .setButtonText(i18n.t("EXPORT"))
             .onClick(() => {
                 let settingsText = JSON.stringify(plugin.settings, null, 2)
-                let exportLink = document.createElement("a")
-                exportLink.setAttrs({
-                        download: "pretty-properties-backup.json",
-                        href: `data:application/json;charset=utf-8,${encodeURIComponent(settingsText)}`,
-                })
-                exportLink.click()
-                exportLink.remove()
+                let fileName = "pretty-properties-backup.json"
+                let exportFileButtonName = i18n.t("DOWNLOAD_FILE")
+
+                if (Platform.isMobile && !navigator.share) {
+                    exportFileButtonName = i18n.t("SAVE_IN_VAULT_ROOT")
+                }
+                class SettingExportModal extends Modal {
+                    onOpen() {
+                        const {contentEl} = this
+                        let exportSetting = new Setting(contentEl)
+                            .setName(i18n.t("EXPORT_OPTIONS"))
+                            .addButton(btn => btn
+                                .setButtonText(exportFileButtonName)
+                                .onClick(() => {
+                                    if (Platform.isDesktop) {
+                                        let exportLink = document.createElement("a")
+                                        exportLink.setAttrs({
+                                                download: fileName,
+                                                href: `data:application/json;charset=utf-8,${encodeURIComponent(settingsText)}`,
+                                        })
+                                        exportLink.click()
+                                        exportLink.remove()
+
+                                    } else if (Platform.isMobile) {
+                                        if (navigator.share) {
+                                            let file = new File([settingsText], fileName, {type: 'application/json'})
+                                            navigator.share({
+                                                files: [file],
+                                                title: "Pretty properties settings backup"
+                                            })
+                                        } else {
+                                            plugin.app.vault.adapter.write(
+                                                fileName,
+                                                settingsText
+                                            ).then();
+                                            this.close()
+                                            new Notice(i18n.t("SAVED_FILE") + " " + fileName)
+                                        }
+                                    }
+                                })
+                            )
+                            .addButton(btn => btn
+                                .setButtonText(i18n.t("COPY_SETTINGS_TO_CLIPBOARD"))
+                                .onClick(() => {
+                                    navigator.clipboard.writeText(settingsText)
+                                    new Notice(i18n.t("SETTINGS_ARE_COPIED_TO_CLIPBOARD"))
+                                })
+                            )
+                        exportSetting.controlEl.classList.add("pp-export-setting")
+                    }
+                }
+
+                new SettingExportModal(plugin.app).open()
             })
         })
         .addButton(button => {button
@@ -86,15 +132,10 @@ export const showOtherSettings = (settingTab: PPSettingTab) => {
                                 updateBaseTagsStyle(plugin)
                                 updateAllProperties(plugin)
                             }
-                            
                         }
                     }
-                    
-                    
-
                     input.remove()
                 }
-
                 input.click()
             })
         })
