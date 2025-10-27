@@ -1,6 +1,8 @@
 // This code is taken from the Iconic Plugin: https://github.com/gfxholo/iconic
 
 import { Menu, MenuItem } from 'obsidian';
+import PrettyPropertiesPlugin from 'src/main';
+import { around, dedupe } from "monkey-around";
 
 /**
  * Intercepts context menus to add custom items.
@@ -136,3 +138,8 @@ export default class MenuManager {
 		this.flush();
 	}
 }
+
+
+
+
+

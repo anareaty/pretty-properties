@@ -93,6 +93,8 @@ export const renderBanner = async (
         bannerContainerSource?.prepend(bannerDiv);
     }
 
+    
+
     if (oldBannerDivPreview) {
         if (oldBannerDivPreview.outerHTML != bannerDivClone.outerHTML) {
             oldBannerDivPreview.remove();

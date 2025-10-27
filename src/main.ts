@@ -60,6 +60,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		patchBaseCards(this)
 		patchBaseList(this)
 
+
 		updateRelativeDateColors(this)
 		updateBannerStyles(this);
 		updateIconStyles(this);

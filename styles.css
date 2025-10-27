@@ -80,7 +80,13 @@
     overflow-y: visible;
     padding-top: 10px;
     margin-top: -10px;
-    height: calc(var(--pp-icon-size) + 20px);
+    height: calc(var(--pp-icon-size) + 10px); 
+}
+
+
+.cm-scroller:has(.banner-image:not(:empty)) .icon-wrapper,
+.markdown-preview-view:has(.banner-image:not(:empty)) .icon-wrapper {
+  height: calc(var(--pp-icon-size) + var(--pp-icon-top-margin) + 10px);
 }
 
 .icon-outer {

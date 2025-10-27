@@ -188,8 +188,10 @@ export const updateImagesForView = async (view: MarkdownView, plugin: PrettyProp
         if (frontmatter && frontmatter[plugin.settings.bannerProperty]  && plugin.settings.enableBanner) {
           renderBanner(contentEl, frontmatter, sourcePath, plugin);
         } else {
-          let oldBannerDiv = contentEl?.querySelector(".banner-image");
-          oldBannerDiv?.remove();
+          let oldBannerDivSource = contentEl?.querySelector(".cm-scroller .banner-image");
+          let oldBannerDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .banner-image");
+          oldBannerDivSource?.remove();
+          oldBannerDivPreview?.remove();
         }
 
         let hasCover = false
@@ -211,15 +213,17 @@ export const updateImagesForView = async (view: MarkdownView, plugin: PrettyProp
 
         if (frontmatter && hasCover  && plugin.settings.enableCover) {
           renderCover(contentEl, frontmatter, sourcePath, plugin);
-        } else {
+        } else {    
           let oldCoverDiv = contentEl?.querySelector(".metadata-side-image");
           oldCoverDiv?.remove();
         }
         if (frontmatter && frontmatter[plugin.settings.iconProperty]  && plugin.settings.enableIcon) {
           renderIcon(contentEl, frontmatter, sourcePath, plugin);
         } else {
-          let oldIconDiv = contentEl?.querySelector(".icon-image");
-          oldIconDiv?.remove();
+          let oldIconDivSource = contentEl?.querySelector(".cm-scroller .icon-wrapper");
+          let oldIconDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .icon-wrapper");
+          oldIconDivSource?.remove();
+          oldIconDivPreview?.remove();
         }
     }
   };
