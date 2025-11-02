@@ -9,6 +9,7 @@ export const patchHoverPopover = async (plugin: PrettyPropertiesPlugin) => {
     load(old) {
       return dedupe("pp-patch-popover-show-around-key", old, function(...args) {
         let popover = this
+        updateImagesInPopover(popover, plugin)
 
         this.embed.previewMode.onRenderComplete = new Proxy(this.embed.previewMode.onRenderComplete, {
           apply(old2, thisArg2, args2) {
