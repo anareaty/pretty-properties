@@ -173,7 +173,13 @@ export default {
   OPEN_IN_DEFAULT_APP: "Open in default app",
   SAVE_IN_VAULT_ROOT: "Save in vault root",
   SAVED_FILE: "Saved file",
-  DOWNLOAD_FILE: "Download"
+  DOWNLOAD_FILE: "Download",
+  SHOW_BANNERS_IN_PAGE_PREVIEWS: "Show banners in page previews",
+  SHOW_ICONS_IN_PAGE_PREVIEWS: "Show banners in page previews",
+  SHOW_COVERS_IN_PAGE_PREVIEWS: "Show banners in page previews",
+  BANNER_HEIGHT_POPOVER: "Banner height in page preview",
+  ICON_SIZE_POPOVER: "Icon size in page preview",
+  MAX_COVER_WIDTH_POPOVER: "Maximal cover width in page preview"
 };
 
 

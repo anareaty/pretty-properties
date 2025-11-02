@@ -36,6 +36,7 @@ import { patchBaseList } from "./patches/patchBaseList";
 import { patchBaseTable } from "./patches/patchBaseTable";
 import { updateTaskCountOnCacheChanged } from "./utils/taskCount/taskCount";
 import { unPatchWidgets } from "./patches/removePatches";
+import { patchHoverPopover } from "./patches/patchHoverPopover";
 
 export default class PrettyPropertiesPlugin extends Plugin {
 	settings: PPPluginSettings;
@@ -56,6 +57,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		patchPropertyWidgets(this)
 		patchTagView(this)
 		patchMarkdownView(this)
+		patchHoverPopover(this)
 		patchBaseTable(this)
 		patchBaseCards(this)
 		patchBaseList(this)

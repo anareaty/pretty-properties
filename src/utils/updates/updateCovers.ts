@@ -11,6 +11,7 @@ export const renderCover = async (
     
 
    
+   
 
     let mdContainer = contentEl.querySelector(".metadata-container")
 
@@ -19,10 +20,15 @@ export const renderCover = async (
     let props = [...plugin.settings.extraCoverProperties];
     props.unshift(plugin.settings.coverProperty);
 
+
+    
+
     for (let prop of props) {
         coverVal = frontmatter?.[prop];
         if (coverVal) break;
     }
+
+    
 
     // Fix wrong property types
 
@@ -105,6 +111,7 @@ export const renderCover = async (
             if (oldCoverDiv) oldCoverDiv.remove();
         }
     }
+
 }
 
 

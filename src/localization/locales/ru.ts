@@ -183,6 +183,12 @@ export default {
   OPEN_IN_DEFAULT_APP: "Открыть в приложении по умолчанию",
   SAVE_IN_VAULT_ROOT: "Сохранить в хранилище",
   SAVED_FILE: "Сохранён файл",
-  DOWNLOAD_FILE: "Скачать"
+  DOWNLOAD_FILE: "Скачать",
+  SHOW_BANNERS_IN_PAGE_PREVIEWS: "Показывать баннеры при предпросмотре страницы",
+  SHOW_ICONS_IN_PAGE_PREVIEWS: "Показывать иконки при предпросмотре страницы",
+  SHOW_COVERS_IN_PAGE_PREVIEWS: "Показывать обложки при предпросмотре страницы",
+  BANNER_HEIGHT_POPOVER: "Высота баннера при предпросмотре страницы",
+  ICON_SIZE_POPOVER: "Размер иконки при предпросмотре страницы",
+  MAX_COVER_WIDTH_POPOVER: "Максимальная ширина обложек при предпросмотре страницы"
 };
 

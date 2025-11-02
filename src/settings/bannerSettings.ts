@@ -66,6 +66,16 @@ export const showBannerSettings = (settingTab: PPSettingTab) => {
                 updateBannerStyles(plugin);
             }));
 
+
+        new Setting(containerEl)
+        .setName(i18n.t("SHOW_BANNERS_IN_PAGE_PREVIEWS"))
+        .addToggle(toggle => toggle
+            .setValue(plugin.settings.enableBannersInPopover)
+            .onChange(async (value) => {
+                plugin.settings.enableBannersInPopover = value
+                await plugin.saveSettings();
+            }));
+
         new Setting(containerEl)
         .setName(i18n.t("BANNER_HEIGHT"))
         .addText(text => {
@@ -93,6 +103,22 @@ export const showBannerSettings = (settingTab: PPSettingTab) => {
                 updateBannerStyles(plugin);
             })
         });
+
+
+        new Setting(containerEl)
+        .setName(i18n.t("BANNER_HEIGHT_POPOVER"))
+        .addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.bannerHeightPopover.toString())
+            .setPlaceholder('100')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.bannerHeightPopover = Number(value);
+                await plugin.saveSettings();
+                updateBannerStyles(plugin);
+            })
+        });
+
 
         new Setting(containerEl)
         .setName(i18n.t("GAP_AFTER_BANNER"))

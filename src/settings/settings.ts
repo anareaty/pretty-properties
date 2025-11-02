@@ -25,6 +25,7 @@ export interface PPPluginSettings {
     extraCoverProperties: string[],
     bannerHeight: number;
     bannerHeightMobile: number;
+	bannerHeightPopover: number;
     bannerMargin: number;
 	bannerMarginMobile: number;
     bannerFading: boolean;
@@ -36,6 +37,7 @@ export interface PPPluginSettings {
     coverHorizontalWidth: number;
     coverSquareWidth: number;
     coverCircleWidth: number;
+	coverMaxWidthPopover: number;
     progressProperties: any;
     allTasksCount: string;
     completedTasksCount: string;
@@ -92,6 +94,7 @@ export interface PPPluginSettings {
 	
 	showTagColorSettings: boolean;
 	iconSizeMobile: number;
+	iconSizePopover: number;
 	hidePropertiesInPropTab: boolean;
 	autoTasksCount: boolean
 	enableColoredTagsInTagPane: boolean;
@@ -100,7 +103,10 @@ export interface PPPluginSettings {
 	//enableMarkdown: boolean;
 	dataVersion: number;
 	dateColors: any;
-	coverPosition: string
+	coverPosition: string;
+	enableBannersInPopover: boolean
+	enableIconsInPopover: boolean
+	enableCoversInPopover: boolean
 
 	
 
@@ -126,6 +132,7 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
     extraCoverProperties: [],
     bannerHeight: 150, 
     bannerHeightMobile: 100,
+	bannerHeightPopover: 100,
     bannerMargin: -20,
 	bannerMarginMobile: 0,
     bannerFading: true,
@@ -137,6 +144,7 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
     coverHorizontalWidth: 300,
     coverSquareWidth: 250,
     coverCircleWidth: 250,
+	coverMaxWidthPopover: 150,
     progressProperties: {},
     allTasksCount: "tasks",
     completedTasksCount: "tasks_completed",
@@ -193,6 +201,7 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	
 	showTagColorSettings: false,
 	iconSizeMobile: 70,
+	iconSizePopover: 50,
 	hidePropertiesInPropTab: false,
 	autoTasksCount: true,
 	enableColoredTagsInTagPane: false,
@@ -214,7 +223,10 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 			textColor: "default"
 		}
 	},
-	coverPosition: "left"
+	coverPosition: "left",
+	enableBannersInPopover: false,
+	enableIconsInPopover: false,
+	enableCoversInPopover: false
 
 }
 

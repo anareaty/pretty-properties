@@ -11,6 +11,10 @@ export const renderIcon = async (
     let iconContainerPreview = contentEl.querySelector(".markdown-reading-view > .markdown-preview-view");
     let iconContainerSource = contentEl.querySelector(".cm-scroller");
 
+    if (contentEl.classList.contains("hover-popover")) {
+      iconContainerPreview = contentEl.querySelector(".markdown-preview-view.markdown-rendered.node-insert-event");
+    }
+
     let iconVal = frontmatter[plugin.settings.iconProperty];
 
     // Fix wrong property types

@@ -1,4 +1,4 @@
-import { TFile, CachedMetadata, MarkdownView } from "obsidian";
+import { TFile, CachedMetadata, MarkdownView, HoverPopover } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { renderCover, updateCoverForView } from "./updateCovers";
 import { renderIcon, updateIconForView } from "./updateIcons";
@@ -172,6 +172,70 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
 
 
 
+export const updateImagesInPopover = async (popover: HoverPopover, plugin: PrettyPropertiesPlugin) => {
+    //@ts-ignore
+    let embed = popover.embed
+
+    
+
+   
+    if (embed) {
+        let file = embed.file
+
+        let contentEl = popover.hoverEl
+        if (file) {
+            let cache = plugin.app.metadataCache.getFileCache(file);
+            let frontmatter = cache == null ? void 0 : cache.frontmatter;
+            let sourcePath = file.path || "";
+                
+            if (frontmatter && frontmatter[plugin.settings.bannerProperty]  && plugin.settings.enableBanner && plugin.settings.enableBannersInPopover) {
+                renderBanner(contentEl, frontmatter, sourcePath, plugin);
+            } else {
+                let oldBannerDivSource = contentEl?.querySelector(".cm-scroller .banner-image");
+                let oldBannerDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .banner-image");
+                oldBannerDivSource?.remove();
+                oldBannerDivPreview?.remove();
+            }
+
+            
+
+            let hasCover = false
+
+            if (frontmatter) {
+                if (frontmatter[plugin.settings.coverProperty]) {
+                    hasCover = true
+                } else {
+                    for (let prop of plugin.settings.extraCoverProperties) {
+                        frontmatter[prop]
+                        hasCover = true
+                        break
+                    }
+                }
+            }
+
+            
+
+            if (frontmatter && hasCover  && plugin.settings.enableCover && plugin.settings.enableCoversInPopover) {
+                
+                renderCover(contentEl, frontmatter, sourcePath, plugin);
+            } else {    
+                let oldCoverDiv = contentEl?.querySelector(".metadata-side-image");
+                oldCoverDiv?.remove();
+            }
+            if (frontmatter && frontmatter[plugin.settings.iconProperty]  && plugin.settings.enableIcon && plugin.settings.enableIconsInPopover) {
+                renderIcon(contentEl, frontmatter, sourcePath, plugin);
+            } else {
+                let oldIconDivSource = contentEl?.querySelector(".cm-scroller .icon-wrapper");
+                let oldIconDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .icon-wrapper");
+                oldIconDivSource?.remove();
+                oldIconDivPreview?.remove();
+            }
+        }
+    }
+}
+
+
+
 
 
 
@@ -179,23 +243,24 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
 
 export const updateImagesForView = async (view: MarkdownView, plugin: PrettyPropertiesPlugin) => {
     let file = view.file;
+    let contentEl = view.contentEl;
+
     if (file) {
-      let cache = plugin.app.metadataCache.getFileCache(file);
-      let frontmatter = cache == null ? void 0 : cache.frontmatter;
-      let contentEl = view.contentEl;
-      let sourcePath = file.path || "";
-      
+        let cache = plugin.app.metadataCache.getFileCache(file);
+        let frontmatter = cache == null ? void 0 : cache.frontmatter;
+        let sourcePath = file.path || "";
+          
         if (frontmatter && frontmatter[plugin.settings.bannerProperty]  && plugin.settings.enableBanner) {
-          renderBanner(contentEl, frontmatter, sourcePath, plugin);
+            renderBanner(contentEl, frontmatter, sourcePath, plugin);
         } else {
-          let oldBannerDivSource = contentEl?.querySelector(".cm-scroller .banner-image");
-          let oldBannerDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .banner-image");
-          oldBannerDivSource?.remove();
-          oldBannerDivPreview?.remove();
+            let oldBannerDivSource = contentEl?.querySelector(".cm-scroller .banner-image");
+            let oldBannerDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .banner-image");
+            oldBannerDivSource?.remove();
+            oldBannerDivPreview?.remove();
         }
-
+    
         let hasCover = false
-
+    
         if (frontmatter) {
             if (frontmatter[plugin.settings.coverProperty]) {
                 hasCover = true
@@ -207,26 +272,26 @@ export const updateImagesForView = async (view: MarkdownView, plugin: PrettyProp
                 }
             }
         }
-
-        
-
-
+    
         if (frontmatter && hasCover  && plugin.settings.enableCover) {
-          renderCover(contentEl, frontmatter, sourcePath, plugin);
+            renderCover(contentEl, frontmatter, sourcePath, plugin);
         } else {    
-          let oldCoverDiv = contentEl?.querySelector(".metadata-side-image");
-          oldCoverDiv?.remove();
+            let oldCoverDiv = contentEl?.querySelector(".metadata-side-image");
+            oldCoverDiv?.remove();
         }
         if (frontmatter && frontmatter[plugin.settings.iconProperty]  && plugin.settings.enableIcon) {
-          renderIcon(contentEl, frontmatter, sourcePath, plugin);
+            renderIcon(contentEl, frontmatter, sourcePath, plugin);
         } else {
-          let oldIconDivSource = contentEl?.querySelector(".cm-scroller .icon-wrapper");
-          let oldIconDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .icon-wrapper");
-          oldIconDivSource?.remove();
-          oldIconDivPreview?.remove();
+            let oldIconDivSource = contentEl?.querySelector(".cm-scroller .icon-wrapper");
+            let oldIconDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .icon-wrapper");
+            oldIconDivSource?.remove();
+            oldIconDivPreview?.remove();
         }
     }
   };
+
+
+
 
 
 

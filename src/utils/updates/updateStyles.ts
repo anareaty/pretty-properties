@@ -17,6 +17,7 @@ export const updateBannerStyles = (plugin: PrettyPropertiesPlugin) => {
     }
     let bannerProps = {
         "--banner-height": bannerHeight + "px",
+        "--banner-height-popover": plugin.settings.bannerHeightPopover + "px",
         "--banner-margin": bannerMargin + "px",
         "--banner-fading": bannerFading
     };
@@ -34,6 +35,11 @@ export const updateIconStyles = (plugin: PrettyPropertiesPlugin) => {
       bannerIconGap = plugin.settings.bannerIconGapMobile;
       iconSize = plugin.settings.iconSizeMobile;
     } 
+
+
+    let bannerIconGapPopover = bannerIconGap + plugin.settings.iconSizePopover - iconSize
+
+
     let iconColor = plugin.settings.iconColor;
     let iconColorDark = plugin.settings.iconColorDark;
 
@@ -45,12 +51,18 @@ export const updateIconStyles = (plugin: PrettyPropertiesPlugin) => {
     if (plugin.settings.iconBackground) {
       iconBackground = "var(--background-primary)";
     }
+
+    let iconTopMarginPopover = iconTopMargin - plugin.settings.bannerHeight + plugin.settings.bannerHeightPopover
+
     let iconProps = {
       "--pp-icon-size": iconSize + "px",
+      "--pp-icon-size-popover": plugin.settings.iconSizePopover + "px",
       "--pp-icon-top-margin": iconTopMargin + "px",
+      "--pp-icon-top-margin-popover": iconTopMarginPopover + "px",
       "--pp-icon-top-margin-wb": plugin.settings.iconTopMarginWithoutBanner + "px",
       "--pp-icon-gap": plugin.settings.iconGap + "px",
       "--pp-banner-icon-gap": bannerIconGap + "px",
+      "--pp-banner-icon-gap-popover": bannerIconGapPopover + "px",
       "--pp-icon-left-margin": plugin.settings.iconLeftMargin + "px",
       "--pp-icon-color-light": iconColor,
       "--pp-icon-color-dark": iconColorDark,
@@ -70,7 +82,8 @@ export const updateCoverStyles = (plugin: PrettyPropertiesPlugin) => {
     "--cover-width-initial-2": plugin.settings.coverDefaultWidth2 + "px",
     "--cover-width-initial-3": plugin.settings.coverDefaultWidth3 + "px",
     "--cover-width-square": plugin.settings.coverSquareWidth + "px",
-    "--cover-width-circle": plugin.settings.coverCircleWidth + "px"
+    "--cover-width-circle": plugin.settings.coverCircleWidth + "px",
+    "--cover-max-width-popover": plugin.settings.coverMaxWidthPopover + "px"
     }
   document.body.setCssProps(coverProps);
 

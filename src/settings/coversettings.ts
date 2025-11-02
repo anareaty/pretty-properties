@@ -23,7 +23,14 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
                 updateAllCovers(plugin)
                 updateCoverStyles(plugin)
             }));
+
+            
+
+
     if (plugin.settings.enableCover) {
+
+        
+
         new Setting(containerEl)
         .setName(i18n.t("COVER_PROPERTY"))
         .addText(text => text
@@ -77,6 +84,16 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
                 settingTab.display();
             }))
         }
+
+
+        new Setting(containerEl)
+            .setName(i18n.t("SHOW_COVERS_IN_PAGE_PREVIEWS"))
+            .addToggle(toggle => toggle
+                .setValue(plugin.settings.enableCoversInPopover)
+                .onChange(async (value) => {
+                    plugin.settings.enableCoversInPopover = value
+                    await plugin.saveSettings();
+                }));
 
 
         new Setting(containerEl)
@@ -205,5 +222,22 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
                 updateCoverStyles(plugin);
             })
         });
+
+
+        new Setting(containerEl)
+        .setName(i18n.t("MAX_COVER_WIDTH_POPOVER"))
+        .addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverMaxWidthPopover.toString())
+            .setPlaceholder('150')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverMaxWidthPopover = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+
     }
 }

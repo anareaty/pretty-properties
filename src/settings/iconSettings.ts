@@ -24,6 +24,8 @@ export const showIconSettings = (settingTab: PPSettingTab) => {
                 updateIconStyles(plugin);
             }));
 
+    
+
     if (plugin.settings.enableIcon) {
         new Setting(containerEl)
         .setName(i18n.t("ICON_PROPERTY"))
@@ -42,6 +44,15 @@ export const showIconSettings = (settingTab: PPSettingTab) => {
             .setValue(plugin.settings.iconsFolder)
             .onChange(async (value) => {
                 plugin.settings.iconsFolder = value;
+                await plugin.saveSettings();
+            }));
+
+        new Setting(containerEl)
+        .setName(i18n.t("SHOW_ICONS_IN_PAGE_PREVIEWS"))
+        .addToggle(toggle => toggle
+            .setValue(plugin.settings.enableIconsInPopover)
+            .onChange(async (value) => {
+                plugin.settings.enableIconsInPopover = value
                 await plugin.saveSettings();
             }));
 
@@ -68,6 +79,21 @@ export const showIconSettings = (settingTab: PPSettingTab) => {
             .onChange(async (value) => {
                 if (!value) value = "0"
                 plugin.settings.iconSizeMobile = Number(value);
+                await plugin.saveSettings();
+                updateIconStyles(plugin);
+            })
+        });
+
+
+        new Setting(containerEl)
+        .setName(i18n.t("ICON_SIZE_POPOVER"))
+        .addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.iconSizePopover.toString())
+            .setPlaceholder('70')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.iconSizePopover = Number(value);
                 await plugin.saveSettings();
                 updateIconStyles(plugin);
             })

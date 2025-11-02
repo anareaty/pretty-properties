@@ -10,6 +10,7 @@ export const renderBanner = async (
 
     let bannerVal = frontmatter[plugin.settings.bannerProperty];
 
+    
     // Fix wrong property types
 
     if (Array.isArray(bannerVal)) {
@@ -20,6 +21,10 @@ export const renderBanner = async (
         bannerVal = null
     }
 
+    
+
+    
+
 
     let positionVal = frontmatter[plugin.settings.bannerPositionProperty]
     if (!positionVal) positionVal = 50
@@ -27,6 +32,12 @@ export const renderBanner = async (
     let bannerContainerPreview = contentEl.querySelector(".markdown-reading-view > .markdown-preview-view");
     let bannerContainerSource = contentEl.querySelector(".cm-scroller");
 
+
+    
+
+    if (contentEl.classList.contains("hover-popover")) {
+      bannerContainerPreview = contentEl.querySelector(".markdown-preview-view.markdown-rendered.node-insert-event");
+    }
     
     let oldBannerDivSource = bannerContainerSource?.querySelector(".banner-image");
     let oldBannerDivPreview = bannerContainerPreview?.querySelector(".banner-image");
