@@ -86,17 +86,23 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
 }
 
 
-export const patchPropertyWidgets = (plugin: PrettyPropertiesPlugin) => {
+export const patchPropertyWidgets = async (plugin: PrettyPropertiesPlugin) => {
   //@ts-ignore
-  let widgets = plugin.app.metadataTypeManager.registeredTypeWidgets
+  let metadataTypeManager = plugin.app.metadataTypeManager
+  let widgets = metadataTypeManager.registeredTypeWidgets
+  let unknownWidget = metadataTypeManager.getWidget("")
+  widgets.unknown = unknownWidget
 
   plugin.patches.uninstallWidgetPatch = {}
 
   for (let type in widgets) {
       let widget = widgets[type]
+
+      
       plugin.patches.uninstallWidgetPatch[type] = around(widget, {
         render(oldRender: any) {
           return dedupe("pp-patch-base-cards-around-key", oldRender, (...args: any[]) => {
+            
             let rendered = oldRender && oldRender.apply(this, args)
             updateWidgets(type, rendered, args, plugin)
             let renderValues = rendered?.multiselect?.renderValues

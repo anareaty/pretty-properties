@@ -14,6 +14,7 @@ export const updateHiddenProperty = async (propEl: HTMLElement, plugin: PrettyPr
 export const updateHiddenPropertiesForContainer = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
     let properties = container.querySelectorAll(".metadata-property")
 
+    
     for (let propEl of properties) {
         if (propEl instanceof HTMLElement) {
             updateHiddenProperty(propEl, plugin);
@@ -23,6 +24,7 @@ export const updateHiddenPropertiesForContainer = async (container: HTMLElement,
 
 
 export const updateHiddenProperties = async (plugin: PrettyPropertiesPlugin) => {
+    
     let leaves = plugin.app.workspace.getLeavesOfType("markdown");
     for (let leaf of leaves) {
         let view = leaf.view

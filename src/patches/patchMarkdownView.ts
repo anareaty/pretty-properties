@@ -1,7 +1,7 @@
 import PrettyPropertiesPlugin from "src/main"
 import { updateImagesForView } from "src/utils/updates/updateElements"
 import { around, dedupe } from "monkey-around";
-import { MarkdownView } from "obsidian";
+import { App, MarkdownView } from "obsidian";
 
 export const patchMarkdownView = async (plugin: PrettyPropertiesPlugin) => {
   plugin.patches.uninstallPPMarkdownPatch = around(MarkdownView.prototype, {
