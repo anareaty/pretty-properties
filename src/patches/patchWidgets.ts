@@ -79,7 +79,7 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
     }
   }
 
-  if (plugin.settings.hiddenProperties.find(p => p == propName)) {
+  if (plugin.settings.hiddenProperties.find(p => p.toLowerCase() == propName.toLowerCase())) {
     let parent = el.parentElement
     parent.classList.add("pp-property-hidden")
   }
