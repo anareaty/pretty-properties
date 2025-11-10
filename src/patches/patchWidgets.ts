@@ -90,8 +90,15 @@ export const patchPropertyWidgets = async (plugin: PrettyPropertiesPlugin) => {
   //@ts-ignore
   let metadataTypeManager = plugin.app.metadataTypeManager
   let widgets = metadataTypeManager.registeredTypeWidgets
-  let unknownWidget = metadataTypeManager.getWidget("")
-  widgets.unknown = unknownWidget
+
+  let unknownWidget
+  if (metadataTypeManager.getWidget) {
+    unknownWidget = metadataTypeManager.getWidget(" ");
+  } else {
+    unknownWidget = metadataTypeManager.getTypeInfo({key: " ", value: "unknown"}).inferred
+  }
+  widgets.unknown = unknownWidget;
+
 
   plugin.patches.uninstallWidgetPatch = {}
 
