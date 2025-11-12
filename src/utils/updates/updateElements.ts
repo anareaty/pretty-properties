@@ -252,7 +252,7 @@ export const updateImagesForView = async (view: MarkdownView, plugin: PrettyProp
         let frontmatter = cache == null ? void 0 : cache.frontmatter;
         let sourcePath = file.path || "";
           
-        if (frontmatter && frontmatter[plugin.settings.bannerProperty]  && plugin.settings.enableBanner) {
+        if (frontmatter && getNestedProperty(frontmatter, plugin.settings.bannerProperty)  && plugin.settings.enableBanner) {
             renderBanner(contentEl, frontmatter, sourcePath, plugin);
         } else {
             let oldBannerDivSource = contentEl?.querySelector(".cm-scroller .banner-image");
