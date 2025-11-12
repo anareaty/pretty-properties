@@ -1,6 +1,7 @@
 import { SuggestModal, TFile, App } from "obsidian";
 import Emojilib from "emojilib";
 import PrettyPropertiesPlugin from "src/main";
+import { setNestedProperty } from "src/utils/propertyUtils";
 
 
 export class EmojiSuggestModal extends SuggestModal<string> {
@@ -31,7 +32,7 @@ export class EmojiSuggestModal extends SuggestModal<string> {
             let file = this.app.workspace.getActiveFile();
             if (file instanceof TFile) {
                 this.app.fileManager.processFrontMatter(file, (fm) => {
-                    fm[this.propName] = emoji;
+                    setNestedProperty(fm, this.propName, emoji);
                 });
             }
         }

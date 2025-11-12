@@ -7,6 +7,7 @@ import { updateProgress  } from "./updateProgress";
 import { updateCardLongtext, updateLongtext, updateMultiselectPill, updateSettingPills, updateTag, updateTagPaneTagsAll, updateTagPill, updateValueListElement } from "./updatePills";
 import { renderBanner, updateBannerForView } from "./updateBanners";
 import { updateBaseProgressEls } from "./updateBaseProgress";
+import { getNestedProperty } from "../propertyUtils";
 
 
 
@@ -188,7 +189,7 @@ export const updateImagesInPopover = async (popover: HoverPopover, plugin: Prett
             let frontmatter = cache == null ? void 0 : cache.frontmatter;
             let sourcePath = file.path || "";
                 
-            if (frontmatter && frontmatter[plugin.settings.bannerProperty]  && plugin.settings.enableBanner && plugin.settings.enableBannersInPopover) {
+            if (frontmatter && getNestedProperty(frontmatter, plugin.settings.bannerProperty)  && plugin.settings.enableBanner && plugin.settings.enableBannersInPopover) {
                 renderBanner(contentEl, frontmatter, sourcePath, plugin);
             } else {
                 let oldBannerDivSource = contentEl?.querySelector(".cm-scroller .banner-image");
@@ -202,13 +203,14 @@ export const updateImagesInPopover = async (popover: HoverPopover, plugin: Prett
             let hasCover = false
 
             if (frontmatter) {
-                if (frontmatter[plugin.settings.coverProperty]) {
+                if (getNestedProperty(frontmatter, plugin.settings.coverProperty)) {
                     hasCover = true
                 } else {
                     for (let prop of plugin.settings.extraCoverProperties) {
-                        frontmatter[prop]
-                        hasCover = true
-                        break
+                        if (getNestedProperty(frontmatter, prop)) {
+                            hasCover = true
+                            break
+                        }
                     }
                 }
             }
@@ -222,7 +224,7 @@ export const updateImagesInPopover = async (popover: HoverPopover, plugin: Prett
                 let oldCoverDiv = contentEl?.querySelector(".metadata-side-image");
                 oldCoverDiv?.remove();
             }
-            if (frontmatter && frontmatter[plugin.settings.iconProperty]  && plugin.settings.enableIcon && plugin.settings.enableIconsInPopover) {
+            if (frontmatter && getNestedProperty(frontmatter, plugin.settings.iconProperty)  && plugin.settings.enableIcon && plugin.settings.enableIconsInPopover) {
                 renderIcon(contentEl, frontmatter, sourcePath, plugin);
             } else {
                 let oldIconDivSource = contentEl?.querySelector(".cm-scroller .icon-wrapper");
@@ -262,13 +264,14 @@ export const updateImagesForView = async (view: MarkdownView, plugin: PrettyProp
         let hasCover = false
     
         if (frontmatter) {
-            if (frontmatter[plugin.settings.coverProperty]) {
+            if (getNestedProperty(frontmatter, plugin.settings.coverProperty)) {
                 hasCover = true
             } else {
                 for (let prop of plugin.settings.extraCoverProperties) {
-                    frontmatter[prop]
-                    hasCover = true
-                    break
+                    if (getNestedProperty(frontmatter, prop)) {
+                        hasCover = true
+                        break
+                    }
                 }
             }
         }
@@ -279,7 +282,7 @@ export const updateImagesForView = async (view: MarkdownView, plugin: PrettyProp
             let oldCoverDiv = contentEl?.querySelector(".metadata-side-image");
             oldCoverDiv?.remove();
         }
-        if (frontmatter && frontmatter[plugin.settings.iconProperty]  && plugin.settings.enableIcon) {
+        if (frontmatter && getNestedProperty(frontmatter, plugin.settings.iconProperty)  && plugin.settings.enableIcon) {
             renderIcon(contentEl, frontmatter, sourcePath, plugin);
         } else {
             let oldIconDivSource = contentEl?.querySelector(".cm-scroller .icon-wrapper");
@@ -307,7 +310,7 @@ export const updateImagesOnCacheChanged = async (file: TFile, cache: CachedMetad
         let frontmatter = cache?.frontmatter;
         let contentEl = view.contentEl;
       
-        if (frontmatter && frontmatter[plugin.settings.bannerProperty]  && plugin.settings.enableBanner) {
+        if (frontmatter && getNestedProperty(frontmatter, plugin.settings.bannerProperty)  && plugin.settings.enableBanner) {
           renderBanner(contentEl, frontmatter, sourcePath, plugin);
         } else {
           let oldBannerDiv = contentEl?.querySelector(".banner-image");
@@ -317,13 +320,14 @@ export const updateImagesOnCacheChanged = async (file: TFile, cache: CachedMetad
         let hasCover = false
 
         if (frontmatter) {
-            if (frontmatter[plugin.settings.coverProperty]) {
+            if (getNestedProperty(frontmatter, plugin.settings.coverProperty)) {
                 hasCover = true
             } else {
                 for (let prop of plugin.settings.extraCoverProperties) {
-                    frontmatter[prop]
-                    hasCover = true
-                    break
+                    if (getNestedProperty(frontmatter, prop)) {
+                        hasCover = true
+                        break
+                    }
                 }
             }
         }
@@ -339,7 +343,7 @@ export const updateImagesOnCacheChanged = async (file: TFile, cache: CachedMetad
           let oldCoverDiv = contentEl?.querySelector(".metadata-side-image");
           oldCoverDiv?.remove();
         }
-        if (frontmatter && frontmatter[plugin.settings.iconProperty]  && plugin.settings.enableIcon) {
+        if (frontmatter && getNestedProperty(frontmatter, plugin.settings.iconProperty)  && plugin.settings.enableIcon) {
           renderIcon(contentEl, frontmatter, sourcePath, plugin);
         } else {
           let oldIconDiv = contentEl?.querySelector(".icon-image");
