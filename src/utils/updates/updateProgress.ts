@@ -1,5 +1,6 @@
 import { CachedMetadata, setTooltip, TFile } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
+import { getNestedProperty } from "../propertyUtils";
 
 
 export const updateProgress = async (propertyEl: HTMLElement, plugin: PrettyPropertiesPlugin, sourcePath?: string) => {
@@ -23,7 +24,7 @@ export const updateProgress = async (propertyEl: HTMLElement, plugin: PrettyProp
             }
 
             let cache = plugin.app.metadataCache.getCache(sourcePath)
-            maxVal = cache?.frontmatter?.[maxProperty]
+            maxVal = getNestedProperty(cache?.frontmatter, maxProperty)
         }
 
         if (maxVal) {  
@@ -93,7 +94,7 @@ export const updateProgress = async (propertyEl: HTMLElement, plugin: PrettyProp
 export const updateAllProgressElsOnMaxChange = async (file: TFile, cache: CachedMetadata, plugin: PrettyPropertiesPlugin) => {
     for (let prop in plugin.settings.progressProperties) {
         let maxProperty = plugin.settings.progressProperties[prop].maxProperty
-        let maxVal = cache.frontmatter?.[maxProperty]
+        let maxVal = getNestedProperty(cache.frontmatter, maxProperty)
         if (maxVal !== undefined) {
             let numbers = document.querySelectorAll("input.metadata-input-number")
             for (let input of numbers) {

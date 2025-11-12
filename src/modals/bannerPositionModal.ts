@@ -1,5 +1,6 @@
 import { TFile, Modal, Setting, App } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
+import { getNestedProperty, setNestedProperty } from "src/utils/propertyUtils";
 
 
 export class BannerPositionModal extends Modal {
@@ -10,7 +11,7 @@ export class BannerPositionModal extends Modal {
     constructor(app: App, plugin: PrettyPropertiesPlugin, file: TFile, bannerPositionProperty: string) {
         super(app)
         let cache = plugin.app.metadataCache.getFileCache(file);
-        this.position = cache?.frontmatter?.[bannerPositionProperty] || 50
+        this.position = getNestedProperty(cache?.frontmatter, bannerPositionProperty) || 50
         this.file = file
         this.bannerPositionProperty = bannerPositionProperty
     }
@@ -24,7 +25,7 @@ export class BannerPositionModal extends Modal {
             .setDynamicTooltip()
             .onChange((value) => {
                 this.app.fileManager.processFrontMatter(this.file, fm => {
-                    fm[this.bannerPositionProperty] = value
+                    setNestedProperty(fm, this.bannerPositionProperty, value);
                 })
             })
         )

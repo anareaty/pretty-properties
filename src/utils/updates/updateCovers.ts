@@ -1,5 +1,6 @@
 import { MarkdownView, FrontMatterCache, MarkdownRenderer } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
+import { getNestedProperty } from "../propertyUtils";
 
 
 export const renderCover = async (
@@ -24,7 +25,7 @@ export const renderCover = async (
     
 
     for (let prop of props) {
-        coverVal = frontmatter?.[prop];
+        coverVal = getNestedProperty(frontmatter, prop);
         if (coverVal) break;
     }
 

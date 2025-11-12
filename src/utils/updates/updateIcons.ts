@@ -1,5 +1,6 @@
 import { MarkdownView, FrontMatterCache, getIcon, MarkdownRenderer } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
+import { getNestedProperty } from "../propertyUtils";
 
 
 export const renderIcon = async (
@@ -15,7 +16,7 @@ export const renderIcon = async (
       iconContainerPreview = contentEl.querySelector(".markdown-preview-view.markdown-rendered.node-insert-event");
     }
 
-    let iconVal = frontmatter[plugin.settings.iconProperty];
+    let iconVal = getNestedProperty(frontmatter, plugin.settings.iconProperty);
 
     // Fix wrong property types
 

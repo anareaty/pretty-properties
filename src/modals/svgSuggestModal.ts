@@ -1,5 +1,6 @@
 import { SuggestModal, TFile, getIcon, getIconIds, App } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
+import { setNestedProperty } from "src/utils/propertyUtils";
 
 
 export class SvgSuggestModal extends SuggestModal<string> {
@@ -28,7 +29,7 @@ export class SvgSuggestModal extends SuggestModal<string> {
             let file = this.app.workspace.getActiveFile();
             if (file instanceof TFile) {
                 this.app.fileManager.processFrontMatter(file, (fm) => {
-                    fm[this.propName] = id;
+                    setNestedProperty(fm, this.propName, id);
                 });
             }
         }
