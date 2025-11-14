@@ -80,6 +80,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 		registerCommands(this)
+		
 
 		registerTagFixExtension(this)
 		registerTagPostProcessor(this)
