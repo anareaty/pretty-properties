@@ -57,5 +57,16 @@ export const getPropertyValue = (e: MouseEvent, plugin: PrettyPropertiesPlugin) 
 }
 
 
+export const getPropertyType = (propName: string, plugin: PrettyPropertiesPlugin) => {
+    //@ts-ignore
+    let propertyTypeObject = plugin.app.metadataTypeManager.getPropertyInfo(propName.toLowerCase());
+    let propertyType;
+    if (propertyTypeObject) {
+        propertyType = propertyTypeObject.widget || propertyTypeObject.type;
+    }
+    return propertyType
+}
+
+
 
 

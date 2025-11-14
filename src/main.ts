@@ -37,12 +37,13 @@ import { patchBaseTable } from "./patches/patchBaseTable";
 import { updateTaskCountOnCacheChanged } from "./utils/taskCount/taskCount";
 import { unPatchWidgets } from "./patches/removePatches";
 import { patchHoverPopover } from "./patches/patchHoverPopover";
+import { API, createApi } from "./utils/createApi";
 
 export default class PrettyPropertiesPlugin extends Plugin {
 	settings: PPPluginSettings;
 	menuManager: MenuManager
 	patches: Record<string, any>
-
+	api: API
 
 	async onload() {
 		await this.loadSettings();
@@ -51,6 +52,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			await loadMathJax()
 		}
 		updateData(this)
+		createApi(this)
 		i18n.setLocale();
 		this.menuManager = new MenuManager
 		this.patches = {}
@@ -220,6 +222,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		);
 
 		this.addSettingTab(new PPSettingTab(this.app, this));
+
+
 	}
 
 	onunload() {
