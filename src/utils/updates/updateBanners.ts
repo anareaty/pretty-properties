@@ -1,5 +1,6 @@
 import { MarkdownRenderer, MarkdownView, FrontMatterCache } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
+import { getNestedProperty } from "../propertyUtils";
 
 
 export const renderBanner = async (
@@ -8,7 +9,7 @@ export const renderBanner = async (
   sourcePath: string,
   plugin: PrettyPropertiesPlugin) => {
 
-    let bannerVal = frontmatter[plugin.settings.bannerProperty];
+    let bannerVal = getNestedProperty(frontmatter, plugin.settings.bannerProperty);
 
     
     // Fix wrong property types
@@ -26,7 +27,7 @@ export const renderBanner = async (
     
 
 
-    let positionVal = frontmatter[plugin.settings.bannerPositionProperty]
+    let positionVal = getNestedProperty(frontmatter, plugin.settings.bannerPositionProperty)
     if (!positionVal) positionVal = 50
 
     let bannerContainerPreview = contentEl.querySelector(".markdown-reading-view > .markdown-preview-view");

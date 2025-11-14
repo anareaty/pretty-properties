@@ -1,5 +1,6 @@
 import { MarkdownView, View, TFile, CachedMetadata } from "obsidian"
 import PrettyPropertiesPlugin from "src/main"
+import { getNestedProperty, setNestedProperty } from "../propertyUtils"
 
 
 
@@ -18,7 +19,7 @@ export const needToUpdateTaskNotes = (plugin: PrettyPropertiesPlugin, cache?: Ca
             } else if (taskIdentificationMethod == "property") {
                 let taskPropertyName = tn.settings.taskPropertyName
                 let taskPropertyValue = tn.settings.taskPropertyValue
-                if (cache.frontmatter?.[taskPropertyName] == taskPropertyValue) {
+                if (getNestedProperty(cache.frontmatter, taskPropertyName) == taskPropertyValue) {
                     isTask = true
                 }
             } 
@@ -109,52 +110,52 @@ export const updateTaskNotesTaskCount = async (plugin: PrettyPropertiesPlugin, f
 
         plugin.app.fileManager.processFrontMatter(file, fm => {
 
-            if (plugin.settings.allTNTasksCount && fm[plugin.settings.allTNTasksCount] !== undefined) {
-                fm[plugin.settings.allTNTasksCount] = allTasks.length
+            if (plugin.settings.allTNTasksCount && getNestedProperty(fm, plugin.settings.allTNTasksCount) !== undefined) {
+                setNestedProperty(fm, plugin.settings.allTNTasksCount, allTasks.length);
             }
 
-            if (plugin.settings.completedTNTasksCount && fm[plugin.settings.completedTNTasksCount] !== undefined) {
-                fm[plugin.settings.completedTNTasksCount] = allCompletedTasks.length
+            if (plugin.settings.completedTNTasksCount && getNestedProperty(fm, plugin.settings.completedTNTasksCount) !== undefined) {
+                setNestedProperty(fm, plugin.settings.completedTNTasksCount, allCompletedTasks.length);
             }
 
-            if (plugin.settings.uncompletedTNTasksCount && fm[plugin.settings.uncompletedTNTasksCount] !== undefined) {
-                fm[plugin.settings.uncompletedTNTasksCount] = allTasks.length - allCompletedTasks.length
+            if (plugin.settings.uncompletedTNTasksCount && getNestedProperty(fm, plugin.settings.uncompletedTNTasksCount) !== undefined) {
+                setNestedProperty(fm, plugin.settings.uncompletedTNTasksCount, allTasks.length - allCompletedTasks.length);
             }
 
-            if (plugin.settings.allTNProjectTasksCount && fm[plugin.settings.allTNProjectTasksCount] !== undefined) {
-                fm[plugin.settings.allTNProjectTasksCount] = projectTasks.length
+            if (plugin.settings.allTNProjectTasksCount && getNestedProperty(fm, plugin.settings.allTNProjectTasksCount) !== undefined) {
+                setNestedProperty(fm, plugin.settings.allTNProjectTasksCount, projectTasks.length);
             }
 
-            if (plugin.settings.completedTNProjectTasksCount && fm[plugin.settings.completedTNProjectTasksCount] !== undefined) {
-                fm[plugin.settings.completedTNProjectTasksCount] = completedProjectTasks.length
+            if (plugin.settings.completedTNProjectTasksCount && getNestedProperty(fm, plugin.settings.completedTNProjectTasksCount) !== undefined) {
+                setNestedProperty(fm, plugin.settings.completedTNProjectTasksCount, completedProjectTasks.length);
             }
 
-            if (plugin.settings.uncompletedTNProjectTasksCount && fm[plugin.settings.uncompletedTNProjectTasksCount] !== undefined) {
-                fm[plugin.settings.uncompletedTNProjectTasksCount] = projectTasks.length - completedProjectTasks.length
+            if (plugin.settings.uncompletedTNProjectTasksCount && getNestedProperty(fm, plugin.settings.uncompletedTNProjectTasksCount) !== undefined) {
+                setNestedProperty(fm, plugin.settings.uncompletedTNProjectTasksCount, projectTasks.length - completedProjectTasks.length);
             }
 
-            if (plugin.settings.allTNInlineTasksCount && fm[plugin.settings.allTNInlineTasksCount] !== undefined) {
-                fm[plugin.settings.allTNInlineTasksCount] = inlineTasks.length
+            if (plugin.settings.allTNInlineTasksCount && getNestedProperty(fm, plugin.settings.allTNInlineTasksCount) !== undefined) {
+                setNestedProperty(fm, plugin.settings.allTNInlineTasksCount, inlineTasks.length);
             }
 
-            if (plugin.settings.completedTNInlineTasksCount && fm[plugin.settings.completedTNInlineTasksCount] !== undefined) {
-                fm[plugin.settings.completedTNInlineTasksCount] = completedInlineTasks.length
+            if (plugin.settings.completedTNInlineTasksCount && getNestedProperty(fm, plugin.settings.completedTNInlineTasksCount) !== undefined) {
+                setNestedProperty(fm, plugin.settings.completedTNInlineTasksCount, completedInlineTasks.length);
             }
 
-            if (plugin.settings.uncompletedTNInlineTasksCount && fm[plugin.settings.uncompletedTNInlineTasksCount] !== undefined) {
-                fm[plugin.settings.uncompletedTNInlineTasksCount] = inlineTasks.length - completedInlineTasks.length
+            if (plugin.settings.uncompletedTNInlineTasksCount && getNestedProperty(fm, plugin.settings.uncompletedTNInlineTasksCount) !== undefined) {
+                setNestedProperty(fm, plugin.settings.uncompletedTNInlineTasksCount, inlineTasks.length - completedInlineTasks.length);
             }
 
-            if (plugin.settings.allTNAndCheckboxTasksCount && fm[plugin.settings.allTNAndCheckboxTasksCount] !== undefined) {
-                fm[plugin.settings.allTNAndCheckboxTasksCount] = allTasks.length + tasks.length
+            if (plugin.settings.allTNAndCheckboxTasksCount && getNestedProperty(fm, plugin.settings.allTNAndCheckboxTasksCount) !== undefined) {
+                setNestedProperty(fm, plugin.settings.allTNAndCheckboxTasksCount, allTasks.length + tasks.length);
             }
 
-            if (plugin.settings.completedTNAndCheckboxTasksCount && fm[plugin.settings.completedTNAndCheckboxTasksCount] !== undefined) {
-                fm[plugin.settings.completedTNAndCheckboxTasksCount] = allCompletedTasks.length + completed.length
+            if (plugin.settings.completedTNAndCheckboxTasksCount && getNestedProperty(fm, plugin.settings.completedTNAndCheckboxTasksCount) !== undefined) {
+                setNestedProperty(fm, plugin.settings.completedTNAndCheckboxTasksCount, allCompletedTasks.length + completed.length);
             }
 
-            if (plugin.settings.uncompletedTNAndCheckboxTasksCount && fm[plugin.settings.uncompletedTNAndCheckboxTasksCount] !== undefined) {
-                fm[plugin.settings.uncompletedTNAndCheckboxTasksCount] = allTasks.length - allCompletedTasks.length + uncompleted.length
+            if (plugin.settings.uncompletedTNAndCheckboxTasksCount && getNestedProperty(fm, plugin.settings.uncompletedTNAndCheckboxTasksCount) !== undefined) {
+                setNestedProperty(fm, plugin.settings.uncompletedTNAndCheckboxTasksCount, allTasks.length - allCompletedTasks.length + uncompleted.length);
             }
         })
     }

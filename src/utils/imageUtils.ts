@@ -1,5 +1,6 @@
 import { TFile } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
+import { getNestedProperty } from "./propertyUtils";
 import { LocalImageSuggestModal } from "src/modals/localImageSuggestModal";
 import { BannerPositionModal } from "src/modals/bannerPositionModal";
 import { CoverShapeSuggestModal } from "src/modals/coverShapeSuggestModal";
@@ -77,7 +78,7 @@ export const getCurrentCoverProperty = (plugin: PrettyPropertiesPlugin) => {
         props.unshift(plugin.settings.coverProperty);
 
         for (let prop of props) {
-            if (frontmatter?.[prop] !== undefined) {
+            if (getNestedProperty(frontmatter, prop) !== undefined) {
                 propName = prop;
                 break;
             }

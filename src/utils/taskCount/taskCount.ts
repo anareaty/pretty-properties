@@ -1,5 +1,6 @@
 import { MarkdownView, FileView, CachedMetadata, TFile } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
+import { getNestedProperty, setNestedProperty } from "../propertyUtils";
 
 
 export const updateTasksCount = async (
@@ -11,9 +12,9 @@ export const updateTasksCount = async (
     let tasksProp = plugin.settings.allTasksCount;
     let completedProp = plugin.settings.completedTasksCount;
     let uncompletedProp = plugin.settings.uncompletedTasksCount;
-    let tasksVal = frontmatter?.[tasksProp];
-    let completedVal = frontmatter?.[completedProp];
-    let uncompletedVal = frontmatter?.[uncompletedProp];
+    let tasksVal = getNestedProperty(frontmatter, tasksProp);
+    let completedVal = getNestedProperty(frontmatter, completedProp);
+    let uncompletedVal = getNestedProperty(frontmatter, uncompletedProp);
 
     if (
         tasksVal !== undefined ||
@@ -47,7 +48,7 @@ export const updateTasksCount = async (
                         await plugin.app.fileManager.processFrontMatter(
                             file,
                             (fm) => {
-                                fm[tasksProp] = tasksNum;
+                                setNestedProperty(fm, tasksProp, tasksNum);
                             }
                         );
                     }
@@ -68,7 +69,7 @@ export const updateTasksCount = async (
                         await plugin.app.fileManager.processFrontMatter(
                             file,
                             (fm) => {
-                                fm[completedProp] = completedNum;
+                                setNestedProperty(fm, completedProp, completedNum);
                             }
                         );
                     }
@@ -89,7 +90,7 @@ export const updateTasksCount = async (
                         await plugin.app.fileManager.processFrontMatter(
                             file,
                             (fm) => {
-                                fm[uncompletedProp] = uncompletedNum;
+                                setNestedProperty(fm, uncompletedProp, uncompletedNum);
                             }
                         );
                     }

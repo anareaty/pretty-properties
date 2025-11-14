@@ -1,5 +1,6 @@
 import { SuggestModal, TFile, App, MarkdownRenderer } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
+import { setNestedProperty } from "src/utils/propertyUtils";
 
 
 export class LocalImageSuggestModal extends SuggestModal<string> {
@@ -52,7 +53,7 @@ export class LocalImageSuggestModal extends SuggestModal<string> {
             if (imageFile instanceof TFile && file instanceof TFile) {
                 let imageLink = this.app.fileManager.generateMarkdownLink(imageFile, "").replace(/^\!/, "")
                 this.app.fileManager.processFrontMatter(file, fm => {
-                    fm[this.propName] = imageLink
+                    setNestedProperty(fm, this.propName, imageLink);
                 })
             }
         }

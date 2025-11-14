@@ -1,5 +1,6 @@
 import { TFile, App, Modal, Setting } from "obsidian";
 import { i18n } from "src/localization/localization";
+import { setNestedProperty } from "src/utils/propertyUtils";
 
 
 export class ImageLinkPrompt extends Modal {
@@ -53,7 +54,7 @@ export class ImageLinkPrompt extends Modal {
             let file = this.app.workspace.getActiveFile()
             if (file instanceof TFile) {
                 this.app.fileManager.processFrontMatter(file, fm => {
-                    fm[this.propName] = this.result
+                    setNestedProperty(fm, this.propName, this.result);
                 })
             }
         }
