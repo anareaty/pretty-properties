@@ -66,7 +66,7 @@ export class API {
         let propType = getPropertyType(propName, this.plugin)
         if (propType == "text") {
             return this.plugin.settings.propertyLongtextColors?.[propValue]?.pillColor || "default"
-        } else if (propType == "multitext") {
+        } else if (propType == "multitext" || propType == "aliases") {
             return this.plugin.settings.propertyPillColors?.[propValue]?.pillColor || "default"
         } else if (propType == "tags") {
             return this.plugin.settings.tagColors?.[propValue]?.pillColor || "default"
@@ -77,7 +77,7 @@ export class API {
         let propType = getPropertyType(propName, this.plugin)
         if (propType == "text") {
             return this.plugin.settings.propertyLongtextColors?.[propValue]?.textColor || "default"
-        } else if (propType == "multitext") {
+        } else if (propType == "multitext" || propType == "aliases") {
             return this.plugin.settings.propertyPillColors?.[propValue]?.textColor || "default"
         } else if (propType == "tags") {
             return this.plugin.settings.tagColors?.[propValue]?.textColor || "default"

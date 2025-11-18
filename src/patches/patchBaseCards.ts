@@ -2,7 +2,6 @@ import PrettyPropertiesPlugin from "src/main";
 import { updateDateInput, updateDateTimeInput } from "src/utils/updates/updateDates";
 import { updateCardLongtext, updateValueListElement } from "src/utils/updates/updatePills";
 import { around, dedupe } from "monkey-around";
-import { updateBaseProgress } from "src/utils/updates/updateBaseProgress";
 
 
 
@@ -55,7 +54,7 @@ const processBaseCardProperty = (property: any, plugin: PrettyPropertiesPlugin) 
         //@ts-ignore
         let type = plugin.app.metadataTypeManager.getPropertyInfo(propName)?.widget
 
-        if (type == "multitext") {
+        if (type == "multitext" || type == "aliases") {
             let elements = property.lineEl.querySelectorAll(".value-list-element")
             for (let el of elements) {
                 updateValueListElement(el, "data-property-pill-value", "multiselect-pill", plugin)
@@ -92,12 +91,5 @@ const processBaseCardProperty = (property: any, plugin: PrettyPropertiesPlugin) 
         
     } 
 
-
-
-    // Remove this after Obsidian v.1.10 goes public
-
-    else if (prop.startsWith("formula.pp_progress")) {
-        updateBaseProgress(property.el)
-    }
 
 }

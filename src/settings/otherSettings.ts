@@ -3,7 +3,7 @@ import { i18n } from 'src/localization/localization';
 import { DEFAULT_SETTINGS, PPSettingTab } from 'src/settings/settings';
 import { updateLongTexts } from 'src/utils/updates/updatePills';
 import { updateHiddenProperties } from 'src/utils/updates/updateHiddenProperties';
-import { updateBannerStyles, updateBaseTagsStyle, updateCoverStyles, updateHiddenPropertiesInPropTab, updateIconStyles, updatePillPaddings, updateRelativeDateColors } from 'src/utils/updates/updateStyles';
+import { updateBannerStyles, updateBaseTagsStyle, updateCoverStyles, updateHiddenEmptyProperties, updateHiddenPropertiesInPropTab, updateIconStyles, updatePillPaddings, updateRelativeDateColors } from 'src/utils/updates/updateStyles';
 import { updateAllProperties } from 'src/utils/updates/updateElements';
 
 
@@ -129,6 +129,7 @@ export const showOtherSettings = (settingTab: PPSettingTab) => {
                                 updateCoverStyles(plugin);
                                 updatePillPaddings(plugin)
                                 updateHiddenPropertiesInPropTab(plugin)
+                                updateHiddenEmptyProperties(plugin)
                                 updateBaseTagsStyle(plugin)
                                 updateAllProperties(plugin)
                             }
@@ -159,6 +160,7 @@ export const showOtherSettings = (settingTab: PPSettingTab) => {
                 updateCoverStyles(plugin);
                 updatePillPaddings(plugin)
                 updateHiddenPropertiesInPropTab(plugin)
+                updateHiddenEmptyProperties(plugin)
                 updateBaseTagsStyle(plugin)
                 updateAllProperties(plugin)
                 settingTab.display();

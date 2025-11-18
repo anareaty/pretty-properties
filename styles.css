@@ -1318,3 +1318,15 @@ button.longtext-color-button:hover {
 }
 
 
+
+.hide-all-empty-properties:not(.show-hidden-properties) .workspace-leaf-content[data-type='markdown'] .metadata-property.is-empty, 
+.hide-all-empty-properties:not(.show-hidden-properties).hidden-props-in-prop-tab .workspace-leaf-content[data-type='file-properties'] .metadata-property.is-empty, 
+.hide-all-empty-properties:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty {
+  display: none;
+}
+
+body:not(.show-hidden-properties) .workspace-leaf-content[data-type='markdown'] .metadata-property.is-empty.pp-property-hidden-when-empty, 
+body:not(.show-hidden-properties).hidden-props-in-prop-tab .workspace-leaf-content[data-type='file-properties'] .metadata-property.is-empty.pp-property-hidden-when-empty, 
+body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-property-hidden-when-empty {
+  display: none;
+}

@@ -212,6 +212,12 @@ export const updateHiddenPropertiesInPropTab = (plugin: PrettyPropertiesPlugin) 
 }
 
 
+export const updateHiddenEmptyProperties = (plugin: PrettyPropertiesPlugin) => {
+  let hideAllEmptyProperties = plugin.settings.hideAllEmptyProperties
+  document.body.classList.toggle("hide-all-empty-properties", hideAllEmptyProperties)
+}
+
+
 export const updateBaseTagsStyle = (plugin: PrettyPropertiesPlugin) => {
   document.body.classList.toggle("base-tags-style", plugin.settings.addBaseTagColor)
 }

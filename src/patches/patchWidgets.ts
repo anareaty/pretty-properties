@@ -11,13 +11,22 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
   let propName = args[2].key;
   let sourcePath = args[2].sourcePath;
   let value = args[1]
+  let parent = el.parentElement
+
 
   if (value && value.value) {
     value = value.value;
-  } 
+  }
 
-  if (type == "multitext") {
+  if (type == "multitext" || type == "aliases") {
     let elements = rendered?.multiselect.elements 
+
+    if (elements.length == 0) {
+      parent.classList.add("is-empty")
+    } else {
+      parent.classList.remove("is-empty")
+    }
+
     for (let element of elements) {
       updateMultiselectPill(element, plugin)
     }
@@ -25,6 +34,13 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
 
   if (type == "tags") {
     let elements = rendered?.multiselect.elements 
+
+    if (elements.length == 0) {
+      parent.classList.add("is-empty")
+    } else {
+      parent.classList.remove("is-empty")
+    }
+
     for (let element of elements) {
       updateTagPill(element, plugin)
     }
@@ -51,8 +67,18 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
     parent.setAttribute("data-source-path", sourcePath)
     updateProgress(parent, plugin, sourcePath)
     let input = el.querySelector("input");
-    input.onchange = () => {
+    if (input.value === "") {
+      parent.classList.add("is-empty")
+    } else {
+      parent.classList.remove("is-empty")
+    }
+    input.onchange = (value: number) => {
       updateProgress(parent, plugin, sourcePath)
+      if (input.value === "") {
+        parent.classList.add("is-empty")
+      } else {
+        parent.classList.remove("is-empty")
+      }
     }
   }
 
@@ -79,10 +105,47 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
     }
   }
 
+  if (type == "unknown") {
+    let input = el.querySelector(".mod-unknown")
+    if (input instanceof HTMLElement && input.innerText == "null") {
+      parent.classList.add("is-empty")
+    } else {
+      parent.classList.remove("is-empty")
+    }
+  }
+
+
+  if (type == "checkbox") {
+    let input = el.querySelector(".metadata-input-checkbox")
+    if (input instanceof HTMLElement) {
+      let indeterminate = input.getAttribute("data-indeterminate")
+      if (indeterminate == "true") {
+        parent.classList.add("is-empty")
+      } else {
+        parent.classList.remove("is-empty")
+      }
+
+      input.onchange = () => {
+        let indeterminate = input.getAttribute("data-indeterminate")
+        if (indeterminate == "true") {
+          parent.classList.add("is-empty")
+        } else {
+          parent.classList.remove("is-empty")
+        }
+      }
+    }
+  }
+
+  
+
   if (plugin.settings.hiddenProperties.find(p => p.toLowerCase() == propName.toLowerCase())) {
-    let parent = el.parentElement
     parent.classList.add("pp-property-hidden")
   }
+
+  if (plugin.settings.hiddenWhenEmptyProperties.find(p => p.toLowerCase() == propName.toLowerCase())) {
+    parent.classList.add("pp-property-hidden-when-empty")
+  }
+
 }
 
 

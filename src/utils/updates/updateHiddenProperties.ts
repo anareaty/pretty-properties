@@ -8,7 +8,14 @@ export const updateHiddenProperty = async (propEl: HTMLElement, plugin: PrettyPr
     } else {
         propEl.classList.remove("pp-property-hidden")
     }
+
+    if (plugin.settings.hiddenWhenEmptyProperties.find(p => p.toLowerCase() == propName.toLowerCase())) {
+        propEl.classList.add("pp-property-hidden-when-empty")
+    } else {
+        propEl.classList.remove("pp-property-hidden-when-empty")
+    }
 }
+
 
 
 export const updateHiddenPropertiesForContainer = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {

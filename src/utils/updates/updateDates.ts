@@ -5,16 +5,17 @@ import PrettyPropertiesPlugin from "src/main";
 export const updateDateInput = async (input: HTMLInputElement, plugin: PrettyPropertiesPlugin) => {
 	let value = input.value;
 	let parent = input.parentElement
+
+	let grandParent = parent?.parentElement
+
 	let customDateFormat = plugin.settings.customDateFormat
 
 	if (parent instanceof HTMLElement) {
 		let isBase = parent.classList.contains("bases-table-cell")
 		let existingCustomDateElement = parent.querySelector(".custom-date")
-		//let disabled = input.disabled
 
 		if (plugin.settings.enableCustomDateFormat && 
 			customDateFormat && 
-			//!disabled &&
 			(!isBase || (plugin.settings.enableBases && plugin.settings.enableCustomDateFormatInBases))) {
 
 				
@@ -43,6 +44,7 @@ export const updateDateInput = async (input: HTMLInputElement, plugin: PrettyPro
 			parent.classList.remove("has-custom-date")
 		}
 
+		
 		if (value) {
 			let currentTime = moment().toISOString(true).slice(0, 10);
 			if (currentTime == value) {
@@ -52,8 +54,10 @@ export const updateDateInput = async (input: HTMLInputElement, plugin: PrettyPro
 			} else {
 				parent.setAttribute("data-relative-date", "future");
 			}
+			grandParent?.classList.remove("is-empty")
 		} else {
 			parent.setAttribute("data-relative-date", "none");
+			grandParent?.classList.add("is-empty")
 		}
 	}
 }
@@ -63,6 +67,7 @@ export const updateDateInput = async (input: HTMLInputElement, plugin: PrettyPro
 export const updateDateTimeInput = async (input: HTMLInputElement, plugin: PrettyPropertiesPlugin) => {
 	let value = input.value;
 	let parent = input.parentElement
+	let grandParent = parent?.parentElement
 	let customDateTimeFormat = plugin.settings.customDateTimeFormat
 
 	if (parent instanceof HTMLElement) {
@@ -108,8 +113,10 @@ export const updateDateTimeInput = async (input: HTMLInputElement, plugin: Prett
 			} else {
 				parent.setAttribute("data-relative-date", "future");
 			}
+			grandParent?.classList.remove("is-empty")
 		} else {
 			parent.setAttribute("data-relative-date", "none");
+			grandParent?.classList.add("is-empty")
 		}
 	}
 }

@@ -107,6 +107,8 @@ export interface PPPluginSettings {
 	enableBannersInPopover: boolean
 	enableIconsInPopover: boolean
 	enableCoversInPopover: boolean
+	hideAllEmptyProperties: boolean
+	hiddenWhenEmptyProperties: string[]
 
 	
 
@@ -226,7 +228,9 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	coverPosition: "left",
 	enableBannersInPopover: false,
 	enableIconsInPopover: false,
-	enableCoversInPopover: false
+	enableCoversInPopover: false,
+	hideAllEmptyProperties: false,
+	hiddenWhenEmptyProperties: []
 
 }
 

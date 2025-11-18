@@ -2,7 +2,6 @@ import PrettyPropertiesPlugin from "src/main";
 import { updateDateInput, updateDateTimeInput } from "src/utils/updates/updateDates";
 import { updateCardLongtext, updateValueListElement } from "src/utils/updates/updatePills";
 import { around, dedupe } from "monkey-around";
-import { updateBaseProgress } from "src/utils/updates/updateBaseProgress";
 
 
 export const patchBaseList = (plugin: PrettyPropertiesPlugin) => {
@@ -74,7 +73,7 @@ const processBaseListProperty = (property: any, plugin: PrettyPropertiesPlugin) 
         //@ts-ignore
         let type = plugin.app.metadataTypeManager.getPropertyInfo(propName)?.widget
 
-        if (type == "multitext") {
+        if (type == "multitext" || type == "aliases") {
 
            
 

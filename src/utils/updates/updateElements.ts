@@ -6,7 +6,6 @@ import { updateDateInput, updateDateTimeInput } from "./updateDates";
 import { updateProgress  } from "./updateProgress";
 import { updateCardLongtext, updateLongtext, updateMultiselectPill, updateSettingPills, updateTag, updateTagPaneTagsAll, updateTagPill, updateValueListElement } from "./updatePills";
 import { renderBanner, updateBannerForView } from "./updateBanners";
-import { updateBaseProgressEls } from "./updateBaseProgress";
 import { getNestedProperty } from "../propertyUtils";
 
 
@@ -101,6 +100,22 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
     }
 
 
+    let unknown = document.querySelectorAll(".metadata-property-value-item.mod-unknown")
+
+    for (let el of unknown) {
+        if (el instanceof HTMLElement) {
+            let property = el.parentElement?.parentElement
+            if (el.innerText == "null") {
+                property?.classList.add("is-empty")
+            } else {
+                property?.classList.remove("is-empty")
+            }
+        }
+        
+        
+    }
+
+
 
     let cardLongTexts = document.querySelectorAll(".bases-rendered-value[data-property-type='text']")
     for (let el of cardLongTexts) {
@@ -121,13 +136,27 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
         if (file instanceof TFile) {
             let numbers = view.containerEl.querySelectorAll("input.metadata-input-number")
             for (let input of numbers) {
-                if (input instanceof HTMLElement) {
+                if (input instanceof HTMLInputElement) {
+                    
                     let num = input.closest(".metadata-property")
                     let sourcePath = file.path
                     if (num instanceof HTMLElement) {
                         updateProgress(num, plugin, sourcePath)
+                        if (input.value === "") {
+                            num.classList.add("is-empty")
+                        } else {
+                            num.classList.remove("is-empty")
+                        }
                         input.onchange = () => {
-                            if (num instanceof HTMLElement) updateProgress(num, plugin, sourcePath)
+                            if (num instanceof HTMLElement) {
+                                updateProgress(num, plugin, sourcePath)
+                                if (input.value === "") {
+                                    num.classList.add("is-empty")
+                                } else {
+                                    num.classList.remove("is-empty")
+                                }
+                            }
+                            
                         }
                     }
                 }
@@ -159,13 +188,19 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
 
 
 
-    // Remove this after Obsidian v.1.10 goes public
-
-    updateBaseProgressEls()
-
     
 
     
+}
+
+
+
+
+export const updateEmptyProperties = async (plugin: PrettyPropertiesPlugin) => {
+    let propertyEls = document.querySelectorAll(".metadata-property")
+    for (let propertyEl of propertyEls) {
+        let emptyLongtext = propertyEl.querySelector(".metadata-input-longtext:empty")
+    }
 }
 
 
@@ -177,16 +212,13 @@ export const updateImagesInPopover = async (popover: HoverPopover, plugin: Prett
     //@ts-ignore
     let embed = popover.embed
 
-    
-
-   
     if (embed) {
         let file = embed.file
 
         let contentEl = popover.hoverEl
-        if (file) {
+        if (file instanceof TFile) {
             let cache = plugin.app.metadataCache.getFileCache(file);
-            let frontmatter = cache == null ? void 0 : cache.frontmatter;
+            let frontmatter = cache?.frontmatter;
             let sourcePath = file.path || "";
                 
             if (frontmatter && getNestedProperty(frontmatter, plugin.settings.bannerProperty)  && plugin.settings.enableBanner && plugin.settings.enableBannersInPopover) {

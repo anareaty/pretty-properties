@@ -179,7 +179,10 @@ export default {
   SHOW_COVERS_IN_PAGE_PREVIEWS: "Show banners in page previews",
   BANNER_HEIGHT_POPOVER: "Banner height in page preview",
   ICON_SIZE_POPOVER: "Icon size in page preview",
-  MAX_COVER_WIDTH_POPOVER: "Maximal cover width in page preview"
+  MAX_COVER_WIDTH_POPOVER: "Maximal cover width in page preview",
+  HIDE_ALL_EMPTY_PROPERTIES: "Hide all empty properties",
+  HIDE_WHEN_EMPTY: "Hide empty property", 
+  NOT_HIDE_WHEN_EMPTY: "Not hide empty property"
 };
 
 

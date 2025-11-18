@@ -189,6 +189,9 @@ export default {
   SHOW_COVERS_IN_PAGE_PREVIEWS: "Показывать обложки при предпросмотре страницы",
   BANNER_HEIGHT_POPOVER: "Высота баннера при предпросмотре страницы",
   ICON_SIZE_POPOVER: "Размер иконки при предпросмотре страницы",
-  MAX_COVER_WIDTH_POPOVER: "Максимальная ширина обложек при предпросмотре страницы"
+  MAX_COVER_WIDTH_POPOVER: "Максимальная ширина обложек при предпросмотре страницы",
+  HIDE_ALL_EMPTY_PROPERTIES: "Скрывать все пустые свойства",
+  HIDE_WHEN_EMPTY: "Скрывать пустое свойство", 
+  NOT_HIDE_WHEN_EMPTY: "Не скрывать пустое свойство"
 };
 

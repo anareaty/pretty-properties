@@ -2,7 +2,7 @@ import { loadMathJax, Setting } from 'obsidian';
 import { i18n } from 'src/localization/localization';
 import { updateAllProperties } from 'src/utils/updates/updateElements';
 import { PPSettingTab } from 'src/settings/settings';
-import { updateBaseTagsStyle, updateHiddenPropertiesInPropTab, updatePillPaddings } from 'src/utils/updates/updateStyles';
+import { updateBaseTagsStyle, updateHiddenEmptyProperties, updateHiddenPropertiesInPropTab, updatePillPaddings } from 'src/utils/updates/updateStyles';
 import { showColoredListSettings } from './coloredListSettings';
 import { showColoredTagsSettings } from './coloredTagsSettings';
 import { showColoredTextSettings } from './coloredTextSettings';
@@ -116,6 +116,17 @@ export const showPropSettings = (settingTab: PPSettingTab) => {
 
 
     new Setting(containerEl)
+        .setName(i18n.t("HIDE_ALL_EMPTY_PROPERTIES"))
+        .addToggle(toggle => toggle
+            .setValue(plugin.settings.hideAllEmptyProperties)
+            .onChange(async (value) => {
+                plugin.settings.hideAllEmptyProperties = value
+                await plugin.saveSettings();
+                updateHiddenEmptyProperties(plugin)
+            }));
+
+
+    new Setting(containerEl)
         .setName(i18n.t("ENABLE_MATH"))
         .addToggle(toggle => toggle
             .setValue(plugin.settings.enableMath)
@@ -129,17 +140,7 @@ export const showPropSettings = (settingTab: PPSettingTab) => {
                 updateLongTexts(document.body, plugin)			
             }));
 
-    /*
-    new Setting(containerEl)
-        .setName(i18n.t("ENABLE_MD"))
-        .addToggle(toggle => toggle
-            .setValue(plugin.settings.enableMarkdown)
-            .onChange(async (value) => {
-                plugin.settings.enableMarkdown = value
-                await plugin.saveSettings();
-                updateLongTexts(document.body, plugin)			
-            }));
-    */
+
 
 
     new Setting(containerEl)

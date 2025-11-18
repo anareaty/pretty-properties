@@ -128,31 +128,33 @@ If you Ctrl+click on any property value, the plugin will open search for this va
 
 ![base](images/image_search.png)
 
-## Bases support (experimental)
+## Bases support 
 
-Bases are still new and do not have API yet, so this functional may change. This functional is still fragile and can have bugs.
+Most of the properties functional, including coloed properties, custom date formats and math rendering also work in bases.
 
 ![base](images/image_base.png)
 
-When bases support option is enabled, properties colors would also shown in bases. They work the same way as in files.
+Since version 1.9.0 the plugin does not support progress-bars in bases anymore, because you can create progress-bars using regular base formulas. Here is a couple of examples of formulas you can use (or you can write your own).
 
-Unfortunately currently there is no way to properly add progress bars to base properties directly, but there is a workaround using formulas:
-
-1.  Create formula property with a name starting with "pp_progress" (you can later change the display name to anything you want).
-2.  Add the formula that will result in string consisting of two digits parted by slash, like "5/10". For example, if you have two number properties "max" and "value", you can use a formula like this:
+Progress-bar formula:
 
 ```
-if(note["max"], if(note["value"], note["value"], 0) + "/" + note["max"], " ")
+if( note["maxProperty"], html("<progress class='metadata-progress' max='" + 
+note["maxProperty"] + "' value='" + 
+if(note["valueProperty"], note["valueProperty"], 0) + 
+"' aria-label='" + 
+if(note["maxProperty"], (if(note["valueProperty"], note["valueProperty"], 0) / note["maxProperty"] * 100).round(), " ") + " %" + 
+"' data-tooltip-position='top' data-tooltip-delay='500'>"), "")
 ```
 
-3.  If everything is done correctly, formula cells will render as progress bars.
+Progress circle formula:
 
-You can also make circle progress instead of the progress-bar. For this do all the same, but the formula name should start with "pp_progress_circle".
+```
+if(note["maxProperty"], html("<div class='metadata-circle-progress'  style='background: radial-gradient(closest-side, var(--background-primary) 64%, transparent 65% 100%), conic-gradient(var(--color-accent-1) " + if(note["maxProperty"], (if(note["valueProperty"], note["valueProperty"], 0) / note["maxProperty"] * 100).round(), 0) + "%" + ", var(--background-secondary) 0);' aria-label='" + 
+if(note["maxProperty"], (if(note["valueProperty"], note["valueProperty"], 0) / note["maxProperty"] * 100).round(), " ") + " %" + 
+"' data-tooltip-position='top' data-tooltip-delay='500'></div>"), "")
+```
 
-![base with circle progress](images/image_circle_progress.png)
-
-> [!IMPORTANT]  
-> Bases support is turned off by default! Do not forget to enable it in the settings!
 
 ## Installation
 

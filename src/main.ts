@@ -6,6 +6,7 @@ import {
 import { 
 	updateBannerStyles, 
 	updateCoverStyles, 
+	updateHiddenEmptyProperties, 
 	updateIconStyles,
 	updateRelativeDateColors,
 } from "./utils/updates/updateStyles";
@@ -19,7 +20,7 @@ import { createIconMenu } from "./menus/iconMenu";
 import { handlePropertyMenu } from "./menus/propertyMenu";
 import { handlePillMenu, handleTagMenu, handleTagPaneMenu } from "./menus/selectColorMenus";
 import { updateTaskNotesTaskCount, updateTaskNotesTaskCountOnCacheChanged } from "./utils/taskCount/taskNotesTaskCount";
-import { updateAllProperties, updateImagesOnCacheChanged } from "./utils/updates/updateElements";
+import { updateAllProperties, updateEmptyProperties, updateImagesOnCacheChanged } from "./utils/updates/updateElements";
 import { getPropertyValue } from "./utils/propertyUtils";
 import { registerTagFixExtension } from "./extensions/tagFixExtension";
 import { updatePillPaddings } from "./utils/updates/updateStyles";
@@ -70,7 +71,9 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		updateIconStyles(this);
 		updateCoverStyles(this);
 		updatePillPaddings(this)
+		updateEmptyProperties(this)
 		updateHiddenPropertiesInPropTab(this)
+		updateHiddenEmptyProperties(this)
 		updateBaseTagsStyle(this)
 
 		this.app.workspace.onLayoutReady(() => {

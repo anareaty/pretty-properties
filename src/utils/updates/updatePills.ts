@@ -197,9 +197,18 @@ const updateColorButton = async(parent: HTMLElement, value:string, isBase: boole
 
 
 export const updateLongtext = async (pill: HTMLElement, plugin: PrettyPropertiesPlugin) => {
+	let parent = pill.parentElement
+	let grandParent = parent?.parentElement
+	let text = pill.innerText
+
+	if (text === "") {
+		grandParent?.classList.add("is-empty")
+	} else {
+		grandParent?.classList.remove("is-empty")
+	}
 
 	if (plugin.settings.enableColoredProperties || plugin.settings.enableMath /* || plugin.settings.enableMarkdown */) {
-		let parent = pill.parentElement
+		
 		let isBase = parent?.classList.contains("bases-table-cell") 
 
 		let existingColorButton = parent?.querySelector(".longtext-color-button")

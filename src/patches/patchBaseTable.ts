@@ -1,7 +1,6 @@
 import PrettyPropertiesPlugin from "src/main";
 import { updateTag } from "src/utils/updates/updatePills";
 import { around, dedupe } from "monkey-around";
-import { updateBaseProgress } from "src/utils/updates/updateBaseProgress";
 
 
 export const patchBaseTable = (plugin: PrettyPropertiesPlugin) => {
@@ -27,13 +26,6 @@ export const patchBaseTable = (plugin: PrettyPropertiesPlugin) => {
                                             updateTag(el, plugin)
                                         }
                                     }
-
-                                    // Remove this after Obsidian v.1.10 goes public
-
-                                    if (cell.prop.startsWith("formula.pp_progress")) {
-                                        updateBaseProgress(cell.el)
-                                    }
-
 
                                 }
                             }

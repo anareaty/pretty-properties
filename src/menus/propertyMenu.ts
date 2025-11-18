@@ -52,6 +52,58 @@ export const handlePropertyMenu = (el: HTMLElement | SVGElement, plugin: PrettyP
                 );
             }
 
+
+
+
+
+
+
+
+
+            if (plugin.settings.hiddenWhenEmptyProperties.find((p) => p == propName)) {
+                menuManager.addItemAfter(
+                    ["clipboard"],
+                    i18n.t("NOT_HIDE_WHEN_EMPTY"),
+                    (item: MenuItem) =>
+                        item
+                        .setTitle(i18n.t("NOT_HIDE_WHEN_EMPTY"))
+                        .setIcon("lucide-eye")
+                        .setSection("pretty-properties")
+                        .onClick(() => {
+                            if (propName)
+                                plugin.settings.hiddenWhenEmptyProperties.remove(
+                                    propName
+                                );
+                            plugin.saveSettings();
+                            updateHiddenProperties(plugin);
+                        })
+                );
+            } else {
+                menuManager.addItemAfter(
+                    ["clipboard"],
+                    i18n.t("HIDE_WHEN_EMPTY"),
+                    (item: MenuItem) =>
+                        item
+                        .setTitle(i18n.t("HIDE_WHEN_EMPTY"))
+                        .setIcon("lucide-eye-off")
+                        .setSection("pretty-properties")
+                        .onClick(() => {
+                            if (propName)
+                                plugin.settings.hiddenWhenEmptyProperties.push(
+                                    propName
+                                );
+                            plugin.saveSettings();
+                            updateHiddenProperties(plugin);
+                        })
+                );
+            }
+
+
+
+
+
+
+
             //@ts-ignore
             let propertyTypeObject = plugin.app.metadataTypeManager.getPropertyInfo(
                     propName.toLowerCase()
