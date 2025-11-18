@@ -150,7 +150,7 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
                         input.onchange = () => {
                             if (num instanceof HTMLElement) {
                                 updateProgress(num, plugin, sourcePath)
-                                if (input.value === "") {
+                                if (input instanceof HTMLInputElement && input.value === "") {
                                     num.classList.add("is-empty")
                                 } else {
                                     num.classList.remove("is-empty")
