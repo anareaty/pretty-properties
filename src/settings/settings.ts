@@ -61,7 +61,6 @@ export interface PPPluginSettings {
 	iconColor: string;
 	iconColorDark: string;
 	iconBackground: boolean;
-	enableBases: boolean;
 	bannerPositionProperty: string;
 	addPillPadding: string;
 	addBaseTagColor: boolean;
@@ -170,7 +169,6 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	iconColor: "",
 	iconColorDark: "",
 	iconBackground: false,
-	enableBases: false,
 	bannerPositionProperty: "banner_position",
 	addPillPadding: "all",
 	addBaseTagColor: true,

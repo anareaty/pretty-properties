@@ -176,7 +176,7 @@ export const updateTag = (tag: HTMLElement, plugin: PrettyPropertiesPlugin) => {
 	let isBase = parent?.classList.contains("value-list-element")
 
 	if ((!isBase && plugin.settings.enableColoredInlineTags) || 
-	(isBase && plugin.settings.enableBases && plugin.settings.enableColoredProperties)) {
+	(isBase && plugin.settings.enableColoredProperties)) {
 		setPillStyles(tag, "data-tag-value", value, "tag", plugin)
 	}
 }
@@ -213,10 +213,6 @@ export const updateLongtext = async (pill: HTMLElement, plugin: PrettyProperties
 
 		let existingColorButton = parent?.querySelector(".longtext-color-button")
 		existingColorButton?.remove()
-
-		if (isBase && !plugin.settings.enableBases) {
-			return
-		}
 
 		let text = pill.innerText
 
@@ -349,7 +345,7 @@ export const updateLongtext = async (pill: HTMLElement, plugin: PrettyProperties
 
 export const updateCardLongtext = async (pill: HTMLElement, plugin: PrettyPropertiesPlugin) => {
 
-	if (plugin.settings.enableBases && (plugin.settings.enableColoredProperties || plugin.settings.enableMath)) {
+	if (plugin.settings.enableColoredProperties || plugin.settings.enableMath) {
 		let parent = pill.parentElement
 		let prop = parent?.getAttribute("data-property") || ""
 		prop = prop.replace(/^note\./, "")

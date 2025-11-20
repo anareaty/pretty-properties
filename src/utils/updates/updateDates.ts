@@ -16,7 +16,7 @@ export const updateDateInput = async (input: HTMLInputElement, plugin: PrettyPro
 
 		if (plugin.settings.enableCustomDateFormat && 
 			customDateFormat && 
-			(!isBase || (plugin.settings.enableBases && plugin.settings.enableCustomDateFormatInBases))) {
+			(!isBase || plugin.settings.enableCustomDateFormatInBases)) {
 
 				
 			let customDate = moment(value).format(customDateFormat);
@@ -76,7 +76,7 @@ export const updateDateTimeInput = async (input: HTMLInputElement, plugin: Prett
 
 		if (plugin.settings.enableCustomDateFormat && 
 			customDateTimeFormat && 
-			(!isBase || (plugin.settings.enableBases && plugin.settings.enableCustomDateFormatInBases))) {
+			(!isBase || plugin.settings.enableCustomDateFormatInBases)) {
 
 			let customDate = moment(value).format(customDateTimeFormat);
 			
