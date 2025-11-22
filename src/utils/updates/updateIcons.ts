@@ -85,6 +85,16 @@ export const renderIcon = async (
                 cls: "icon-image",
             });
             iconImage.append(image);
+
+
+
+
+
+            
+
+
+
+
         }
     }
 
@@ -107,6 +117,16 @@ export const renderIcon = async (
     } else {
         iconContainerPreview?.prepend(iconDivClone);
     }
+
+
+
+
+
+    /*
+    let titleWrapperSource = iconContainerSource?.querySelector(".title-wrapper")
+    let titleWrapperPreview = iconContainerPreview?.querySelector(".title-wrapper")
+    console.log(titleWrapperPreview)
+    */
 }
 
 
