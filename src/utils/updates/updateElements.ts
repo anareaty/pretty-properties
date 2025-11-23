@@ -345,8 +345,10 @@ export const updateImagesOnCacheChanged = async (file: TFile, cache: CachedMetad
         if (frontmatter && getNestedProperty(frontmatter, plugin.settings.bannerProperty)  && plugin.settings.enableBanner) {
           renderBanner(contentEl, frontmatter, sourcePath, plugin);
         } else {
-          let oldBannerDiv = contentEl?.querySelector(".banner-image");
-          oldBannerDiv?.remove();
+            let oldBannerDivSource = contentEl?.querySelector(".cm-scroller .banner-image");
+            let oldBannerDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .banner-image");
+            oldBannerDivSource?.remove();
+            oldBannerDivPreview?.remove();
         }
 
         let hasCover = false
@@ -378,8 +380,10 @@ export const updateImagesOnCacheChanged = async (file: TFile, cache: CachedMetad
         if (frontmatter && getNestedProperty(frontmatter, plugin.settings.iconProperty)  && plugin.settings.enableIcon) {
           renderIcon(contentEl, frontmatter, sourcePath, plugin);
         } else {
-          let oldIconDiv = contentEl?.querySelector(".icon-image");
-          oldIconDiv?.remove();
+            let oldIconDivSource = contentEl?.querySelector(".cm-scroller .icon-wrapper");
+            let oldIconDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .icon-wrapper");
+            oldIconDivSource?.remove();
+            oldIconDivPreview?.remove();
         }
 
 
