@@ -314,7 +314,7 @@ export const updateLongtext = async (pill: HTMLElement, plugin: PrettyProperties
 				}
 				setPillStyles(mdWrapper, "data-property-longtext-value", text, "longtext", plugin)				
 				if (parent) {
-					console.log("button")
+	
 					updateColorButton(parent, text, isBase, plugin)
 				}
 				

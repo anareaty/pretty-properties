@@ -107,7 +107,10 @@ export interface PPPluginSettings {
 	enableIconsInPopover: boolean
 	enableCoversInPopover: boolean
 	hideAllEmptyProperties: boolean
-	hiddenWhenEmptyProperties: string[]
+	hiddenWhenEmptyProperties: string[],
+	iconInTitle: boolean,
+	titleIconSize: number,
+	titleTextIconMatchTitleSize: boolean
 
 	
 
@@ -228,7 +231,10 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	enableIconsInPopover: false,
 	enableCoversInPopover: false,
 	hideAllEmptyProperties: false,
-	hiddenWhenEmptyProperties: []
+	hiddenWhenEmptyProperties: [],
+	iconInTitle: false,
+	titleIconSize: 30,
+	titleTextIconMatchTitleSize: true
 
 }
 

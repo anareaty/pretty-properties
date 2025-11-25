@@ -56,6 +56,7 @@ export const updateIconStyles = (plugin: PrettyPropertiesPlugin) => {
 
     let iconProps = {
       "--pp-icon-size": iconSize + "px",
+      "--pp-title-icon-size": plugin.settings.titleIconSize + "px",
       "--pp-icon-size-popover": plugin.settings.iconSizePopover + "px",
       "--pp-icon-top-margin": iconTopMargin + "px",
       "--pp-icon-top-margin-popover": iconTopMarginPopover + "px",
@@ -69,6 +70,12 @@ export const updateIconStyles = (plugin: PrettyPropertiesPlugin) => {
       "--pp-icon-background": iconBackground
     };
     document.body.setCssProps(iconProps);
+
+    if (plugin.settings.iconInTitle && plugin.settings.titleTextIconMatchTitleSize) {
+      document.body.classList.add("text-icon-match-title-size")
+    } else {
+      document.body.classList.remove("text-icon-match-title-size")
+    }
 }
 
 
@@ -94,6 +101,8 @@ export const updateCoverStyles = (plugin: PrettyPropertiesPlugin) => {
     document.body.classList.remove("pp-cover-right")
     document.body.classList.add("pp-cover-left")
   }
+
+  
 }
 
 

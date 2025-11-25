@@ -27,6 +27,19 @@ export const showIconSettings = (settingTab: PPSettingTab) => {
     
 
     if (plugin.settings.enableIcon) {
+
+        new Setting(containerEl)
+        .setName(i18n.t("ICON_IN_TITLE"))
+        .addToggle(toggle => toggle
+            .setValue(plugin.settings.iconInTitle)
+            .onChange(async (value) => {
+                plugin.settings.iconInTitle = value
+                await plugin.saveSettings();
+                settingTab.display();
+                updateAllIcons(plugin)
+            }));
+
+
         new Setting(containerEl)
         .setName(i18n.t("ICON_PROPERTY"))
         .addText(text => text
@@ -98,6 +111,34 @@ export const showIconSettings = (settingTab: PPSettingTab) => {
                 updateIconStyles(plugin);
             })
         });
+
+
+        new Setting(containerEl)
+        .setName(i18n.t("ICON_SIZE_TITLE"))
+        .addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.titleIconSize.toString())
+            .setPlaceholder('30')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.titleIconSize = Number(value);
+                await plugin.saveSettings();
+                updateIconStyles(plugin);
+            })
+        });
+
+
+        new Setting(containerEl)
+        .setName(i18n.t("TEXT_ICON_IN_TITLE_MATCH_TITLE_SIZE"))
+        .addToggle(toggle => toggle
+            .setValue(plugin.settings.titleTextIconMatchTitleSize)
+            .onChange(async (value) => {
+                plugin.settings.titleTextIconMatchTitleSize = value
+                await plugin.saveSettings();
+                updateIconStyles(plugin);
+            }));
+
+
 
         new Setting(containerEl)
         .setName(i18n.t("ICON_COLOR"))

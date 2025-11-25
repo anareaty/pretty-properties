@@ -182,7 +182,10 @@ export default {
   MAX_COVER_WIDTH_POPOVER: "Maximal cover width in page preview",
   HIDE_ALL_EMPTY_PROPERTIES: "Hide all empty properties",
   HIDE_WHEN_EMPTY: "Hide empty property", 
-  NOT_HIDE_WHEN_EMPTY: "Not hide empty property"
+  NOT_HIDE_WHEN_EMPTY: "Not hide empty property",
+  ICON_IN_TITLE: "Place icon in inline title",
+  ICON_SIZE_TITLE: "Icon size in inline title",
+  TEXT_ICON_IN_TITLE_MATCH_TITLE_SIZE: "Text and emoji icons in inline title match title size"
 };
 
 

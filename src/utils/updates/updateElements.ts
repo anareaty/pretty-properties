@@ -12,6 +12,7 @@ import { getNestedProperty } from "../propertyUtils";
 
 
 
+
 export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => { 
 
     
@@ -185,12 +186,6 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
     
     updateTagPaneTagsAll(plugin)
     updateSettingPills(plugin)
-
-
-
-    
-
-    
 }
 
 
@@ -263,6 +258,10 @@ export const updateImagesInPopover = async (popover: HoverPopover, plugin: Prett
                 let oldIconDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .icon-wrapper");
                 oldIconDivSource?.remove();
                 oldIconDivPreview?.remove();
+                let titleIconWrappers = contentEl?.querySelectorAll(".title-icon-wrapper")
+                for (let titleIconWrapper of titleIconWrappers) {
+                    titleIconWrapper.remove()
+                }
             }
         }
     }
@@ -276,6 +275,7 @@ export const updateImagesInPopover = async (popover: HoverPopover, plugin: Prett
 
 
 export const updateImagesForView = async (view: MarkdownView, plugin: PrettyPropertiesPlugin) => {
+
     let file = view.file;
     let contentEl = view.contentEl;
 
@@ -316,13 +316,20 @@ export const updateImagesForView = async (view: MarkdownView, plugin: PrettyProp
         }
         if (frontmatter && getNestedProperty(frontmatter, plugin.settings.iconProperty)  && plugin.settings.enableIcon) {
             renderIcon(contentEl, frontmatter, sourcePath, plugin);
+            
         } else {
             let oldIconDivSource = contentEl?.querySelector(".cm-scroller .icon-wrapper");
             let oldIconDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .icon-wrapper");
             oldIconDivSource?.remove();
             oldIconDivPreview?.remove();
+            let titleIconWrappers = contentEl?.querySelectorAll(".title-icon-wrapper")
+            for (let titleIconWrapper of titleIconWrappers) {
+                titleIconWrapper.remove()
+            }
         }
     }
+
+
   };
 
 
@@ -334,6 +341,7 @@ export const updateImagesForView = async (view: MarkdownView, plugin: PrettyProp
 
 
 export const updateImagesOnCacheChanged = async (file: TFile, cache: CachedMetadata, plugin: PrettyPropertiesPlugin) => {
+
     let sourcePath = file.path || ""
     let leaves = plugin.app.workspace.getLeavesOfType("markdown");
     for (let leaf of leaves) {
@@ -379,11 +387,16 @@ export const updateImagesOnCacheChanged = async (file: TFile, cache: CachedMetad
         }
         if (frontmatter && getNestedProperty(frontmatter, plugin.settings.iconProperty)  && plugin.settings.enableIcon) {
           renderIcon(contentEl, frontmatter, sourcePath, plugin);
+         
         } else {
             let oldIconDivSource = contentEl?.querySelector(".cm-scroller .icon-wrapper");
             let oldIconDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .icon-wrapper");
             oldIconDivSource?.remove();
             oldIconDivPreview?.remove();
+            let titleIconWrappers = contentEl?.querySelectorAll(".title-icon-wrapper")
+            for (let titleIconWrapper of titleIconWrappers) {
+                titleIconWrapper.remove()
+            }
         }
 
 

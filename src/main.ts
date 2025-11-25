@@ -27,7 +27,6 @@ import { updatePillPaddings } from "./utils/updates/updateStyles";
 import { registerTagPostProcessor } from "./extensions/tagPostProcessor";
 import { updateHiddenPropertiesInPropTab, updateBaseTagsStyle } from "./utils/updates/updateStyles";
 import { removeAll } from "./utils/remove";
-import { updateData } from "./utils/updateData";
 import { patchPropertyWidgets } from "./patches/patchWidgets";
 import { patchTagView } from "./patches/patchTagView";
 import { patchMarkdownView } from "./patches/patchMarkdownView";
@@ -52,11 +51,12 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		if (this.settings.enableMath && !window.MathJax) {
 			await loadMathJax()
 		}
-		updateData(this)
+
 		createApi(this)
 		i18n.setLocale();
 		this.menuManager = new MenuManager
 		this.patches = {}
+
 		patchPropertyWidgets(this)
 		patchTagView(this)
 		patchMarkdownView(this)
@@ -64,7 +64,6 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		patchBaseTable(this)
 		patchBaseCards(this)
 		patchBaseList(this)
-
 
 		updateRelativeDateColors(this)
 		updateBannerStyles(this);
@@ -80,14 +79,10 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			updateAllProperties(this)
 		})
 		
-
-
 		registerCommands(this)
 		
-
 		registerTagFixExtension(this)
 		registerTagPostProcessor(this)
-
 
 		this.registerEvent(
 			this.app.metadataCache.on("changed", async (file, data, cache) => {
@@ -100,13 +95,11 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 		this.registerEvent(
 			this.app.workspace.on("file-open", async (file) => {
-				
 				if (file && this.settings.enableTaskNotesCount && this.settings.autoTasksCount) {
 					updateTaskNotesTaskCount(this, file)
 				}
 			})
 		);
-
 
 		const registerDocumentEvents = (doc: Document) => {
 			if (Platform.isMobile) {

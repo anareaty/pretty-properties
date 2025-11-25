@@ -48,7 +48,7 @@ export class API {
         } else if (colorSetting == "none") {
             return "transparent"
         } else if (colorSetting != "default") {
-            console.log(colorSetting)
+
             return "hsl(" + colorSetting.h + " ," + colorSetting.s + "% ," + colorSetting.l + "%)"
         } else {
             let bgColorSetting = this.getPropertyBackgroundColorSetting(propName, propValue)

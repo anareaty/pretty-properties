@@ -1330,3 +1330,47 @@ body:not(.show-hidden-properties).hidden-props-in-prop-tab .workspace-leaf-conte
 body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-property-hidden-when-empty {
   display: none;
 }
+
+
+
+
+
+.title-wrapper {
+  margin-block-end: var(--inline-title-margin-bottom);
+}
+
+.title-wrapper .inline-title {
+  display: inline;
+  vertical-align: middle;
+}
+
+.title-icon-wrapper {
+  display: inline;
+  margin-right: 8px;
+  font-weight: var(--inline-title-weight);
+  font-style: var(--inline-title-style);
+  font-variant: var(--inline-title-variant);
+  font-family: var(--inline-title-font);
+  letter-spacing: -0.015em;
+  
+}
+
+.title-icon-wrapper .pp-icon {
+  height: var(--pp-title-icon-size);
+  --icon-size: var(--pp-title-icon-size);
+  image-rendering: auto;
+  vertical-align: middle;
+  
+}
+
+.title-icon-wrapper .pp-text-icon {
+  display: inline;
+  font-size: var(--pp-title-icon-size);
+}
+
+.text-icon-match-title-size .title-icon-wrapper .pp-text-icon {
+  font-size: var(--inline-title-size);
+}
+
+
+
