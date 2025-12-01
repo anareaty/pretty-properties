@@ -15,6 +15,8 @@ import { getNestedProperty } from "../propertyUtils";
 
 export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => { 
 
+  
+
     
    
     let multitexts = document.querySelectorAll(".metadata-property:not([data-property-key='tags']) .multi-select-pill")
@@ -166,10 +168,11 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
 
 
         if (view instanceof MarkdownView) {
+
             updateBannerForView(view, plugin);
             updateIconForView(view, plugin);
             updateCoverForView(view, plugin);
-
+            
             let state = view.getState()
 
             if (state.mode == "source") {
@@ -275,6 +278,8 @@ export const updateImagesInPopover = async (popover: HoverPopover, plugin: Prett
 
 
 export const updateImagesForView = async (view: MarkdownView, plugin: PrettyPropertiesPlugin) => {
+
+ 
 
     let file = view.file;
     let contentEl = view.contentEl;

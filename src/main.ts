@@ -75,7 +75,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		updateHiddenEmptyProperties(this)
 		updateBaseTagsStyle(this)
 
-		this.app.workspace.onLayoutReady(() => {
+		this.app.workspace.onLayoutReady(async() => {
 			updateAllProperties(this)
 		})
 		

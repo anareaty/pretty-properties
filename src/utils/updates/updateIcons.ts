@@ -10,8 +10,6 @@ export const renderIcon = async (
   sourcePath: string,
   plugin: PrettyPropertiesPlugin) => {
 
-    console.log("render")
-
     let preview = contentEl.querySelector(".markdown-reading-view > .markdown-preview-view");
     let source = contentEl.querySelector(".cm-scroller");
 
@@ -167,6 +165,7 @@ export const getIconValue = (frontmatter: FrontMatterCache, plugin: PrettyProper
 
 
 export const getIconImage = (iconVal: string, sourcePath: string, plugin: PrettyPropertiesPlugin) => {
+    if (!iconVal) return
     let image:
         | HTMLDivElement
         | HTMLImageElement
@@ -238,6 +237,8 @@ export const updateAllIcons = (plugin: PrettyPropertiesPlugin) => {
 
 export const renderTitleIcon = (view: any, plugin: PrettyPropertiesPlugin) => {
   if (plugin.settings.enableIcon && plugin.settings.iconInTitle) {
+
+    
     let currentMode = view.currentMode
     let containerEl = currentMode.containerEl
     if (currentMode.type == "source") {
@@ -246,19 +247,31 @@ export const renderTitleIcon = (view: any, plugin: PrettyPropertiesPlugin) => {
       containerEl = currentMode.renderer.header.el
     }
 
+    
+
     let wrappedTitle = containerEl.querySelector(".title-wrapper .inline-title")
     let titleIconWrapper = containerEl.querySelector(".title-icon-wrapper")
+
+
+    
 
     let iconVal
     let iconImage
     let file = view.file
+
+    
     if (file) {
         let cache = plugin.app.metadataCache.getFileCache(file);
         let frontmatter = cache?.frontmatter;
         let sourcePath = view.file?.path || ""
+
+        
+        
         if (frontmatter) {
           iconVal = getIconValue(frontmatter, plugin)
+          
           iconImage = getIconImage(iconVal, sourcePath, plugin)
+          
         }
     }
 

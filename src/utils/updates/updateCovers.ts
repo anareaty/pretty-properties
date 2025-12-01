@@ -1,4 +1,4 @@
-import { MarkdownView, FrontMatterCache, MarkdownRenderer } from "obsidian";
+import { MarkdownView, FrontMatterCache, MarkdownRenderer, loadPdfJs, normalizePath, TFile } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { getNestedProperty } from "../propertyUtils";
 
@@ -9,27 +9,15 @@ export const renderCover = async (
   sourcePath: string,
   plugin: PrettyPropertiesPlugin) => {
 
-    
-
-   
-   
-
     let mdContainer = contentEl.querySelector(".metadata-container")
-
     let coverVal;
-
     let props = [...plugin.settings.extraCoverProperties];
     props.unshift(plugin.settings.coverProperty);
-
-
-    
 
     for (let prop of props) {
         coverVal = getNestedProperty(frontmatter, prop);
         if (coverVal) break;
     }
-
-    
 
     // Fix wrong property types
 
@@ -41,20 +29,18 @@ export const renderCover = async (
         coverVal = null
     }
 
- 
-
-
-
     let cssVal = frontmatter?.cssclasses;
 
     if (mdContainer instanceof HTMLElement) {
         let coverDiv;
-        let oldCoverDiv = mdContainer.querySelector(".metadata-side-image");
+        let isPdf = coverVal.match(/^(\!)?(\[\[)(.+\.pdf)(\]\])$/) || 
+            coverVal.match(/^(\!)?(\[)([^\]]*)(\])(\()(.+\.pdf)(\))$/)
 
         if (coverVal && plugin.settings.enableCover) {
             if (coverVal.startsWith("http")) coverVal = "![](" + coverVal + ")";
             if (!coverVal.startsWith("!")) coverVal = "!" + coverVal;
             coverDiv = document.createElement("div");
+            coverDiv.setAttribute("data-value", coverVal)
             coverDiv.classList.add("metadata-side-image");
 
             if (cssVal && (cssVal.includes("cover-vertical") || cssVal.includes("cover-vertical-cover"))) {
@@ -85,20 +71,34 @@ export const renderCover = async (
                 coverDiv.classList.add("initial");
             }
 
-            let coverTemp = document.createElement("div");
-            MarkdownRenderer.render(
-                plugin.app,
-                coverVal,
-                coverTemp,
-                sourcePath,
-                plugin
-            );
-            let image = coverTemp.querySelector("img");
-            if (image) {
-                coverDiv.append(image);
+            
+
+            if (isPdf) {
+                let pdfCover = await renderPdfCover(isPdf, sourcePath, plugin)
+
+                if (pdfCover) {
+                    coverDiv.append(pdfCover);
+                }
+            } else {
+                
+                let coverTemp = document.createElement("div");
+                MarkdownRenderer.render(
+                    plugin.app,
+                    coverVal,
+                    coverTemp,
+                    sourcePath,
+                    plugin
+                );
+                
+                let image = coverTemp.querySelector("img");
+                if (image) {
+                    image.classList.add("pp-cover-image")
+                    coverDiv.append(image);
+                }
             }
         }
 
+        let oldCoverDiv = mdContainer.querySelector(".metadata-side-image")
         if (coverDiv) {
             if (oldCoverDiv) {
                 if (coverDiv.outerHTML != oldCoverDiv.outerHTML) {
@@ -113,13 +113,71 @@ export const renderCover = async (
         }
     }
 
+
 }
+
+
+
+const renderPdfCover = async (isPdf: any[], sourcePath: string, plugin: PrettyPropertiesPlugin) => {
+
+    let pdfPath = ""
+    if (isPdf.length == 5) {
+        let relativePath = isPdf[3]
+        pdfPath = plugin.app.metadataCache.getFirstLinkpathDest(relativePath, sourcePath)?.path || ""
+    } else if (isPdf.length == 8) {
+        let relativePath = isPdf[6]
+        relativePath = relativePath.replaceAll("%20", " ")
+        pdfPath = plugin.app.metadataCache.getFirstLinkpathDest(relativePath, sourcePath)?.path || ""
+    }
+
+    if (!pdfPath) return
+
+    //@ts-ignore
+    let pdfjsLib = window.pdfjsLib
+    if (!pdfjsLib) {
+        pdfjsLib = await loadPdfJs()
+    }
+    let canvas
+    let pdf
+    let path = plugin.app.vault.adapter.getResourcePath(normalizePath(pdfPath))
+
+    try {
+        pdf = await pdfjsLib.getDocument(path)?.promise
+    } catch(err) {
+        return
+    }
+
+    if (pdf) {
+        let firstPage = await pdf.getPage(1)
+        if (firstPage) {
+            let viewport = firstPage.getViewport({scale: 1});
+            canvas = document.createElement("canvas")
+            canvas.classList.add("pp-pdf-cover-canvas")
+            canvas.classList.add("pp-cover-image")
+            let context = canvas.getContext('2d')
+            canvas.width = viewport.width
+            canvas.height = viewport.height
+            await firstPage.render({
+                canvasContext: context,
+                viewport: viewport
+            });
+            let pdfContainer = document.createElement("div")
+            pdfContainer.classList.add("pp-pdf-cover-container")
+            pdfContainer.append(canvas)
+            return pdfContainer
+        }
+    }
+    return 
+}
+
 
 
 export const updateCoverForView = async (
     view: MarkdownView,
     plugin: PrettyPropertiesPlugin
 ) => {
+
+   
 
   let file = view.file
   if (file) {
@@ -136,6 +194,8 @@ export const updateCoverForView = async (
 
 
 export const updateAllCovers = (plugin: PrettyPropertiesPlugin) => {
+
+
   let leaves = plugin.app.workspace.getLeavesOfType("markdown");
   for (let leaf of leaves) {
     let view = leaf.view

@@ -172,7 +172,7 @@
 
 
 @media (min-width: 600px) {
-  .metadata-container:has(.metadata-side-image img) {
+  .metadata-container:has(.metadata-side-image .pp-cover-image) {
     --metadata-display-editing: grid;
     --metadata-display-reading: grid;
     grid-column-gap: 22px;
@@ -254,13 +254,13 @@
 
 
 
-.metadata-side-image img {
+.metadata-side-image .pp-cover-image {
   max-height: var(--cover-max-height);
 }
 
-.metadata-side-image.initial img,
-.metadata-side-image.initial-2 img,
-.metadata-side-image.initial-3 img {
+.metadata-side-image.initial .pp-cover-image,
+.metadata-side-image.initial-2 .pp-cover-image,
+.metadata-side-image.initial-3 .pp-cover-image {
   object-fit: cover;
 }
 
@@ -271,27 +271,27 @@
     text-align: center;
   }
   
-  .metadata-side-image img {
+  .metadata-side-image .pp-cover-image {
     height: 200px !important;
 	width: auto !important;
     margin: auto;
   }
 
-  .metadata-side-image.vertical img,
-  .metadata-side-image.vertical-cover img,
-  .metadata-side-image.vertical-contain img {
+  .metadata-side-image.vertical .pp-cover-image,
+  .metadata-side-image.vertical-cover .pp-cover-image,
+  .metadata-side-image.vertical-contain .pp-cover-image {
     aspect-ratio: auto !important;
     max-width: 150px !important;
   }
 
-  .metadata-side-image.horizontal img,
-  .metadata-side-image.horizontal-cover img,
-  .metadata-side-image.horizontal-contain img{
+  .metadata-side-image.horizontal .pp-cover-image,
+  .metadata-side-image.horizontal-cover .pp-cover-image,
+  .metadata-side-image.horizontal-contain .pp-cover-image {
     width: 100% !important;
   }
 
-  .metadata-side-image.square img,
-  .metadata-side-image.circle img {
+  .metadata-side-image.square .pp-cover-image,
+  .metadata-side-image.circle .pp-cover-image {
     width: 200px !important;
   }
 }
@@ -302,42 +302,42 @@
 
 
 
-.metadata-side-image.vertical-cover img,
-.metadata-side-image.vertical-contain img {
+.metadata-side-image.vertical-cover .pp-cover-image,
+.metadata-side-image.vertical-contain .pp-cover-image {
   aspect-ratio: 0.63;
   object-position: top;
 }
 
-.metadata-side-image.vertical-contain img {
+.metadata-side-image.vertical-contain .pp-cover-image {
   object-fit: contain;
 }
 
-.metadata-side-image.vertical-cover img {
+.metadata-side-image.vertical-cover .pp-cover-image {
   object-fit: cover;
 }
 
 
-.metadata-side-image.horizontal-cover img,
-.metadata-side-image.horizontal-contain img {
+.metadata-side-image.horizontal-cover .pp-cover-image,
+.metadata-side-image.horizontal-contain .pp-cover-image {
   aspect-ratio: 4/3;
 }
 
-.metadata-side-image.horizontal-contain img {
+.metadata-side-image.horizontal-contain .pp-cover-image {
   object-fit: contain;
 }
 
-.metadata-side-image.horizontal-cover img {
+.metadata-side-image.horizontal-cover .pp-cover-image {
   object-fit: cover;
 }
 
 
 
-.metadata-side-image.square img {
+.metadata-side-image.square .pp-cover-image {
   aspect-ratio: 1;
   object-fit: cover;
 }
 
-.metadata-side-image.circle img {
+.metadata-side-image.circle .pp-cover-image {
   aspect-ratio: 1;
   object-fit: cover;
   border-radius: 50% !important;
@@ -345,7 +345,7 @@
 
 
 
-.metadata-side-image > img {
+.metadata-side-image > .pp-cover-image {
   width: 100%;
 }
 
@@ -1374,3 +1374,11 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 
 
 
+.multi-select-pill {
+max-width: unset;
+}
+
+.pp-pdf-cover-canvas {
+  width: 100%;
+  height: 100%;
+}
