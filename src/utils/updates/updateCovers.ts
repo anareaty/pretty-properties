@@ -74,7 +74,16 @@ export const renderCover = async (
             
 
             if (isPdf) {
-                let pdfCover = await renderPdfCover(isPdf, sourcePath, plugin)
+
+                let relativePath = ""
+                if (isPdf.length == 5) {
+                    relativePath = isPdf[3]
+                } else if (isPdf.length == 8) {
+                    relativePath = isPdf[6]
+                    relativePath = relativePath.replaceAll("%20", " ")
+                }
+
+                let pdfCover = await renderPdfCover(relativePath, sourcePath, plugin)
 
                 if (pdfCover) {
                     coverDiv.append(pdfCover);
@@ -118,17 +127,9 @@ export const renderCover = async (
 
 
 
-const renderPdfCover = async (isPdf: any[], sourcePath: string, plugin: PrettyPropertiesPlugin) => {
+export const renderPdfCover = async (relativePath: string, sourcePath: string, plugin: PrettyPropertiesPlugin) => {
 
-    let pdfPath = ""
-    if (isPdf.length == 5) {
-        let relativePath = isPdf[3]
-        pdfPath = plugin.app.metadataCache.getFirstLinkpathDest(relativePath, sourcePath)?.path || ""
-    } else if (isPdf.length == 8) {
-        let relativePath = isPdf[6]
-        relativePath = relativePath.replaceAll("%20", " ")
-        pdfPath = plugin.app.metadataCache.getFirstLinkpathDest(relativePath, sourcePath)?.path || ""
-    }
+    let pdfPath = plugin.app.metadataCache.getFirstLinkpathDest(relativePath, sourcePath)?.path || ""
 
     if (!pdfPath) return
 
