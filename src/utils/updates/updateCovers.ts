@@ -33,8 +33,13 @@ export const renderCover = async (
 
     if (mdContainer instanceof HTMLElement) {
         let coverDiv;
-        let isPdf = coverVal.match(/^(\!)?(\[\[)(.+\.pdf)(\]\])$/) || 
+        let isPdf
+
+        if (coverVal) {
+            isPdf = coverVal.match(/^(\!)?(\[\[)(.+\.pdf)(\]\])$/) || 
             coverVal.match(/^(\!)?(\[)([^\]]*)(\])(\()(.+\.pdf)(\))$/)
+        }
+        
 
         if (coverVal && plugin.settings.enableCover) {
             if (coverVal.startsWith("http")) coverVal = "![](" + coverVal + ")";
