@@ -47,7 +47,14 @@
 
 .cm-scroller:has(.banner-image:not(:empty)) > .cm-sizer,
 .markdown-preview-view:has(.banner-image:not(:empty)) > .markdown-preview-sizer {
-  margin-top: calc(var(--banner-height) + var(--banner-margin));
+  --pp-banner-top-spacing-phone: calc(var(--banner-height) + var(--banner-margin) - var(--view-top-spacing-markdown));
+  --pp-banner-top-spacing: calc(var(--banner-height) + var(--banner-margin));
+  margin-top: var(--pp-banner-top-spacing-phone);
+}
+
+.is-phone .mod-root .workspace-leaf-content .view-content .markdown-source-view > .cm-editor > .cm-scroller:has(.banner-image:not(:empty)) > .cm-sizer,
+.is-phone .mod-root .workspace-leaf-content .view-content .markdown-reading-view > .markdown-preview-view:has(.banner-image:not(:empty)) > .markdown-preview-sizer {
+  margin-top: var(--pp-banner-top-spacing-phone, var(--pp-banner-top-spacing));
 }
 
 
@@ -60,7 +67,15 @@
 
 .cm-scroller:has(.banner-image:not(:empty)):has(.icon-image:not(:empty)) > .cm-sizer,
 .markdown-preview-view:has(.banner-image:not(:empty)):has(.icon-image:not(:empty)) > .markdown-preview-sizer {
-  margin-top: calc(var(--banner-height) + var(--pp-banner-icon-gap));
+  --pp-banner-icon-top-spacing-phone: calc(var(--banner-height) + var(--pp-banner-icon-gap) - var(--view-top-spacing-markdown));
+  --pp-banner-icon-top-spacing: calc(var(--banner-height) + var(--pp-banner-icon-gap));
+  margin-top: var(--pp-banner-icon-top-spacing);
+}
+
+
+.is-phone .mod-root .workspace-leaf-content .view-content .markdown-source-view > .cm-editor > .cm-scroller:has(.banner-image:not(:empty)):has(.icon-image:not(:empty)) > .cm-sizer,
+.is-phone .mod-root .workspace-leaf-content .view-content .markdown-reading-view > .markdown-preview-view:has(.banner-image:not(:empty)):has(.icon-image:not(:empty)) > .markdown-preview-sizer {
+  margin-top: var(--pp-banner-icon-top-spacing-phone, var(--pp-banner-icon-top-spacing));
 }
 
 
@@ -79,6 +94,8 @@
 
 
 
+
+
 /* ICONS */
 
 
@@ -89,7 +106,17 @@
     right: 0;
     overflow-x: clip;
     overflow-y: visible;
+
 }
+
+
+.cm-scroller:has(.banner-image:not(:empty)):has(.icon-image:not(:empty)) > .icon-wrapper,
+.markdown-preview-view:has(.banner-image:not(:empty)):has(.icon-image:not(:empty)) > .icon-wrapper {
+  top: 0px;
+}
+
+
+
 
 .icon-outer {
   padding: var(--file-margins);
@@ -1363,9 +1390,13 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 .title-icon-wrapper .pp-icon {
   height: var(--pp-title-icon-size);
   --icon-size: var(--pp-title-icon-size);
-  image-rendering: auto;
+  
   vertical-align: middle;
   
+}
+
+.pp-icon {
+  image-rendering: auto !important;
 }
 
 .title-icon-wrapper .pp-text-icon {

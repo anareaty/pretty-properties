@@ -83,10 +83,13 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
   }
 
   if (type == "text") {
-    let input = el.querySelector(".metadata-input-longtext");
-    updateLongtext(input, plugin);
-    input.onblur = () => {
-      updateLongtext(input, plugin);
+    let longText = el.querySelector(".metadata-input-longtext");
+    
+    if (longText) {
+      updateLongtext(longText, plugin);
+      longText.onblur = () => {
+        updateLongtext(longText, plugin);
+      };
     }
 
     let parent = el.parentElement
