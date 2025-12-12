@@ -47,7 +47,7 @@
 .markdown-preview-view:has(.banner-image:not(:empty)) > .markdown-preview-sizer {
   --pp-banner-top-spacing-phone: calc(var(--banner-height) + var(--banner-margin) - var(--view-top-spacing-markdown));
   --pp-banner-top-spacing: calc(var(--banner-height) + var(--banner-margin));
-  margin-top: var(--pp-banner-top-spacing-phone);
+  margin-top: var(--pp-banner-top-spacing);
 }
 
 .is-phone .mod-root .workspace-leaf-content .view-content .markdown-source-view > .cm-editor > .cm-scroller:has(.banner-image:not(:empty)) > .cm-sizer,
