@@ -9,6 +9,8 @@ export const renderBanner = async (
   sourcePath: string,
   plugin: PrettyPropertiesPlugin) => {
 
+    contentEl.classList.add("has-banner")
+
     let bannerVal = getNestedProperty(frontmatter, plugin.settings.bannerProperty);
 
     

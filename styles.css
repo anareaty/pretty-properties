@@ -15,7 +15,11 @@
     top: 0;
     left: 0;
     right: 0;
-	z-index: -1;
+    z-index: -1;
+}
+
+.workspace-split.mod-root .view-content.has-banner {
+  background-color: transparent;
 }
 
 .banner-image img {
