@@ -43,7 +43,9 @@ export const renderCover = async (
 
         if (coverVal && plugin.settings.enableCover) {
             if (coverVal.startsWith("http")) coverVal = "![](" + coverVal + ")";
-            if (!coverVal.startsWith("!")) coverVal = "!" + coverVal;
+            if (coverVal.startsWith("[") && !coverVal.startsWith("!")) coverVal = "!" + coverVal;
+            if (!coverVal.startsWith("![")) coverVal = "![[" + coverVal + "]]"
+
             coverDiv = document.createElement("div");
             coverDiv.setAttribute("data-value", coverVal)
             coverDiv.classList.add("metadata-side-image");

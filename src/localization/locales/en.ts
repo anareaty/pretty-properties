@@ -185,7 +185,12 @@ export default {
   NOT_HIDE_WHEN_EMPTY: "Not hide empty property",
   ICON_IN_TITLE: "Place icon in inline title",
   ICON_SIZE_TITLE: "Icon size in inline title",
-  TEXT_ICON_IN_TITLE_MATCH_TITLE_SIZE: "Text and emoji icons in inline title match title size"
+  TEXT_ICON_IN_TITLE_MATCH_TITLE_SIZE: "Text and emoji icons in inline title match title size",
+  IMAGE_LINK_FORMAT: "Image link format",
+  IMAGE_LINK_FORMAT_DESC: "Select the format in which the image links will be added to cover / banner / icon properties",
+  LINK: "link",
+  EMBED: "embed",
+  RAW_PATH: "raw path",
 };
 
 

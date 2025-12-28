@@ -688,6 +688,7 @@
 .is-mobile .metadata-property-value.has-custom-date  input.metadata-input-text.mod-date,
 .is-mobile .metadata-property-value.has-custom-date  input.metadata-input-text.mod-datetime {
   font-size: 0; 
+  width: 1rem !important;
 }
 
 body {
@@ -877,12 +878,12 @@ button.pp-settings-tab:not(.pp-settings-tab-selected):hover {
 }
 
 
-.color-picker-modal input {
+.color-picker-modal .setting-item input[type="color"]{
   height: 80px;
   width: 80px;
 }
 
-.color-picker-modal input::-webkit-color-swatch  {
+.color-picker-modal .setting-item input[type="color"]::-webkit-color-swatch  {
 border-radius: 50%;
 height: 100% !important;
 }
@@ -1078,14 +1079,13 @@ body {
 }
 
 .metadata-input-longtext.theme-color:not(:hover, :focus),
-/*.md-wrapper.theme-color,*/
 .bases-cards-line.theme-color,
 .bases-rendered-value.theme-color {
   background-color: rgba(var(--pp-color-rgb), 0.2);
+  /*color: rgba(var(--pp-color-rgb), 1);*/
 }
 
 .metadata-input-longtext.custom-color:not(:hover),
-/*.md-wrapper.custom-color,*/
 .bases-cards-line.custom-color,
 .bases-rendered-value.custom-color {
   background-color: hsl(var(--pp-background-hsl));
@@ -1093,7 +1093,6 @@ body {
 }
 
 .metadata-input-longtext,
-/*.md-wrapper,*/
 .bases-cards-line[data-property-longtext-value] {
   border-radius: 4px;
   display: block;
@@ -1330,12 +1329,30 @@ button.longtext-color-button:hover {
   --pp-text-color: var(--metadata-input-text-color);
 }
 
+.metadata-property-value .internal-link, .markdown-rendered .internal-link {
+    cursor: var(--cursor-link);
+    text-decoration-line: var(--link-decoration);
+    --font-weight: var(--link-weight);
+    color: var(--link-color);
+    transition: opacity var(--anim-duration-fast) ease-in-out;
+}
 
 .theme-text-color, .custom-text-color, .none-text-color {
   color: var(--pp-text-color) !important;
   --pill-color-remove: var(--pp-text-color) !important;
   --pill-color-remove-hover: var(--pp-text-color) !important;
 }
+
+.theme-color, .custom-color, .theme-text-color, .custom-text-color {
+  --link-color: var(--pp-text-color);
+  --link-color-hover: var(--pp-text-color);
+}
+
+.none-text-color {
+  --link-color: var(--text-accent);
+  --link-color-hover: var(--text-accent-hover);
+}
+
 
 
 .custom-date:empty {

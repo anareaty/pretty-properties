@@ -74,9 +74,10 @@ export const renderBanner = async (
     bannerDiv.classList.add("banner-image");
 
     if (bannerVal) {
-        if (bannerVal.startsWith("http"))
-            bannerVal = "![](" + bannerVal + ")";
-        if (!bannerVal.startsWith("!")) bannerVal = "!" + bannerVal;
+        if (bannerVal.startsWith("http")) bannerVal = "![](" + bannerVal + ")";
+        if (bannerVal.startsWith("[") && !bannerVal.startsWith("!")) bannerVal = "!" + bannerVal;
+        if (!bannerVal.startsWith("![")) bannerVal = "![[" + bannerVal + "]]"
+
         let bannerTemp = document.createElement("div");
 
         MarkdownRenderer.render(

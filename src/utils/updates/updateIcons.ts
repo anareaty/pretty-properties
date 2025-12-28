@@ -176,7 +176,8 @@ export const getIconImage = (iconVal: string, sourcePath: string, plugin: Pretty
         let iconLink = iconVal;
         if (iconLink.startsWith("http"))
             iconLink = "![](" + iconLink + ")";
-        if (!iconLink.startsWith("!")) iconLink = "!" + iconLink;
+        if (iconLink.startsWith("[") && !iconLink.startsWith("!")) iconLink = "!" + iconLink;
+        if (!iconLink.startsWith("![")) iconLink = "![[" + iconLink + "]]"
         let iconTemp = document.createElement("div");
         MarkdownRenderer.render(
             plugin.app,

@@ -1,22 +1,29 @@
 import { Setting, loadMathJax, Notice, Platform, Modal } from 'obsidian';
 import { i18n } from 'src/localization/localization';
 import { DEFAULT_SETTINGS, PPSettingTab } from 'src/settings/settings';
-import { updateLongTexts } from 'src/utils/updates/updatePills';
-import { updateHiddenProperties } from 'src/utils/updates/updateHiddenProperties';
 import { updateBannerStyles, updateBaseTagsStyle, updateCoverStyles, updateHiddenEmptyProperties, updateHiddenPropertiesInPropTab, updateIconStyles, updatePillPaddings, updateRelativeDateColors } from 'src/utils/updates/updateStyles';
 import { updateAllProperties } from 'src/utils/updates/updateElements';
-
-
-
-
-
 
 
 
 export const showOtherSettings = (settingTab: PPSettingTab) => {
     const {containerEl, plugin} = settingTab
 
-    
+    new Setting(containerEl)
+    .setName(i18n.t("IMAGE_LINK_FORMAT"))
+    .setDesc(i18n.t("IMAGE_LINK_FORMAT_DESC"))
+    .addDropdown(drop => drop
+        .addOptions({
+            "link": i18n.t("LINK"),
+            "embed": i18n.t("EMBED"),
+            "raw": i18n.t("RAW_PATH")
+        })
+        .setValue(plugin.settings.imageLinkFormat)
+        .onChange((value) => {
+            plugin.settings.imageLinkFormat = value
+            plugin.saveSettings()
+        })
+    )
 
 
     new Setting(containerEl)

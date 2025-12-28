@@ -110,7 +110,8 @@ export interface PPPluginSettings {
 	hiddenWhenEmptyProperties: string[],
 	iconInTitle: boolean,
 	titleIconSize: number,
-	titleTextIconMatchTitleSize: boolean
+	titleTextIconMatchTitleSize: boolean,
+	imageLinkFormat: string
 
 	
 
@@ -234,7 +235,8 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	hiddenWhenEmptyProperties: [],
 	iconInTitle: false,
 	titleIconSize: 30,
-	titleTextIconMatchTitleSize: true
+	titleTextIconMatchTitleSize: true,
+	imageLinkFormat: "link"
 
 }
 

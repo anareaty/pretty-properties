@@ -51,7 +51,16 @@ export class LocalImageSuggestModal extends SuggestModal<string> {
             let file = this.app.workspace.getActiveFile()
 
             if (imageFile instanceof TFile && file instanceof TFile) {
-                let imageLink = this.app.fileManager.generateMarkdownLink(imageFile, "").replace(/^\!/, "")
+                let imageLink = imagePath
+                if (this.plugin.settings.imageLinkFormat != "raw") {
+                    imageLink = this.app.fileManager.generateMarkdownLink(imageFile, "").replace(/^\!/, "")
+                    if (this.plugin.settings.imageLinkFormat == "embed") {
+                        imageLink = "!" + imageLink
+                    }
+                }
+                if (imageLink.startsWith("[]")) {
+                    imageLink = imageLink.replace("[]", "[" + imageFile.basename + "]")
+                }
                 this.app.fileManager.processFrontMatter(file, fm => {
                     setNestedProperty(fm, this.propName, imageLink);
                 })
