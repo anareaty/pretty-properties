@@ -167,7 +167,7 @@ export const handleTagMenu = (e: MouseEvent | TouchEvent, el: HTMLElement, plugi
         tag = tag.parentElement?.nextElementSibling || null
     }
     if (tag instanceof HTMLElement) {
-        let tagText = tag?.innerText
+        let tagText = tag.getAttribute("data-tag-value") || ""
         if (tagText) {
             createColorMenu(tagText, "tagColors", "pillColor", plugin, menuManager);
             createColorMenu(tagText, "tagColors", "textColor", plugin, menuManager);

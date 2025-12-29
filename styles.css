@@ -954,10 +954,11 @@ a.tag.transparent-color {
 
 
 .cm-hashtag:hover,
-.cm-hashtag-begin:hover + .cm-hashtag-end,
-.cm-hashtag-begin:has(+.cm-hashtag-end:hover),
 .cm-hashtag-begin:hover + .cm-hashtag > .cm-hashtag-inner,
-.cm-hashtag-begin:has(+ .cm-hashtag-end:hover) > .cm-hashtag-inner {
+.cm-hashtag-begin:hover + .cm-hashtag + .cm-hashtag > .cm-hashtag-inner,
+.cm-hashtag:hover + .cm-hashtag-end > .cm-hashtag-inner,
+.cm-hashtag-begin:has(+ .cm-hashtag:hover, + .cm-hashtag + .cm-hashtag:hover) > .cm-hashtag-inner,
+.cm-hashtag:has(+ .cm-hashtag-end:hover) > .cm-hashtag-inner {
   background-color: var(--tag-background-hover);
 }
 
