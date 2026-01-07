@@ -64,7 +64,7 @@ export default {
   ICON_PROPERTY: "Icon property",
   ICONS_FOLDER: "Icons folder",
   ICON_SIZE: "Icon size",
-  ICON_COLOR: "Icon color for the ligth theme",
+  ICON_COLOR: "Icon color for the light theme",
   ICON_COLOR_DARK: "Icon color for the dark theme",
   ICON_LEFT_MARGIN: "Icon left margin",
   ICON_TOP_MARGIN_WITHOUT_BANNER: "Icon top margin without banner",
