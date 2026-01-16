@@ -6,56 +6,67 @@ import { removeProperty } from "src/utils/propertyUtils";
 import { IconSuggestModal } from "src/modals/iconSuggestModal";
 
 export const createIconMenu = (e: MouseEvent, plugin: PrettyPropertiesPlugin) => {
-    let propName = plugin.settings.iconProperty;
-    let menu = new Menu();
 
-    menu.addItem((item: MenuItem) =>
-        item
+    //@ts-ignore
+    let menuExist = plugin.app.plugins.getPlugin("copy-url-in-preview")
+    let propName = plugin.settings.iconProperty;
+
+    let selectIconItem = (item: MenuItem) => item
         .setTitle(i18n.t("SELECT_ICON"))
         .setIcon("lucide-image-plus")
         .setSection("pretty-properties")
         .onClick(async () => {
             new IconSuggestModal(plugin.app, plugin).open();
         })
-    );
-
-    menu.addItem((item: MenuItem) =>
-        item
+    let removeIconItem = (item: MenuItem) => item
         .setTitle(i18n.t("REMOVE_ICON"))
         .setIcon("image-off")
         .setSection("pretty-properties")
         .onClick(async () => {
             removeProperty(plugin.settings.iconProperty, plugin);
         })
-    );
+    let unhideIconItem = (item: MenuItem) => item
+        .setTitle(i18n.t("UNHIDE_ICON_PROPERTY"))
+        .setIcon("lucide-eye")
+        .setSection("pretty-properties")
+        .onClick(() => {
+            if (propName)
+                plugin.settings.hiddenProperties.remove(propName);
+            plugin.saveSettings();
+            updateHiddenProperties(plugin);
+        })
+    let hideIconItem = (item: MenuItem) => item
+        .setTitle(i18n.t("HIDE_ICON_PROPERTY"))
+        .setIcon("lucide-eye-off")
+        .setSection("pretty-properties")
+        .onClick(() => {
+            if (propName)
+                plugin.settings.hiddenProperties.push(propName);
+            plugin.saveSettings();
+            updateHiddenProperties(plugin);
+        })
 
-    if (plugin.settings.hiddenProperties.find((p) => p == propName)) {
-        menu.addItem((item: MenuItem) =>
-            item
-            .setTitle(i18n.t("UNHIDE_ICON_PROPERTY"))
-            .setIcon("lucide-eye")
-            .setSection("pretty-properties")
-            .onClick(() => {
-                if (propName)
-                    plugin.settings.hiddenProperties.remove(propName);
-                plugin.saveSettings();
-                updateHiddenProperties(plugin);
-            })
-        );
+
+    if (menuExist && e.target instanceof HTMLImageElement) {
+        let menuManager = plugin.menuManager
+        menuManager.closeAndFlush()
+        menuManager.addItemAfter(["system"], i18n.t("SELECT_ICON"), selectIconItem);
+        menuManager.addItemAfter(["system"], i18n.t("REMOVE_ICON"), removeIconItem);
+        if (plugin.settings.hiddenProperties.find(p => p == propName)) {
+            menuManager.addItemAfter(["system"], i18n.t("UNHIDE_ICON_PROPERTY"), unhideIconItem);
+        } else {
+            menuManager.addItemAfter(["system"], i18n.t("HIDE_ICON_PROPERTY"), hideIconItem);
+        }
     } else {
-        menu.addItem((item: MenuItem) =>
-            item
-            .setTitle(i18n.t("HIDE_ICON_PROPERTY"))
-            .setIcon("lucide-eye-off")
-            .setSection("pretty-properties")
-            .onClick(() => {
-                if (propName)
-                    plugin.settings.hiddenProperties.push(propName);
-                plugin.saveSettings();
-                updateHiddenProperties(plugin);
-            })
-        );
-    }
+        let menu = new Menu();
+        menu.addItem(selectIconItem);
+        menu.addItem(removeIconItem);
 
-    menu.showAtMouseEvent(e);
+        if (plugin.settings.hiddenProperties.find((p) => p == propName)) {
+            menu.addItem(unhideIconItem);
+        } else {
+            menu.addItem(hideIconItem);
+        }
+        menu.showAtMouseEvent(e);
+    }
 }
