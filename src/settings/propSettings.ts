@@ -2,13 +2,14 @@ import { loadMathJax, Setting } from 'obsidian';
 import { i18n } from 'src/localization/localization';
 import { updateAllProperties } from 'src/utils/updates/updateElements';
 import { PPSettingTab } from 'src/settings/settings';
-import { updateBaseTagsStyle, updateHiddenEmptyProperties, updateHiddenPropertiesInPropTab, updatePillPaddings } from 'src/utils/updates/updateStyles';
+import { updateAutoHideProps, updateBaseTagsStyle, updateHiddenEmptyProperties, updateHiddenMetadataContainer, updateHiddenPropertiesInPropTab, updatePillPaddings } from 'src/utils/updates/updateStyles';
 import { showColoredListSettings } from './coloredListSettings';
 import { showColoredTagsSettings } from './coloredTagsSettings';
 import { showColoredTextSettings } from './coloredTextSettings';
 import { showHiddenSettings } from './hiddenSettings';
 import { updateLongTexts, updateTagPaneTagsAll } from 'src/utils/updates/updatePills';
 import { removeColorStyles, removeInlineTagsColorStyles } from 'src/utils/remove';
+
 
 
 
@@ -123,6 +124,40 @@ export const showPropSettings = (settingTab: PPSettingTab) => {
                 plugin.settings.hideAllEmptyProperties = value
                 await plugin.saveSettings();
                 updateHiddenEmptyProperties(plugin)
+            }));
+
+
+    new Setting(containerEl)
+        .setName(i18n.t("HIDE_PROPERTIES_BLOCK_IF_ALL_PROPERTIES_HIDDEN_EDITING"))
+        .addToggle(toggle => toggle
+            .setValue(plugin.settings.hideMetadataContainerIfAllPropertiesHiddenEditing)
+            .onChange(async (value) => {
+                plugin.settings.hideMetadataContainerIfAllPropertiesHiddenEditing = value
+                await plugin.saveSettings();
+                updateHiddenMetadataContainer(plugin)
+            }));
+
+    
+    new Setting(containerEl)
+        .setName(i18n.t("HIDE_PROPERTIES_BLOCK_IF_ALL_PROPERTIES_HIDDEN_READING"))
+        .addToggle(toggle => toggle
+            .setValue(plugin.settings.hideMetadataContainerIfAllPropertiesHiddenReading)
+            .onChange(async (value) => {
+                plugin.settings.hideMetadataContainerIfAllPropertiesHiddenReading = value
+                await plugin.saveSettings();
+                updateHiddenMetadataContainer(plugin)
+            }));
+
+
+    new Setting(containerEl)
+        .setName(i18n.t("AUTOHIDE_PROPS_WITH_BANNER"))
+        .setDesc(i18n.t("AUTOHIDE_PROPS_WITH_BANNER_DESC"))
+        .addToggle(toggle => toggle
+            .setValue(plugin.settings.autoHidePropertiesWithBanner)
+            .onChange(async (value) => {
+                plugin.settings.autoHidePropertiesWithBanner = value
+                await plugin.saveSettings();
+                updateAutoHideProps(plugin)
             }));
 
 

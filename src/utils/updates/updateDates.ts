@@ -1,5 +1,6 @@
 import { moment } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
+import { hideMetadataContainerIfAllPropertiesHidden } from "./updateHiddenProperties";
 
 
 export const updateDateInput = async (input: HTMLInputElement, plugin: PrettyPropertiesPlugin) => {
@@ -59,7 +60,17 @@ export const updateDateInput = async (input: HTMLInputElement, plugin: PrettyPro
 			parent.setAttribute("data-relative-date", "none");
 			grandParent?.classList.add("is-empty")
 		}
+
+		
+		let metadataContainer = parent.closest(".metadata-container")
+		if (metadataContainer instanceof HTMLElement) {
+			hideMetadataContainerIfAllPropertiesHidden(metadataContainer)
+		}
+		
 	}
+
+
+	
 }
 
 
@@ -118,6 +129,13 @@ export const updateDateTimeInput = async (input: HTMLInputElement, plugin: Prett
 			parent.setAttribute("data-relative-date", "none");
 			grandParent?.classList.add("is-empty")
 		}
+
+		
+		let metadataContainer = parent.closest(".metadata-container")
+		if (metadataContainer instanceof HTMLElement) {
+			hideMetadataContainerIfAllPropertiesHidden(metadataContainer)
+		}
+		
 	}
 }
 

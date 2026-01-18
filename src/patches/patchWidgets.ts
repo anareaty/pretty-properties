@@ -4,6 +4,7 @@ import { updateLongtext, updateMultiselectPill, updateTagPill } from "src/utils/
 import { updateDateInput, updateDateTimeInput } from "src/utils/updates/updateDates"
 import { updateProgress } from "src/utils/updates/updateProgress"
 import { around, dedupe } from "monkey-around";
+import { updateAllMetadataContainers } from "src/utils/updates/updateHiddenProperties";
 
 
 const updateWidgets = async (type: string, rendered: any, args: any[], plugin: PrettyPropertiesPlugin) => {
@@ -76,8 +77,10 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
       updateProgress(parent, plugin, sourcePath)
       if (input.value === "") {
         parent.classList.add("is-empty")
+        updateAllMetadataContainers()
       } else {
         parent.classList.remove("is-empty")
+        updateAllMetadataContainers()
       }
     }
   }
@@ -135,6 +138,7 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
         } else {
           parent.classList.remove("is-empty")
         }
+        updateAllMetadataContainers()
       }
     }
   }
@@ -149,6 +153,7 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
     parent.classList.add("pp-property-hidden-when-empty")
   }
 
+  updateAllMetadataContainers()
 }
 
 
@@ -188,11 +193,16 @@ export const patchPropertyWidgets = async (plugin: PrettyPropertiesPlugin) => {
                 }
               })
             }
+
+
+            
             return rendered
           })
         }
     })
   }
+
+  
 }
 
 

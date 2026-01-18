@@ -90,7 +90,6 @@ export interface PPPluginSettings {
 	nonLatinTagsSupport: boolean;
 	enableColorButton: boolean;
 	propertySearchKey: string;
-	
 	showTagColorSettings: boolean;
 	iconSizeMobile: number;
 	iconSizePopover: number;
@@ -111,12 +110,10 @@ export interface PPPluginSettings {
 	iconInTitle: boolean,
 	titleIconSize: number,
 	titleTextIconMatchTitleSize: boolean,
-	imageLinkFormat: string
-
-	
-
-	
-	
+	imageLinkFormat: string,
+	hideMetadataContainerIfAllPropertiesHiddenEditing: boolean,
+	hideMetadataContainerIfAllPropertiesHiddenReading: boolean,
+	autoHidePropertiesWithBanner: boolean,	
 }
 
 
@@ -236,7 +233,10 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	iconInTitle: false,
 	titleIconSize: 30,
 	titleTextIconMatchTitleSize: true,
-	imageLinkFormat: "link"
+	imageLinkFormat: "link",
+	hideMetadataContainerIfAllPropertiesHiddenEditing: false,
+	hideMetadataContainerIfAllPropertiesHiddenReading: false,
+	autoHidePropertiesWithBanner: false
 
 }
 

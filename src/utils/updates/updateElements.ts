@@ -7,6 +7,7 @@ import { updateProgress  } from "./updateProgress";
 import { updateCardLongtext, updateLongtext, updateMultiselectPill, updateSettingPills, updateTag, updateTagPaneTagsAll, updateTagPill, updateValueListElement } from "./updatePills";
 import { renderBanner, updateBannerForView } from "./updateBanners";
 import { getNestedProperty } from "../propertyUtils";
+import { updateAllMetadataContainers } from "./updateHiddenProperties";
 
 
 
@@ -159,6 +160,7 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
                                     num.classList.remove("is-empty")
                                 }
                             }
+                            updateAllMetadataContainers()
                             
                         }
                     }
@@ -189,6 +191,9 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
     
     updateTagPaneTagsAll(plugin)
     updateSettingPills(plugin)
+    
+    updateAllMetadataContainers()
+    
 }
 
 

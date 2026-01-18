@@ -227,6 +227,21 @@ export const updateHiddenEmptyProperties = (plugin: PrettyPropertiesPlugin) => {
 }
 
 
+export const updateHiddenMetadataContainer = (plugin: PrettyPropertiesPlugin) => {
+  let hideMetadataContainerIfAllPropertiesHiddenEditing = plugin.settings.hideMetadataContainerIfAllPropertiesHiddenEditing
+  document.body.classList.toggle("hide-metadata-if-props-empty-editing", hideMetadataContainerIfAllPropertiesHiddenEditing)
+
+  let hideMetadataContainerIfAllPropertiesHiddenReading = plugin.settings.hideMetadataContainerIfAllPropertiesHiddenReading
+  document.body.classList.toggle("hide-metadata-if-props-empty-reading", hideMetadataContainerIfAllPropertiesHiddenReading)
+}
+
+
+export const updateAutoHideProps = (plugin: PrettyPropertiesPlugin) => {
+  let autoHidePropertiesWithBanner = plugin.settings.autoHidePropertiesWithBanner
+  document.body.classList.toggle("autohide-props-with-banner", autoHidePropertiesWithBanner)
+}
+
+
 export const updateBaseTagsStyle = (plugin: PrettyPropertiesPlugin) => {
   document.body.classList.toggle("base-tags-style", plugin.settings.addBaseTagColor)
 }

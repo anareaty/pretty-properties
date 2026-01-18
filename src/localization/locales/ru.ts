@@ -201,5 +201,9 @@ export default {
   LINK: "ссылка",
   EMBED: "встроенный файл",
   RAW_PATH: "путь к файлу",
+  HIDE_PROPERTIES_BLOCK_IF_ALL_PROPERTIES_HIDDEN_EDITING: "Скрывать блок свойств в режиме редакирования, если все свойства в нём скрыты",
+  HIDE_PROPERTIES_BLOCK_IF_ALL_PROPERTIES_HIDDEN_READING: "Скрывать блок свойств в режиме просмотра, если все свойства в нём скрыты",
+  AUTOHIDE_PROPS_WITH_BANNER: "Автоматически скрывать свойства в заметке с баннером",
+  AUTOHIDE_PROPS_WITH_BANNER_DESC: "Свойства будут показаны при наведении на верхнюю часть баннера.",
 };
 

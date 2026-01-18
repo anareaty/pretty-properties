@@ -90,6 +90,58 @@
 
 
 
+/* Autohide properties when banner is enabled */
+
+
+.autohide-props-with-banner .cm-scroller:has(.banner-image:not(:empty)) .metadata-container,
+.autohide-props-with-banner .markdown-preview-view:has(.banner-image:not(:empty)) .metadata-container {
+  position: absolute;
+  top: 5px;
+  border-radius: 10px;
+  container-type: unset;
+  width: calc(100% - var(--file-margins-x) * 2);
+  left: 50%;
+  transform: translate(-50%);
+  background-color: var(--background-primary);
+  padding: 8px 24px;
+  z-index: 2;
+  box-shadow: 0 3px 3px #0003;
+  margin-bottom: 0;
+}
+
+
+.autohide-props-with-banner .is-readable-line-width .cm-scroller:has(.banner-image:not(:empty)) .metadata-container,
+.autohide-props-with-banner .is-readable-line-width.markdown-preview-view:has(.banner-image:not(:empty)) .metadata-container {
+    max-width: var(--file-line-width);
+}
+
+.autohide-props-with-banner .cm-scroller:has(.banner-image:not(:empty)) .metadata-container,
+.autohide-props-with-banner .markdown-preview-view:has(.banner-image:not(:empty)) .metadata-container {
+  opacity: 1;
+  transition: opacity 0.15s;
+}
+
+.autohide-props-with-banner .cm-scroller:has(.banner-image:not(:empty)) .metadata-container:not(:hover, :focus, :focus-within),
+.autohide-props-with-banner .markdown-preview-view:has(.banner-image:not(:empty)) .metadata-container:not(:hover, :focus, :focus-within) {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.autohide-props-with-banner .cm-scroller:has(.banner-image:not(:empty)) .metadata-container .metadata-content,
+.autohide-props-with-banner .markdown-preview-view:has(.banner-image:not(:empty)) .metadata-container .metadata-content {
+  overflow: hidden;
+  max-height: 500px;  
+}
+
+.autohide-props-with-banner .cm-scroller:has(.banner-image:not(:empty)) .metadata-container:not(:hover, :focus, :focus-within) .metadata-content,
+.autohide-props-with-banner .markdown-preview-view:has(.banner-image:not(:empty)) .metadata-container:not(:hover, :focus, :focus-within) .metadata-content {
+  max-height: 0;
+  transition-delay: 0.3s;
+}
+
+
+  
+
 
 
 
@@ -1379,6 +1431,19 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
   display: none;
 }
 
+
+
+
+
+.hide-metadata-if-props-empty-editing:not(.show-hidden-properties) .markdown-source-view .metadata-container.pp-mc-hidden,
+.hide-metadata-if-props-empty-editing.hide-all-empty-properties:not(.show-hidden-properties) .markdown-source-view .metadata-container.pp-mc-empty-hidden {
+    display: none;
+}
+
+.hide-metadata-if-props-empty-reading:not(.show-hidden-properties) .markdown-preview-view .metadata-container.pp-mc-hidden,
+.hide-metadata-if-props-empty-reading.hide-all-empty-properties:not(.show-hidden-properties) .markdown-preview-view .metadata-container.pp-mc-empty-hidden {
+    display: none;
+}
 
 
 

@@ -3,10 +3,13 @@ import { updateImagesForView } from "src/utils/updates/updateElements"
 import { around, dedupe } from "monkey-around";
 import { MarkdownView } from "obsidian";
 import { renderTitleIcon } from "src/utils/updates/updateIcons";
+import { updateAllMetadataContainers } from "src/utils/updates/updateHiddenProperties";
 
 
 export const patchMarkdownView = async (plugin: PrettyPropertiesPlugin) => {
+
   plugin.patches.uninstallPPMarkdownPatch = around(MarkdownView.prototype, {
+
     onLoadFile(old) {
       return dedupe("pp-patch-markdown-around-key", old, async function(...args) {
         let view = this
@@ -23,12 +26,22 @@ export const patchMarkdownView = async (plugin: PrettyPropertiesPlugin) => {
           apply(old2, thisArg2, args2) {
             let result = old2.call(thisArg2, ...args2) 
             renderTitleIcon(view, plugin)
+            
+            return result
+          }
+        })
+
+        this.loadFrontmatter = new Proxy(this.loadFrontmatter, {
+          apply(old2, thisArg2, args2) {
+            let result = old2.call(thisArg2, ...args2)
+            updateAllMetadataContainers()
             return result
           }
         })
 
         await updateImagesForView(this, plugin);
         renderTitleIcon(view, plugin)
+        
         return old && old.apply(this, args)
       })
     }

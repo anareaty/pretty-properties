@@ -191,6 +191,10 @@ export default {
   LINK: "link",
   EMBED: "embed",
   RAW_PATH: "raw path",
+  HIDE_PROPERTIES_BLOCK_IF_ALL_PROPERTIES_HIDDEN_EDITING: "Hide properties block in editing view if all properties are hidden",
+  HIDE_PROPERTIES_BLOCK_IF_ALL_PROPERTIES_HIDDEN_READING: "Hide properties block in reading view if all properties are hidden",
+  AUTOHIDE_PROPS_WITH_BANNER: "Autohide properties block when banner is enabled",
+  AUTOHIDE_PROPS_WITH_BANNER_DESC: "Properties will be revealed when hovering over the top of the banner.",
 };
 
 

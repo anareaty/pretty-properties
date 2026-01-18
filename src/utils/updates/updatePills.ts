@@ -2,6 +2,7 @@ import { MarkdownRenderer, MarkdownView } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { createColorButton } from "src/menus/selectColorMenus";
 import { finishRenderMath, loadMathJax, renderMath } from "obsidian"
+import { hideMetadataContainerIfAllPropertiesHidden } from "./updateHiddenProperties";
 
 
 export const getTextLightness = (color: any) => {
@@ -340,6 +341,16 @@ export const updateLongtext = async (pill: HTMLElement, plugin: PrettyProperties
 
 		}
 	}
+
+
+	
+	
+	let metadataContainer = pill.closest(".metadata-container")
+	if (metadataContainer instanceof HTMLElement) {
+		hideMetadataContainerIfAllPropertiesHidden(metadataContainer)
+	}
+	
+	
 }
 
 

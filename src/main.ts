@@ -4,9 +4,11 @@ import {
 	loadMathJax
 } from "obsidian";
 import { 
+	updateAutoHideProps,
 	updateBannerStyles, 
 	updateCoverStyles, 
 	updateHiddenEmptyProperties, 
+	updateHiddenMetadataContainer, 
 	updateIconStyles,
 	updateRelativeDateColors,
 } from "./utils/updates/updateStyles";
@@ -73,6 +75,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		updateEmptyProperties(this)
 		updateHiddenPropertiesInPropTab(this)
 		updateHiddenEmptyProperties(this)
+		updateHiddenMetadataContainer(this)
+		updateAutoHideProps(this)
 		updateBaseTagsStyle(this)
 
 		this.app.workspace.onLayoutReady(async() => {
