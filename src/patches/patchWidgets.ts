@@ -19,7 +19,6 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
     value = value.value;
   }
 
-  console.log(type)
 
   if (type == "multitext" || type == "aliases") {
     let elements = rendered?.multiselect.elements 
