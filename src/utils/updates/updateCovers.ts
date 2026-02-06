@@ -9,7 +9,11 @@ export const renderCover = async (
   sourcePath: string,
   plugin: PrettyPropertiesPlugin) => {
 
+
     let mdContainer = contentEl.querySelector(".metadata-container")
+
+
+
     let coverVal;
     let props = [...plugin.settings.extraCoverProperties];
     props.unshift(plugin.settings.coverProperty);
@@ -31,14 +35,23 @@ export const renderCover = async (
 
     let cssVal = frontmatter?.cssclasses;
 
+
+
     if (mdContainer instanceof HTMLElement) {
+
+
         let coverDiv;
         let isPdf
+
+        
 
         if (coverVal) {
             isPdf = coverVal.match(/^(\!)?(\[\[)(.+\.pdf)(\]\])$/) || 
             coverVal.match(/^(\!)?(\[)([^\]]*)(\])(\()(.+\.pdf)(\))$/)
         }
+
+
+        
         
 
         if (coverVal && plugin.settings.enableCover) {

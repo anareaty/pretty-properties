@@ -307,7 +307,7 @@ export const updateImagesInPopover = async (popover: HoverPopover, plugin: Prett
 
 export const updateImagesForView = async (view: MarkdownView, plugin: PrettyPropertiesPlugin) => {
 
- 
+    
 
     let file = view.file;
     let contentEl = view.contentEl;
@@ -327,6 +327,9 @@ export const updateImagesForView = async (view: MarkdownView, plugin: PrettyProp
         }
     
         let hasCover = false
+
+
+        
     
         if (frontmatter) {
             if (getNestedProperty(frontmatter, plugin.settings.coverProperty)) {
@@ -340,6 +343,8 @@ export const updateImagesForView = async (view: MarkdownView, plugin: PrettyProp
                 }
             }
         }
+
+        
     
         if (frontmatter && hasCover  && plugin.settings.enableCover) {
             renderCover(contentEl, frontmatter, sourcePath, plugin);

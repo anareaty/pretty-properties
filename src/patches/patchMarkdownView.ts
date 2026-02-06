@@ -4,6 +4,7 @@ import { around, dedupe } from "monkey-around";
 import { MarkdownView } from "obsidian";
 import { renderTitleIcon } from "src/utils/updates/updateIcons";
 import { updateAllMetadataContainers } from "src/utils/updates/updateHiddenProperties";
+import { updateCoverForView } from "src/utils/updates/updateCovers";
 
 
 export const patchMarkdownView = async (plugin: PrettyPropertiesPlugin) => {
@@ -35,6 +36,7 @@ export const patchMarkdownView = async (plugin: PrettyPropertiesPlugin) => {
           apply(old2, thisArg2, args2) {
             let result = old2.call(thisArg2, ...args2)
             updateAllMetadataContainers()
+            updateCoverForView(this, plugin)
             return result
           }
         })
