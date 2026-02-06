@@ -9,7 +9,13 @@ import { ImageSuggestModal } from "src/modals/imageSuggestModal";
 
 export const createCoverMenu = (e: MouseEvent, plugin: PrettyPropertiesPlugin) => {
     //@ts-ignore
-    let menuExist = plugin.app.plugins.getPlugin("copy-url-in-preview")
+    let plugins = plugin.app.plugins
+    let menuExist = 
+        plugins.getPlugin("copy-url-in-preview") || 
+        plugins.getPlugin("pixel-perfect-image")
+
+
+
     let file = plugin.app.workspace.getActiveFile();
 
     if (file instanceof TFile) {

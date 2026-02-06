@@ -18,6 +18,19 @@
     z-index: -1;
 }
 
+
+.markdown-preview-view .banner-image:not(:empty) {
+  z-index: 0;
+}
+
+.markdown-preview-view:has(.banner-image) .markdown-preview-sizer > * {
+  position: relative;
+  z-index: 1;
+}
+
+
+
+
 .workspace-split.mod-root .view-content.has-banner {
   background-color: transparent;
 }
@@ -249,7 +262,7 @@
   
 .cm-sizer,
 .mod-header {
-  container-type: size;
+  container-type: inline-size;
 }
 
 @container (width >= 600px) {

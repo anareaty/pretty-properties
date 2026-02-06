@@ -8,7 +8,13 @@ import { IconSuggestModal } from "src/modals/iconSuggestModal";
 export const createIconMenu = (e: MouseEvent, plugin: PrettyPropertiesPlugin) => {
 
     //@ts-ignore
-    let menuExist = plugin.app.plugins.getPlugin("copy-url-in-preview")
+    let plugins = plugin.app.plugins
+    let menuExist = 
+        plugins.getPlugin("copy-url-in-preview") || 
+        plugins.getPlugin("pixel-perfect-image")
+
+
+
     let propName = plugin.settings.iconProperty;
 
     let selectIconItem = (item: MenuItem) => item
