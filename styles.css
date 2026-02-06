@@ -18,6 +18,17 @@
     z-index: -1;
 }
 
+.has-banner .markdown-preview-view .banner-image:not(:empty) {
+    z-index: 1;
+}
+
+.has-banner .markdown-preview-sizer {
+  position: relative;
+  z-index: 2;
+}
+
+
+/*
 
 .markdown-preview-view .banner-image:not(:empty) {
   z-index: 0;
@@ -27,6 +38,8 @@
   position: relative;
   z-index: 1;
 }
+
+*/
 
 
 
