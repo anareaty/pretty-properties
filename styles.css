@@ -1446,6 +1446,17 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 }
 
 
+.markdown-source-view .metadata-container.pp-mc-empty-hidden:focus-within,
+.markdown-source-view .metadata-container.pp-mc-empty-hidden:has(.metadata-property[data-property-key=""]) {
+  display: var(--metadata-display-editing) !important;
+}
+
+.markdown-preview-view .metadata-container.pp-mc-empty-hidden:focus-within,
+.markdown-preview-view .metadata-container.pp-mc-empty-hidden:has(.metadata-property[data-property-key=""]) {
+  display: var(--metadata-display-reading) !important;
+}
+
+
 
 
 .title-wrapper {

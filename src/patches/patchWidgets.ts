@@ -19,6 +19,8 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
     value = value.value;
   }
 
+  console.log(type)
+
   if (type == "multitext" || type == "aliases") {
     let elements = rendered?.multiselect.elements 
 
@@ -87,15 +89,25 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
 
   if (type == "text") {
     let longText = el.querySelector(".metadata-input-longtext");
+    let link = el.querySelector(".metadata-link");
+
+    let parent = el.parentElement
     
     if (longText) {
       updateLongtext(longText, plugin);
       longText.onblur = () => {
         updateLongtext(longText, plugin);
+        let link = el.querySelector(".metadata-link");
+        if (link) {
+          parent.classList.remove("is-empty")
+          updateAllMetadataContainers()
+        }
       };
+    } else if (link) {
+      parent.classList.remove("is-empty")
+      updateAllMetadataContainers()
     }
 
-    let parent = el.parentElement
     parent.setAttribute("data-source-path", sourcePath)
 
     if (propName == plugin.settings.bannerProperty) {

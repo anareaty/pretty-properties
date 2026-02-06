@@ -104,6 +104,29 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
     }
 
 
+
+    let mdLinks = document.querySelectorAll(".metadata-property-value > .metadata-link")
+
+    for (let link of mdLinks) {
+        if (link instanceof HTMLElement) {
+            let parent = link.parentElement
+            if (parent instanceof HTMLElement) {
+                let clickEvent = () => {
+                    let longtext = parent.querySelector(".metadata-input-longtext")
+                    if (longtext instanceof HTMLElement) {
+                        updateLongtext(longtext, plugin);
+                        longtext.onblur = () => {
+                            if (longtext instanceof HTMLElement) updateLongtext(longtext, plugin);
+                        }
+                    }
+                    parent.removeEventListener('click', clickEvent)
+                }
+                parent.addEventListener("click", clickEvent)
+            }
+        }
+    }
+
+
     let unknown = document.querySelectorAll(".metadata-property-value-item.mod-unknown")
 
     for (let el of unknown) {
