@@ -112,14 +112,14 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
             let parent = link.parentElement
             if (parent instanceof HTMLElement) {
                 let clickEvent = () => {
-                    let longtext = parent.querySelector(".metadata-input-longtext")
+                    let longtext = parent!.querySelector(".metadata-input-longtext")
                     if (longtext instanceof HTMLElement) {
                         updateLongtext(longtext, plugin);
                         longtext.onblur = () => {
                             if (longtext instanceof HTMLElement) updateLongtext(longtext, plugin);
                         }
                     }
-                    parent.removeEventListener('click', clickEvent)
+                    parent!.removeEventListener('click', clickEvent)
                 }
                 parent.addEventListener("click", clickEvent)
             }
