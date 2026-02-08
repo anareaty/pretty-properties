@@ -114,6 +114,7 @@ export interface PPPluginSettings {
 	hideMetadataContainerIfAllPropertiesHiddenEditing: boolean,
 	hideMetadataContainerIfAllPropertiesHiddenReading: boolean,
 	autoHidePropertiesWithBanner: boolean,	
+	hideCoverCollapsed: boolean
 }
 
 
@@ -237,7 +238,8 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	imageLinkFormat: "link",
 	hideMetadataContainerIfAllPropertiesHiddenEditing: false,
 	hideMetadataContainerIfAllPropertiesHiddenReading: false,
-	autoHidePropertiesWithBanner: false
+	autoHidePropertiesWithBanner: false,
+	hideCoverCollapsed: false
 
 }
 

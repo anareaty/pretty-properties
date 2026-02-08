@@ -562,7 +562,9 @@
   overflow: hidden;
 }
 
-.metadata-container.is-collapsed .metadata-side-image {
+
+
+.hide-cover-collapsed .metadata-container.is-collapsed .metadata-side-image {
 	display: none;
 }
 
@@ -1143,10 +1145,10 @@ body:not(.show-hidden-properties).hidden-props-in-prop-tab .workspace-leaf-conte
 body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-property-hidden-when-empty:not(:focus, :focus-within),
 
 /* Hide metadata block when all properties are hidden */
-.hide-metadata-if-props-empty-editing:not(.show-hidden-properties) .markdown-source-view .metadata-container.pp-mc-hidden:not(:focus-within),
-.hide-metadata-if-props-empty-editing.hide-all-empty-properties:not(.show-hidden-properties) .markdown-source-view .metadata-container.pp-mc-empty-hidden:not(:focus-within),
-.hide-metadata-if-props-empty-reading:not(.show-hidden-properties) .markdown-preview-view .metadata-container.pp-mc-hidden:not(:focus-within),
-.hide-metadata-if-props-empty-reading.hide-all-empty-properties:not(.show-hidden-properties) .markdown-preview-view .metadata-container.pp-mc-empty-hidden:not(:focus-within)
+.hide-metadata-if-props-empty-editing:not(.show-hidden-properties) .markdown-source-view .metadata-container.pp-mc-hidden:not(:focus-within, :has(.metadata-side-image)),
+.hide-metadata-if-props-empty-editing.hide-all-empty-properties:not(.show-hidden-properties) .markdown-source-view .metadata-container.pp-mc-empty-hidden:not(:focus-within, :has(.metadata-side-image)),
+.hide-metadata-if-props-empty-reading:not(.show-hidden-properties) .markdown-preview-view .metadata-container.pp-mc-hidden:not(:focus-within, :has(.metadata-side-image)),
+.hide-metadata-if-props-empty-reading.hide-all-empty-properties:not(.show-hidden-properties) .markdown-preview-view .metadata-container.pp-mc-empty-hidden:not(:focus-within, :has(.metadata-side-image))
 {
   position: absolute;
   width: 1px;

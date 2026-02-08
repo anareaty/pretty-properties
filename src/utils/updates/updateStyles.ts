@@ -95,8 +95,12 @@ export const updateCoverStyles = (plugin: PrettyPropertiesPlugin) => {
     }
   document.body.setCssProps(coverProps);
 
-
-
+  if (plugin.settings.hideCoverCollapsed) {
+    document.body.classList.add("hide-cover-collapsed")
+  } else {
+    document.body.classList.remove("hide-cover-collapsed")
+  }
+    
   
 }
 

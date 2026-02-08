@@ -209,5 +209,6 @@ export default {
   HIDE_PROPERTIES_BLOCK_IF_ALL_PROPERTIES_HIDDEN_READING: "Скрывать блок свойств в режиме просмотра, если все свойства в нём скрыты",
   AUTOHIDE_PROPS_WITH_BANNER: "Автоматически скрывать свойства в заметке с баннером",
   AUTOHIDE_PROPS_WITH_BANNER_DESC: "Свойства будут показаны при наведении на верхнюю часть баннера.",
+  HIDE_COVER_COLLAPSED: "Скрывать обложку когда свойства свёрнуты",
 };
 

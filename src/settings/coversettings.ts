@@ -95,6 +95,17 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
                     await plugin.saveSettings();
                 }));
 
+        
+        new Setting(containerEl)
+            .setName(i18n.t("HIDE_COVER_COLLAPSED"))
+            .addToggle(toggle => toggle
+                .setValue(plugin.settings.hideCoverCollapsed)
+                .onChange(async (value) => {
+                    plugin.settings.hideCoverCollapsed = value
+                    await plugin.saveSettings();
+                    updateCoverStyles(plugin);
+                }));
+
 
         new Setting(containerEl)
         .setName(i18n.t("COVER_POSITION"))
