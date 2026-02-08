@@ -1148,7 +1148,12 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 .hide-metadata-if-props-empty-editing:not(.show-hidden-properties) .markdown-source-view .metadata-container.pp-mc-hidden:not(:focus-within, :has(.metadata-side-image)),
 .hide-metadata-if-props-empty-editing.hide-all-empty-properties:not(.show-hidden-properties) .markdown-source-view .metadata-container.pp-mc-empty-hidden:not(:focus-within, :has(.metadata-side-image)),
 .hide-metadata-if-props-empty-reading:not(.show-hidden-properties) .markdown-preview-view .metadata-container.pp-mc-hidden:not(:focus-within, :has(.metadata-side-image)),
-.hide-metadata-if-props-empty-reading.hide-all-empty-properties:not(.show-hidden-properties) .markdown-preview-view .metadata-container.pp-mc-empty-hidden:not(:focus-within, :has(.metadata-side-image))
+.hide-metadata-if-props-empty-reading.hide-all-empty-properties:not(.show-hidden-properties) .markdown-preview-view .metadata-container.pp-mc-empty-hidden:not(:focus-within, :has(.metadata-side-image)),
+/* Manage hiding metadata when it has the cover image */
+.hide-metadata-if-props-empty-editing:not(.show-hidden-properties) .markdown-source-view .metadata-container.pp-mc-hidden:has(.metadata-side-image) :is(.metadata-properties-heading, .metadata-content):not(:focus, :focus-within),
+.hide-metadata-if-props-empty-editing.hide-all-empty-properties:not(.show-hidden-properties) .markdown-source-view .metadata-container.pp-mc-empty-hidden:has(.metadata-side-image) :is(.metadata-properties-heading, .metadata-content):not(:focus, :focus-within),
+.hide-metadata-if-props-empty-reading:not(.show-hidden-properties) .markdown-preview-view .metadata-container.pp-mc-hidden:has(.metadata-side-image) :is(.metadata-properties-heading, .metadata-content):not(:focus, :focus-within),
+.hide-metadata-if-props-empty-reading.hide-all-empty-properties:not(.show-hidden-properties) .markdown-preview-view .metadata-container.pp-mc-empty-hidden:has(.metadata-side-image) :is(.metadata-properties-heading, .metadata-content):not(:focus, :focus-within)
 {
   position: absolute;
   width: 1px;
@@ -1159,9 +1164,6 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
   clip: rect(0, 0, 0, 0);
   border: 0;
 }
-
-
-
 
 
 
