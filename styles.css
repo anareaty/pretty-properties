@@ -18,7 +18,7 @@
     z-index: -1;
 }
 
-.has-banner .markdown-preview-view .banner-image:not(:empty) {
+.has-banner .markdown-preview-view .banner-image {
     z-index: 1;
 }
 
@@ -28,18 +28,7 @@
 }
 
 
-/*
 
-.markdown-preview-view .banner-image:not(:empty) {
-  z-index: 0;
-}
-
-.markdown-preview-view:has(.banner-image) .markdown-preview-sizer > * {
-  position: relative;
-  z-index: 1;
-}
-
-*/
 
 
 
@@ -279,7 +268,7 @@
 }
 
 @container (width >= 600px) {
-  .metadata-container:has(.metadata-side-image .pp-cover-image) {
+  .metadata-container:has(.metadata-side-image:not(.top, .bottom) .pp-cover-image) {
     --metadata-display-editing: grid;
     --metadata-display-reading: grid;
     grid-column-gap: 22px;
@@ -289,11 +278,30 @@
 
 
 
+.metadata-container:has(.metadata-side-image.bottom .pp-cover-image) {
+  --metadata-display-editing: flex;
+  --metadata-display-reading: flex;
+  flex-direction: column;
+}
+
+
+.metadata-side-image.bottom {
+  order: 1;
+}
+
+
+
+
+
 
 .metadata-side-image {
     grid-row: 1/3;
     font-size: 0;
+    text-align: center;
 }
+
+
+
 
 
 
@@ -330,24 +338,23 @@
 
 
 
-
-.pp-cover-left .metadata-container:has(.metadata-side-image) {
+.metadata-container:has(.metadata-side-image.left) {
   grid-template-columns: var(--cover-column-width) auto;
 }
 
-.pp-cover-right .metadata-container:has(.metadata-side-image) {
+.metadata-container:has(.metadata-side-image.right) {
   grid-template-columns: auto var(--cover-column-width);
 }
 
-.pp-cover-left .hover-popover .metadata-container:has(.metadata-side-image) {
+.hover-popover .metadata-container:has(.metadata-side-image.left) {
   grid-template-columns: min(var(--cover-column-width), var(--cover-max-width-popover)) auto;
 }
 
-.pp-cover-right .hover-popover  .metadata-container:has(.metadata-side-image) {
+.hover-popover  .metadata-container:has(.metadata-side-image.right) {
   grid-template-columns: auto min(var(--cover-column-width), var(--cover-max-width-popover));
 }
 
-.pp-cover-right .metadata-side-image {
+.metadata-side-image.right {
   grid-column: 2
 }
 
@@ -358,10 +365,16 @@
 
 
 
-
-.metadata-side-image .pp-cover-image {
+.metadata-side-image:not(.top, .bottom) .pp-cover-image {
   max-height: var(--cover-max-height);
 }
+
+.metadata-side-image.top .pp-cover-image {
+  max-height: var(--cover-max-height-top-bottom);
+}
+
+
+
 
 .metadata-side-image.initial .pp-cover-image,
 .metadata-side-image.initial-2 .pp-cover-image,
@@ -373,9 +386,7 @@
 
 
 @container (width < 600px) {
-  .metadata-side-image {
-    text-align: center;
-  }
+
 
   .metadata-side-image .pp-cover-image {
     width: var(--cover-column-width) !important;
@@ -466,6 +477,27 @@
 
 
 
+/*
+.metadata-side-image.horizontal.top .pp-cover-image, 
+.metadata-side-image.horizontal.bottom .pp-cover-image,
+.metadata-side-image.horizontal-cover.top .pp-cover-image, 
+.metadata-side-image.horizontal-cover.bottom .pp-cover-image,
+.metadata-side-image.horizontal-contain.top .pp-cover-image,
+.metadata-side-image.horizontal-contain.bottom .pp-cover-image {
+  width: 100% !important;
+}
+*/
+
+
+.metadata-side-image.top.square > .pp-cover-image,
+.metadata-side-image.bottom.square > .pp-cover-image {
+    width: min(var(--cover-max-height-top-bottom), var(--cover-width-square));
+}
+
+.metadata-side-image.top.circle > .pp-cover-image,
+.metadata-side-image.bottom.circle > .pp-cover-image {
+    width: min(var(--cover-max-height-top-bottom), var(--cover-width-circle));
+}
 
 
 
@@ -1067,11 +1099,35 @@ a.tag.transparent-color {
   --pill-radius: 1em;
 }
 
-body:not(.show-hidden-properties) .workspace-leaf-content[data-type='markdown'] .metadata-property.pp-property-hidden,
-body:not(.show-hidden-properties).hidden-props-in-prop-tab .workspace-leaf-content[data-type='file-properties'] .metadata-property.pp-property-hidden,
-body:not(.show-hidden-properties) .hover-popover .metadata-property.pp-property-hidden {
-  display: none;
+
+/* Hide properties marked as hidden */
+
+body:not(.show-hidden-properties) .workspace-leaf-content[data-type='markdown'] .metadata-property.pp-property-hidden:not(:focus, :focus-within),
+body:not(.show-hidden-properties).hidden-props-in-prop-tab .workspace-leaf-content[data-type='file-properties'] .metadata-property.pp-property-hidden:not(:focus, :focus-within),
+body:not(.show-hidden-properties) .hover-popover .metadata-property.pp-property-hidden:not(:focus, :focus-within),
+.hide-all-empty-properties:not(.show-hidden-properties) .workspace-leaf-content[data-type='markdown'] .metadata-property.is-empty:not(:focus, :focus-within), 
+.hide-all-empty-properties:not(.show-hidden-properties).hidden-props-in-prop-tab .workspace-leaf-content[data-type='file-properties'] .metadata-property.is-empty:not(:focus, :focus-within), 
+.hide-all-empty-properties:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty:not(:focus, :focus-within),
+body:not(.show-hidden-properties) .workspace-leaf-content[data-type='markdown'] .metadata-property.is-empty.pp-property-hidden-when-empty:not(:focus, :focus-within), 
+body:not(.show-hidden-properties).hidden-props-in-prop-tab .workspace-leaf-content[data-type='file-properties'] .metadata-property.is-empty.pp-property-hidden-when-empty:not(:focus, :focus-within), 
+body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-property-hidden-when-empty:not(:focus, :focus-within) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
 }
+
+
+
+
+
+
+
+
 
 .bases-view .bases-cards-property[data-property*="note"] .value-list-element:not(:has(.tag)),
 .bases-view .bases-list-property [data-property-type="multitext"] .value-list-element:not(:has(.tag)) {
@@ -1446,22 +1502,16 @@ button.longtext-color-button:hover {
 
 
 
-.hide-all-empty-properties:not(.show-hidden-properties) .workspace-leaf-content[data-type='markdown'] .metadata-property.is-empty, 
-.hide-all-empty-properties:not(.show-hidden-properties).hidden-props-in-prop-tab .workspace-leaf-content[data-type='file-properties'] .metadata-property.is-empty, 
-.hide-all-empty-properties:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty {
-  display: none;
-}
+
+
+
 
 .metadata-property:focus-within, 
 .metadata-property[data-property-key=""] {
   display: flex !important;
 }
 
-body:not(.show-hidden-properties) .workspace-leaf-content[data-type='markdown'] .metadata-property.is-empty.pp-property-hidden-when-empty, 
-body:not(.show-hidden-properties).hidden-props-in-prop-tab .workspace-leaf-content[data-type='file-properties'] .metadata-property.is-empty.pp-property-hidden-when-empty, 
-body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-property-hidden-when-empty {
-  display: none;
-}
+
 
 
 

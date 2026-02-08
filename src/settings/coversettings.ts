@@ -101,13 +101,15 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
         .addDropdown(dropdown => dropdown
             .addOptions({
                 "left": i18n.t("LEFT"),
-                "right": i18n.t("RIGHT")
+                "right": i18n.t("RIGHT"),
+                "top": i18n.t("TOP"),
+                "bottom": i18n.t("BOTTOM")
             })
             .setValue(plugin.settings.coverPosition)
             .onChange(async (value) => {
                 plugin.settings.coverPosition = value
                 await plugin.saveSettings();
-                updateCoverStyles(plugin);
+                updateAllCovers(plugin)
             })
         )
 
@@ -124,6 +126,23 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
                 updateCoverStyles(plugin);
             })
         });
+
+
+        new Setting(containerEl)
+        .setName(i18n.t("COVER_MAX_HEIGHT_TOP_BOTTOM"))
+        .addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverMaxHeightTopBottom.toString())
+            .setPlaceholder('400')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverMaxHeightTopBottom = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+
 
         new Setting(containerEl)
         .setName(i18n.t("DEFAULT_COVER_WIDTH"))

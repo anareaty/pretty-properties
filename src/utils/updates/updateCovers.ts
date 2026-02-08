@@ -91,6 +91,23 @@ export const renderCover = async (
                 coverDiv.classList.add("initial");
             }
 
+
+            if (cssVal && cssVal.includes("cover-top")) {
+                coverDiv.classList.add("top");
+            } 
+            else if (cssVal && cssVal.includes("cover-bottom")) {
+                coverDiv.classList.add("bottom");
+            }
+            else if (cssVal && cssVal.includes("cover-right")) {
+                coverDiv.classList.add("right");
+            }
+            else if (cssVal && cssVal.includes("cover-left")) {
+                coverDiv.classList.add("left");
+            }
+            else {
+                coverDiv.classList.add(plugin.settings.coverPosition);
+            }
+
             
 
             if (isPdf) {

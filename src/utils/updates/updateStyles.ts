@@ -85,6 +85,7 @@ export const updateCoverStyles = (plugin: PrettyPropertiesPlugin) => {
     "--cover-width-horizontal": plugin.settings.coverHorizontalWidth + "px",
     "--cover-width-vertical": plugin.settings.coverVerticalWidth + "px",
     "--cover-max-height": plugin.settings.coverMaxHeight + "px",
+    "--cover-max-height-top-bottom": plugin.settings.coverMaxHeightTopBottom + "px",
     "--cover-width-initial": plugin.settings.coverDefaultWidth1 + "px",
     "--cover-width-initial-2": plugin.settings.coverDefaultWidth2 + "px",
     "--cover-width-initial-3": plugin.settings.coverDefaultWidth3 + "px",
@@ -94,13 +95,7 @@ export const updateCoverStyles = (plugin: PrettyPropertiesPlugin) => {
     }
   document.body.setCssProps(coverProps);
 
-  if (plugin.settings.coverPosition == "right") {
-    document.body.classList.remove("pp-cover-left")
-    document.body.classList.add("pp-cover-right")
-  } else {
-    document.body.classList.remove("pp-cover-right")
-    document.body.classList.add("pp-cover-left")
-  }
+
 
   
 }

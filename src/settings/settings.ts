@@ -33,6 +33,7 @@ export interface PPPluginSettings {
 	coverDefaultWidth2: number;
 	coverDefaultWidth3: number;
 	coverMaxHeight: number;
+	coverMaxHeightTopBottom: number;
     coverVerticalWidth: number;
     coverHorizontalWidth: number;
     coverSquareWidth: number;
@@ -98,7 +99,6 @@ export interface PPPluginSettings {
 	enableColoredTagsInTagPane: boolean;
 	mathProperties: string[];
 	enableMath: boolean;
-	//enableMarkdown: boolean;
 	dataVersion: number;
 	dateColors: any;
 	coverPosition: string;
@@ -142,6 +142,7 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	coverDefaultWidth2: 250,
 	coverDefaultWidth3: 300,
 	coverMaxHeight: 500,
+	coverMaxHeightTopBottom: 400,
     coverVerticalWidth: 200,
     coverHorizontalWidth: 300,
     coverSquareWidth: 250,

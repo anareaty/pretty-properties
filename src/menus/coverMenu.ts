@@ -2,7 +2,7 @@ import { TFile, Menu, MenuItem } from "obsidian";
 import { i18n } from "src/localization/localization";
 import PrettyPropertiesPlugin from "src/main";
 import { updateHiddenProperties } from "src/utils/updates/updateHiddenProperties";
-import { getCurrentCoverProperty } from "src/utils/imageUtils";
+import { getCurrentCoverProperty, selectCoverPosition } from "src/utils/imageUtils";
 import { selectCoverShape } from "src/utils/imageUtils";
 import { removeProperty } from "src/utils/propertyUtils";
 import { ImageSuggestModal } from "src/modals/imageSuggestModal";
@@ -47,6 +47,13 @@ export const createCoverMenu = (e: MouseEvent, plugin: PrettyPropertiesPlugin) =
                 .onClick(async () => {
                     selectCoverShape(plugin);
                 })
+            let selectPositionItem = (item: MenuItem) => item
+                .setTitle(i18n.t("SELECT_COVER_POSITION"))
+                .setIcon("layout-grid")
+                .setSection("pretty-properties")
+                .onClick(async () => {
+                    selectCoverPosition(plugin);
+                })
             let removeCoverItem = (item: MenuItem) => item
                 .setTitle(i18n.t("REMOVE_COVER"))
                 .setIcon("image-off")
@@ -81,6 +88,8 @@ export const createCoverMenu = (e: MouseEvent, plugin: PrettyPropertiesPlugin) =
                 menuManager.closeAndFlush()
                 menuManager.addItemAfter(["system"], i18n.t("SELECT_COVER_IMAGE"), selectCoverItem);
                 menuManager.addItemAfter(["system"], i18n.t("SELECT_COVER_SHAPE"), selectShapeItem);
+                menuManager.addItemAfter(["system"], i18n.t("SELECT_COVER_POSITION"), selectPositionItem);
+                
                 menuManager.addItemAfter(["system"], i18n.t("REMOVE_COVER"), removeCoverItem);
                 if (plugin.settings.hiddenProperties.find(p => p == propName)) {
                     menuManager.addItemAfter(["system"], i18n.t("UNHIDE_COVER_PROPERTY"), unhideCoverItem);
@@ -92,6 +101,7 @@ export const createCoverMenu = (e: MouseEvent, plugin: PrettyPropertiesPlugin) =
                 let menu = new Menu();
                 menu.addItem(selectCoverItem);
                 menu.addItem(selectShapeItem);
+                menu.addItem(selectPositionItem);
                 menu.addItem(removeCoverItem);
 
                 if (plugin.settings.hiddenProperties.find(p => p == propName)) {

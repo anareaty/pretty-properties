@@ -4,6 +4,7 @@ import { getNestedProperty } from "./propertyUtils";
 import { LocalImageSuggestModal } from "src/modals/localImageSuggestModal";
 import { BannerPositionModal } from "src/modals/bannerPositionModal";
 import { CoverShapeSuggestModal } from "src/modals/coverShapeSuggestModal";
+import { CoverPositionSuggestModal } from "src/modals/coverPositionSuggestModal";
 import { ImageSuggestModal } from "src/modals/imageSuggestModal";
 
 
@@ -63,6 +64,15 @@ export const selectCoverShape = async(plugin: PrettyPropertiesPlugin) => {
     let file = plugin.app.workspace.getActiveFile();
     if (file instanceof TFile) {
         new CoverShapeSuggestModal(plugin.app, file).open();
+    }
+}
+
+
+
+export const selectCoverPosition = async(plugin: PrettyPropertiesPlugin) => {
+    let file = plugin.app.workspace.getActiveFile();
+    if (file instanceof TFile) {
+        new CoverPositionSuggestModal(plugin.app, file).open();
     }
 }
 
