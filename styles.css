@@ -808,11 +808,14 @@
   width: fit-content;
 }
 
-.metadata-property-value.has-custom-date input.metadata-input-text.mod-date:not(.is-empty)::-webkit-datetime-edit,
-.metadata-property-value.has-custom-date input.metadata-input-text.mod-datetime:not(.is-empty)::-webkit-datetime-edit {
+.metadata-property-value.has-custom-date:not(:focus-within) input.metadata-input-text.mod-date:not(.is-empty)::-webkit-datetime-edit,
+.metadata-property-value.has-custom-date:not(:focus-within) input.metadata-input-text.mod-datetime:not(.is-empty)::-webkit-datetime-edit {
   display: none;
 }
 
+.has-custom-date:focus-within .custom-date {
+  display: none;
+}
 
 .bases-cards-line.has-custom-date input.metadata-input-text.mod-date,
 .bases-cards-line.has-custom-date input.metadata-input-text.mod-datetime,
