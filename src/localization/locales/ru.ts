@@ -65,6 +65,8 @@ export default {
   ADD_TEXT_COLORED_PROPERTY: "Добавить текстовое цветное свойство",
   SHOW_HIDDEN_PROPERTIES_LIST: "Показать список скрытых свойств",
   ADD_HIDDEN_PROPERTY: "Добавить скрытое свойство",
+  SHOW_HIDDEN_WHEN_EMPTY_PROPERTIES_LIST: "Показать список скрытых свойств, скрытых, когда пустые",
+  ADD_HIDDEN_EMPTY_PROPERTY: "Добавить свойство, чтобы скрывать, когда пустое",
   SELECT_ICON: "Выбрать иконку",
   LOCAL_IMAGE: "Локальное изображение",
   LUCIDE_ICON: "Иконка Lucide",

@@ -6,7 +6,7 @@ import { updateAutoHideProps, updateBaseTagsStyle, updateHiddenEmptyProperties, 
 import { showColoredListSettings } from './coloredListSettings';
 import { showColoredTagsSettings } from './coloredTagsSettings';
 import { showColoredTextSettings } from './coloredTextSettings';
-import { showHiddenSettings } from './hiddenSettings';
+import { showHiddenEmptySettings, showHiddenSettings } from './hiddenSettings';
 import { updateLongTexts, updateTagPaneTagsAll } from 'src/utils/updates/updatePills';
 import { removeColorStyles, removeInlineTagsColorStyles } from 'src/utils/remove';
 
@@ -239,5 +239,21 @@ export const showPropSettings = (settingTab: PPSettingTab) => {
 
     if (plugin.settings.showHiddenSettings) { 
         showHiddenSettings(settingTab)
+    }
+
+
+    new Setting(containerEl)
+    .setName(i18n.t("SHOW_HIDDEN_WHEN_EMPTY_PROPERTIES_LIST"))
+    .addToggle(toggle => {
+        toggle.setValue(plugin.settings.showHiddenEmptySettings)
+        .onChange(value => {
+            plugin.settings.showHiddenEmptySettings = value
+            plugin.saveSettings()
+            settingTab.display()
+        })
+    });
+
+    if (plugin.settings.showHiddenEmptySettings) { 
+        showHiddenEmptySettings(settingTab)
     }
 }

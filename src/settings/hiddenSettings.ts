@@ -65,3 +65,67 @@ export const showHiddenSettings = (settingTab: PPSettingTab) => {
                 })
             )
 }
+
+
+
+export const showHiddenEmptySettings = (settingTab: PPSettingTab) => {
+    const {containerEl, plugin} = settingTab
+
+    let hiddenSettingsEl = containerEl.createEl("div")
+        const addHiddenSetting = (property: string) => {
+            let propertyHiddenSetting = new Setting(hiddenSettingsEl)
+
+            propertyHiddenSetting.addText(text => {
+                text.setValue(property)
+                let inputEl = text.inputEl
+                inputEl.onblur = () => {
+                    let value = inputEl.value
+                    if (value && !plugin.settings.hiddenWhenEmptyProperties.find(p => p == value)) {
+                        plugin.settings.hiddenWhenEmptyProperties.push(value)
+                        plugin.settings.hiddenWhenEmptyProperties = plugin.settings.hiddenWhenEmptyProperties.filter(p => p != property)
+                        plugin.saveSettings()
+                        updateHiddenProperties(plugin)
+                        settingTab.display()
+                    }
+                }
+            })
+
+            .addButton(btn => btn
+                .setIcon("x")
+                .onClick(() => {
+                    plugin.settings.hiddenWhenEmptyProperties = plugin.settings.hiddenWhenEmptyProperties.filter(p => p != property)
+                    plugin.saveSettings()
+                    propertyHiddenSetting.settingEl.remove()
+                    updateHiddenProperties(plugin)
+                })
+            )
+        }
+        
+        for (let property of plugin.settings.hiddenWhenEmptyProperties) {
+            addHiddenSetting(property)
+        }
+
+        let newProperty = ""
+        let newPropertySetting = new Setting(containerEl)
+            .setName(i18n.t("ADD_HIDDEN_EMPTY_PROPERTY"))
+            .addText(text => text
+                .setValue("")
+                .onChange(value => newProperty = value)
+            )
+            .addButton(btn => btn
+                .setIcon("plus")
+                .onClick(() => {
+                    newProperty = newProperty.trim()
+                    if (newProperty && !plugin.settings.hiddenWhenEmptyProperties.find(p => p == newProperty)) {
+                        plugin.settings.hiddenWhenEmptyProperties.push(newProperty)
+                        plugin.saveSettings()
+                        updateHiddenProperties(plugin)
+                        addHiddenSetting(newProperty)
+                        let inputSetting = newPropertySetting.components[0]
+                        if (inputSetting instanceof TextComponent) {
+                            inputSetting.setValue("")
+                        }
+                    }
+                })
+            )
+}

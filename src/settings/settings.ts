@@ -51,6 +51,7 @@ export interface PPPluginSettings {
 	showColorSettings: boolean;
 	showTextColorSettings: boolean;
 	showHiddenSettings: boolean;
+	showHiddenEmptySettings: boolean;
 	iconSize: number;
 	iconTopMargin: number;
 	iconTopMarginMobile: number;
@@ -160,6 +161,7 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	showColorSettings: false,
 	showTextColorSettings: false,
 	showHiddenSettings: false,
+	showHiddenEmptySettings: false,
 	iconsFolder: "",
 	iconSize: 70,
 	iconTopMargin: 70,
@@ -210,7 +212,6 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	enableColoredTagsInTagPane: false,
 	mathProperties: [],
 	enableMath: false,
-	//enableMarkdown: false,
 	dataVersion: 0,
 	dateColors: {
 		past: {
