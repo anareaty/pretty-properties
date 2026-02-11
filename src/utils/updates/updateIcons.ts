@@ -87,6 +87,19 @@ export const renderIcon = async (
                 if (titleWrapper && titleIconWrapper) {
                     titleWrapper.prepend(titleIconWrapper)
                 }
+
+                if (titleWrapper instanceof HTMLElement) {
+                    titleWrapper.onclick = (e) => {
+                        if (e.target instanceof HTMLElement && 
+                            e.target?.classList.contains("title-wrapper") && 
+                            inlineTitle instanceof HTMLElement) {
+                                inlineTitle.focus()
+                                document.getSelection()?.modify("move", "forward", "documentboundary")
+                            }
+                    }
+                }
+
+                
             }
 
         } else {
@@ -306,6 +319,17 @@ export const renderTitleIcon = (view: any, plugin: PrettyPropertiesPlugin) => {
 
         if (titleWrapper && titleIconWrapper) {
           titleWrapper.prepend(titleIconWrapper)
+        }
+
+        if (titleWrapper instanceof HTMLElement) {
+            titleWrapper.onclick = (e) => {
+                if (e.target instanceof HTMLElement && 
+                    e.target?.classList.contains("title-wrapper") && 
+                    inlineTitle instanceof HTMLElement) {
+                        inlineTitle.focus()
+                        document.getSelection()?.modify("move", "forward", "documentboundary")
+                    }
+            }
         }
       } 
     } 
