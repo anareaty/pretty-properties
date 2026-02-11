@@ -54,12 +54,18 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
     input.onchange = () => {
       updateDateInput(input, plugin)
     }
+    input.onblur = () => {
+      updateDateInput(input, plugin)
+    }
   }
 
   if (type == "datetime") {
     let input = el.querySelector("input");
     updateDateTimeInput(input, plugin)
     input.onchange = () => {
+      updateDateTimeInput(input, plugin)
+    }
+    input.onblur = () => {
       updateDateTimeInput(input, plugin)
     }
   }

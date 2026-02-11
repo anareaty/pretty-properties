@@ -9,8 +9,6 @@ import { ImageSuggestModal } from "src/modals/imageSuggestModal";
 
 export const createBannerMenu = (e: MouseEvent, plugin: PrettyPropertiesPlugin) => {
 
-    console.log("banner menu")
-
     //@ts-ignore
     let plugins = plugin.app.plugins
     let menuExist = 

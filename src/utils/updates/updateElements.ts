@@ -75,6 +75,9 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
             input.onchange = () => {
                 if (input instanceof HTMLInputElement) updateDateInput(input, plugin)
             }
+            input.onblur = () => {
+                if (input instanceof HTMLInputElement) updateDateInput(input, plugin)
+            }
         }
     }
 
@@ -83,6 +86,9 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
         if (input instanceof HTMLInputElement) {
             updateDateTimeInput(input, plugin)
             input.onchange = () => {
+                if (input instanceof HTMLInputElement) updateDateTimeInput(input, plugin)
+            }
+            input.onblur = () => {
                 if (input instanceof HTMLInputElement) updateDateTimeInput(input, plugin)
             }
         }
