@@ -94,6 +94,7 @@ export const renderIcon = async (
                             e.target?.classList.contains("title-wrapper") && 
                             inlineTitle instanceof HTMLElement) {
                                 inlineTitle.focus()
+                                // @ts-ignore: Property 'modify' is a non-standard API
                                 document.getSelection()?.modify("move", "forward", "documentboundary")
                             }
                     }
@@ -327,6 +328,7 @@ export const renderTitleIcon = (view: any, plugin: PrettyPropertiesPlugin) => {
                     e.target?.classList.contains("title-wrapper") && 
                     inlineTitle instanceof HTMLElement) {
                         inlineTitle.focus()
+                        // @ts-ignore: Property 'modify' is a non-standard API
                         document.getSelection()?.modify("move", "forward", "documentboundary")
                     }
             }
