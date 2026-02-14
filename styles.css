@@ -1572,6 +1572,7 @@ button.longtext-color-button:hover {
 
 .title-wrapper {
   margin-block-end: var(--inline-title-margin-bottom);
+  cursor: text;
 }
 
 .title-wrapper .inline-title {
@@ -1588,6 +1589,7 @@ button.longtext-color-button:hover {
   font-family: var(--inline-title-font);
   letter-spacing: -0.015em;
   
+  
 }
 
 .title-icon-wrapper .pp-icon {
@@ -1600,6 +1602,7 @@ button.longtext-color-button:hover {
 
 .pp-icon {
   image-rendering: auto !important;
+  cursor: auto;
 }
 
 .title-icon-wrapper .pp-text-icon {
