@@ -1,7 +1,7 @@
 import { Setting, loadMathJax, Notice, Platform, Modal } from 'obsidian';
 import { i18n } from 'src/localization/localization';
 import { DEFAULT_SETTINGS, PPSettingTab } from 'src/settings/settings';
-import { updateAutoHideProps, updateBannerStyles, updateBaseTagsStyle, updateCoverStyles, updateHiddenEmptyProperties, updateHiddenMetadataContainer, updateHiddenPropertiesInPropTab, updateIconStyles, updatePillPaddings, updateRelativeDateColors } from 'src/utils/updates/updateStyles';
+import { updateAutoHideProps, updateBannerStyles, updateBaseTagsStyle, updateCoverStyles, updateHiddenEmptyProperties, updateHiddenMetadataContainer, updateHiddenPropertiesInPropTab, updateHidePropTitle, updateIconStyles, updatePillPaddings, updateRelativeDateColors } from 'src/utils/updates/updateStyles';
 import { updateAllProperties } from 'src/utils/updates/updateElements';
 
 
@@ -139,6 +139,7 @@ export const showOtherSettings = (settingTab: PPSettingTab) => {
                                 updateHiddenEmptyProperties(plugin)
                                 updateHiddenMetadataContainer(plugin)
                                 updateAutoHideProps(plugin)
+                                updateHidePropTitle(plugin)
                                 updateBaseTagsStyle(plugin)
                                 updateAllProperties(plugin)
                             }
@@ -172,6 +173,7 @@ export const showOtherSettings = (settingTab: PPSettingTab) => {
                 updateHiddenEmptyProperties(plugin)
                 updateHiddenMetadataContainer(plugin)
                 updateAutoHideProps(plugin)
+                updateHidePropTitle(plugin)
                 updateBaseTagsStyle(plugin)
                 updateAllProperties(plugin)
                 settingTab.display();
