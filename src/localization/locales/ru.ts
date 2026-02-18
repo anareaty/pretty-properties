@@ -212,5 +212,6 @@ export default {
   AUTOHIDE_PROPS_WITH_BANNER: "Автоматически скрывать свойства в заметке с баннером",
   AUTOHIDE_PROPS_WITH_BANNER_DESC: "Свойства будут показаны при наведении на верхнюю часть баннера.",
   HIDE_COVER_COLLAPSED: "Скрывать обложку когда свойства свёрнуты",
+  HIDE_PROPERTIES_TITLE: "Скрыть заголовок свойств",
 };
 

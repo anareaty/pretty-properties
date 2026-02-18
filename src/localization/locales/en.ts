@@ -202,6 +202,7 @@ export default {
   AUTOHIDE_PROPS_WITH_BANNER: "Autohide properties block when banner is enabled",
   AUTOHIDE_PROPS_WITH_BANNER_DESC: "Properties will be revealed when hovering over the top of the banner.",
   HIDE_COVER_COLLAPSED: "Hide cover when properties are collapsed",
+  HIDE_PROPERTIES_TITLE: "Hide properties title",
 };
 
 

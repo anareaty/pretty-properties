@@ -1624,3 +1624,21 @@ max-width: unset;
   width: 100%;
   height: 100%;
 }
+
+
+/* Hide properties title */
+
+.hide-properties-title .metadata-properties-heading:not(:focus) .metadata-properties-title {
+  font-size: 0;
+}
+
+.hide-properties-title .metadata-properties-heading {
+  display: block;
+  padding: 0;
+  margin-bottom: 0;
+}
+
+.hide-properties-title .metadata-container.is-collapsed {
+  margin-block-end: 0;
+  padding: 0;
+}
