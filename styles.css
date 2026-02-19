@@ -1642,3 +1642,19 @@ max-width: unset;
   margin-block-end: 0;
   padding: 0;
 }
+
+/* Need to make inset smaller so collapse indicator is visible on canvas nodes */
+
+.hide-properties-title .markdown-embed-content .metadata-properties-heading .collapse-indicator,
+.hide-properties-title .mod-inside-iframe .metadata-properties-heading .collapse-indicator {
+    inset-inline-start: -16px;
+}
+
+/* Hide metadata add button */
+
+.hide-metadata-add-button .markdown-source-view .metadata-content:not(:focus-within) .metadata-add-button,
+.hide-metadata-add-button .markdown-preview-view .metadata-content:not(:focus-within) .metadata-add-button {
+  display: none;
+  
+}
+

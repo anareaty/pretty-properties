@@ -213,5 +213,6 @@ export default {
   AUTOHIDE_PROPS_WITH_BANNER_DESC: "Свойства будут показаны при наведении на верхнюю часть баннера.",
   HIDE_COVER_COLLAPSED: "Скрывать обложку когда свойства свёрнуты",
   HIDE_PROPERTIES_TITLE: "Скрыть заголовок свойств",
+  HIDE_ADD_PROPERTY_BUTTON: "Скрыть кнопку добавления свойств",
 };
 

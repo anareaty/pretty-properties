@@ -249,3 +249,8 @@ export const updateBaseTagsStyle = (plugin: PrettyPropertiesPlugin) => {
 export const updateHidePropTitle = (plugin: PrettyPropertiesPlugin) => {
   document.body.classList.toggle("hide-properties-title", plugin.settings.hidePropTitle)
 }
+
+
+export const updateHideMetadataAddButton = (plugin: PrettyPropertiesPlugin) => {
+  document.body.classList.toggle("hide-metadata-add-button", plugin.settings.hideAddPropertyButton)
+}

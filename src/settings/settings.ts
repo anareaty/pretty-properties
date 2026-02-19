@@ -117,6 +117,7 @@ export interface PPPluginSettings {
 	autoHidePropertiesWithBanner: boolean,	
 	hideCoverCollapsed: boolean,
 	hidePropTitle: boolean,
+	hideAddPropertyButton: boolean,
 }
 
 
@@ -243,6 +244,7 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	autoHidePropertiesWithBanner: false,
 	hideCoverCollapsed: false,
 	hidePropTitle: false,
+	hideAddPropertyButton: false,
 
 }
 

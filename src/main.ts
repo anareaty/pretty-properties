@@ -9,6 +9,7 @@ import {
 	updateCoverStyles, 
 	updateHiddenEmptyProperties, 
 	updateHiddenMetadataContainer, 
+	updateHideMetadataAddButton, 
 	updateHidePropTitle, 
 	updateIconStyles,
 	updateRelativeDateColors,
@@ -79,6 +80,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		updateHiddenMetadataContainer(this)
 		updateAutoHideProps(this)
 		updateHidePropTitle(this)
+		updateHideMetadataAddButton(this)
 		updateBaseTagsStyle(this)
 		
 
