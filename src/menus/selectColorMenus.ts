@@ -164,8 +164,11 @@ export const handleTagMenu = (e: MouseEvent | TouchEvent, el: HTMLElement, plugi
     menuManager.closeAndFlush()
     let tag = el.closest(".cm-hashtag");
     if (tag?.classList.contains("cm-hashtag-begin") && tag?.classList.contains("cm-hashtag-inner")) {
-        tag = tag.parentElement?.nextElementSibling || null
+        tag = tag.parentElement?.nextElementSibling?.firstElementChild || null
+        
     }
+
+
     if (tag instanceof HTMLElement) {
         let tagText = tag.getAttribute("data-tag-value") || ""
         if (tagText) {

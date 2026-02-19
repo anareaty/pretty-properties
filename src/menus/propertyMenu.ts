@@ -1,20 +1,36 @@
-import { MenuItem } from "obsidian";
+import { MarkdownView, MenuItem, View } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { i18n } from "src/localization/localization";
 import { updateHiddenProperties } from "src/utils/updates/updateHiddenProperties";
 import { updateAllProperties } from "src/utils/updates/updateElements";
+import { around, dedupe } from "monkey-around";
 
 export const handlePropertyMenu = (el: HTMLElement | SVGElement, plugin: PrettyPropertiesPlugin) => {
+
+
+
+    
     
     let propEl = el.closest(".metadata-property");
+    
     if (propEl instanceof HTMLElement) {
         let propName = propEl?.getAttribute("data-property-key");
 
         if (propName) {
+
+            
+        
+
             let menuManager = plugin.menuManager
             menuManager.closeAndFlush()
 
+        
+
             if (plugin.settings.hiddenProperties.find((p) => p == propName)) {
+
+                
+
+
                 menuManager.addItemAfter(
                     ["clipboard"],
                     i18n.t("UNHIDE_PROPERTY"),
@@ -33,6 +49,9 @@ export const handlePropertyMenu = (el: HTMLElement | SVGElement, plugin: PrettyP
                         })
                 );
             } else {
+
+          
+
                 menuManager.addItemAfter(
                     ["clipboard"],
                     i18n.t("HIDE_PROPERTY"),
@@ -50,6 +69,8 @@ export const handlePropertyMenu = (el: HTMLElement | SVGElement, plugin: PrettyP
                             updateHiddenProperties(plugin);
                         })
                 );
+
+             
             }
 
 
@@ -241,3 +262,8 @@ export const handlePropertyMenu = (el: HTMLElement | SVGElement, plugin: PrettyP
         }
     }
 }
+
+
+
+
+

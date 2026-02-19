@@ -7,6 +7,7 @@ import { updateAllMetadataContainers } from "src/utils/updates/updateHiddenPrope
 import { updateCoverForView } from "src/utils/updates/updateCovers";
 
 
+
 export const patchMarkdownView = async (plugin: PrettyPropertiesPlugin) => {
 
   plugin.patches.uninstallPPMarkdownPatch = around(MarkdownView.prototype, {
@@ -14,6 +15,8 @@ export const patchMarkdownView = async (plugin: PrettyPropertiesPlugin) => {
     onLoadFile(old) {
       return dedupe("pp-patch-markdown-around-key", old, async function(...args) {
         let view = this
+
+        
 
         this.previewMode.renderer.onRendered = new Proxy(this.previewMode.renderer.onRendered, {
           apply(old2, thisArg2, args2) {
@@ -35,6 +38,10 @@ export const patchMarkdownView = async (plugin: PrettyPropertiesPlugin) => {
         this.loadFrontmatter = new Proxy(this.loadFrontmatter, {
           apply(old2, thisArg2, args2) {
             let result = old2.call(thisArg2, ...args2)
+
+           
+
+            
             updateAllMetadataContainers()
             updateCoverForView(this, plugin)
             return result

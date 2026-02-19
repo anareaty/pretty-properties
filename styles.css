@@ -1133,17 +1133,20 @@ a.tag.transparent-color {
 /* We need to use more complex styles instead of just 'display: none' so the property can be revealed when selected by keyboard navigation. */
 
 /* Hide properties marked as hidden */
-body:not(.show-hidden-properties) .workspace-leaf-content[data-type='markdown'] .metadata-property.pp-property-hidden:not(:focus, :focus-within),
+body:not(.show-hidden-properties) .markdown-source-view .metadata-property.pp-property-hidden:not(:focus, :focus-within),
+body:not(.show-hidden-properties) .markdown-preview-view .metadata-property.pp-property-hidden:not(:focus, :focus-within),
 body:not(.show-hidden-properties).hidden-props-in-prop-tab .workspace-leaf-content[data-type='file-properties'] .metadata-property.pp-property-hidden:not(:focus, :focus-within),
 body:not(.show-hidden-properties) .hover-popover .metadata-property.pp-property-hidden:not(:focus, :focus-within),
 
 /* Hide empty properties when the settings set to hide all empty properties */
-.hide-all-empty-properties:not(.show-hidden-properties) .workspace-leaf-content[data-type='markdown'] .metadata-property.is-empty:not(:focus, :focus-within), 
+.hide-all-empty-properties:not(.show-hidden-properties) .markdown-source-view .metadata-property.is-empty:not(:focus, :focus-within), 
+.hide-all-empty-properties:not(.show-hidden-properties) .markdown-preview-view .metadata-property.is-empty:not(:focus, :focus-within), 
 .hide-all-empty-properties:not(.show-hidden-properties).hidden-props-in-prop-tab .workspace-leaf-content[data-type='file-properties'] .metadata-property.is-empty:not(:focus, :focus-within), 
 .hide-all-empty-properties:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty:not(:focus, :focus-within),
 
 /* Hide empty properties when marked as hide when empty */
-body:not(.show-hidden-properties) .workspace-leaf-content[data-type='markdown'] .metadata-property.is-empty.pp-property-hidden-when-empty:not(:focus, :focus-within), 
+body:not(.show-hidden-properties) .markdown-source-view .metadata-property.is-empty.pp-property-hidden-when-empty:not(:focus, :focus-within), 
+body:not(.show-hidden-properties) .markdown-preview-view .metadata-property.is-empty.pp-property-hidden-when-empty:not(:focus, :focus-within), 
 body:not(.show-hidden-properties).hidden-props-in-prop-tab .workspace-leaf-content[data-type='file-properties'] .metadata-property.is-empty.pp-property-hidden-when-empty:not(:focus, :focus-within), 
 body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-property-hidden-when-empty:not(:focus, :focus-within),
 

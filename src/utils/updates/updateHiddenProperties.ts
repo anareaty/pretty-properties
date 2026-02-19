@@ -1,4 +1,5 @@
 import PrettyPropertiesPlugin from "src/main";
+import { querySelectorsWithIframes, querySelectorsWithIframesForContainer } from "../querySelectorsHelper";
 
 
 export const updateHiddenProperty = async (propEl: HTMLElement, plugin: PrettyPropertiesPlugin) => {
@@ -25,9 +26,9 @@ export const updateHiddenProperty = async (propEl: HTMLElement, plugin: PrettyPr
 
 export const hideMetadataContainerIfAllPropertiesHidden = (metadataContainer: HTMLElement) => {
 
-    let propertiesNotHidden = metadataContainer.querySelectorAll(".metadata-property:not(.pp-property-hidden, .is-empty.pp-property-hidden-when-empty)")
+    let propertiesNotHidden = querySelectorsWithIframesForContainer(".metadata-property:not(.pp-property-hidden, .is-empty.pp-property-hidden-when-empty)", metadataContainer)
 
-    let propertiesNotEmptyOrHidden = metadataContainer.querySelectorAll(".metadata-property:not(.pp-property-hidden, .is-empty)")
+    let propertiesNotEmptyOrHidden = querySelectorsWithIframesForContainer(".metadata-property:not(.pp-property-hidden, .is-empty)", metadataContainer)
 
 
     if (propertiesNotHidden.length == 0) {
@@ -47,7 +48,7 @@ export const hideMetadataContainerIfAllPropertiesHidden = (metadataContainer: HT
 
 export const updateAllMetadataContainers = () => {
 
-    let metadataContainers = document.querySelectorAll(".metadata-container")
+    let metadataContainers = querySelectorsWithIframes(".metadata-container")
     for (let metadataContainer of metadataContainers) {
         if (metadataContainer instanceof HTMLElement) {
             hideMetadataContainerIfAllPropertiesHidden(metadataContainer)
@@ -61,9 +62,8 @@ export const updateAllMetadataContainers = () => {
 
 
 export const updateHiddenPropertiesForContainer = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-    let properties = container.querySelectorAll(".metadata-property")
+    let properties = querySelectorsWithIframesForContainer(".metadata-property", container)
 
-    
     for (let propEl of properties) {
         if (propEl instanceof HTMLElement) {
             updateHiddenProperty(propEl, plugin);

@@ -3,6 +3,7 @@ import PrettyPropertiesPlugin from "src/main";
 import { createColorButton } from "src/menus/selectColorMenus";
 import { finishRenderMath, loadMathJax, renderMath } from "obsidian"
 import { hideMetadataContainerIfAllPropertiesHidden } from "./updateHiddenProperties";
+import { querySelectorsWithIframesForContainer } from "../querySelectorsHelper";
 
 
 export const getTextLightness = (color: any) => {
@@ -420,7 +421,8 @@ export const updateCardLongtext = async (pill: HTMLElement, plugin: PrettyProper
 export const updateLongTexts = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
 
 	
-	let longtexts = container.querySelectorAll(".metadata-input-longtext");
+	let longtexts = querySelectorsWithIframesForContainer(".metadata-input-longtext", container);
+
 	
 	for (let pill of longtexts) {
 		if (pill instanceof HTMLElement) {

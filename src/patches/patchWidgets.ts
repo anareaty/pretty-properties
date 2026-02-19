@@ -193,12 +193,14 @@ export const patchPropertyWidgets = async (plugin: PrettyPropertiesPlugin) => {
   for (let type in widgets) {
       let widget = widgets[type]
 
-      
+
       plugin.patches.uninstallWidgetPatch[type] = around(widget, {
+
         render(oldRender: any) {
-          return dedupe("pp-patch-base-cards-around-key", oldRender, (...args: any[]) => {
+          return dedupe("pp-patch-widgets-around-key", oldRender, (...args: any[]) => {
             
             let rendered = oldRender && oldRender.apply(this, args)
+
             updateWidgets(type, rendered, args, plugin)
             let renderValues = rendered?.multiselect?.renderValues
             if (renderValues) {
@@ -210,12 +212,14 @@ export const patchPropertyWidgets = async (plugin: PrettyPropertiesPlugin) => {
                 }
               })
             }
-
-
-            
             return rendered
           })
         }
+
+
+
+
+
     })
   }
 

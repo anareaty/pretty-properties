@@ -8,6 +8,7 @@ import { updateCardLongtext, updateLongtext, updateMultiselectPill, updateSettin
 import { renderBanner, updateBannerForView } from "./updateBanners";
 import { getNestedProperty } from "../propertyUtils";
 import { updateAllMetadataContainers } from "./updateHiddenProperties";
+import { querySelectorsWithIframes, querySelectorsWithIframesForContainer } from "../querySelectorsHelper";
 
 
 
@@ -16,17 +17,13 @@ import { updateAllMetadataContainers } from "./updateHiddenProperties";
 
 export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => { 
 
-  
-
-    
-   
-    let multitexts = document.querySelectorAll(".metadata-property:not([data-property-key='tags']) .multi-select-pill")
+    let multitexts = querySelectorsWithIframes(".metadata-property:not([data-property-key='tags']) .multi-select-pill")
     
     for (let pill of multitexts) {
         if (pill instanceof HTMLElement) updateMultiselectPill(pill, plugin) 
     }
     
-    let tagPills = document.querySelectorAll(".metadata-property[data-property-key='tags'] .multi-select-pill")
+    let tagPills = querySelectorsWithIframes(".metadata-property[data-property-key='tags'] .multi-select-pill")
     for (let pill of tagPills) {
         if (pill instanceof HTMLElement) updateTagPill(pill, plugin)
     }
@@ -60,7 +57,7 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
 
     
 
-    let tags = document.querySelectorAll("a.tag")
+    let tags = querySelectorsWithIframes("a.tag")
     
     for (let pill of tags) {
         if (pill instanceof HTMLElement) updateTag(pill, plugin)
@@ -68,7 +65,7 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
 
     
 
-    let dates = document.querySelectorAll(".metadata-input.mod-date")
+    let dates = querySelectorsWithIframes(".metadata-input.mod-date")
     for (let input of dates) {
         if (input instanceof HTMLInputElement) {
             updateDateInput(input, plugin)
@@ -81,7 +78,7 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
         }
     }
 
-    let datetimes = document.querySelectorAll(".metadata-input.mod-datetime")
+    let datetimes = querySelectorsWithIframes(".metadata-input.mod-datetime")
     for (let input of datetimes) {
         if (input instanceof HTMLInputElement) {
             updateDateTimeInput(input, plugin)
@@ -98,7 +95,7 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
 
     
 
-    let longtexts = document.querySelectorAll(".metadata-input-longtext")
+    let longtexts = querySelectorsWithIframes(".metadata-input-longtext")
 
     for (let input of longtexts) {
         if (input instanceof HTMLElement) {
@@ -111,7 +108,7 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
 
 
 
-    let mdLinks = document.querySelectorAll(".metadata-property-value > .metadata-link")
+    let mdLinks = querySelectorsWithIframes(".metadata-property-value > .metadata-link")
 
     for (let link of mdLinks) {
         if (link instanceof HTMLElement) {
@@ -133,7 +130,7 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
     }
 
 
-    let unknown = document.querySelectorAll(".metadata-property-value-item.mod-unknown")
+    let unknown = querySelectorsWithIframes(".metadata-property-value-item.mod-unknown")
 
     for (let el of unknown) {
         if (el instanceof HTMLElement) {
@@ -167,7 +164,7 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
         let file = view.file
 
         if (file instanceof TFile) {
-            let numbers = view.containerEl.querySelectorAll("input.metadata-input-number")
+            let numbers = querySelectorsWithIframesForContainer("input.metadata-input-number", view.containerEl)
             for (let input of numbers) {
                 if (input instanceof HTMLInputElement) {
                     
@@ -214,7 +211,19 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
                 })
             }
         }
+
     })
+
+
+    // Also dispatch active editor (useful for canvas)
+    let editor = plugin.app.workspace.activeEditor?.editor
+    if (editor) {
+        // @ts-expect-error, not typed
+        const editorView = editor.cm as EditorView;
+        editorView.dispatch({
+            userEvent: "updatePillColors"
+        })
+    }
 
     
     
@@ -229,7 +238,7 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
 
 
 export const updateEmptyProperties = async (plugin: PrettyPropertiesPlugin) => {
-    let propertyEls = document.querySelectorAll(".metadata-property")
+    let propertyEls = querySelectorsWithIframes(".metadata-property")
     for (let propertyEl of propertyEls) {
         let emptyLongtext = propertyEl.querySelector(".metadata-input-longtext:empty")
     }
