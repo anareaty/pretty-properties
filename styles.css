@@ -1098,12 +1098,22 @@ a.tag.transparent-color {
 }
 
 
-.cm-hashtag:hover,
+.cm-hashtag-inner:hover,
 .cm-hashtag-begin:hover + .cm-hashtag > .cm-hashtag-inner,
-.cm-hashtag-begin:hover + .cm-hashtag + .cm-hashtag > .cm-hashtag-inner,
+.cm-hashtag-begin:hover + .cm-hashtag:not(.cm-hashtag-end) + .cm-hashtag > .cm-hashtag-inner,
 .cm-hashtag:hover + .cm-hashtag-end > .cm-hashtag-inner,
-.cm-hashtag-begin:has(+ .cm-hashtag:hover, + .cm-hashtag + .cm-hashtag:hover) > .cm-hashtag-inner,
-.cm-hashtag:has(+ .cm-hashtag-end:hover) > .cm-hashtag-inner {
+.cm-hashtag-begin:has(+ .cm-hashtag:hover, + .cm-hashtag + .cm-hashtag-end:hover) > .cm-hashtag-inner,
+.cm-hashtag:has(+ .cm-hashtag-end:hover) > .cm-hashtag-inner
+
+/*
+,
+
+.
+
+,
+ 
+*/
+{
   background-color: var(--tag-background-hover);
 }
 
@@ -1644,6 +1654,11 @@ max-width: unset;
 .hide-properties-title .metadata-container.is-collapsed {
   margin-block-end: 0;
   padding: 0;
+}
+
+.hide-properties-title .metadata-properties-heading.is-collapsed .collapse-indicator {
+    top:-1em;
+
 }
 
 /* Need to make inset smaller so collapse indicator is visible on canvas nodes */
