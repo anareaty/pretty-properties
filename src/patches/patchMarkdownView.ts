@@ -16,8 +16,6 @@ export const patchMarkdownView = async (plugin: PrettyPropertiesPlugin) => {
       return dedupe("pp-patch-markdown-around-key", old, async function(...args) {
         let view = this
 
-        
-
         this.previewMode.renderer.onRendered = new Proxy(this.previewMode.renderer.onRendered, {
           apply(old2, thisArg2, args2) {
             let result = old2.call(thisArg2, ...args2) 
@@ -30,7 +28,6 @@ export const patchMarkdownView = async (plugin: PrettyPropertiesPlugin) => {
           apply(old2, thisArg2, args2) {
             let result = old2.call(thisArg2, ...args2) 
             renderTitleIcon(view, plugin)
-            
             return result
           }
         })
@@ -38,18 +35,15 @@ export const patchMarkdownView = async (plugin: PrettyPropertiesPlugin) => {
         this.loadFrontmatter = new Proxy(this.loadFrontmatter, {
           apply(old2, thisArg2, args2) {
             let result = old2.call(thisArg2, ...args2)
-
-           
-
-            
-            updateAllMetadataContainers()
             updateCoverForView(this, plugin)
+            updateAllMetadataContainers(plugin)
             return result
           }
         })
 
         await updateImagesForView(this, plugin);
         renderTitleIcon(view, plugin)
+        updateAllMetadataContainers(plugin)
         
         return old && old.apply(this, args)
       })

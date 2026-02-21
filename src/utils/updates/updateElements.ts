@@ -186,7 +186,7 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
                                     num.classList.remove("is-empty")
                                 }
                             }
-                            updateAllMetadataContainers()
+                            updateAllMetadataContainers(plugin)
                             
                         }
                     }
@@ -230,7 +230,7 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
     updateTagPaneTagsAll(plugin)
     updateSettingPills(plugin)
     
-    updateAllMetadataContainers()
+    updateAllMetadataContainers(plugin)
     
 }
 

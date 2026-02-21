@@ -17,6 +17,7 @@ export const updateHiddenProperty = async (propEl: HTMLElement, plugin: PrettyPr
     }
 
     let metadataContainer = propEl.closest(".metadata-container")
+
     if (metadataContainer instanceof HTMLElement) {
         hideMetadataContainerIfAllPropertiesHidden(metadataContainer)
     }
@@ -26,10 +27,12 @@ export const updateHiddenProperty = async (propEl: HTMLElement, plugin: PrettyPr
 
 export const hideMetadataContainerIfAllPropertiesHidden = (metadataContainer: HTMLElement) => {
 
+
     let propertiesNotHidden = querySelectorsWithIframesForContainer(".metadata-property:not(.pp-property-hidden, .is-empty.pp-property-hidden-when-empty)", metadataContainer)
 
     let propertiesNotEmptyOrHidden = querySelectorsWithIframesForContainer(".metadata-property:not(.pp-property-hidden, .is-empty)", metadataContainer)
 
+    
 
     if (propertiesNotHidden.length == 0) {
         metadataContainer.classList.add("pp-mc-hidden")
@@ -46,9 +49,9 @@ export const hideMetadataContainerIfAllPropertiesHidden = (metadataContainer: HT
 
 
 
-export const updateAllMetadataContainers = () => {
-
+export const updateAllMetadataContainers = (plugin: PrettyPropertiesPlugin) => {
     let metadataContainers = querySelectorsWithIframes(".metadata-container")
+    
     for (let metadataContainer of metadataContainers) {
         if (metadataContainer instanceof HTMLElement) {
             hideMetadataContainerIfAllPropertiesHidden(metadataContainer)
@@ -60,8 +63,8 @@ export const updateAllMetadataContainers = () => {
 
 
 
-
 export const updateHiddenPropertiesForContainer = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
+
     let properties = querySelectorsWithIframesForContainer(".metadata-property", container)
 
     for (let propEl of properties) {

@@ -84,10 +84,10 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
       updateProgress(parent, plugin, sourcePath)
       if (input.value === "") {
         parent.classList.add("is-empty")
-        updateAllMetadataContainers()
+        updateAllMetadataContainers(plugin)
       } else {
         parent.classList.remove("is-empty")
-        updateAllMetadataContainers()
+        updateAllMetadataContainers(plugin)
       }
     }
   }
@@ -105,12 +105,12 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
         let link = el.querySelector(".metadata-link");
         if (link) {
           parent.classList.remove("is-empty")
-          updateAllMetadataContainers()
+          updateAllMetadataContainers(plugin)
         }
       };
     } else if (link) {
       parent.classList.remove("is-empty")
-      updateAllMetadataContainers()
+      updateAllMetadataContainers(plugin)
     }
 
     parent.setAttribute("data-source-path", sourcePath)
@@ -155,7 +155,7 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
         } else {
           parent.classList.remove("is-empty")
         }
-        updateAllMetadataContainers()
+        updateAllMetadataContainers(plugin)
       }
     }
   }
@@ -170,7 +170,7 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
     parent.classList.add("pp-property-hidden-when-empty")
   }
 
-  updateAllMetadataContainers()
+  updateAllMetadataContainers(plugin)
 }
 
 
