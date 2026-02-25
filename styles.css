@@ -1648,7 +1648,11 @@ button.longtext-color-button:hover {
 
 
 .multi-select-pill {
-max-width: unset;
+  max-width: unset;
+}
+
+.metadata-property:not(:focus-within) .multi-select-input {
+  display: none;
 }
 
 .pp-pdf-cover-canvas {
@@ -1698,3 +1702,10 @@ max-width: unset;
   
 }
 
+/* Fix for Minimal theme */
+
+[data-theme="Minimal"] .markdown-source-view.mod-cm6.is-readable-line-width .cm-sizer>.title-wrapper {
+    max-width: var(--max-width);
+    width: var(--line-width);
+    margin-inline: var(--content-margin)!important;
+}

@@ -13,6 +13,7 @@ import {
 	updateHidePropTitle, 
 	updateIconStyles,
 	updateRelativeDateColors,
+	updateTheme,
 } from "./utils/updates/updateStyles";
 import MenuManager from "src/utils/menuManager";
 import { i18n } from "./localization/localization";
@@ -82,6 +83,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		updateHidePropTitle(this)
 		updateHideMetadataAddButton(this)
 		updateBaseTagsStyle(this)
+		updateTheme(this)
 		
 
 		this.app.workspace.onLayoutReady(async() => {
@@ -99,6 +101,14 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				updateAllProgressElsOnMaxChange(file, cache, this)
 				updateTaskCountOnCacheChanged(file, cache, this)
 				updateTaskNotesTaskCountOnCacheChanged(file, cache, this)
+			})
+		);
+
+		
+
+		this.registerEvent(
+			this.app.workspace.on('css-change', () => {
+				updateTheme(this)
 			})
 		);
 
@@ -233,6 +243,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				registerWindowEvents(window);
 			})
 		);
+
+		
 
 		this.addSettingTab(new PPSettingTab(this.app, this));
 

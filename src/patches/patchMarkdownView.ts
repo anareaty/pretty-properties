@@ -19,7 +19,13 @@ export const patchMarkdownView = async (plugin: PrettyPropertiesPlugin) => {
         this.previewMode.renderer.onRendered = new Proxy(this.previewMode.renderer.onRendered, {
           apply(old2, thisArg2, args2) {
             let result = old2.call(thisArg2, ...args2) 
-            renderTitleIcon(view, plugin)
+
+            try {
+              renderTitleIcon(view, plugin)
+            } catch {
+              console.error("Can not render title icon in preview mode")
+            }
+            
             return result
           }
         })
@@ -27,7 +33,13 @@ export const patchMarkdownView = async (plugin: PrettyPropertiesPlugin) => {
         this.editMode.show = new Proxy(this.editMode.show, {
           apply(old2, thisArg2, args2) {
             let result = old2.call(thisArg2, ...args2) 
-            renderTitleIcon(view, plugin)
+
+            try {
+              renderTitleIcon(view, plugin)
+            } catch {
+              console.error("Can not render title icon in edit mode")
+            }
+            
             return result
           }
         })
@@ -35,15 +47,45 @@ export const patchMarkdownView = async (plugin: PrettyPropertiesPlugin) => {
         this.loadFrontmatter = new Proxy(this.loadFrontmatter, {
           apply(old2, thisArg2, args2) {
             let result = old2.call(thisArg2, ...args2)
-            updateCoverForView(this, plugin)
-            updateAllMetadataContainers(plugin)
+
+            try {
+              updateCoverForView(this, plugin)  
+            } catch {
+              console.error("Can not update cover for markdown view")
+            }
+
+            try {
+              updateAllMetadataContainers(plugin) 
+            } catch {
+              console.error("Can not update metadata containers on loading frontmatter")
+            }
+            
+            
             return result
           }
         })
 
-        await updateImagesForView(this, plugin);
-        renderTitleIcon(view, plugin)
-        updateAllMetadataContainers(plugin)
+
+        try {
+          await updateImagesForView(this, plugin);
+        } catch {
+          console.error("Can not update images for file view")
+        }
+        
+
+
+        try {
+          renderTitleIcon(view, plugin)
+        } catch {
+          console.error("Can not render title icon on file load")
+        }
+
+        
+        try {
+          updateAllMetadataContainers(plugin) 
+        } catch {
+          console.error("Can not update metadata containers on file load")
+        }
         
         return old && old.apply(this, args)
       })
