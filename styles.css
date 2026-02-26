@@ -1651,9 +1651,7 @@ button.longtext-color-button:hover {
   max-width: unset;
 }
 
-.metadata-property:not(:focus-within) .multi-select-input {
-  display: none;
-}
+
 
 .pp-pdf-cover-canvas {
   width: 100%;
