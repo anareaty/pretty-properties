@@ -16,6 +16,8 @@ Adding the cover will add the "cover" property to your note. Do not delete the p
 
 Right-click on the cover to change it's shape or select another image. You can use initial shape with 3 custom widths, vertical, horizontal, square and circle. Shapes are stored in cssclasses property. You can set the custom width for every shape.
 
+You can also show arbitrary markdown as a cover. See [Formatting](#Formatting) for more infos.
+
 > [!NOTE]  
 > Cover shapes would look a bit different on mobile devices with small screen. This is intentional to make them look more neat in the limited space.
 
@@ -127,6 +129,73 @@ Task count can also work with the task created by TaskNotes plugin. You can coun
 If you Ctrl+click on any property value, the plugin will open search for this value in the search tab (works only on desktop). If the property value is a link you should click outside the link.
 
 ![base](images/image_search.png)
+
+## Formatting
+
+The formatting settings allow you to show properties differently or render any markdown as a cover. This allows you to for example store a number property that represents a duration in seconds (eg. `829`), but render it visually as a readable text (eg. `13m 49s`). This essentially avoids having to store the same value twice in a note with different formats.
+
+![property-formatting.png](images/property-formatting.png)
+
+This is accomplished using [Handlebars](https://handlebarsjs.com/), a templating language similar to Obsidian's built in date/time template syntax.
+The syntax for this uses curly brackets around helper names. Arguments can be passed separated by spaces and they can be nested.
+Pretty propperties adds `{{propertyValue}}` and `{{propertyName}}` which will be replaced by the property content.
+
+Currently supported helper packages are:
+- [@budibase/handlebars-helpers](https://www.npmjs.com/package/%40budibase/handlebars-helpers) for general utils
+- [handlebars.moment](https://www.npmjs.com/package/handlebars.moment) for time and duration
+
+## Custom helpers
+
+Pretty properties mainly uses the handlebar helpers from the packages list above. However to make some functionality more easily accessible it also adds some custom helpers:
+### `{{durationAbbreviated}}`
+Turns a duration into abbreviated numbers, ignoring leading zeros.
+#### Params
+- `time` **{Number}**: The input value
+- `unit` **{String}**: The unit of the input value
+- `returns` **{String}**
+### `{{durationFormatted}}`
+Turns a duration into the specified format.
+#### Params
+- `time` **{Number}**: The input value
+- `unit` **{String}**: The unit of the input value
+- `format` **{Boolean}**: Optional. See [dayjs](https://day.js.org/docs/en/display/format)
+- `returns` **{String}**
+### `{{durationHumanized}}`
+Turns a duration into a natural sounding string.
+#### Params
+- `time` **{Number}**: The input value
+- `unit` **{String}**: The unit of the input value
+- `withSuffix` **{Boolean}**: Optional. Will add "in " at the front or " ago" at the end.
+- `returns` **{String}**
+
+## Example Templates
+
+### Properties
+Reverse the order of a property:
+````
+{{reverse propertyValue}}
+````
+Show a number as as abbreviated (eg. `1234567` -> `1.23M`):
+````
+{{uppercase (toAbbr propertyValue)}}
+````
+Show a duration originally in seconds as human readable (eg. `829` -> `in 14 minutes`):
+````
+{{durationHumanized propertyValue "s" true}}
+````
+Show a duration originally in seconds as a clock (eg. `829` -> `00:13:49`):
+````
+{{durationFormatted propertyValue "seconds" "HH:mm:ss"}}
+````
+Show a duration originally in seconds as abbreviated (eg. `829` -> `00h 13m 49s`):
+````
+{{durationFormatted propertyValue "seconds" "HH"}}h {{durationFormatted propertyValue "seconds" "mm"}}m {{durationFormatted propertyValue "seconds" "ss"}}s
+````
+Show a steamid property as an iframe (as a cover):
+````
+<iframe src="https://store.steampowered.com/widget/{{propertyValue}}" frameborder="0" width="100%" height="190"></iframe>
+````
+![markdown-cover](images/markdown-cover.png)
 
 ## Bases support 
 
