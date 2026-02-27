@@ -22,7 +22,11 @@
 		"typescript": "4.7.4"
 	},
 	"dependencies": {
+		"@budibase/handlebars-helpers": "^0.14.2",
+		"dayjs": "^1.11.19",
 		"emojilib": "^4.0.2",
+		"handlebars": "^4.7.8",
+		"handlebars.moment": "^1.0.4",
 		"monkey-around": "3.0.0"
 	}
 }

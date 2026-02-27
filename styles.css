@@ -296,8 +296,6 @@
 
 .metadata-side-image {
     grid-row: 1/3;
-    font-size: 0;
-    text-align: center;
 }
 
 
@@ -365,17 +363,6 @@
 
 
 
-.metadata-side-image:not(.top, .bottom) .pp-cover-image {
-  max-height: var(--cover-max-height);
-}
-
-.metadata-side-image.top .pp-cover-image,
-.metadata-side-image.bottom .pp-cover-image {
-  max-height: var(--cover-max-height-top-bottom);
-}
-
-
-
 
 .metadata-side-image.initial .pp-cover-image,
 .metadata-side-image.initial-2 .pp-cover-image,
@@ -394,7 +381,6 @@
   }
   
   .metadata-side-image .pp-cover-image {
-    height: 200px !important;
 	  width: auto !important;
     margin: auto;
   }
@@ -1201,6 +1187,17 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 
 
 
+.pp-formatted-value-overlay {
+	position: absolute;
+	pointer-events: none;
+}
+
+.pp-formatted-value-hidden {
+	color: inherit;
+	-webkit-text-fill-color: transparent;
+	caret-color: var(--text-normal);
+}
+
 
 
 
@@ -1659,51 +1656,18 @@ button.longtext-color-button:hover {
 }
 
 
-/* Hide properties title */
 
-.hide-properties-title .metadata-properties-heading:not(:focus) .metadata-properties-title {
-  font-size: 0;
+.pp-format-wrapper {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
 }
 
-.hide-properties-title .metadata-properties-heading {
-  display: block;
-  padding: 0;
-  margin-bottom: 0;
+.pp-format-invalid {
+	box-shadow: 0 0 0 1px var(--text-error);
 }
 
-.hide-properties-title .metadata-container.is-collapsed {
-  margin-block-end: 0;
-  padding: 0;
-}
-
-.hide-properties-title .metadata-properties-heading.is-collapsed .collapse-indicator {
-    top:-1em;
-
-}
-
-.metadata-properties-heading .collapse-indicator {
-    inset-inline-start: -21px; 
-}
-
-/* Need to make inset smaller so collapse indicator is visible on canvas nodes */
-
-.hide-properties-title .markdown-embed-content .metadata-properties-heading .collapse-indicator,
-.hide-properties-title .mod-inside-iframe .metadata-properties-heading .collapse-indicator {
-    inset-inline-start: -16px;
-}
-
-/* Hide metadata add button */
-
-.hide-metadata-add-button .markdown-source-view .metadata-content:not(:focus-within) .metadata-add-button,
-.hide-metadata-add-button .markdown-preview-view .metadata-content:not(:focus-within) .metadata-add-button {
-  display: none;
-  
-}
-
-/* Fix for Minimal theme */
-
-[data-theme="Minimal"] .markdown-source-view.mod-cm6.is-readable-line-width .cm-sizer>.title-wrapper {
-    max-width: var(--max-width);
-    width: var(--line-width);
-    margin-inline: var(--content-margin)!important;
+.pp-format-error {
+	color: var(--text-error);
+	font-size: var(--font-ui-smaller);
 }
