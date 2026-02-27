@@ -557,12 +557,30 @@
 
 
 
+.banner-image .image-resize-container {
+  width: 100% !important;
+
+}
+
+.banner-image .image-resize-container img {
+  width: 100% !important;
+
+}
+
 
 /* SUGGESTERS */
 
+.image-suggestion-item > div > p {
+  margin: 0;
+}
+.image-captions-enabled .image-suggestion-item .internal-embed.image-embed[alt] {
+  display: block !important;
+  width: 100%;
+}
+
 .image-suggestion-item.banner img {
   width: 100%;
-  height: 130px;
+  height: 130px !important;
   object-fit: cover;
   margin: 0;
 }
@@ -575,7 +593,7 @@
 
 
 .image-suggestion-item.cover {
-  height: 240px;
+  height: 200px !important;
   width: 130px;
   display: inline-block;
 }
@@ -588,7 +606,7 @@
 
 .image-suggestion-item.cover img {
   width: 100%;
-  height: 160px;
+  height: 160px !important;
   object-fit: cover;
   margin: 0;
 }
@@ -602,7 +620,7 @@
 
 
 .image-suggestion-item.icon {
-  height: calc(var(--pp-icon-size) + 70px);
+  height: calc(var(--pp-icon-size) + 35px) !important;
   width: calc(var(--pp-icon-size) + 24px);
   display: inline-block;
 }
@@ -615,7 +633,7 @@
 
 
 .image-suggestion-item.icon img {
-  height: var(--pp-icon-size);
+  height: var(--pp-icon-size) !important;
   width: var(--pp-icon-size);
   object-fit: contain;
   margin: 0;
@@ -1084,12 +1102,22 @@ a.tag.transparent-color {
 }
 
 
-.cm-hashtag:hover,
+.cm-hashtag-inner:hover,
 .cm-hashtag-begin:hover + .cm-hashtag > .cm-hashtag-inner,
-.cm-hashtag-begin:hover + .cm-hashtag + .cm-hashtag > .cm-hashtag-inner,
+.cm-hashtag-begin:hover + .cm-hashtag:not(.cm-hashtag-end) + .cm-hashtag > .cm-hashtag-inner,
 .cm-hashtag:hover + .cm-hashtag-end > .cm-hashtag-inner,
-.cm-hashtag-begin:has(+ .cm-hashtag:hover, + .cm-hashtag + .cm-hashtag:hover) > .cm-hashtag-inner,
-.cm-hashtag:has(+ .cm-hashtag-end:hover) > .cm-hashtag-inner {
+.cm-hashtag-begin:has(+ .cm-hashtag:hover, + .cm-hashtag + .cm-hashtag-end:hover) > .cm-hashtag-inner,
+.cm-hashtag:has(+ .cm-hashtag-end:hover) > .cm-hashtag-inner
+
+/*
+,
+
+.
+
+,
+
+*/
+{
   background-color: var(--tag-background-hover);
 }
 
@@ -1119,17 +1147,20 @@ a.tag.transparent-color {
 /* We need to use more complex styles instead of just 'display: none' so the property can be revealed when selected by keyboard navigation. */
 
 /* Hide properties marked as hidden */
-body:not(.show-hidden-properties) .workspace-leaf-content[data-type='markdown'] .metadata-property.pp-property-hidden:not(:focus, :focus-within),
+body:not(.show-hidden-properties) .markdown-source-view .metadata-property.pp-property-hidden:not(:focus, :focus-within),
+body:not(.show-hidden-properties) .markdown-preview-view .metadata-property.pp-property-hidden:not(:focus, :focus-within),
 body:not(.show-hidden-properties).hidden-props-in-prop-tab .workspace-leaf-content[data-type='file-properties'] .metadata-property.pp-property-hidden:not(:focus, :focus-within),
 body:not(.show-hidden-properties) .hover-popover .metadata-property.pp-property-hidden:not(:focus, :focus-within),
 
 /* Hide empty properties when the settings set to hide all empty properties */
-.hide-all-empty-properties:not(.show-hidden-properties) .workspace-leaf-content[data-type='markdown'] .metadata-property.is-empty:not(:focus, :focus-within), 
+.hide-all-empty-properties:not(.show-hidden-properties) .markdown-source-view .metadata-property.is-empty:not(:focus, :focus-within),
+.hide-all-empty-properties:not(.show-hidden-properties) .markdown-preview-view .metadata-property.is-empty:not(:focus, :focus-within),
 .hide-all-empty-properties:not(.show-hidden-properties).hidden-props-in-prop-tab .workspace-leaf-content[data-type='file-properties'] .metadata-property.is-empty:not(:focus, :focus-within), 
 .hide-all-empty-properties:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty:not(:focus, :focus-within),
 
 /* Hide empty properties when marked as hide when empty */
-body:not(.show-hidden-properties) .workspace-leaf-content[data-type='markdown'] .metadata-property.is-empty.pp-property-hidden-when-empty:not(:focus, :focus-within), 
+body:not(.show-hidden-properties) .markdown-source-view .metadata-property.is-empty.pp-property-hidden-when-empty:not(:focus, :focus-within),
+body:not(.show-hidden-properties) .markdown-preview-view .metadata-property.is-empty.pp-property-hidden-when-empty:not(:focus, :focus-within),
 body:not(.show-hidden-properties).hidden-props-in-prop-tab .workspace-leaf-content[data-type='file-properties'] .metadata-property.is-empty.pp-property-hidden-when-empty:not(:focus, :focus-within), 
 body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-property-hidden-when-empty:not(:focus, :focus-within),
 
@@ -1569,6 +1600,7 @@ button.longtext-color-button:hover {
 
 .title-wrapper {
   margin-block-end: var(--inline-title-margin-bottom);
+  cursor: text;
 }
 
 .title-wrapper .inline-title {
@@ -1585,6 +1617,7 @@ button.longtext-color-button:hover {
   font-family: var(--inline-title-font);
   letter-spacing: -0.015em;
   
+
 }
 
 .title-icon-wrapper .pp-icon {
@@ -1597,6 +1630,7 @@ button.longtext-color-button:hover {
 
 .pp-icon {
   image-rendering: auto !important;
+  cursor: auto;
 }
 
 .title-icon-wrapper .pp-text-icon {
@@ -1611,14 +1645,65 @@ button.longtext-color-button:hover {
 
 
 .multi-select-pill {
-max-width: unset;
+  max-width: unset;
 }
+
+
 
 .pp-pdf-cover-canvas {
   width: 100%;
   height: 100%;
 }
 
+
+/* Hide properties title */
+
+.hide-properties-title .metadata-properties-heading:not(:focus) .metadata-properties-title {
+  font-size: 0;
+}
+
+.hide-properties-title .metadata-properties-heading {
+  display: block;
+  padding: 0;
+  margin-bottom: 0;
+}
+
+.hide-properties-title .metadata-container.is-collapsed {
+  margin-block-end: 0;
+  padding: 0;
+}
+
+.hide-properties-title .metadata-properties-heading.is-collapsed .collapse-indicator {
+    top:-1em;
+
+}
+
+.metadata-properties-heading .collapse-indicator {
+    inset-inline-start: -21px;
+}
+
+/* Need to make inset smaller so collapse indicator is visible on canvas nodes */
+
+.hide-properties-title .markdown-embed-content .metadata-properties-heading .collapse-indicator,
+.hide-properties-title .mod-inside-iframe .metadata-properties-heading .collapse-indicator {
+    inset-inline-start: -16px;
+}
+
+/* Hide metadata add button */
+
+.hide-metadata-add-button .markdown-source-view .metadata-content:not(:focus-within) .metadata-add-button,
+.hide-metadata-add-button .markdown-preview-view .metadata-content:not(:focus-within) .metadata-add-button {
+  display: none;
+
+}
+
+/* Fix for Minimal theme */
+
+[data-theme="Minimal"] .markdown-source-view.mod-cm6.is-readable-line-width .cm-sizer>.title-wrapper {
+    max-width: var(--max-width);
+    width: var(--line-width);
+    margin-inline: var(--content-margin)!important;
+}
 
 
 .pp-format-wrapper {

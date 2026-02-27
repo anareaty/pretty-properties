@@ -2,7 +2,7 @@ import { loadMathJax, Setting } from 'obsidian';
 import { i18n } from 'src/localization/localization';
 import { updateAllProperties } from 'src/utils/updates/updateElements';
 import { PPSettingTab } from 'src/settings/settings';
-import { updateAutoHideProps, updateBaseTagsStyle, updateHiddenEmptyProperties, updateHiddenMetadataContainer, updateHiddenPropertiesInPropTab, updatePillPaddings } from 'src/utils/updates/updateStyles';
+import { updateAutoHideProps, updateBaseTagsStyle, updateHiddenEmptyProperties, updateHiddenMetadataContainer, updateHiddenPropertiesInPropTab, updateHideMetadataAddButton, updateHidePropTitle, updatePillPaddings } from 'src/utils/updates/updateStyles';
 import { showColoredListSettings } from './coloredListSettings';
 import { showColoredTagsSettings } from './coloredTagsSettings';
 import { showColoredTextSettings } from './coloredTextSettings';
@@ -215,6 +215,31 @@ export const showPropSettings = (settingTab: PPSettingTab) => {
                 await plugin.saveSettings();
                 updateAutoHideProps(plugin)
             }));
+
+
+
+    new Setting(containerEl)
+        .setName(i18n.t("HIDE_PROPERTIES_TITLE"))
+        .addToggle(toggle => toggle
+            .setValue(plugin.settings.hidePropTitle)
+            .onChange(async (value) => {
+                plugin.settings.hidePropTitle = value
+                await plugin.saveSettings();
+                updateHidePropTitle(plugin)
+            }));
+
+
+    
+    new Setting(containerEl)
+        .setName(i18n.t("HIDE_ADD_PROPERTY_BUTTON"))
+        .addToggle(toggle => toggle
+            .setValue(plugin.settings.hideAddPropertyButton)
+            .onChange(async (value) => {
+                plugin.settings.hideAddPropertyButton = value
+                await plugin.saveSettings();
+                updateHideMetadataAddButton(plugin)
+            }));
+
 
 
     new Setting(containerEl)

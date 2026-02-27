@@ -30,7 +30,7 @@ export class API {
     getPropertyBackgroundColorValue(propName: string, propValue: string) {
         let colorSetting = this.getPropertyBackgroundColorSetting(propName, propValue)
         if (typeof colorSetting == "string" && colors.find(c => c == colorSetting)) {
-            return "rgba(var(--color-" + colorSetting + "-rgb), 0.3)"
+            return "rgba(var(--color-" + colorSetting + "-rgb), 0.2)"
         } else if (colorSetting == "none") {
             return "transparent"
         } else if (colorSetting == "default") {

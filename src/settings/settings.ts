@@ -119,7 +119,9 @@ export interface PPPluginSettings {
 	hideMetadataContainerIfAllPropertiesHiddenEditing: boolean,
 	hideMetadataContainerIfAllPropertiesHiddenReading: boolean,
 	autoHidePropertiesWithBanner: boolean,	
-	hideCoverCollapsed: boolean
+	hideCoverCollapsed: boolean,
+	hidePropTitle: boolean,
+	hideAddPropertyButton: boolean,
 }
 
 
@@ -248,7 +250,9 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	hideMetadataContainerIfAllPropertiesHiddenEditing: false,
 	hideMetadataContainerIfAllPropertiesHiddenReading: false,
 	autoHidePropertiesWithBanner: false,
-	hideCoverCollapsed: false
+	hideCoverCollapsed: false,
+	hidePropTitle: false,
+	hideAddPropertyButton: false,
 
 }
 

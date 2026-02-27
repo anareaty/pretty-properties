@@ -38,7 +38,7 @@ export class LocalImageSuggestModal extends SuggestModal<string> {
             await MarkdownRenderer.render(this.app, link, image, "", this.plugin)
             el.classList.add("image-suggestion-item")
             el.classList.add(this.shape)
-            image.append(name)
+            //image.append(name)
             el.append(image)
         } else {
             el.append(name)

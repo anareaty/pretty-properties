@@ -1,25 +1,26 @@
+import { querySelectorsWithIframes } from "./querySelectorsHelper"
 
 export const removeAll = async() => {
-    let formulaProps = document.querySelectorAll(".has-math")
+    let formulaProps = querySelectorsWithIframes(".has-math")
     for (let formulaProp of formulaProps) {
         let formula = formulaProp.querySelector(".math-wrapper")
         formulaProp.classList.remove("has-math")
         formula?.remove()
     }
 
-    let dateProps = document.querySelectorAll(".has-custom-date")
+    let dateProps = querySelectorsWithIframes(".has-custom-date")
     for (let dateProp of dateProps) {
         let custom = dateProp.querySelector(".custom-date")
         dateProp.classList.remove("has-custom-date")
         custom?.remove()
     }
 
-    let colorButtons = document.querySelectorAll(".longtext-color-button")
+    let colorButtons = querySelectorsWithIframes(".longtext-color-button")
     for (let button of colorButtons) {
         button.remove()
     }
 
-    let progressWrappers = document.querySelectorAll(".metadata-progress-wrapper")
+    let progressWrappers = querySelectorsWithIframes(".metadata-progress-wrapper")
     for (let progress of progressWrappers) {
     progress.remove()
     }
@@ -51,7 +52,7 @@ export const removeColorStyles = () => {
         ]
 
         for (let queryString of queryStrings) {
-            let elements = document.querySelectorAll(queryString)
+            let elements = querySelectorsWithIframes(queryString)
             for (let el of elements) {
                 el.classList.remove(colorClass)
             }
@@ -64,7 +65,7 @@ export const removeInlineTagsColorStyles = () => {
     let colorClasses = ["theme-color", "custom-color", "transparent-color", "default-color", "theme-text-color", "custom-text-color", "none-text-color", "default-text-color"];
     for (let colorClass of colorClasses) {
         let queryString = ".markdown-preview-sizer a.tag:not(.metadata-container a.tag)"
-        let elements = document.querySelectorAll(queryString)
+        let elements = querySelectorsWithIframes(queryString)
         for (let el of elements) {
             el.classList.remove(colorClass)
         }

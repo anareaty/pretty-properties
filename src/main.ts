@@ -9,8 +9,11 @@ import {
 	updateCoverStyles, 
 	updateHiddenEmptyProperties, 
 	updateHiddenMetadataContainer, 
+	updateHideMetadataAddButton, 
+	updateHidePropTitle, 
 	updateIconStyles,
 	updateRelativeDateColors,
+	updateTheme,
 } from "./utils/updates/updateStyles";
 import MenuManager from "src/utils/menuManager";
 import { i18n } from "./localization/localization";
@@ -81,7 +84,11 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		updateHiddenEmptyProperties(this)
 		updateHiddenMetadataContainer(this)
 		updateAutoHideProps(this)
+		updateHidePropTitle(this)
+		updateHideMetadataAddButton(this)
 		updateBaseTagsStyle(this)
+		updateTheme(this)
+		
 
 		this.app.workspace.onLayoutReady(async() => {
 			updateAllProperties(this)
@@ -101,6 +108,14 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			})
 		);
 
+		
+
+		this.registerEvent(
+			this.app.workspace.on('css-change', () => {
+				updateTheme(this)
+			})
+		);
+
 		this.registerEvent(
 			this.app.workspace.on("file-open", async (file) => {
 				if (file && this.settings.enableTaskNotesCount && this.settings.autoTasksCount) {
@@ -109,9 +124,9 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			})
 		);
 
-		const registerDocumentEvents = (doc: Document) => {
+		const registerWindowEvents = (win: Window) => {
 			if (Platform.isMobile) {
-				this.registerDomEvent(doc, "contextmenu", (e: MouseEvent) => {
+				this.registerDomEvent(win, "contextmenu", (e: MouseEvent) => {
 					if (
 						e.target instanceof HTMLElement &&
 						e.target.closest(".multi-select-pill") &&
@@ -121,7 +136,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 					}
 				});
 
-				this.registerDomEvent(doc, "touchstart", (e: TouchEvent) => {
+				this.registerDomEvent(win, "touchstart", (e: TouchEvent) => {
 					if (
 						(e.target instanceof HTMLElement ||
 							e.target instanceof SVGElement) &&
@@ -138,8 +153,10 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				});
 			} else {
 
-				this.registerDomEvent(doc, "mousedown", (e: MouseEvent) => {
+				this.registerDomEvent(win, "mousedown", (e: MouseEvent) => {
+
 					let targetEl = e.target as HTMLElement;
+
 					if (e.button == 2) {
 						if (targetEl.closest(".multi-select-pill") || targetEl.closest(".metadata-input-longtext")) {
 							if (this.settings.enableColoredProperties) {
@@ -158,7 +175,9 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				});
 			}
 
-			this.registerDomEvent(doc, "click", (e: MouseEvent) => {
+			this.registerDomEvent(win, "click", (e: MouseEvent) => {
+
+				
 
 				if (e.target instanceof HTMLElement && (
 					e.target.classList.contains("internal-link") || e.target.closest(".internal-link")
@@ -185,46 +204,51 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			});
 
 			this.registerDomEvent(
-				doc,
+				win,
 				"contextmenu",
 				(e: MouseEvent) => {
-					let targetEl = e.target;
 
+					let targetEl = e.target as HTMLElement
+
+					if (targetEl.closest(".pp-icon")) {
+						e.preventDefault();
+						createIconMenu(e, this);
+					}
+					if (targetEl.closest(".banner-image")) {
+						e.preventDefault();
+						createBannerMenu(e, this);
+					}
+					if (targetEl.closest(".metadata-side-image")) {
+						e.preventDefault();
+						createCoverMenu(e, this);
+					}
+					if (targetEl.closest(".tag-pane-tag") &&
+					this.settings.enableColoredTagsInTagPane) {
+						handleTagPaneMenu(e, targetEl, this);
+					}
+					if (targetEl.closest(".multi-select-pill") || targetEl.closest(".metadata-input-longtext")) {
+						if (this.settings.enableColoredProperties) {
+							handlePillMenu(e, targetEl, this);
+						}
+					}
+					if (targetEl.closest(".metadata-property-icon")) {
+						handlePropertyMenu(targetEl, this);
+					}
 					
-					if (targetEl instanceof Element) {
-						if (targetEl.closest(".pp-icon")) {
-							e.preventDefault();
-							createIconMenu(e, this);
-						}
-					}
-
-					if (targetEl instanceof HTMLElement) {
-						if (targetEl.closest(".banner-image")) {
-							e.preventDefault();
-							createBannerMenu(e, this);
-						}
-						if (targetEl.closest(".metadata-side-image")) {
-							e.preventDefault();
-							createCoverMenu(e, this);
-						}
-						if (targetEl.closest(".tag-pane-tag") &&
-						this.settings.enableColoredTagsInTagPane) {
-							handleTagPaneMenu(e, targetEl, this);
-						}
-
-					}
 				},
 				true
 			)
 		}
 
-		registerDocumentEvents(document);
+		registerWindowEvents(window);
 
 		this.registerEvent(
 			this.app.workspace.on("window-open", async (win, window) => {
-				registerDocumentEvents(win.doc);
+				registerWindowEvents(window);
 			})
 		);
+
+		
 
 		this.addSettingTab(new PPSettingTab(this.app, this));
 

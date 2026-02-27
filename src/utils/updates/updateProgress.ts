@@ -1,9 +1,13 @@
 import { CachedMetadata, setTooltip, TFile } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { getNestedProperty } from "../propertyUtils";
+import { querySelectorsWithIframes } from "../querySelectorsHelper";
 
 
 export const updateProgress = async (propertyEl: HTMLElement, plugin: PrettyPropertiesPlugin, sourcePath?: string) => {
+
+    
+
     if (propertyEl.classList.contains("bases-td")) {
         return
     }
@@ -11,23 +15,35 @@ export const updateProgress = async (propertyEl: HTMLElement, plugin: PrettyProp
     let propName = propertyEl.getAttribute("data-property-key") || ""
     let progressSettings = plugin.settings.progressProperties[propName]
     let existingProgressWrapper = propertyEl.querySelector(".metadata-progress-wrapper")
+
+   
 	
     if (progressSettings) {
+
+       
+
+
         let maxVal
         if (progressSettings.maxNumber) {
             maxVal = progressSettings.maxNumber
         } else {
+
+            
+
             let maxProperty = progressSettings.maxProperty
 
-            if (!sourcePath) {
+            if (!sourcePath || sourcePath.endsWith(".canvas")) {
                 sourcePath = propertyEl.getAttribute("data-source-path") || ""
             }
 
             let cache = plugin.app.metadataCache.getCache(sourcePath)
             maxVal = getNestedProperty(cache?.frontmatter, maxProperty)
+
         }
 
         if (maxVal) {  
+
+         
             let value = 0
             let valueString = ""
             let valueEl = propertyEl.querySelector(".metadata-input-number")
@@ -96,7 +112,7 @@ export const updateAllProgressElsOnMaxChange = async (file: TFile, cache: Cached
         let maxProperty = plugin.settings.progressProperties[prop].maxProperty
         let maxVal = getNestedProperty(cache.frontmatter, maxProperty)
         if (maxVal !== undefined) {
-            let numbers = document.querySelectorAll("input.metadata-input-number")
+            let numbers = querySelectorsWithIframes("input.metadata-input-number")
             for (let input of numbers) {
                 if (input instanceof HTMLElement) {
                     let num = input.closest(".metadata-property")

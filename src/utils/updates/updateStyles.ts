@@ -246,3 +246,22 @@ export const updateBaseTagsStyle = (plugin: PrettyPropertiesPlugin) => {
 }
 
 
+export const updateHidePropTitle = (plugin: PrettyPropertiesPlugin) => {
+  document.body.classList.toggle("hide-properties-title", plugin.settings.hidePropTitle)
+}
+
+
+export const updateHideMetadataAddButton = (plugin: PrettyPropertiesPlugin) => {
+  document.body.classList.toggle("hide-metadata-add-button", plugin.settings.hideAddPropertyButton)
+}
+
+
+export const updateTheme = (plugin: PrettyPropertiesPlugin) => {
+  //@ts-ignore
+  let theme = plugin.app.customCss?.theme
+  if (theme) {
+    document.body.setAttr('data-theme', theme);
+  } else {
+    document.body.removeAttribute('data-theme');
+  }
+}

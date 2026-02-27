@@ -9,170 +9,176 @@ import {applyPropertyFormatting} from "./patchPropertyValues";
 
 
 const updateWidgets = async (type: string, rendered: any, args: any[], plugin: PrettyPropertiesPlugin) => {
-  let el = args[0]
-  let propName = args[2].key;
-  let sourcePath = args[2].sourcePath;
-  let value = args[1]
-  let parent = el.parentElement
+
+  try {
+    let el = args[0]
+    let propName = args[2].key;
+    let sourcePath = args[2].sourcePath;
+    let value = args[1]
+    let parent = el.parentElement
 
 
-  if (value && value.value) {
-    value = value.value;
-  }
+    if (value && value.value) {
+      value = value.value;
+    }
 
   applyPropertyFormatting(el, propName, plugin, type, sourcePath, value);
 
-  if (type == "multitext" || type == "aliases") {
-    let elements = rendered?.multiselect.elements 
+    if (type == "multitext" || type == "aliases") {
+      let elements = rendered?.multiselect.elements
 
-    if (elements.length == 0) {
-      parent.classList.add("is-empty")
-    } else {
-      parent.classList.remove("is-empty")
+      if (elements.length == 0) {
+        parent.classList.add("is-empty")
+      } else {
+        parent.classList.remove("is-empty")
+      }
+
+      for (let element of elements) {
+        updateMultiselectPill(element, plugin)
+      }
     }
 
-    for (let element of elements) {
-      updateMultiselectPill(element, plugin)
+    if (type == "tags") {
+      let elements = rendered?.multiselect.elements
+
+      if (elements.length == 0) {
+        parent.classList.add("is-empty")
+      } else {
+        parent.classList.remove("is-empty")
+      }
+
+      for (let element of elements) {
+        updateTagPill(element, plugin)
+      }
     }
-  }
 
-  if (type == "tags") {
-    let elements = rendered?.multiselect.elements 
-
-    if (elements.length == 0) {
-      parent.classList.add("is-empty")
-    } else {
-      parent.classList.remove("is-empty")
-    }
-
-    for (let element of elements) {
-      updateTagPill(element, plugin)
-    }
-  }
-
-  if (type == "date") {
-    let input = el.querySelector("input");
-    updateDateInput(input, plugin)
-    input.onchange = () => {
+    if (type == "date") {
+      let input = el.querySelector("input");
       updateDateInput(input, plugin)
+      input.onchange = () => {
+        updateDateInput(input, plugin)
+      }
+      input.onblur = () => {
+        updateDateInput(input, plugin)
+      }
     }
-    input.onblur = () => {
-      updateDateInput(input, plugin)
-    }
-  }
 
-  if (type == "datetime") {
-    let input = el.querySelector("input");
-    updateDateTimeInput(input, plugin)
-    input.onchange = () => {
+    if (type == "datetime") {
+      let input = el.querySelector("input");
       updateDateTimeInput(input, plugin)
+      input.onchange = () => {
+        updateDateTimeInput(input, plugin)
+      }
+      input.onblur = () => {
+        updateDateTimeInput(input, plugin)
+      }
     }
-    input.onblur = () => {
-      updateDateTimeInput(input, plugin)
-    }
-  }
 
-  if (type == "number") {
-    let parent = el.parentElement
-    parent.setAttribute("data-source-path", sourcePath)
-    updateProgress(parent, plugin, sourcePath)
-    let input = el.querySelector("input");
-    if (input.value === "") {
-      parent.classList.add("is-empty")
-    } else {
-      parent.classList.remove("is-empty")
-    }
-    input.onchange = (value: number) => {
+    if (type == "number") {
+      let parent = el.parentElement
+      parent.setAttribute("data-source-path", sourcePath)
       updateProgress(parent, plugin, sourcePath)
+      let input = el.querySelector("input");
       if (input.value === "") {
         parent.classList.add("is-empty")
-        updateAllMetadataContainers()
       } else {
         parent.classList.remove("is-empty")
-        updateAllMetadataContainers()
+      }
+      input.onchange = (value: number) => {
+        updateProgress(parent, plugin, sourcePath)
+        if (input.value === "") {
+          parent.classList.add("is-empty")
+          updateAllMetadataContainers(plugin)
+        } else {
+          parent.classList.remove("is-empty")
+          updateAllMetadataContainers(plugin)
+        }
       }
     }
-  }
 
-  if (type == "text") {
-    let longText = el.querySelector(".metadata-input-longtext");
-    let link = el.querySelector(".metadata-link");
+    if (type == "text") {
+      let longText = el.querySelector(".metadata-input-longtext");
+      let link = el.querySelector(".metadata-link");
 
-    let parent = el.parentElement
-    
-    if (longText) {
-      updateLongtext(longText, plugin);
-      longText.onblur = () => {
+      let parent = el.parentElement
+
+      if (longText) {
         updateLongtext(longText, plugin);
-        let link = el.querySelector(".metadata-link");
-        if (link) {
-          parent.classList.remove("is-empty")
-          updateAllMetadataContainers()
-        }
-      };
-    } else if (link) {
-      parent.classList.remove("is-empty")
-      updateAllMetadataContainers()
+        longText.onblur = () => {
+          updateLongtext(longText, plugin);
+          let link = el.querySelector(".metadata-link");
+          if (link) {
+            parent.classList.remove("is-empty")
+            updateAllMetadataContainers(plugin)
+          }
+        };
+      } else if (link) {
+        parent.classList.remove("is-empty")
+        updateAllMetadataContainers(plugin)
+      }
+
+      parent.setAttribute("data-source-path", sourcePath)
+
+      if (propName == plugin.settings.bannerProperty) {
+        el.classList.add("banner-property-value")
+      }
+
+      if (propName == plugin.settings.iconProperty) {
+        el.classList.add("icon-property-value")
+      }
+
+      if (propName == plugin.settings.coverProperty) {
+        el.classList.add("cover-property-value")
+      }
     }
 
-    parent.setAttribute("data-source-path", sourcePath)
-
-    if (propName == plugin.settings.bannerProperty) {
-      el.classList.add("banner-property-value")
-    }
-
-    if (propName == plugin.settings.iconProperty) {
-      el.classList.add("icon-property-value")
-    }
-
-    if (propName == plugin.settings.coverProperty) {
-      el.classList.add("cover-property-value")
-    }
-  }
-
-  if (type == "unknown") {
-    let input = el.querySelector(".mod-unknown")
-    if (input instanceof HTMLElement && input.innerText == "null") {
-      parent.classList.add("is-empty")
-    } else {
-      parent.classList.remove("is-empty")
-    }
-  }
-
-
-  if (type == "checkbox") {
-    let input = el.querySelector(".metadata-input-checkbox")
-    if (input instanceof HTMLElement) {
-      let indeterminate = input.getAttribute("data-indeterminate")
-      if (indeterminate == "true") {
+    if (type == "unknown") {
+      let input = el.querySelector(".mod-unknown")
+      if (input instanceof HTMLElement && input.innerText == "null") {
         parent.classList.add("is-empty")
       } else {
         parent.classList.remove("is-empty")
       }
+    }
 
-      input.onchange = () => {
+
+    if (type == "checkbox") {
+      let input = el.querySelector(".metadata-input-checkbox")
+      if (input instanceof HTMLElement) {
         let indeterminate = input.getAttribute("data-indeterminate")
         if (indeterminate == "true") {
           parent.classList.add("is-empty")
         } else {
           parent.classList.remove("is-empty")
         }
-        updateAllMetadataContainers()
+
+        input.onchange = () => {
+          let indeterminate = input.getAttribute("data-indeterminate")
+          if (indeterminate == "true") {
+            parent.classList.add("is-empty")
+          } else {
+            parent.classList.remove("is-empty")
+          }
+          updateAllMetadataContainers(plugin)
+        }
       }
     }
+
+
+
+    if (plugin.settings.hiddenProperties.find(p => p.toLowerCase() == propName.toLowerCase())) {
+      parent.classList.add("pp-property-hidden")
+    }
+
+    if (plugin.settings.hiddenWhenEmptyProperties.find(p => p.toLowerCase() == propName.toLowerCase())) {
+      parent.classList.add("pp-property-hidden-when-empty")
+    }
+
+    updateAllMetadataContainers(plugin)
+  } catch {
+    console.error("Can not update metadata widgets")
   }
 
-  
-
-  if (plugin.settings.hiddenProperties.find(p => p.toLowerCase() == propName.toLowerCase())) {
-    parent.classList.add("pp-property-hidden")
-  }
-
-  if (plugin.settings.hiddenWhenEmptyProperties.find(p => p.toLowerCase() == propName.toLowerCase())) {
-    parent.classList.add("pp-property-hidden-when-empty")
-  }
-
-  updateAllMetadataContainers()
 }
 
 
@@ -195,12 +201,14 @@ export const patchPropertyWidgets = async (plugin: PrettyPropertiesPlugin) => {
   for (let type in widgets) {
       let widget = widgets[type]
 
-      
+
       plugin.patches.uninstallWidgetPatch[type] = around(widget, {
+
         render(oldRender: any) {
-          return dedupe("pp-patch-base-cards-around-key", oldRender, (...args: any[]) => {
+          return dedupe("pp-patch-widgets-around-key", oldRender, (...args: any[]) => {
             
             let rendered = oldRender && oldRender.apply(this, args)
+
             updateWidgets(type, rendered, args, plugin)
             let renderValues = rendered?.multiselect?.renderValues
             if (renderValues) {
@@ -212,19 +220,16 @@ export const patchPropertyWidgets = async (plugin: PrettyPropertiesPlugin) => {
                 }
               })
             }
-
-
-            
             return rendered
           })
         }
+
+
+
+
+
     })
   }
 
   
 }
-
-
-
-
-

@@ -52,6 +52,9 @@ export default class MenuManager {
 		//@ts-ignore
 		if (this.menu) {
 
+
+			
+
 			// Check if item with this name already exist
 
 			//@ts-ignore
@@ -89,6 +92,7 @@ export default class MenuManager {
 			});
 
 		} else {
+
 			this.queuedActions.push(() => this.addItemAfter(preSections, itemTitle, callback));
 		}
 		return this;
