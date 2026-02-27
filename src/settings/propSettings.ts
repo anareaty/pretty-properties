@@ -9,6 +9,10 @@ import { showColoredTextSettings } from './coloredTextSettings';
 import { showHiddenEmptySettings, showHiddenSettings } from './hiddenSettings';
 import { updateLongTexts, updateTagPaneTagsAll } from 'src/utils/updates/updatePills';
 import { removeColorStyles, removeInlineTagsColorStyles } from 'src/utils/remove';
+import {updateAllCovers} from "../utils/updates/updateCovers";
+import {updateAllPropertyFormats} from "../patches/patchPropertyValues";
+import {PropertyNameSuggest} from "../utils/propertyNameSuggester";
+import {enhanceFormatTextArea} from "../utils/settingsHelper";
 
 
 
@@ -35,7 +39,59 @@ export const showPropSettings = (settingTab: PPSettingTab) => {
         })
     )
 
-    new Setting(containerEl)
+	const addPropertyFormatSetting = new Setting(containerEl)
+		.setName(i18n.t("ADD_PROPERTY_FORMAT"))
+		.setDesc(i18n.t("PROPERTY_FORMAT_DESC"));
+	addPropertyFormatSetting.descEl.createEl("a", {
+		text: "README",
+		href: "https://github.com/anareaty/pretty-properties/blob/master/README.md",
+	});
+	addPropertyFormatSetting.addButton(button => button
+		.setIcon("plus")
+		.onClick(async () => {
+			if (plugin.settings.propertiesToFormat.find(p => p == "") === undefined) {
+				plugin.settings.propertiesToFormat.push("")
+				await plugin.saveSettings();
+				settingTab.display();
+			}
+		}))
+
+	for (let i = 0; i < plugin.settings.propertiesToFormat.length; i++) {
+		let prop = plugin.settings.propertiesToFormat[i]
+		let propFormat = plugin.settings.propertyFormats[i]
+		new Setting(containerEl)
+			.setName(i18n.t("PROPERTY_FORMAT"))
+			.addSearch((search) => {
+				search.setValue(prop);
+				search.setPlaceholder(i18n.t("PROPERTY_SEARCH_PLACEHOLDER"));
+				new PropertyNameSuggest(plugin.app, search.inputEl);
+				search.onChange(async (value) => {
+					plugin.settings.propertiesToFormat[i] = value;
+					await plugin.saveSettings();
+					updateAllPropertyFormats(plugin);
+				});
+			})
+			.addTextArea((text) => {
+				enhanceFormatTextArea(plugin, text, propFormat, async (value) => {
+					plugin.settings.propertyFormats[i] = value;
+					await plugin.saveSettings();
+					updateAllPropertyFormats(plugin);
+				});
+			})
+			.addButton(button => button
+				.setIcon("x")
+				.onClick(async () => {
+					prop = plugin.settings.propertiesToFormat[i];
+					propFormat = plugin.settings.propertyFormats[i];
+					plugin.settings.propertiesToFormat = plugin.settings.propertiesToFormat.filter(p => p != prop);
+					plugin.settings.propertyFormats = plugin.settings.propertyFormats.filter(pf => pf != propFormat);
+					await plugin.saveSettings();
+					updateAllCovers(plugin)
+					settingTab.display();
+				}))
+	}
+
+	new Setting(containerEl)
     .setName(i18n.t("ENABLE_COLORED_PROPERTIES"))
     .addToggle(toggle => {
         toggle.setValue(plugin.settings.enableColoredProperties)

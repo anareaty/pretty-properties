@@ -40,12 +40,14 @@ import { updateTaskCountOnCacheChanged } from "./utils/taskCount/taskCount";
 import { unPatchWidgets } from "./patches/removePatches";
 import { patchHoverPopover } from "./patches/patchHoverPopover";
 import { API, createApi } from "./utils/createApi";
+import {PropertyFormatter} from "./utils/propertyFormatter";
 
 export default class PrettyPropertiesPlugin extends Plugin {
 	settings: PPPluginSettings;
-	menuManager: MenuManager
-	patches: Record<string, any>
-	api: API
+	menuManager: MenuManager;
+	patches: Record<string, any>;
+	api: API;
+	formatter: PropertyFormatter;
 
 	async onload() {
 		await this.loadSettings();
@@ -58,6 +60,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		i18n.setLocale();
 		this.menuManager = new MenuManager
 		this.patches = {}
+
+		this.formatter = new PropertyFormatter();
 
 		patchPropertyWidgets(this)
 		patchTagView(this)
@@ -230,6 +234,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 	onunload() {
 		unPatchWidgets(this)
 		removeAll()
+		this.formatter.clearCache();
 	}
 
 	async loadSettings() {

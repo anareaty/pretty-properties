@@ -5,6 +5,8 @@ import {
 } from 'src/utils/updates/updateStyles';
 import { PPSettingTab } from 'src/settings/settings';
 import { updateAllCovers } from 'src/utils/updates/updateCovers';
+import {PropertyNameSuggest} from "../utils/propertyNameSuggester";
+import {enhanceFormatTextArea} from "../utils/settingsHelper";
 
 
 
@@ -33,14 +35,31 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
 
         new Setting(containerEl)
         .setName(i18n.t("COVER_PROPERTY"))
-        .addText(text => text
-            .setPlaceholder('cover')
-            .setValue(plugin.settings.coverProperty)
-            .onChange(async (value) => {
-                plugin.settings.coverProperty = value;
-                await plugin.saveSettings();
-                updateAllCovers(plugin)
-            }));
+		.addSearch((search) => {
+			search.setValue(plugin.settings.coverProperty);
+			search.setPlaceholder(i18n.t("PROPERTY_SEARCH_PLACEHOLDER"));
+			new PropertyNameSuggest(plugin.app, search.inputEl);
+			search.onChange(async (value) => {
+				plugin.settings.coverProperty = value;
+				await plugin.saveSettings();
+				updateAllCovers(plugin);
+			});
+		})
+
+		const coverFormatSetting = new Setting(containerEl)
+			.setName(i18n.t("COVER_PROPERTY_FORMAT"))
+			.setDesc(i18n.t("COVER_PROPERTY_FORMAT_DESC"));
+		coverFormatSetting.descEl.createEl("a", {
+			text: "README",
+			href: "https://github.com/anareaty/pretty-properties/blob/master/README.md",
+		});
+		coverFormatSetting.addTextArea((text) => {
+			enhanceFormatTextArea(plugin, text, plugin.settings.coverPropertyFormat, async (value) => {
+				plugin.settings.coverPropertyFormat = value;
+				await plugin.saveSettings();
+				updateAllCovers(plugin);
+			});
+		});
 
         new Setting(containerEl)
         .setName(i18n.t("COVERS_FOLDER"))
@@ -63,27 +82,44 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
                 }
             }))
 
-        for (let i = 0; i < plugin.settings.extraCoverProperties.length; i++) {
-            let prop = plugin.settings.extraCoverProperties[i]
-            new Setting(containerEl)
-            .setName(i18n.t("EXTRA_COVER_PROPERTY"))
-            .addText(text => text
-                .setValue(prop)
-                .onChange(async (value) => {
-                    plugin.settings.extraCoverProperties[i] = value;
-                    await plugin.saveSettings();
-                    updateAllCovers(plugin)
-                }))
-            .addButton(button => button
-            .setIcon("x")
-            .onClick(async () => {
-                prop = plugin.settings.extraCoverProperties[i]
-                plugin.settings.extraCoverProperties = plugin.settings.extraCoverProperties.filter(p => p != prop)
-                await plugin.saveSettings();
-                updateAllCovers(plugin)
-                settingTab.display();
-            }))
-        }
+		for (let i = 0; i < plugin.settings.extraCoverProperties.length; i++) {
+			let prop = plugin.settings.extraCoverProperties[i];
+			let propFormat = plugin.settings.extraCoverPropertyFormats[i];
+
+			new Setting(containerEl)
+				.setName(i18n.t("EXTRA_COVER_PROPERTY"))
+				.addSearch((search) => {
+					search.setValue(prop);
+					search.setPlaceholder(i18n.t("PROPERTY_SEARCH_PLACEHOLDER"))
+					new PropertyNameSuggest(plugin.app, search.inputEl);
+					search.onChange(async (value) => {
+						plugin.settings.extraCoverProperties[i] = value;
+						await plugin.saveSettings();
+						updateAllCovers(plugin);
+					});
+				})
+				.addTextArea((text) => {
+					enhanceFormatTextArea(plugin, text, propFormat, async (value) => {
+						plugin.settings.extraCoverPropertyFormats[i] = value;
+						await plugin.saveSettings();
+						updateAllCovers(plugin);
+					});
+				})
+				.addButton((button) =>
+					button.setIcon("x").onClick(async () => {
+						prop = plugin.settings.extraCoverProperties[i];
+						propFormat = plugin.settings.extraCoverPropertyFormats[i];
+						plugin.settings.extraCoverProperties =
+							plugin.settings.extraCoverProperties.filter((p) => p != prop);
+						plugin.settings.extraCoverPropertyFormats =
+							plugin.settings.extraCoverPropertyFormats.filter((pf) => pf != propFormat);
+
+						await plugin.saveSettings();
+						updateAllCovers(plugin);
+						settingTab.display();
+					}),
+				);
+		}
 
 
         new Setting(containerEl)

@@ -283,7 +283,7 @@ export const updateImagesInPopover = async (popover: HoverPopover, plugin: Prett
 
             if (frontmatter && hasCover  && plugin.settings.enableCover && plugin.settings.enableCoversInPopover) {
                 
-                renderCover(contentEl, frontmatter, sourcePath, plugin);
+                renderCover(popover, contentEl, frontmatter, sourcePath, plugin);
             } else {    
                 let oldCoverDiv = contentEl?.querySelector(".metadata-side-image");
                 oldCoverDiv?.remove();
@@ -353,7 +353,7 @@ export const updateImagesForView = async (view: MarkdownView, plugin: PrettyProp
         
     
         if (frontmatter && hasCover  && plugin.settings.enableCover) {
-            renderCover(contentEl, frontmatter, sourcePath, plugin);
+            renderCover(view, contentEl, frontmatter, sourcePath, plugin);
         } else {    
             let oldCoverDiv = contentEl?.querySelector(".metadata-side-image");
             oldCoverDiv?.remove();
@@ -424,7 +424,7 @@ export const updateImagesOnCacheChanged = async (file: TFile, cache: CachedMetad
         
 
         if (frontmatter && hasCover && plugin.settings.enableCover) {
-          renderCover(contentEl, frontmatter, sourcePath, plugin);
+          renderCover(view, contentEl, frontmatter, sourcePath, plugin);
         } else {
           let oldCoverDiv = contentEl?.querySelector(".metadata-side-image");
           oldCoverDiv?.remove();
