@@ -16,7 +16,7 @@ export class FileImageSuggestModal extends SuggestModal<string> {
         super(app)
         this.plugin = plugin
         this.options = {};
-        if (plugin.settings.enableCover && plugin.settings.coverProperty) {
+		if (plugin.settings.enableCover && plugin.settings.coverProperties[0]?.property) {
             this.options["cover"] = i18n.t("SELECT_COVER_IMAGE");
         }
         if (plugin.settings.enableBanner && plugin.settings.bannerProperty) {

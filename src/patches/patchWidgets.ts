@@ -127,7 +127,7 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
         el.classList.add("icon-property-value")
       }
 
-      if (propName == plugin.settings.coverProperty) {
+      if (propName == plugin.settings.coverProperties[0]?.property) {
         el.classList.add("cover-property-value")
       }
     }
