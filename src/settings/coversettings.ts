@@ -31,18 +31,27 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
 
     if (plugin.settings.enableCover) {
 
-        
+
 
         new Setting(containerEl)
         .setName(i18n.t("COVER_PROPERTY"))
 		.addSearch((search) => {
 			search.setValue(plugin.settings.coverProperty);
 			search.setPlaceholder(i18n.t("PROPERTY_SEARCH_PLACEHOLDER"));
-			new PropertyNameSuggest(plugin.app, search.inputEl);
-			search.onChange(async (value) => {
+
+			const persist = async (value: string) => {
 				plugin.settings.coverProperty = value;
 				await plugin.saveSettings();
 				updateAllCovers(plugin);
+			};
+			search.onChange(async (value) => {
+				await persist(value);
+			});
+			const suggester = new PropertyNameSuggest(plugin.app, search.inputEl);
+			suggester.onSelect(async (value) => {
+				await persist(value);
+				suggester.setValue(value);
+				suggester.close();
 			});
 		})
 
@@ -91,11 +100,20 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
 				.addSearch((search) => {
 					search.setValue(prop);
 					search.setPlaceholder(i18n.t("PROPERTY_SEARCH_PLACEHOLDER"))
-					new PropertyNameSuggest(plugin.app, search.inputEl);
-					search.onChange(async (value) => {
+
+					const persist = async (value: string) => {
 						plugin.settings.extraCoverProperties[i] = value;
 						await plugin.saveSettings();
 						updateAllCovers(plugin);
+					};
+					search.onChange(async (value) => {
+						await persist(value);
+					});
+					const suggester = new PropertyNameSuggest(plugin.app, search.inputEl);
+					suggester.onSelect(async (value) => {
+						await persist(value);
+						suggester.setValue(value);
+						suggester.close();
 					});
 				})
 				.addTextArea((text) => {

@@ -1,14 +1,7 @@
-import { AbstractInputSuggest, App } from "obsidian";
+import { AbstractInputSuggest } from "obsidian";
 
 export class PropertyNameSuggest extends AbstractInputSuggest<string> {
-	public app: App;
-
-	constructor(app: App, inputEl: HTMLInputElement) {
-		super(app, inputEl);
-		this.app = app;
-	}
-
-	getSuggestions(query: string): string[] {
+	protected  getSuggestions(query: string): string[] {
 		const querySanitized = query.trim().toLowerCase();
 		const allPropertyNames = this.getAllPropertyNames();
 
@@ -20,11 +13,6 @@ export class PropertyNameSuggest extends AbstractInputSuggest<string> {
 
 	renderSuggestion(value: string, el: HTMLElement): void {
 		el.setText(value);
-	}
-
-	selectSuggestion(value: string, _evt: MouseEvent | KeyboardEvent): void {
-		this.setValue(value);
-		this.close();
 	}
 
 	private getAllPropertyNames(): string[] {
