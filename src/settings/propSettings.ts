@@ -64,11 +64,20 @@ export const showPropSettings = (settingTab: PPSettingTab) => {
 			.addSearch((search) => {
 				search.setValue(prop);
 				search.setPlaceholder(i18n.t("PROPERTY_SEARCH_PLACEHOLDER"));
-				new PropertyNameSuggest(plugin.app, search.inputEl);
-				search.onChange(async (value) => {
+
+				const persist = async (value: string) => {
 					plugin.settings.propertiesToFormat[i] = value;
 					await plugin.saveSettings();
 					updateAllPropertyFormats(plugin);
+				};
+				search.onChange(async (value) => {
+					await persist(value);
+				});
+				const suggester = new PropertyNameSuggest(plugin.app, search.inputEl);
+				suggester.onSelect(async (value) => {
+					await persist(value);
+					suggester.setValue(value);
+					suggester.close();
 				});
 			})
 			.addTextArea((text) => {
