@@ -90,6 +90,7 @@ export const renderIcon = async (
 
                 if (titleWrapper instanceof HTMLElement) {
                     titleWrapper.onclick = (e) => {
+                        console.log("click")
                         if (e.target instanceof HTMLElement && 
                             e.target?.classList.contains("title-wrapper") && 
                             inlineTitle instanceof HTMLElement) {
@@ -323,15 +324,32 @@ export const renderTitleIcon = (view: any, plugin: PrettyPropertiesPlugin) => {
         }
 
         if (titleWrapper instanceof HTMLElement) {
-            titleWrapper.onclick = (e) => {
-                if (e.target instanceof HTMLElement && 
-                    e.target?.classList.contains("title-wrapper") && 
-                    inlineTitle instanceof HTMLElement) {
-                        inlineTitle.focus()
-                        // @ts-ignore: Property 'modify' is a non-standard API
-                        document.getSelection()?.modify("move", "forward", "documentboundary")
-                    }
+
+            titleWrapper.onmousedown = (e) => {
+                if (e.target instanceof HTMLElement && e.target?.classList.contains("title-wrapper")) {
+                    let selection = window.getSelection()
+                    selection?.collapse(selection.focusNode)
+                }
             }
+
+            titleWrapper.onmouseup = (e) => {
+                let selection = window.getSelection()
+                if (selection && !selection.isCollapsed) {
+                    let selectionContainer = selection.focusNode?.parentElement
+                    if (selectionContainer?.classList.contains("inline-title")) {
+                        return;
+                    }
+                }
+
+                if (e.target instanceof HTMLElement && 
+                e.target?.classList.contains("title-wrapper") && 
+                inlineTitle instanceof HTMLElement) {
+                    inlineTitle.focus()
+                    // @ts-ignore: Property 'modify' is a non-standard API
+                    document.getSelection()?.modify("move", "forward", "documentboundary")
+                }
+            }
+                
         }
       } 
     } 
