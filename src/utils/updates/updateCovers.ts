@@ -32,24 +32,14 @@ export const renderCover = async (
 	if (!(mdContainer instanceof HTMLElement))
 		return;
 
-	const properties = [
-		plugin.settings.coverProperty,
-		...plugin.settings.extraCovers.map((c) => c.property),
-	];
-
-	const propertyFormats = [
-		plugin.settings.coverPropertyFormat,
-		...plugin.settings.extraCovers.map((c) => c.format),
-	];
-
 	let coverDiv: HTMLDivElement | undefined;
 
 	if (plugin.settings.enableCover) {
 		const coverItems: HTMLElement[] = [];
 
-		for (let i = 0; i < properties.length; i++) {
-			const property = properties[i];
-			let propertyValue = getNestedProperty(frontmatter, property);
+		for (let i = 0; i < plugin.settings.coverProperties.length; i++) {
+			const entry = plugin.settings.coverProperties[i];
+			let propertyValue = getNestedProperty(frontmatter, entry.property);
 
 			if (Array.isArray(propertyValue))
 				propertyValue = propertyValue[0];
@@ -57,10 +47,10 @@ export const renderCover = async (
 				continue;
 
 			let coverVal = propertyValue.toString();
-			const formatString = propertyFormats[i];
+			const formatString = entry.format;
 
 			if (formatString)
-				coverVal = plugin.formatter.format(property, coverVal, formatString);
+				coverVal = plugin.formatter.format(entry.property, coverVal, formatString);
 
 			const coverType = getCoverType(coverVal);
 

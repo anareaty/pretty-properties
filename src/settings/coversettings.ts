@@ -31,45 +31,6 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
 
     if (plugin.settings.enableCover) {
 
-
-
-        new Setting(containerEl)
-        .setName(i18n.t("COVER_PROPERTY"))
-		.addSearch((search) => {
-			search.setValue(plugin.settings.coverProperty);
-			search.setPlaceholder(i18n.t("PROPERTY_SEARCH_PLACEHOLDER"));
-
-			const persist = async (value: string) => {
-				plugin.settings.coverProperty = value;
-				await plugin.saveSettings();
-				updateAllCovers(plugin);
-			};
-			search.onChange(async (value) => {
-				await persist(value);
-			});
-			const suggester = new PropertyNameSuggest(plugin.app, search.inputEl);
-			suggester.onSelect(async (value) => {
-				await persist(value);
-				suggester.setValue(value);
-				suggester.close();
-			});
-		})
-
-		const coverFormatSetting = new Setting(containerEl)
-			.setName(i18n.t("COVER_PROPERTY_FORMAT"))
-			.setDesc(i18n.t("COVER_PROPERTY_FORMAT_DESC"));
-		coverFormatSetting.descEl.createEl("a", {
-			text: "README",
-			href: "https://github.com/anareaty/pretty-properties/blob/master/README.md",
-		});
-		coverFormatSetting.addTextArea((text) => {
-			enhanceFormatTextArea(plugin, text, plugin.settings.coverPropertyFormat, async (value) => {
-				plugin.settings.coverPropertyFormat = value;
-				await plugin.saveSettings();
-				updateAllCovers(plugin);
-			});
-		});
-
         new Setting(containerEl)
         .setName(i18n.t("COVERS_FOLDER"))
         .addText(text => text
@@ -83,16 +44,16 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
 			.setName(i18n.t("ADD_EXTRA_COVER_PROPERTY"))
 			.addButton((button) =>
 				button.setIcon("plus").onClick(async () => {
-					if (plugin.settings.extraCovers.find((c) => c.property === "") === undefined) {
-						plugin.settings.extraCovers.push({ property: "", format: "" });
+					if (plugin.settings.coverProperties.find((c) => c.property === "") === undefined) {
+						plugin.settings.coverProperties.push({ property: "", format: "" });
 						await plugin.saveSettings();
 						settingTab.display();
 					}
 				}),
 			);
 
-		for (let i = 0; i < plugin.settings.extraCovers.length; i++) {
-			const cover = plugin.settings.extraCovers[i];
+		for (let i = 0; i < plugin.settings.coverProperties.length; i++) {
+			const cover = plugin.settings.coverProperties[i];
 			new Setting(containerEl)
 				.setName(i18n.t("EXTRA_COVER_PROPERTY"))
 				.addSearch((search) => {
@@ -100,7 +61,7 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
 					search.setPlaceholder(i18n.t("PROPERTY_SEARCH_PLACEHOLDER"));
 
 					const persist = async (value: string) => {
-						plugin.settings.extraCovers[i].property = value;
+						plugin.settings.coverProperties[i].property = value;
 						await plugin.saveSettings();
 						updateAllCovers(plugin);
 					};
@@ -116,7 +77,7 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
 				})
 				.addTextArea((text) => {
 					enhanceFormatTextArea(plugin, text, cover.format, async (value) => {
-						plugin.settings.extraCovers[i].format = value;
+						plugin.settings.coverProperties[i].format = value;
 						await plugin.saveSettings();
 						updateAllCovers(plugin);
 					});
@@ -129,7 +90,7 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
 						.onClick(async () => {
 							if (i === 0)
 								return;
-							const covers = plugin.settings.extraCovers;
+							const covers = plugin.settings.coverProperties;
 							[covers[i - 1], covers[i]] = [covers[i], covers[i - 1]];
 
 							await plugin.saveSettings();
@@ -141,11 +102,11 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
 					button
 						.setIcon("arrow-down")
 						.setTooltip("Move down")
-						.setDisabled(i === plugin.settings.extraCovers.length - 1)
+						.setDisabled(i === plugin.settings.coverProperties.length - 1)
 						.onClick(async () => {
-							if (i === plugin.settings.extraCovers.length - 1)
+							if (i === plugin.settings.coverProperties.length - 1)
 								return;
-							const covers = plugin.settings.extraCovers;
+							const covers = plugin.settings.coverProperties;
 							[covers[i + 1], covers[i]] = [covers[i], covers[i + 1]];
 
 							await plugin.saveSettings();
@@ -155,7 +116,7 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
 				)
 				.addButton((button) =>
 					button.setIcon("x").onClick(async () => {
-						plugin.settings.extraCovers.splice(i, 1);
+						plugin.settings.coverProperties.splice(i, 1);
 
 						await plugin.saveSettings();
 						updateAllCovers(plugin);

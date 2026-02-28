@@ -84,8 +84,9 @@ export const getCurrentCoverProperty = (plugin: PrettyPropertiesPlugin) => {
     if (file instanceof TFile) {
         let cache = plugin.app.metadataCache.getFileCache(file);
         let frontmatter = cache!.frontmatter;
-		let props = plugin.settings.extraCovers.map((c) => c.property);
-        props.unshift(plugin.settings.coverProperty);
+		const props = plugin.settings.coverProperties
+			.map((c) => c.property)
+			.filter((p) => p);
 
         for (let prop of props) {
             if (getNestedProperty(frontmatter, prop) !== undefined) {
@@ -103,7 +104,7 @@ export const selectCoverImage = async (plugin: PrettyPropertiesPlugin) => {
     let file = plugin.app.workspace.getActiveFile();
     if (file instanceof TFile) {
         let propName = getCurrentCoverProperty(plugin);
-        if (!propName) propName = plugin.settings.coverProperty;
+        if (!propName) propName = plugin.settings.coverProperties[0]?.property;
         if (propName) {
             new ImageSuggestModal(
                 plugin.app, 

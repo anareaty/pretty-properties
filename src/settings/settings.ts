@@ -21,9 +21,9 @@ export interface PPPluginSettings {
     enableCover: boolean;
     bannerProperty: string;
 	iconProperty: string;
-    coverProperty: string;//TODO: merge with extraCovers and migrate
-    coverPropertyFormat: string;
-	extraCovers: Array<{ property: string; format: string }>;
+    coverProperty?: string;//deprecated
+	extraCoverProperties?: string[];//deprecated
+	coverProperties: Array<{ property: string; format: string }>;
     bannerHeight: number;
     bannerHeightMobile: number;
 	bannerHeightPopover: number;
@@ -136,10 +136,8 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
     enableCover: true,
     bannerProperty: "banner",
 	iconProperty: "icon",
-    coverProperty: "cover",
-	coverPropertyFormat: "",
-	extraCovers: [],
-    bannerHeight: 150, 
+	coverProperties: [{ property: "cover", format: "" }],
+    bannerHeight: 150,
     bannerHeightMobile: 100,
 	bannerHeightPopover: 100,
     bannerMargin: -20,

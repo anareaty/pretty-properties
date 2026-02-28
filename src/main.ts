@@ -261,12 +261,28 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		this.formatter.clearCache();
 	}
 
+
 	async loadSettings() {
-		this.settings = Object.assign(
-			{},
-			DEFAULT_SETTINGS,
-			await this.loadData()
-		)
+		const data = (await this.loadData()) ?? {};
+		await this.migrateSettings(data);
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
+	}
+
+	async migrateSettings(data: any){
+		if (!Array.isArray(data.coverProperties)) {
+			const coverProperty = data.coverProperty ?? DEFAULT_SETTINGS.coverProperties[0].property;
+			const extra = Array.isArray(data.extraCoverProperties) ? data.extraCoverProperties : [];
+
+			data.coverProperties = [
+				{ property: coverProperty, format: "" },
+				...extra.map((p: string) => ({ property: p, format: "" })),
+			];
+
+			delete data.coverProperty;
+			delete data.extraCoverProperties;
+
+			await this.saveData(data);
+		}
 	}
 
 	async saveSettings() {
