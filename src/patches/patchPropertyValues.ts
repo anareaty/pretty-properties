@@ -75,7 +75,7 @@ export function applyPropertyFormatting(
 		return;
 
 	const formatIndex = findPropertyFormatIndex(plugin, propertyName);
-	const propertyFormat = formatIndex >= 0 ? plugin.settings.propertyFormats[formatIndex] : undefined;
+	const propertyFormat = formatIndex >= 0 ? plugin.settings.propertyFormats[formatIndex].format : undefined;
 
 	if (formatIndex < 0 || !propertyFormat || propertyFormat.trim() === "") {
 		resetPropertyFormatting(containerElement, inputElement);
@@ -207,8 +207,8 @@ function coerceToString(value: unknown): string {
 }
 
 function findPropertyFormatIndex(plugin: PrettyPropertiesPlugin, propertyName: string): number {
-	return plugin.settings.propertiesToFormat.findIndex((candidate) => {
-		return candidate.toLowerCase() === propertyName.toLowerCase();
+	return plugin.settings.propertyFormats.findIndex((candidate) => {
+		return candidate.property.toLowerCase() === propertyName.toLowerCase();
 	});
 }
 

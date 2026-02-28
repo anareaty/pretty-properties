@@ -46,27 +46,29 @@ export const showPropSettings = (settingTab: PPSettingTab) => {
 		text: "README",
 		href: "https://github.com/anareaty/pretty-properties/blob/master/README.md",
 	});
-	addPropertyFormatSetting.addButton(button => button
-		.setIcon("plus")
-		.onClick(async () => {
-			if (plugin.settings.propertiesToFormat.find(p => p == "") === undefined) {
-				plugin.settings.propertiesToFormat.push("")
+	addPropertyFormatSetting.addButton(button =>
+		button.setIcon("plus").onClick(async () => {
+			if (plugin.settings.propertyFormats.find(pf => pf.property === "") === undefined) {
+				plugin.settings.propertyFormats.push({
+					property: "",
+					format: "",
+				});
 				await plugin.saveSettings();
 				settingTab.display();
 			}
-		}))
+		})
+	);
+	for (let i = 0; i < plugin.settings.propertyFormats.length; i++) {
+		const entry = plugin.settings.propertyFormats[i];
 
-	for (let i = 0; i < plugin.settings.propertiesToFormat.length; i++) {
-		let prop = plugin.settings.propertiesToFormat[i]
-		let propFormat = plugin.settings.propertyFormats[i]
 		new Setting(containerEl)
 			.setName(i18n.t("PROPERTY_FORMAT"))
 			.addSearch((search) => {
-				search.setValue(prop);
+				search.setValue(entry.property);
 				search.setPlaceholder(i18n.t("PROPERTY_SEARCH_PLACEHOLDER"));
 
 				const persist = async (value: string) => {
-					plugin.settings.propertiesToFormat[i] = value;
+					plugin.settings.propertyFormats[i].property = value;
 					await plugin.saveSettings();
 					updateAllPropertyFormats(plugin);
 				};
@@ -81,23 +83,21 @@ export const showPropSettings = (settingTab: PPSettingTab) => {
 				});
 			})
 			.addTextArea((text) => {
-				enhanceFormatTextArea(plugin, text, propFormat, async (value) => {
-					plugin.settings.propertyFormats[i] = value;
+				enhanceFormatTextArea(plugin, text, entry.format, async (value) => {
+					plugin.settings.propertyFormats[i].format = value;
 					await plugin.saveSettings();
 					updateAllPropertyFormats(plugin);
 				});
 			})
-			.addButton(button => button
-				.setIcon("x")
-				.onClick(async () => {
-					prop = plugin.settings.propertiesToFormat[i];
-					propFormat = plugin.settings.propertyFormats[i];
-					plugin.settings.propertiesToFormat = plugin.settings.propertiesToFormat.filter(p => p != prop);
-					plugin.settings.propertyFormats = plugin.settings.propertyFormats.filter(pf => pf != propFormat);
+			.addButton(button =>
+				button.setIcon("x").onClick(async () => {
+					plugin.settings.propertyFormats.splice(i, 1);
+
 					await plugin.saveSettings();
-					updateAllPropertyFormats(plugin)
+					updateAllPropertyFormats(plugin);
 					settingTab.display();
-				}))
+				})
+			);
 	}
 
 	new Setting(containerEl)

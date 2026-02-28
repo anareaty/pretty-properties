@@ -21,10 +21,9 @@ export interface PPPluginSettings {
     enableCover: boolean;
     bannerProperty: string;
 	iconProperty: string;
-    coverProperty: string;
+    coverProperty: string;//TODO: merge with extraCovers and migrate
     coverPropertyFormat: string;
-    extraCoverProperties: string[],
-    extraCoverPropertyFormats: string[],
+	extraCovers: Array<{ property: string; format: string }>;
     bannerHeight: number;
     bannerHeightMobile: number;
 	bannerHeightPopover: number;
@@ -89,8 +88,7 @@ export interface PPPluginSettings {
 	allTNAndCheckboxTasksCount: string;
     completedTNAndCheckboxTasksCount: string;
     uncompletedTNAndCheckboxTasksCount: string;
-	propertiesToFormat: string[],
-	propertyFormats: string[],
+	propertyFormats: Array<{ property: string; format: string }>;
 	enableColoredProperties: boolean;
 	enableColoredInlineTags: boolean;
 	nonLatinTagsSupport: boolean;
@@ -140,8 +138,7 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	iconProperty: "icon",
     coverProperty: "cover",
 	coverPropertyFormat: "",
-	extraCoverProperties: [],
-	extraCoverPropertyFormats: [],
+	extraCovers: [],
     bannerHeight: 150, 
     bannerHeightMobile: 100,
 	bannerHeightPopover: 100,
@@ -206,7 +203,6 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	allTNAndCheckboxTasksCount: "tn_and_checkbox_tasks",
     completedTNAndCheckboxTasksCount: "tn_and_checkbox_tasks_completed",
     uncompletedTNAndCheckboxTasksCount: "tn_and_checkbox_tasks_uncompleted",
-	propertiesToFormat: [],
 	propertyFormats: [],
 	enableColoredProperties: true,
 	enableColoredInlineTags: false,

@@ -32,10 +32,14 @@ export const renderCover = async (
 	if (!(mdContainer instanceof HTMLElement))
 		return;
 
-	const properties = [plugin.settings.coverProperty, ...plugin.settings.extraCoverProperties];
+	const properties = [
+		plugin.settings.coverProperty,
+		...plugin.settings.extraCovers.map((c) => c.property),
+	];
+
 	const propertyFormats = [
 		plugin.settings.coverPropertyFormat,
-		...plugin.settings.extraCoverPropertyFormats,
+		...plugin.settings.extraCovers.map((c) => c.format),
 	];
 
 	let coverDiv: HTMLDivElement | undefined;
