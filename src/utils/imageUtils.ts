@@ -84,7 +84,7 @@ export const getCurrentCoverProperty = (plugin: PrettyPropertiesPlugin) => {
     if (file instanceof TFile) {
         let cache = plugin.app.metadataCache.getFileCache(file);
         let frontmatter = cache!.frontmatter;
-        let props = [...plugin.settings.extraCoverProperties];
+		let props = plugin.settings.extraCovers.map((c) => c.property);
         props.unshift(plugin.settings.coverProperty);
 
         for (let prop of props) {

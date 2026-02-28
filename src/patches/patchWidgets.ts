@@ -175,8 +175,9 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
     }
 
     updateAllMetadataContainers(plugin)
-  } catch {
+  } catch(e){
     console.error("Can not update metadata widgets")
+    console.error(e)
   }
 
 }

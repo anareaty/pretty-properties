@@ -279,8 +279,8 @@ export const updateImagesInPopover = async (popover: HoverPopover, plugin: Prett
                 if (getNestedProperty(frontmatter, plugin.settings.coverProperty)) {
                     hasCover = true
                 } else {
-                    for (let prop of plugin.settings.extraCoverProperties) {
-                        if (getNestedProperty(frontmatter, prop)) {
+					for (let extraCover of plugin.settings.extraCovers) {
+						if (getNestedProperty(frontmatter, extraCover.property)) {
                             hasCover = true
                             break
                         }
@@ -350,8 +350,8 @@ export const updateImagesForView = async (view: MarkdownView, plugin: PrettyProp
             if (getNestedProperty(frontmatter, plugin.settings.coverProperty)) {
                 hasCover = true
             } else {
-                for (let prop of plugin.settings.extraCoverProperties) {
-                    if (getNestedProperty(frontmatter, prop)) {
+				for (let extraCover of plugin.settings.extraCovers) {
+					if (getNestedProperty(frontmatter, extraCover.property)) {
                         hasCover = true
                         break
                     }
@@ -418,8 +418,8 @@ export const updateImagesOnCacheChanged = async (file: TFile, cache: CachedMetad
             if (getNestedProperty(frontmatter, plugin.settings.coverProperty)) {
                 hasCover = true
             } else {
-                for (let prop of plugin.settings.extraCoverProperties) {
-                    if (getNestedProperty(frontmatter, prop)) {
+				for (let extraCover of plugin.settings.extraCovers) {
+					if (getNestedProperty(frontmatter, extraCover.property)) {
                         hasCover = true
                         break
                     }

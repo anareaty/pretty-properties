@@ -79,30 +79,28 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
                 await plugin.saveSettings();
             }));
 
-        new Setting(containerEl)
-        .setName(i18n.t("ADD_EXTRA_COVER_PROPERTY"))
-        .addButton(button => button
-            .setIcon("plus")
-            .onClick(async () => {
-                if (plugin.settings.extraCoverProperties.find(p => p == "") === undefined) {
-                    plugin.settings.extraCoverProperties.push("")
-                    await plugin.saveSettings();
-                    settingTab.display();
-                }
-            }))
+		new Setting(containerEl)
+			.setName(i18n.t("ADD_EXTRA_COVER_PROPERTY"))
+			.addButton((button) =>
+				button.setIcon("plus").onClick(async () => {
+					if (plugin.settings.extraCovers.find((c) => c.property === "") === undefined) {
+						plugin.settings.extraCovers.push({ property: "", format: "" });
+						await plugin.saveSettings();
+						settingTab.display();
+					}
+				}),
+			);
 
-		for (let i = 0; i < plugin.settings.extraCoverProperties.length; i++) {
-			let prop = plugin.settings.extraCoverProperties[i];
-			let propFormat = plugin.settings.extraCoverPropertyFormats[i];
-
+		for (let i = 0; i < plugin.settings.extraCovers.length; i++) {
+			const cover = plugin.settings.extraCovers[i];
 			new Setting(containerEl)
 				.setName(i18n.t("EXTRA_COVER_PROPERTY"))
 				.addSearch((search) => {
-					search.setValue(prop);
-					search.setPlaceholder(i18n.t("PROPERTY_SEARCH_PLACEHOLDER"))
+					search.setValue(cover.property);
+					search.setPlaceholder(i18n.t("PROPERTY_SEARCH_PLACEHOLDER"));
 
 					const persist = async (value: string) => {
-						plugin.settings.extraCoverProperties[i] = value;
+						plugin.settings.extraCovers[i].property = value;
 						await plugin.saveSettings();
 						updateAllCovers(plugin);
 					};
@@ -117,20 +115,47 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
 					});
 				})
 				.addTextArea((text) => {
-					enhanceFormatTextArea(plugin, text, propFormat, async (value) => {
-						plugin.settings.extraCoverPropertyFormats[i] = value;
+					enhanceFormatTextArea(plugin, text, cover.format, async (value) => {
+						plugin.settings.extraCovers[i].format = value;
 						await plugin.saveSettings();
 						updateAllCovers(plugin);
 					});
 				})
+				.addExtraButton((button) =>
+					button
+						.setIcon("arrow-up")
+						.setTooltip("Move up")
+						.setDisabled(i === 0)
+						.onClick(async () => {
+							if (i === 0)
+								return;
+							const covers = plugin.settings.extraCovers;
+							[covers[i - 1], covers[i]] = [covers[i], covers[i - 1]];
+
+							await plugin.saveSettings();
+							updateAllCovers(plugin);
+							settingTab.display();
+						}),
+				)
+				.addExtraButton((button) =>
+					button
+						.setIcon("arrow-down")
+						.setTooltip("Move down")
+						.setDisabled(i === plugin.settings.extraCovers.length - 1)
+						.onClick(async () => {
+							if (i === plugin.settings.extraCovers.length - 1)
+								return;
+							const covers = plugin.settings.extraCovers;
+							[covers[i + 1], covers[i]] = [covers[i], covers[i + 1]];
+
+							await plugin.saveSettings();
+							updateAllCovers(plugin);
+							settingTab.display();
+						}),
+				)
 				.addButton((button) =>
 					button.setIcon("x").onClick(async () => {
-						prop = plugin.settings.extraCoverProperties[i];
-						propFormat = plugin.settings.extraCoverPropertyFormats[i];
-						plugin.settings.extraCoverProperties =
-							plugin.settings.extraCoverProperties.filter((p) => p != prop);
-						plugin.settings.extraCoverPropertyFormats =
-							plugin.settings.extraCoverPropertyFormats.filter((pf) => pf != propFormat);
+						plugin.settings.extraCovers.splice(i, 1);
 
 						await plugin.saveSettings();
 						updateAllCovers(plugin);

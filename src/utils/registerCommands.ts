@@ -146,10 +146,9 @@ export function registerCommands(plugin: PrettyPropertiesPlugin) {
             ) {
                 if (!checking) {
                     removeProperty(plugin.settings.coverProperty, plugin);
-                    for (let extraProp of plugin.settings
-                        .extraCoverProperties) {
-                        removeProperty(extraProp, plugin);
-                    }
+					for (let extra of plugin.settings.extraCovers) {
+						removeProperty(extra.property, plugin);
+					}
                 }
                 return true;
             }
