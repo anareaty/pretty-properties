@@ -70,14 +70,17 @@ export function applyPropertyFormatting(
 	if (!isSupportedPropertyInputType(propertyInputType))
 		return;
 
-	const formatIndex = findPropertyFormatIndex(plugin, propertyName);
-	if (formatIndex < 0)
-		return;
-
-	const propertyFormat = plugin.settings.propertyFormats[formatIndex];
 	const inputElement = findInputElement(containerElement, propertyInputType);
 	if (!inputElement)
 		return;
+
+	const formatIndex = findPropertyFormatIndex(plugin, propertyName);
+	const propertyFormat = formatIndex >= 0 ? plugin.settings.propertyFormats[formatIndex] : undefined;
+
+	if (formatIndex < 0 || !propertyFormat || propertyFormat.trim() === "") {
+		resetPropertyFormatting(containerElement, inputElement);
+		return;
+	}
 
 	containerElement.classList.add(FORMATTED_WRAPPER_CLASS);
 
@@ -89,7 +92,6 @@ export function applyPropertyFormatting(
 
 		const isEditing = document.activeElement === inputElement;
 		setEditingState(inputElement, overlayElement, isEditing);
-
 		if (isEditing)
 			return;
 
@@ -107,6 +109,16 @@ export function applyPropertyFormatting(
 	refreshByInput.set(inputElement, refresh);
 	bindRefreshOnce(inputElement);
 	requestAnimationFrame(refresh);
+}
+
+function resetPropertyFormatting(containerElement: HTMLElement, inputElement: HTMLElement): void {
+	const overlayElement = containerElement.querySelector<HTMLDivElement>(`.${FORMATTED_OVERLAY_CLASS}`);
+	if (overlayElement)
+		overlayElement.remove();
+
+	containerElement.classList.remove(FORMATTED_WRAPPER_CLASS);
+	inputElement.classList.remove(HIDDEN_INPUT_CLASS);
+	refreshByInput.delete(inputElement);
 }
 
 function bindRefreshOnce(inputElement: HTMLElement): void {

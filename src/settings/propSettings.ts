@@ -95,7 +95,7 @@ export const showPropSettings = (settingTab: PPSettingTab) => {
 					plugin.settings.propertiesToFormat = plugin.settings.propertiesToFormat.filter(p => p != prop);
 					plugin.settings.propertyFormats = plugin.settings.propertyFormats.filter(pf => pf != propFormat);
 					await plugin.saveSettings();
-					updateAllCovers(plugin)
+					updateAllPropertyFormats(plugin)
 					settingTab.display();
 				}))
 	}
