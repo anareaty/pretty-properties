@@ -22,7 +22,7 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
       value = value.value;
     }
 
-  applyPropertyFormatting(el, propName, plugin, type, sourcePath, value);
+    applyPropertyFormatting(el, propName, plugin, type, sourcePath, value);
 
     if (type == "multitext" || type == "aliases") {
       let elements = rendered?.multiselect.elements
