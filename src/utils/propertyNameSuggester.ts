@@ -22,6 +22,11 @@ export class PropertyNameSuggest extends AbstractInputSuggest<string> {
 		el.setText(value);
 	}
 
+	selectSuggestion(value: string, _evt: MouseEvent | KeyboardEvent): void {
+		this.setValue(value);
+		this.close();
+	}
+
 	private getAllPropertyNames(): string[] {
 		const cacheAny = this.app.metadataCache as any;
 		if (typeof cacheAny.getAllPropertyInfos === "function") {
