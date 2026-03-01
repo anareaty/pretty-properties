@@ -132,23 +132,23 @@ If you Ctrl+click on any property value, the plugin will open search for this va
 
 ## Formatting
 
-The formatting settings allow you to show properties differently or render any markdown as a cover. This allows you to for example store a number property that represents a duration in seconds (eg. `829`), but render it visually as a readable text (eg. `13m 49s`). This essentially avoids having to store the same value twice in a note with different formats.
+The formatting settings allow you to display properties differently or render Markdown as a cover. This allows you to for example store a number property that represents a duration in seconds (eg. `829`), but render it visually as a human readable duration (eg. `13m 49s`). This avoids having to store the same value twice in a note in multiple formats.
 
 ![property-formatting.png](images/property-formatting.png)
 
 This is accomplished using [Handlebars](https://handlebarsjs.com/), a templating language similar to Obsidian's built in date/time template syntax.
-The syntax for this uses curly brackets around helper names. Arguments can be passed separated by spaces and they can be nested.
-Pretty propperties adds `{{propertyValue}}` and `{{propertyName}}` which will be replaced by the property content.
+The syntax uses double curly braces around helper names. Arguments are passed as space-separated values and can be nested.
+Pretty Properties adds `{{propertyValue}}` and `{{propertyName}}`, which will be replaced by the respective content.
 
 Currently supported helper packages are:
-- [@budibase/handlebars-helpers](https://www.npmjs.com/package/%40budibase/handlebars-helpers) for general utils
+- [@budibase/handlebars-helpers](https://www.npmjs.com/package/%40budibase/handlebars-helpers) for general utilities
 - [handlebars.moment](https://www.npmjs.com/package/handlebars.moment) for time and duration
 
 ## Custom helpers
 
-Pretty properties mainly uses the handlebar helpers from the packages list above. However to make some functionality more easily accessible it also adds some custom helpers:
+Pretty properties mainly uses the handlebar helpers from the packages list above. However to make some functionality more easily accessible it also adds custom helpers:
 ### `{{durationAbbreviated}}`
-Turns a duration into abbreviated numbers, ignoring leading zeros.
+Converts a duration into an abbreviated format, omitting leading zero units.
 #### Params
 - `time` **{Number}**: The input value
 - `unit` **{String}**: The unit of the input value
@@ -161,7 +161,7 @@ Turns a duration into the specified format.
 - `format` **{Boolean}**: Optional. See [dayjs](https://day.js.org/docs/en/display/format)
 - `returns` **{String}**
 ### `{{durationHumanized}}`
-Turns a duration into a natural sounding string.
+Converts a duration into a natural-sounding string.
 #### Params
 - `time` **{Number}**: The input value
 - `unit` **{String}**: The unit of the input value
@@ -169,8 +169,6 @@ Turns a duration into a natural sounding string.
 - `returns` **{String}**
 
 ## Example Templates
-
-### Properties
 Reverse the order of a property:
 ````
 {{reverse propertyValue}}
