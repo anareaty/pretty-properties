@@ -41,7 +41,7 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
             }));
 
 		new Setting(containerEl)
-			.setName(i18n.t("ADD_EXTRA_COVER_PROPERTY"))
+			.setName(i18n.t("ADD_COVER_PROPERTY"))
 			.addButton((button) =>
 				button.setIcon("plus").onClick(async () => {
 					if (plugin.settings.coverProperties.find((c) => c.property === "") === undefined) {
@@ -55,7 +55,7 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
 		for (let i = 0; i < plugin.settings.coverProperties.length; i++) {
 			const cover = plugin.settings.coverProperties[i];
 			new Setting(containerEl)
-				.setName(i18n.t("EXTRA_COVER_PROPERTY"))
+				.setName(i18n.t("COVER_PROPERTY"))
 				.addSearch((search) => {
 					search.setValue(cover.property);
 					search.setPlaceholder(i18n.t("PROPERTY_SEARCH_PLACEHOLDER"));
