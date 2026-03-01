@@ -327,7 +327,10 @@ function syncOverlayTextStyleFromInput(inputElement: HTMLElement, overlayElement
 
 	overlayElement.style.textIndent = computed.textIndent;
 	overlayElement.style.margin = computed.margin;
-}
+
+	overlayElement.style.backgroundColor = computed.backgroundColor;
+
+	overlayElement.style.borderRadius = computed.borderRadius;}
 
 function readPropertyName(rowElement: HTMLElement): string {
 	const fromAttribute = rowElement.getAttribute("data-property-key");

@@ -1196,7 +1196,15 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 	opacity: 0;
 }
 
-
+.pp-formatted-value-overlay > *:first-child {
+	margin-top: 0;
+}
+.pp-formatted-value-overlay > *:last-child {
+	margin-bottom: 0;
+}
+.pp-formatted-value-overlay p {
+	margin: 0;
+}
 
 
 
