@@ -300,6 +300,9 @@ function detectPropertyInputType(rowElement: HTMLElement): SupportedPropertyInpu
 function isSupportedPropertyInputType(type: string): type is SupportedPropertyInputType {
 	return Object.prototype.hasOwnProperty.call(INPUT_SELECTORS, type);
 }
+export function getSupportedPropertyInputTypes(): string[] {
+	return Object.keys(INPUT_SELECTORS);
+}
 
 function findPropertyValueContainer(rowElement: HTMLElement): HTMLElement {
 	return (
