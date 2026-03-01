@@ -5,6 +5,7 @@ import { ColorPickerModal } from "src/modals/colorPickerModal";
 import MenuManager from "src/utils/menuManager";
 import { updateRelativeDateColors } from "src/utils/updates/updateStyles";
 import { updateAllProperties } from "src/utils/updates/updateElements";
+import {updateAllPropertyFormats} from "../patches/patchPropertyValues";
 
 
 
@@ -66,6 +67,7 @@ export const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string
 
                 plugin.saveSettings();
                 updateAllProperties(plugin)
+				updateAllPropertyFormats(plugin);
 
                 if (colorList == "dateColors") {
                     updateRelativeDateColors(plugin)
