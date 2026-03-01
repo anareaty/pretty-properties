@@ -7,6 +7,7 @@ import { removeProperty } from "src/utils/propertyUtils";
 import { ImageSuggestModal } from "src/modals/imageSuggestModal";
 
 
+
 export const createBannerMenu = (e: MouseEvent, plugin: PrettyPropertiesPlugin) => {
 
     //@ts-ignore
