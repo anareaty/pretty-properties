@@ -296,8 +296,6 @@
 
 .metadata-side-image {
     grid-row: 1/3;
-    font-size: 0;
-    text-align: center;
 }
 
 
@@ -365,17 +363,6 @@
 
 
 
-.metadata-side-image:not(.top, .bottom) .pp-cover-image {
-  max-height: var(--cover-max-height);
-}
-
-.metadata-side-image.top .pp-cover-image,
-.metadata-side-image.bottom .pp-cover-image {
-  max-height: var(--cover-max-height-top-bottom);
-}
-
-
-
 
 .metadata-side-image.initial .pp-cover-image,
 .metadata-side-image.initial-2 .pp-cover-image,
@@ -394,7 +381,6 @@
   }
   
   .metadata-side-image .pp-cover-image {
-    height: 200px !important;
 	  width: auto !important;
     margin: auto;
   }
@@ -578,7 +564,7 @@
 
 .banner-image .image-resize-container img {
   width: 100% !important;
-  
+
 }
 
 
@@ -1129,7 +1115,7 @@ a.tag.transparent-color {
 .
 
 ,
- 
+
 */
 {
   background-color: var(--tag-background-hover);
@@ -1167,14 +1153,14 @@ body:not(.show-hidden-properties).hidden-props-in-prop-tab .workspace-leaf-conte
 body:not(.show-hidden-properties) .hover-popover .metadata-property.pp-property-hidden:not(:focus, :focus-within),
 
 /* Hide empty properties when the settings set to hide all empty properties */
-.hide-all-empty-properties:not(.show-hidden-properties) .markdown-source-view .metadata-property.is-empty:not(:focus, :focus-within), 
-.hide-all-empty-properties:not(.show-hidden-properties) .markdown-preview-view .metadata-property.is-empty:not(:focus, :focus-within), 
+.hide-all-empty-properties:not(.show-hidden-properties) .markdown-source-view .metadata-property.is-empty:not(:focus, :focus-within),
+.hide-all-empty-properties:not(.show-hidden-properties) .markdown-preview-view .metadata-property.is-empty:not(:focus, :focus-within),
 .hide-all-empty-properties:not(.show-hidden-properties).hidden-props-in-prop-tab .workspace-leaf-content[data-type='file-properties'] .metadata-property.is-empty:not(:focus, :focus-within), 
 .hide-all-empty-properties:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty:not(:focus, :focus-within),
 
 /* Hide empty properties when marked as hide when empty */
-body:not(.show-hidden-properties) .markdown-source-view .metadata-property.is-empty.pp-property-hidden-when-empty:not(:focus, :focus-within), 
-body:not(.show-hidden-properties) .markdown-preview-view .metadata-property.is-empty.pp-property-hidden-when-empty:not(:focus, :focus-within), 
+body:not(.show-hidden-properties) .markdown-source-view .metadata-property.is-empty.pp-property-hidden-when-empty:not(:focus, :focus-within),
+body:not(.show-hidden-properties) .markdown-preview-view .metadata-property.is-empty.pp-property-hidden-when-empty:not(:focus, :focus-within),
 body:not(.show-hidden-properties).hidden-props-in-prop-tab .workspace-leaf-content[data-type='file-properties'] .metadata-property.is-empty.pp-property-hidden-when-empty:not(:focus, :focus-within), 
 body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-property-hidden-when-empty:not(:focus, :focus-within),
 
@@ -1201,7 +1187,24 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 
 
 
+.pp-formatted-value-overlay {
+	position: absolute;
+	pointer-events: none;
+}
 
+.pp-formatted-value-hidden {
+	opacity: 0;
+}
+
+.pp-formatted-value-overlay > *:first-child {
+	margin-top: 0;
+}
+.pp-formatted-value-overlay > *:last-child {
+	margin-bottom: 0;
+}
+.pp-formatted-value-overlay p {
+	margin: 0;
+}
 
 
 
@@ -1620,7 +1623,7 @@ button.longtext-color-button:hover {
   font-family: var(--inline-title-font);
   letter-spacing: -0.015em;
   
-  
+
 }
 
 .title-icon-wrapper .pp-icon {
@@ -1682,7 +1685,7 @@ button.longtext-color-button:hover {
 }
 
 .metadata-properties-heading .collapse-indicator {
-    inset-inline-start: -21px; 
+    inset-inline-start: -21px;
 }
 
 /* Need to make inset smaller so collapse indicator is visible on canvas nodes */
@@ -1697,7 +1700,7 @@ button.longtext-color-button:hover {
 .hide-metadata-add-button .markdown-source-view .metadata-content:not(:focus-within) .metadata-add-button,
 .hide-metadata-add-button .markdown-preview-view .metadata-content:not(:focus-within) .metadata-add-button {
   display: none;
-  
+
 }
 
 /* Fix for Minimal theme */
@@ -1706,4 +1709,20 @@ button.longtext-color-button:hover {
     max-width: var(--max-width);
     width: var(--line-width);
     margin-inline: var(--content-margin)!important;
+}
+
+
+.pp-format-wrapper {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+.pp-format-invalid {
+	box-shadow: 0 0 0 1px var(--text-error);
+}
+
+.pp-format-error {
+	color: var(--text-error);
+	font-size: var(--font-ui-smaller);
 }

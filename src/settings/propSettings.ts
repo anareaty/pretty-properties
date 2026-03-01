@@ -9,6 +9,10 @@ import { showColoredTextSettings } from './coloredTextSettings';
 import { showHiddenEmptySettings, showHiddenSettings } from './hiddenSettings';
 import { updateLongTexts, updateTagPaneTagsAll } from 'src/utils/updates/updatePills';
 import { removeColorStyles, removeInlineTagsColorStyles } from 'src/utils/remove';
+import {updateAllCovers} from "../utils/updates/updateCovers";
+import {getSupportedPropertyInputTypes, updateAllPropertyFormats} from "../patches/patchPropertyValues";
+import {PropertyNameSuggest} from "../utils/propertyNameSuggester";
+import {enhanceFormatTextArea} from "../utils/settingsHelper";
 
 
 
@@ -35,7 +39,69 @@ export const showPropSettings = (settingTab: PPSettingTab) => {
         })
     )
 
-    new Setting(containerEl)
+	const addPropertyFormatSetting = new Setting(containerEl)
+		.setName(i18n.t("ADD_PROPERTY_FORMAT"))
+		.setDesc(i18n.t("PROPERTY_FORMAT_DESC"));
+	addPropertyFormatSetting.descEl.createEl("a", {
+		text: "README",
+		href: "https://github.com/anareaty/pretty-properties/blob/master/README.md",
+	});
+	addPropertyFormatSetting.addButton(button =>
+		button.setIcon("plus").onClick(async () => {
+			if (plugin.settings.propertyFormats.find(pf => pf.property === "") === undefined) {
+				plugin.settings.propertyFormats.push({
+					property: "",
+					format: "",
+				});
+				await plugin.saveSettings();
+				settingTab.display();
+			}
+		})
+	);
+	for (let i = 0; i < plugin.settings.propertyFormats.length; i++) {
+		const entry = plugin.settings.propertyFormats[i];
+
+		new Setting(containerEl)
+			.setName(i18n.t("PROPERTY_FORMAT"))
+			.addSearch((search) => {
+				search.setValue(entry.property);
+				search.setPlaceholder(i18n.t("PROPERTY_SEARCH_PLACEHOLDER"));
+
+				const persist = async (value: string) => {
+					plugin.settings.propertyFormats[i].property = value;
+					await plugin.saveSettings();
+					updateAllPropertyFormats(plugin);
+				};
+				search.onChange(async (value) => {
+					await persist(value);
+				});
+
+				const suggester = new PropertyNameSuggest(plugin.app, search.inputEl, getSupportedPropertyInputTypes());
+				suggester.onSelect(async (value) => {
+					await persist(value);
+					suggester.setValue(value);
+					suggester.close();
+				});
+			})
+			.addTextArea((text) => {
+				enhanceFormatTextArea(plugin, text, entry.format, async (value) => {
+					plugin.settings.propertyFormats[i].format = value;
+					await plugin.saveSettings();
+					updateAllPropertyFormats(plugin);
+				});
+			})
+			.addButton(button =>
+				button.setIcon("x").onClick(async () => {
+					plugin.settings.propertyFormats.splice(i, 1);
+
+					await plugin.saveSettings();
+					updateAllPropertyFormats(plugin);
+					settingTab.display();
+				})
+			);
+	}
+
+	new Setting(containerEl)
     .setName(i18n.t("ENABLE_COLORED_PROPERTIES"))
     .addToggle(toggle => {
         toggle.setValue(plugin.settings.enableColoredProperties)

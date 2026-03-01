@@ -276,23 +276,19 @@ export const updateImagesInPopover = async (popover: HoverPopover, plugin: Prett
             let hasCover = false
 
             if (frontmatter) {
-                if (getNestedProperty(frontmatter, plugin.settings.coverProperty)) {
-                    hasCover = true
-                } else {
-                    for (let prop of plugin.settings.extraCoverProperties) {
-                        if (getNestedProperty(frontmatter, prop)) {
-                            hasCover = true
-                            break
-                        }
-                    }
-                }
+				for (let extraCover of plugin.settings.coverProperties) {
+					if (getNestedProperty(frontmatter, extraCover.property)) {
+						hasCover = true
+						break
+					}
+				}
             }
 
             
 
             if (frontmatter && hasCover  && plugin.settings.enableCover && plugin.settings.enableCoversInPopover) {
                 
-                renderCover(contentEl, frontmatter, sourcePath, plugin);
+                renderCover(popover, contentEl, frontmatter, sourcePath, plugin);
             } else {    
                 let oldCoverDiv = contentEl?.querySelector(".metadata-side-image");
                 oldCoverDiv?.remove();
@@ -347,22 +343,18 @@ export const updateImagesForView = async (view: MarkdownView, plugin: PrettyProp
         
     
         if (frontmatter) {
-            if (getNestedProperty(frontmatter, plugin.settings.coverProperty)) {
-                hasCover = true
-            } else {
-                for (let prop of plugin.settings.extraCoverProperties) {
-                    if (getNestedProperty(frontmatter, prop)) {
-                        hasCover = true
-                        break
-                    }
-                }
-            }
+			for (let extraCover of plugin.settings.coverProperties) {
+				if (getNestedProperty(frontmatter, extraCover.property)) {
+					hasCover = true
+					break
+				}
+			}
         }
 
         
     
         if (frontmatter && hasCover  && plugin.settings.enableCover) {
-            renderCover(contentEl, frontmatter, sourcePath, plugin);
+            renderCover(view, contentEl, frontmatter, sourcePath, plugin);
         } else {    
             let oldCoverDiv = contentEl?.querySelector(".metadata-side-image");
             oldCoverDiv?.remove();
@@ -415,16 +407,12 @@ export const updateImagesOnCacheChanged = async (file: TFile, cache: CachedMetad
         let hasCover = false
 
         if (frontmatter) {
-            if (getNestedProperty(frontmatter, plugin.settings.coverProperty)) {
-                hasCover = true
-            } else {
-                for (let prop of plugin.settings.extraCoverProperties) {
-                    if (getNestedProperty(frontmatter, prop)) {
-                        hasCover = true
-                        break
-                    }
-                }
-            }
+			for (let extraCover of plugin.settings.coverProperties) {
+				if (getNestedProperty(frontmatter, extraCover.property)) {
+					hasCover = true
+					break
+				}
+			}
         }
 
 
@@ -433,7 +421,7 @@ export const updateImagesOnCacheChanged = async (file: TFile, cache: CachedMetad
         
 
         if (frontmatter && hasCover && plugin.settings.enableCover) {
-          renderCover(contentEl, frontmatter, sourcePath, plugin);
+          renderCover(view, contentEl, frontmatter, sourcePath, plugin);
         } else {
           let oldCoverDiv = contentEl?.querySelector(".metadata-side-image");
           oldCoverDiv?.remove();

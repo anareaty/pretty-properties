@@ -1,32 +1,32 @@
 // Query selectors not only whithin the current document, but also within iframes (for example canvas nodes)
 
-export const querySelectorsWithIframes = (query: string) => {
-    let simpleQuery = document.querySelectorAll(query)
-    let allSelectors = [...simpleQuery]
-    let iframes = document.querySelectorAll("iframe")
-    
-    for (let iframe of iframes) {
-        let frameDoc = iframe.contentDocument || iframe.contentWindow?.document
-        if (frameDoc) {
-            let frameQuery = frameDoc.querySelectorAll(query)
-            allSelectors = allSelectors.concat([...frameQuery])
-        }
-    }
-    return allSelectors
-}
 
+export const querySelectorsWithIframes = (query: string) => {
+    return querySelectorsInRootAndIframes(document, query);
+};
 
 export const querySelectorsWithIframesForContainer = (query: string, container: HTMLElement) => {
-    let simpleQuery = container.querySelectorAll(query)
-    let allSelectors = [...simpleQuery]
-    let iframes = container.querySelectorAll("iframe")
-    
-    for (let iframe of iframes) {
-        let frameDoc = iframe.contentDocument || iframe.contentWindow?.document
-        if (frameDoc) {
-            let frameQuery = frameDoc.querySelectorAll(query)
-            allSelectors = allSelectors.concat([...frameQuery])
-        }
+    return querySelectorsInRootAndIframes(container, query);
+};
+
+function querySelectorsInRootAndIframes(root: ParentNode, query: string): Element[] {
+    const results: Element[] = Array.from(root.querySelectorAll(query));
+    const iframes = Array.from(root.querySelectorAll("iframe"));
+
+    for (const iframe of iframes) {
+        const frameDoc = safeGetFrameDocument(iframe);
+        if (!frameDoc)
+            continue;
+
+        results.push(...Array.from(frameDoc.querySelectorAll(query)));
     }
-    return allSelectors
+    return results;
+}
+
+function safeGetFrameDocument(iframe: HTMLIFrameElement): Document | null {
+    try {
+        return iframe.contentDocument ?? iframe.contentWindow?.document ?? null;
+    } catch {
+        return null;
+    }
 }

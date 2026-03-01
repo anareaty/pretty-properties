@@ -5,6 +5,8 @@ import {
 } from 'src/utils/updates/updateStyles';
 import { PPSettingTab } from 'src/settings/settings';
 import { updateAllCovers } from 'src/utils/updates/updateCovers';
+import {PropertyNameSuggest} from "../utils/propertyNameSuggester";
+import {enhanceFormatTextArea} from "../utils/settingsHelper";
 
 
 
@@ -29,19 +31,6 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
 
     if (plugin.settings.enableCover) {
 
-        
-
-        new Setting(containerEl)
-        .setName(i18n.t("COVER_PROPERTY"))
-        .addText(text => text
-            .setPlaceholder('cover')
-            .setValue(plugin.settings.coverProperty)
-            .onChange(async (value) => {
-                plugin.settings.coverProperty = value;
-                await plugin.saveSettings();
-                updateAllCovers(plugin)
-            }));
-
         new Setting(containerEl)
         .setName(i18n.t("COVERS_FOLDER"))
         .addText(text => text
@@ -51,39 +40,90 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
                 await plugin.saveSettings();
             }));
 
-        new Setting(containerEl)
-        .setName(i18n.t("ADD_EXTRA_COVER_PROPERTY"))
-        .addButton(button => button
-            .setIcon("plus")
-            .onClick(async () => {
-                if (plugin.settings.extraCoverProperties.find(p => p == "") === undefined) {
-                    plugin.settings.extraCoverProperties.push("")
-                    await plugin.saveSettings();
-                    settingTab.display();
-                }
-            }))
+		new Setting(containerEl)
+			.setName(i18n.t("ADD_COVER_PROPERTY"))
+			.addButton((button) =>
+				button.setIcon("plus").onClick(async () => {
+					if (plugin.settings.coverProperties.find((c) => c.property === "") === undefined) {
+						plugin.settings.coverProperties.push({ property: "", format: "" });
+						await plugin.saveSettings();
+						settingTab.display();
+					}
+				}),
+			);
 
-        for (let i = 0; i < plugin.settings.extraCoverProperties.length; i++) {
-            let prop = plugin.settings.extraCoverProperties[i]
-            new Setting(containerEl)
-            .setName(i18n.t("EXTRA_COVER_PROPERTY"))
-            .addText(text => text
-                .setValue(prop)
-                .onChange(async (value) => {
-                    plugin.settings.extraCoverProperties[i] = value;
-                    await plugin.saveSettings();
-                    updateAllCovers(plugin)
-                }))
-            .addButton(button => button
-            .setIcon("x")
-            .onClick(async () => {
-                prop = plugin.settings.extraCoverProperties[i]
-                plugin.settings.extraCoverProperties = plugin.settings.extraCoverProperties.filter(p => p != prop)
-                await plugin.saveSettings();
-                updateAllCovers(plugin)
-                settingTab.display();
-            }))
-        }
+		for (let i = 0; i < plugin.settings.coverProperties.length; i++) {
+			const cover = plugin.settings.coverProperties[i];
+			new Setting(containerEl)
+				.setName(i18n.t("COVER_PROPERTY"))
+				.addSearch((search) => {
+					search.setValue(cover.property);
+					search.setPlaceholder(i18n.t("PROPERTY_SEARCH_PLACEHOLDER"));
+
+					const persist = async (value: string) => {
+						plugin.settings.coverProperties[i].property = value;
+						await plugin.saveSettings();
+						updateAllCovers(plugin);
+					};
+					search.onChange(async (value) => {
+						await persist(value);
+					});
+					const suggester = new PropertyNameSuggest(plugin.app, search.inputEl);
+					suggester.onSelect(async (value) => {
+						await persist(value);
+						suggester.setValue(value);
+						suggester.close();
+					});
+				})
+				.addTextArea((text) => {
+					enhanceFormatTextArea(plugin, text, cover.format, async (value) => {
+						plugin.settings.coverProperties[i].format = value;
+						await plugin.saveSettings();
+						updateAllCovers(plugin);
+					});
+				})
+				.addExtraButton((button) =>
+					button
+						.setIcon("arrow-up")
+						.setTooltip("Move up")
+						.setDisabled(i === 0)
+						.onClick(async () => {
+							if (i === 0)
+								return;
+							const covers = plugin.settings.coverProperties;
+							[covers[i - 1], covers[i]] = [covers[i], covers[i - 1]];
+
+							await plugin.saveSettings();
+							updateAllCovers(plugin);
+							settingTab.display();
+						}),
+				)
+				.addExtraButton((button) =>
+					button
+						.setIcon("arrow-down")
+						.setTooltip("Move down")
+						.setDisabled(i === plugin.settings.coverProperties.length - 1)
+						.onClick(async () => {
+							if (i === plugin.settings.coverProperties.length - 1)
+								return;
+							const covers = plugin.settings.coverProperties;
+							[covers[i + 1], covers[i]] = [covers[i], covers[i + 1]];
+
+							await plugin.saveSettings();
+							updateAllCovers(plugin);
+							settingTab.display();
+						}),
+				)
+				.addButton((button) =>
+					button.setIcon("x").onClick(async () => {
+						plugin.settings.coverProperties.splice(i, 1);
+
+						await plugin.saveSettings();
+						updateAllCovers(plugin);
+						settingTab.display();
+					}),
+				);
+		}
 
 
         new Setting(containerEl)

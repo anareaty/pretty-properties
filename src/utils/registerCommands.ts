@@ -121,7 +121,7 @@ export function registerCommands(plugin: PrettyPropertiesPlugin) {
             if (
                 file instanceof TFile &&
                 plugin.settings.enableCover &&
-                plugin.settings.coverProperty
+				plugin.settings.coverProperties[0]?.property
             ) {
                 if (!checking) {
                     selectCoverImage(plugin);
@@ -141,15 +141,14 @@ export function registerCommands(plugin: PrettyPropertiesPlugin) {
             if (
                 file instanceof TFile &&
                 plugin.settings.enableCover &&
-                plugin.settings.coverProperty &&
+				plugin.settings.coverProperties[0]?.property &&
                 currentCoverProp
             ) {
                 if (!checking) {
-                    removeProperty(plugin.settings.coverProperty, plugin);
-                    for (let extraProp of plugin.settings
-                        .extraCoverProperties) {
-                        removeProperty(extraProp, plugin);
-                    }
+                    removeProperty(plugin.settings.coverProperties[0]?.property, plugin);
+					for (let coverProperty of plugin.settings.coverProperties) {
+						removeProperty(coverProperty.property, plugin);
+					}
                 }
                 return true;
             }
@@ -166,7 +165,7 @@ export function registerCommands(plugin: PrettyPropertiesPlugin) {
             if (
                 file instanceof TFile &&
                 plugin.settings.enableCover &&
-                plugin.settings.coverProperty &&
+				plugin.settings.coverProperties[0]?.property &&
                 currentCoverProp
             ) {
                 if (!checking) {
@@ -188,7 +187,7 @@ export function registerCommands(plugin: PrettyPropertiesPlugin) {
                 ((plugin.settings.enableBanner &&
                     plugin.settings.bannerProperty) ||
                     (plugin.settings.enableCover &&
-                        plugin.settings.coverProperty) ||
+						plugin.settings.coverProperties[0]?.property) ||
                     (plugin.settings.enableIcon &&
                         plugin.settings.iconProperty))
             ) {
@@ -238,5 +237,3 @@ export function registerCommands(plugin: PrettyPropertiesPlugin) {
 
 
 }
-
-

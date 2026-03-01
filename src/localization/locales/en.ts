@@ -13,8 +13,8 @@ export default {
   GAP_AFTER_BANNER_MOBILE: "Gap after banner on mobile",
   ENABLE_COVER: "Enable covers",
   COVER_PROPERTY: "Cover property",
-  ADD_EXTRA_COVER_PROPERTY: "Add extra cover property",
-  EXTRA_COVER_PROPERTY: "Extra cover property",
+  COVER_PROPERTY_FORMAT_DESC: "Optional formatting string that will change how the cover is rendered. Use {{propertyValue}} to add the property content. For more infos check out the ",
+  ADD_COVER_PROPERTY: "Add cover property",
   VERTICAL_COVER_WIDTH: "Vertical cover width",
   HORIZONTAL_COVER_WIDTH: "Horizontal cover width",
   SQUARE_COVER_WIDTH: "Square cover width",
@@ -48,7 +48,7 @@ export default {
   BANNERS_FOLDER: "Folder with images for banners",
   COVERS_FOLDER: "Folder with images for covers",
   CAN_BE_POSITIVE_OR_NEGATIVE: "Can be positive or negative",
-  PROPERTY_SETTINGS: "Property settings",
+  PROPERTY_SETTINGS: "Properties",
   SHOW_COLORED_PROPERTIES: "Show colored list properties",
   ADD_COLORED_PROPERTY: "Add colored list property",
   SHOW_TEXT_COLORED_PROPERTIES: "Show colored text properties",
@@ -146,6 +146,11 @@ export default {
   TASKNOTES_AND_CHECKBOX_COUNT_PROPERTY: "Property to count all TaskNotes tasks and checkbox tasks",
   TASKNOTES_AND_CHECKBOX_COMPLETED_COUNT_PROPERTY: "Property to count completed TaskNotes tasks and checkbox tasks",
   TASKNOTES_AND_CHECKBOX_UNCOMPLETED_COUNT_PROPERTY: "Property to count uncompleted TaskNotes tasks and checkbox tasks",
+  ADD_PROPERTY_FORMAT: "Add property format",
+  PROPERTY_FORMAT_DESC: "Property formats allow rendering properties differently. Use {{propertyValue}} to add the property content. For more infos check out the ",
+  PROPERTY_FORMAT: "Property format",
+  PROPERTY_SEARCH_PLACEHOLDER: "property",
+  PROPERTY_FORMAT_PLACEHOLDER: "{{reverse propertyValue}}",
   ENABLE_COLORED_PROPERTIES: "Enable colored properties",
   ENABLE_COLORED_INLINE_TAGS: "Enable colored inline tags",
   ENABLE_NON_LATIN_TAGS_SUPPORT: "Enable non-latin tags styling support",
@@ -205,6 +210,3 @@ export default {
   HIDE_PROPERTIES_TITLE: "Hide properties title",
   HIDE_ADD_PROPERTY_BUTTON: "Hide add property button",
 };
-
-
-

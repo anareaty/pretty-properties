@@ -5,6 +5,7 @@ import { updateDateInput, updateDateTimeInput } from "src/utils/updates/updateDa
 import { updateProgress } from "src/utils/updates/updateProgress"
 import { around, dedupe } from "monkey-around";
 import { updateAllMetadataContainers } from "src/utils/updates/updateHiddenProperties";
+import {applyPropertyFormatting} from "./patchPropertyValues";
 
 
 const updateWidgets = async (type: string, rendered: any, args: any[], plugin: PrettyPropertiesPlugin) => {
@@ -21,9 +22,10 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
       value = value.value;
     }
 
+    applyPropertyFormatting(el, propName, plugin, type, sourcePath, value);
 
     if (type == "multitext" || type == "aliases") {
-      let elements = rendered?.multiselect.elements 
+      let elements = rendered?.multiselect.elements
 
       if (elements.length == 0) {
         parent.classList.add("is-empty")
@@ -37,7 +39,7 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
     }
 
     if (type == "tags") {
-      let elements = rendered?.multiselect.elements 
+      let elements = rendered?.multiselect.elements
 
       if (elements.length == 0) {
         parent.classList.add("is-empty")
@@ -99,7 +101,7 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
       let link = el.querySelector(".metadata-link");
 
       let parent = el.parentElement
-      
+
       if (longText) {
         updateLongtext(longText, plugin);
         longText.onblur = () => {
@@ -125,7 +127,7 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
         el.classList.add("icon-property-value")
       }
 
-      if (propName == plugin.settings.coverProperty) {
+      if (propName == plugin.settings.coverProperties[0]?.property) {
         el.classList.add("cover-property-value")
       }
     }
@@ -162,7 +164,7 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
       }
     }
 
-    
+
 
     if (plugin.settings.hiddenProperties.find(p => p.toLowerCase() == propName.toLowerCase())) {
       parent.classList.add("pp-property-hidden")
@@ -173,10 +175,11 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
     }
 
     updateAllMetadataContainers(plugin)
-  } catch {
+  } catch(e){
     console.error("Can not update metadata widgets")
+    console.error(e)
   }
-  
+
 }
 
 
@@ -231,8 +234,3 @@ export const patchPropertyWidgets = async (plugin: PrettyPropertiesPlugin) => {
 
   
 }
-
-
-
-
-

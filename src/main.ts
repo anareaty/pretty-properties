@@ -43,12 +43,14 @@ import { updateTaskCountOnCacheChanged } from "./utils/taskCount/taskCount";
 import { unPatchWidgets } from "./patches/removePatches";
 import { patchHoverPopover } from "./patches/patchHoverPopover";
 import { API, createApi } from "./utils/createApi";
+import {PropertyFormatter} from "./utils/propertyFormatter";
 
 export default class PrettyPropertiesPlugin extends Plugin {
 	settings: PPPluginSettings;
-	menuManager: MenuManager
-	patches: Record<string, any>
-	api: API
+	menuManager: MenuManager;
+	patches: Record<string, any>;
+	api: API;
+	formatter: PropertyFormatter;
 
 	async onload() {
 		await this.loadSettings();
@@ -61,6 +63,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		i18n.setLocale();
 		this.menuManager = new MenuManager
 		this.patches = {}
+
+		this.formatter = new PropertyFormatter();
 
 		patchPropertyWidgets(this)
 		patchTagView(this)
@@ -254,14 +258,31 @@ export default class PrettyPropertiesPlugin extends Plugin {
 	onunload() {
 		unPatchWidgets(this)
 		removeAll()
+		this.formatter.clearCache();
 	}
 
+
 	async loadSettings() {
-		this.settings = Object.assign(
-			{},
-			DEFAULT_SETTINGS,
-			await this.loadData()
-		)
+		const data = (await this.loadData()) ?? {};
+		await this.migrateSettings(data);
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
+	}
+
+	async migrateSettings(data: any){
+		if (!Array.isArray(data.coverProperties)) {
+			const coverProperty = data.coverProperty ?? DEFAULT_SETTINGS.coverProperties[0].property;
+			const extra = Array.isArray(data.extraCoverProperties) ? data.extraCoverProperties : [];
+
+			data.coverProperties = [
+				{ property: coverProperty, format: "" },
+				...extra.map((p: string) => ({ property: p, format: "" })),
+			];
+
+			delete data.coverProperty;
+			delete data.extraCoverProperties;
+
+			await this.saveData(data);
+		}
 	}
 
 	async saveSettings() {
