@@ -8,6 +8,8 @@ import { ImageSuggestModal } from "src/modals/imageSuggestModal";
 
 
 
+
+
 export const handleBannerMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => {
 
     let propName = plugin.settings.bannerProperty;
