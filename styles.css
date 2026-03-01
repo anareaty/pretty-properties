@@ -1193,9 +1193,7 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 }
 
 .pp-formatted-value-hidden {
-	color: inherit;
-	-webkit-text-fill-color: transparent;
-	caret-color: var(--text-normal);
+	opacity: 0;
 }
 
 
