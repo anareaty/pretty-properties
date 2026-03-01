@@ -10,7 +10,7 @@ import { showHiddenEmptySettings, showHiddenSettings } from './hiddenSettings';
 import { updateLongTexts, updateTagPaneTagsAll } from 'src/utils/updates/updatePills';
 import { removeColorStyles, removeInlineTagsColorStyles } from 'src/utils/remove';
 import {updateAllCovers} from "../utils/updates/updateCovers";
-import {updateAllPropertyFormats} from "../patches/patchPropertyValues";
+import {getSupportedPropertyInputTypes, updateAllPropertyFormats} from "../patches/patchPropertyValues";
 import {PropertyNameSuggest} from "../utils/propertyNameSuggester";
 import {enhanceFormatTextArea} from "../utils/settingsHelper";
 
@@ -75,7 +75,8 @@ export const showPropSettings = (settingTab: PPSettingTab) => {
 				search.onChange(async (value) => {
 					await persist(value);
 				});
-				const suggester = new PropertyNameSuggest(plugin.app, search.inputEl);
+
+				const suggester = new PropertyNameSuggest(plugin.app, search.inputEl, getSupportedPropertyInputTypes());
 				suggester.onSelect(async (value) => {
 					await persist(value);
 					suggester.setValue(value);
