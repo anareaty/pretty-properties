@@ -1,9 +1,10 @@
 import PrettyPropertiesPlugin from "../main";
 import { MarkdownRenderer, MarkdownView } from "obsidian";
 
-type SupportedPropertyInputType = "number" | "date" | "datetime";
+type SupportedPropertyInputType = "text" | "number" | "date" | "datetime";
 
 const INPUT_SELECTORS: Record<SupportedPropertyInputType, string> = {
+	text: ".metadata-input-longtext",
 	number: ".metadata-input-number",
 	date: ".metadata-input.metadata-input-text.mod-date",
 	datetime: ".metadata-input.metadata-input-text.mod-datetime",
@@ -17,6 +18,9 @@ const BOUND_DATASET_KEY = "ppFormattedValueBound";
 const LAST_RENDERED_DATASET_KEY = "ppLastRendered";
 
 const refreshByInput = new WeakMap<HTMLElement, () => void>();
+const observerByContainer = new WeakMap<HTMLElement, MutationObserver>();
+const BOUND_CONTAINER_KEY = "ppFormattedContainerBound";
+const pendingReapplyByContainer = new WeakMap<HTMLElement, number>();
 
 export function updateAllPropertyFormats(plugin: PrettyPropertiesPlugin): void {
 	requestAnimationFrame(() => {
@@ -87,10 +91,24 @@ export function applyPropertyFormatting(
 	const overlayElement = ensureOverlayElement(containerElement);
 	const renderMarkdown = createMarkdownRenderer(plugin, overlayElement, sourcePath);
 
+	if (propertyInputType === "text") {
+		bindContainerReapplyOnce({
+			containerElement,
+			propertyName,
+			plugin,
+			propertyInputType,
+			sourcePath,
+		});
+	}
+
 	const refresh = () => {
 		syncOverlayTextStyleFromInput(inputElement, overlayElement);
 
-		const isEditing = document.activeElement === inputElement;
+		const active = document.activeElement as HTMLElement | null;
+		const isEditing =
+			active === inputElement ||
+			(active != null && inputElement.contains(active));
+
 		setEditingState(inputElement, overlayElement, isEditing);
 		if (isEditing)
 			return;
@@ -102,13 +120,45 @@ export function applyPropertyFormatting(
 			inputElement,
 			rawValue,
 		});
-
 		void renderMarkdown(formatted);
 	};
 
 	refreshByInput.set(inputElement, refresh);
 	bindRefreshOnce(inputElement);
 	requestAnimationFrame(refresh);
+}
+
+function bindContainerReapplyOnce(args: {
+	containerElement: HTMLElement;
+	propertyName: string;
+	plugin: PrettyPropertiesPlugin;
+	propertyInputType: SupportedPropertyInputType;
+	sourcePath: string;
+}): void {
+	const dataset = args.containerElement.dataset as DOMStringMap & Record<string, string | undefined>;
+	if (dataset[BOUND_CONTAINER_KEY])
+		return;
+	dataset[BOUND_CONTAINER_KEY] = "1";
+
+	const scheduleReapply = () => {
+		if (pendingReapplyByContainer.has(args.containerElement))
+			return;
+		pendingReapplyByContainer.set(args.containerElement, 1);
+
+		queueMicrotask(() => {
+			pendingReapplyByContainer.delete(args.containerElement);
+
+			applyPropertyFormatting(
+				args.containerElement,
+				args.propertyName,
+				args.plugin,
+				args.propertyInputType,
+				args.sourcePath
+			);
+		});
+	};
+
+	args.containerElement.addEventListener("focusout", scheduleReapply);
 }
 
 function resetPropertyFormatting(containerElement: HTMLElement, inputElement: HTMLElement): void {
@@ -119,6 +169,12 @@ function resetPropertyFormatting(containerElement: HTMLElement, inputElement: HT
 	containerElement.classList.remove(FORMATTED_WRAPPER_CLASS);
 	inputElement.classList.remove(HIDDEN_INPUT_CLASS);
 	refreshByInput.delete(inputElement);
+
+	const observer = observerByContainer.get(containerElement);
+	if (observer) {
+		observer.disconnect();
+		observerByContainer.delete(containerElement);
+	}
 }
 
 function bindRefreshOnce(inputElement: HTMLElement): void {
@@ -270,6 +326,7 @@ function syncOverlayTextStyleFromInput(inputElement: HTMLElement, overlayElement
 	overlayElement.style.paddingLeft = computed.paddingLeft;
 
 	overlayElement.style.textIndent = computed.textIndent;
+	overlayElement.style.margin = computed.margin;
 }
 
 function readPropertyName(rowElement: HTMLElement): string {
