@@ -5,6 +5,7 @@ import { ColorPickerModal } from "src/modals/colorPickerModal";
 import MenuManager from "src/utils/menuManager";
 import { updateRelativeDateColors } from "src/utils/updates/updateStyles";
 import { updateAllProperties } from "src/utils/updates/updateElements";
+import { removeTagAtCursor } from "src/utils/remove";
 
 
 
@@ -175,7 +176,18 @@ export const handleTagMenu = (e: MouseEvent | TouchEvent, el: HTMLElement, plugi
             createColorMenu(tagText, "tagColors", "pillColor", plugin, menuManager);
             createColorMenu(tagText, "tagColors", "textColor", plugin, menuManager);
         }
+
+        menuManager.addItem((item) => item
+            .setTitle(i18n.t("DELETE_TAG"))
+            .setIcon("delete")
+            .setSection("selection")
+            .onClick(() => {
+                removeTagAtCursor(plugin)
+            })
+        );
     }
+
+
 }
 
 

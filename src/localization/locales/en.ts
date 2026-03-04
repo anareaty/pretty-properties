@@ -204,6 +204,8 @@ export default {
   HIDE_COVER_COLLAPSED: "Hide cover when properties are collapsed",
   HIDE_PROPERTIES_TITLE: "Hide properties title",
   HIDE_ADD_PROPERTY_BUTTON: "Hide add property button",
+
+  DELETE_TAG: "Delete tag",
 };
 
 
