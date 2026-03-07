@@ -1189,7 +1189,6 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 
 .pp-formatted-value-overlay {
 	position: absolute;
-	pointer-events: none;
 }
 
 .pp-formatted-value-hidden {
