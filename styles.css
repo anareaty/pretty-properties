@@ -509,28 +509,22 @@
 }
 
 
+
 .pp-cover-has-iframe {
 	position: relative;
 }
 
 .pp-cover-menu-button {
-	position: absolute;
-	top: 8px;
-	right: 8px;
-
-	display: flex;
-	align-items: center;
-	justify-content: center;
-
-	width: 24px;
-	height: 24px;
-	border-radius: 6px;
-
-	background-color: var(--background-modifier-border-hover);
-	opacity: 0.8;
-	cursor: pointer;
+	color: var(--text-muted) !important;
+	background-color: var(--background-modifier-border-hover) !important;
+	opacity: 0.75 !important;
+	cursor: pointer !important;
 }
 
+.pp-cover-menu-button:hover {
+	color: var(--text-normal) !important;
+	opacity: 1 !important;
+}
 
 
 
