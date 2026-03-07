@@ -189,6 +189,12 @@ Show a duration originally in seconds as abbreviated (eg. `829` -> `00h 13m 49s`
 ````
 {{durationFormatted propertyValue "seconds" "HH"}}h {{durationFormatted propertyValue "seconds" "mm"}}m {{durationFormatted propertyValue "seconds" "ss"}}s
 ````
+Show a [Meta Bind](https://github.com/mProjectsCode/obsidian-meta-bind-plugin) scroll input for a number field:
+````
+{{propertyValue}} (`INPUT[slider(addLabels(true)):someNumber]`)
+````
+![meta-bind](images/meta-bind.png)
+
 Show a steamid property as an iframe (as a cover):
 ````
 <iframe src="https://store.steampowered.com/widget/{{propertyValue}}" frameborder="0" width="100%" height="190"></iframe>
