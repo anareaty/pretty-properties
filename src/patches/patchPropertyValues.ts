@@ -1,5 +1,6 @@
 import PrettyPropertiesPlugin from "../main";
-import { MarkdownRenderer, MarkdownView } from "obsidian";
+import { MarkdownRenderer, MarkdownView, TFile } from "obsidian";
+import { getNestedProperty } from "../utils/propertyUtils";
 
 type SupportedPropertyInputType = "text" | "number" | "date" | "datetime";
 
@@ -16,11 +17,18 @@ const HIDDEN_INPUT_CLASS = "pp-formatted-value-hidden";
 
 const BOUND_DATASET_KEY = "ppFormattedValueBound";
 const LAST_RENDERED_DATASET_KEY = "ppLastRendered";
+const BOUND_CONTAINER_KEY = "ppFormattedContainerBound";
+const SYNC_BOUND_DATASET_KEY = "ppFormattedValueSyncBound";
+const LAST_TEMPLATE_DATASET_KEY = "ppLastTemplate";
 
 const refreshByInput = new WeakMap<HTMLElement, () => void>();
-const observerByContainer = new WeakMap<HTMLElement, MutationObserver>();
-const BOUND_CONTAINER_KEY = "ppFormattedContainerBound";
+const widgetMutationObserverByContainer = new WeakMap<HTMLElement, MutationObserver>();
+const lastObservedWidgetValueByContainer = new WeakMap<HTMLElement, string | null>();
 const pendingReapplyByContainer = new WeakMap<HTMLElement, number>();
+
+const LIVE_REFRESH_BOUND_DATASET_KEY = "ppFormattedLiveRefreshBound";
+const pendingLiveRefreshByContainer = new WeakMap<HTMLElement, number>();
+const LIVE_VALUE_MARKER = '<span data-pp-live-property-value></span>';
 
 export function updateAllPropertyFormats(plugin: PrettyPropertiesPlugin): void {
 	requestAnimationFrame(() => {
@@ -78,10 +86,11 @@ export function applyPropertyFormatting(
 	if (!inputElement)
 		return;
 
-	const formatIndex = findPropertyFormatIndex(plugin, propertyName);
-	const propertyFormat = formatIndex >= 0 ? plugin.settings.propertyFormats[formatIndex].format : undefined;
+	const propertyFormat = plugin.settings.propertyFormats.find(
+		(candidate) => candidate.property.toLowerCase() === propertyName.toLowerCase()
+	)?.format;
 
-	if (formatIndex < 0 || !propertyFormat || propertyFormat.trim() === "") {
+	if (!propertyFormat?.trim()) {
 		resetPropertyFormatting(containerElement, inputElement);
 		return;
 	}
@@ -91,36 +100,49 @@ export function applyPropertyFormatting(
 	const overlayElement = ensureOverlayElement(containerElement);
 	const renderMarkdown = createMarkdownRenderer(plugin, overlayElement, sourcePath);
 
-	if (propertyInputType === "text") {
-		bindContainerReapplyOnce({
-			containerElement,
-			propertyName,
-			plugin,
-			propertyInputType,
-			sourcePath,
-		});
-	}
+	bindContainerReapplyOnce(containerElement, propertyName, plugin, propertyInputType, sourcePath);
+	bindNativeInputSyncOnce(containerElement, inputElement, propertyName, plugin, propertyInputType, sourcePath);
+	bindLiveOverlayRefreshOnce(containerElement, inputElement, propertyInputType);
+
+	const supportsLiveToken = hasLivePropertyValueToken(propertyFormat);
 
 	const refresh = () => {
 		syncOverlayTextStyleFromInput(inputElement, overlayElement);
 
 		const active = document.activeElement as HTMLElement | null;
-		const isEditing =
+		const isEditingNative =
 			active === inputElement ||
 			(active != null && inputElement.contains(active));
 
-		setEditingState(inputElement, overlayElement, isEditing);
-		if (isEditing)
+		setEditingState(inputElement, overlayElement, isEditingNative);
+		if (isEditingNative)
 			return;
 
-		const formatted = computeFormattedValue({
-			plugin,
-			propertyName,
-			propertyFormat,
-			inputElement,
-			rawValue,
+		const liveValue =
+			readWidgetValue(containerElement, propertyInputType) ??
+			readInputText(inputElement) ??
+			rawValue;
+
+		const liveText = String(liveValue ?? "");
+
+		const templateMarkdown = supportsLiveToken
+			? String(propertyFormat).replaceAll("{{propertyValue}}", LIVE_VALUE_MARKER)
+			: computeFormattedValue(plugin, propertyName, propertyFormat, liveValue);
+
+		const lastTemplate = overlayElement.dataset[LAST_TEMPLATE_DATASET_KEY];
+		const templateChanged = lastTemplate !== templateMarkdown;
+
+		if (!templateChanged && supportsLiveToken && overlayElement.hasChildNodes()) {
+			const patched = updateLivePropertyValueText(overlayElement, liveText);
+			if (patched)
+				return;
+		}
+
+		void renderMarkdown(templateMarkdown).then(() => {
+			overlayElement.dataset[LAST_TEMPLATE_DATASET_KEY] = templateMarkdown;
+			if (supportsLiveToken)
+				updateLivePropertyValueText(overlayElement, liveText);
 		});
-		void renderMarkdown(formatted);
 	};
 
 	refreshByInput.set(inputElement, refresh);
@@ -128,68 +150,281 @@ export function applyPropertyFormatting(
 	requestAnimationFrame(refresh);
 }
 
-function bindContainerReapplyOnce(args: {
-	containerElement: HTMLElement;
-	propertyName: string;
-	plugin: PrettyPropertiesPlugin;
-	propertyInputType: SupportedPropertyInputType;
-	sourcePath: string;
-}): void {
-	const dataset = args.containerElement.dataset as DOMStringMap & Record<string, string | undefined>;
+function hasLivePropertyValueToken(propertyFormat: unknown): propertyFormat is string {
+	return typeof propertyFormat === "string" && propertyFormat.includes("{{propertyValue}}");
+}
+
+function updateLivePropertyValueText(
+	overlayElement: HTMLElement,
+	value: string
+): boolean {
+	const markers = overlayElement.querySelectorAll<HTMLElement>("[data-pp-live-property-value]");
+	if (!markers.length)
+		return false;
+
+	for (const marker of markers)
+		marker.textContent = value;
+	return true;
+}
+
+function bindContainerReapplyOnce(
+	containerElement: HTMLElement,
+	propertyName: string,
+	plugin: PrettyPropertiesPlugin,
+	propertyInputType: SupportedPropertyInputType,
+	sourcePath: string
+): void {
+	const dataset = containerElement.dataset as Record<string, string | undefined>;
 	if (dataset[BOUND_CONTAINER_KEY])
 		return;
+
 	dataset[BOUND_CONTAINER_KEY] = "1";
 
-	const scheduleReapply = () => {
-		if (pendingReapplyByContainer.has(args.containerElement))
+	containerElement.addEventListener("focusout", () => {
+		if (pendingReapplyByContainer.has(containerElement))
 			return;
-		pendingReapplyByContainer.set(args.containerElement, 1);
+
+		pendingReapplyByContainer.set(containerElement, 1);
 
 		queueMicrotask(() => {
-			pendingReapplyByContainer.delete(args.containerElement);
+			pendingReapplyByContainer.delete(containerElement);
+			applyPropertyFormatting(containerElement, propertyName, plugin, propertyInputType, sourcePath);
+		});
+	});
+}
 
-			applyPropertyFormatting(
-				args.containerElement,
-				args.propertyName,
-				args.plugin,
-				args.propertyInputType,
-				args.sourcePath
-			);
+function bindLiveOverlayRefreshOnce(
+	containerElement: HTMLElement,
+	inputElement: HTMLElement,
+	propertyInputType?: SupportedPropertyInputType
+): void {
+	const dataset = containerElement.dataset as Record<string, string | undefined>;
+	if (dataset[LIVE_REFRESH_BOUND_DATASET_KEY])
+		return;
+
+	dataset[LIVE_REFRESH_BOUND_DATASET_KEY] = "1";
+
+	const scheduleRefresh = () => {
+		if (pendingLiveRefreshByContainer.has(containerElement))
+			return;
+		pendingLiveRefreshByContainer.set(containerElement, 1);
+
+		requestAnimationFrame(() => {
+			pendingLiveRefreshByContainer.delete(containerElement);
+			refreshByInput.get(inputElement)?.();
 		});
 	};
 
-	args.containerElement.addEventListener("focusout", scheduleReapply);
+	// Native controls
+	containerElement.addEventListener("input", scheduleRefresh, true);
+	containerElement.addEventListener("change", scheduleRefresh, true);
+
+	// Custom controls that mutate DOM instead of firing input/change
+	if (propertyInputType) {
+		const observer = new MutationObserver(() => {
+			const nextValue = readWidgetValue(containerElement, propertyInputType);
+			const previousValue = lastObservedWidgetValueByContainer.get(containerElement) ?? null;
+
+			if (nextValue === previousValue)
+				return;
+			lastObservedWidgetValueByContainer.set(containerElement, nextValue);
+			scheduleRefresh();
+		});
+
+		observer.observe(containerElement, {
+			subtree: true,
+			childList: true,
+			characterData: true,
+			attributes: true,
+			attributeFilter: [
+				"data-internal-value",
+				"aria-selected",
+				"class",
+				"value"
+			],
+		});
+
+		widgetMutationObserverByContainer.set(containerElement, observer);
+		lastObservedWidgetValueByContainer.set(
+			containerElement,
+			readWidgetValue(containerElement, propertyInputType)
+		);
+	}
+}
+
+function bindNativeInputSyncOnce(
+	containerElement: HTMLElement,
+	inputElement: HTMLElement,
+	propertyName: string,
+	plugin: PrettyPropertiesPlugin,
+	propertyInputType: SupportedPropertyInputType,
+	sourcePath: string
+): void {
+	const dataset = containerElement.dataset as Record<string, string | undefined>;
+	if (dataset[SYNC_BOUND_DATASET_KEY])
+		return;
+	dataset[SYNC_BOUND_DATASET_KEY] = "1";
+
+	const sync = () => {
+		const nextValue = getSyncedNativeValue(
+			containerElement,
+			plugin,
+			sourcePath,
+			propertyName,
+			propertyInputType
+		);
+
+		if (nextValue != null)
+			writeNativeValue(inputElement, nextValue, propertyInputType);
+	};
+
+	containerElement.addEventListener("mousedown", sync, true);
+	containerElement.addEventListener("pointerdown", sync, true);
+	containerElement.addEventListener("focusin", sync, true);
+}
+
+function getSyncedNativeValue(
+	containerElement: HTMLElement,
+	plugin: PrettyPropertiesPlugin,
+	sourcePath: string,
+	propertyName: string,
+	propertyInputType: SupportedPropertyInputType
+): string | null {
+	const widgetValue = readWidgetValue(containerElement, propertyInputType);
+	const frontmatterValue = readFrontmatterValue(plugin, sourcePath, propertyName, propertyInputType);
+
+	return propertyInputType === "text"
+		? (widgetValue ?? frontmatterValue)
+		: (frontmatterValue ?? widgetValue);
+}
+
+function readFrontmatterValue(
+	plugin: PrettyPropertiesPlugin,
+	sourcePath: string,
+	propertyName: string,
+	propertyInputType: SupportedPropertyInputType
+): string | null {
+	const file = plugin.app.vault.getAbstractFileByPath(sourcePath);
+	if (!(file instanceof TFile))
+		return null;
+
+	const frontmatter = plugin.app.metadataCache.getFileCache(file)?.frontmatter;
+	return getNestedProperty(frontmatter, propertyName);
+}
+
+function readWidgetValue(
+	containerElement: HTMLElement,
+	propertyInputType: SupportedPropertyInputType
+): string | null {
+	const overlay = containerElement.querySelector<HTMLElement>(`.${FORMATTED_OVERLAY_CLASS}`);
+	if (!overlay)
+		return null;
+
+	// Live native-ish controls first
+	const rangeInput = overlay.querySelector<HTMLInputElement>('input[type="range"]');
+	if (rangeInput)
+		return rangeInput.value;
+
+	const select = overlay.querySelector<HTMLSelectElement>("select");
+	if (select)
+		return select.value;
+
+	const textInput = overlay.querySelector<HTMLInputElement>(
+		'input[type="text"], input:not([type]), textarea'
+	);
+	if (textInput)
+		return textInput.value;
+
+	// Meta Bind / Meta Edit suggester-like displayed value
+	const suggestText = overlay.querySelector<HTMLElement>(".mb-suggest-text span");
+	if (suggestText?.textContent != null)
+		return suggestText.textContent.trim();
+
+	// Checked radio / checkbox groups
+	const checkedRadio = overlay.querySelector<HTMLInputElement>('input[type="radio"]:checked');
+	if (checkedRadio)
+		return checkedRadio.value;
+
+	const checkedCheckboxes = Array.from(
+		overlay.querySelectorAll<HTMLInputElement>('input[type="checkbox"]:checked')
+	).map((input) => input.value);
+
+	if (checkedCheckboxes.length > 0)
+		return String(propertyInputType === "text" ? checkedCheckboxes.join(", ") : checkedCheckboxes);
+
+	// Generic selected/active text fallback for custom controls
+	const selectedText =
+		overlay.querySelector<HTMLElement>('[aria-selected="true"]')?.textContent?.trim() ??
+		overlay.querySelector<HTMLElement>(".is-selected")?.textContent?.trim() ??
+		overlay.querySelector<HTMLElement>(".mod-selected")?.textContent?.trim();
+
+	if (selectedText)
+		return selectedText
+
+	// Only after live DOM checks, use internal data attributes
+	const internalValue = overlay
+		.querySelector<HTMLElement>("[data-internal-value]")
+		?.getAttribute("data-internal-value");
+
+	if (internalValue != null)
+		return internalValue;
+
+	return null;
+}
+
+function writeNativeValue(
+	inputElement: HTMLElement,
+	value: string,
+	propertyInputType: SupportedPropertyInputType
+): void {
+	if (propertyInputType === "text") {
+		const editable = inputElement as HTMLDivElement;
+		if (editable.textContent === value && editable.getAttribute("data-property-longtext-value") === value)
+			return;
+
+		editable.textContent = value;
+		return;
+	}
+
+	const input = inputElement as HTMLInputElement | HTMLTextAreaElement;
+	if (input.value === value)
+		return;
+
+	const prototype =
+		input instanceof HTMLTextAreaElement
+			? HTMLTextAreaElement.prototype
+			: HTMLInputElement.prototype;
+
+	Object.getOwnPropertyDescriptor(prototype, "value")?.set?.call(input, value);
+
+	if ("defaultValue" in input)
+		input.defaultValue = value;
 }
 
 function resetPropertyFormatting(containerElement: HTMLElement, inputElement: HTMLElement): void {
-	const overlayElement = containerElement.querySelector<HTMLDivElement>(`.${FORMATTED_OVERLAY_CLASS}`);
-	if (overlayElement)
-		overlayElement.remove();
-
+	containerElement.querySelector<HTMLDivElement>(`.${FORMATTED_OVERLAY_CLASS}`)?.remove();
 	containerElement.classList.remove(FORMATTED_WRAPPER_CLASS);
 	inputElement.classList.remove(HIDDEN_INPUT_CLASS);
 	refreshByInput.delete(inputElement);
 
-	const observer = observerByContainer.get(containerElement);
-	if (observer) {
-		observer.disconnect();
-		observerByContainer.delete(containerElement);
-	}
+	widgetMutationObserverByContainer.get(containerElement)?.disconnect();
+	widgetMutationObserverByContainer.delete(containerElement);
+	lastObservedWidgetValueByContainer.delete(containerElement);
+
+	const dataset = containerElement.dataset as Record<string, string | undefined>;
+	delete dataset[BOUND_CONTAINER_KEY];
+	delete dataset[SYNC_BOUND_DATASET_KEY];
+	delete dataset[LIVE_REFRESH_BOUND_DATASET_KEY];
 }
 
 function bindRefreshOnce(inputElement: HTMLElement): void {
-	const dataset = inputElement.dataset as DOMStringMap & Record<string, string | undefined>;
+	const dataset = inputElement.dataset as Record<string, string | undefined>;
 	if (dataset[BOUND_DATASET_KEY])
 		return;
 
 	dataset[BOUND_DATASET_KEY] = "1";
 
-	const callRefresh = () => {
-		const refresh = refreshByInput.get(inputElement);
-
-		if (refresh)
-			refresh();
-	};
+	const callRefresh = () => refreshByInput.get(inputElement)?.();
 
 	inputElement.addEventListener("focus", callRefresh);
 	inputElement.addEventListener("blur", callRefresh);
@@ -204,68 +439,37 @@ function createMarkdownRenderer(
 
 	return async (markdown: string) => {
 		const currentSequence = ++renderSequence;
-		const dataset = overlayElement.dataset;
-		if (dataset[LAST_RENDERED_DATASET_KEY] === markdown)
+		if (overlayElement.dataset[LAST_RENDERED_DATASET_KEY] === markdown)
 			return;
 
 		overlayElement.empty();
-
 		await MarkdownRenderer.render(plugin.app, markdown, overlayElement, sourcePath, plugin);
 
 		if (currentSequence !== renderSequence)
 			return;
 
-		dataset[LAST_RENDERED_DATASET_KEY] = markdown;
+		overlayElement.dataset[LAST_RENDERED_DATASET_KEY] = markdown;
 	};
 }
 
-function computeFormattedValue(args: {
-	plugin: PrettyPropertiesPlugin;
-	propertyName: string;
-	propertyFormat: unknown;
-	inputElement: HTMLElement;
-	rawValue?: unknown;
-}): string {
-	const inputText = readInputText(args.inputElement);
-
-	const value: unknown =
-		inputText !== "" && inputText != null
-			? inputText
-			: args.rawValue ?? "";
-
-	const rawText = coerceToString(value);
+function computeFormattedValue(
+	plugin: PrettyPropertiesPlugin,
+	propertyName: string,
+	propertyFormat: unknown,
+	currentValue: unknown
+): string {
+	const rawText = String(currentValue ?? "");
 
 	try {
-		return args.plugin.formatter.format(
-			args.propertyName,
-			rawText,
-			args.propertyFormat as any
-		);
+		return plugin.formatter.format(propertyName, rawText, propertyFormat as any);
 	} catch {
 		return rawText;
 	}
 }
 
 function readInputText(element: HTMLElement): string {
-	const possibleValue = (element as unknown as { value?: unknown }).value;
-	if (typeof possibleValue === "string")
-		return possibleValue;
-
-	return element.textContent ?? "";
-}
-
-function coerceToString(value: unknown): string {
-	if (typeof value === "string")
-		return value;
-	if (value == null)
-		return "";
-	return String(value);
-}
-
-function findPropertyFormatIndex(plugin: PrettyPropertiesPlugin, propertyName: string): number {
-	return plugin.settings.propertyFormats.findIndex((candidate) => {
-		return candidate.property.toLowerCase() === propertyName.toLowerCase();
-	});
+	const value = (element as { value?: unknown }).value;
+	return typeof value === "string" ? value : (element.textContent ?? "");
 }
 
 function findInputElement(
@@ -283,19 +487,12 @@ function ensureOverlayElement(container: HTMLElement): HTMLDivElement {
 	const overlay = document.createElement("div");
 	overlay.className = FORMATTED_OVERLAY_CLASS;
 	container.appendChild(overlay);
-
 	return overlay;
 }
 
 function setEditingState(inputElement: HTMLElement, overlayElement: HTMLElement, isEditing: boolean): void {
-	if (isEditing) {
-		overlayElement.style.display = "none";
-		inputElement.classList.remove(HIDDEN_INPUT_CLASS);
-		return;
-	}
-
-	overlayElement.style.display = "";
-	inputElement.classList.add(HIDDEN_INPUT_CLASS);
+	overlayElement.style.display = isEditing ? "none" : "";
+	inputElement.classList.toggle(HIDDEN_INPUT_CLASS, !isEditing);
 }
 
 function syncOverlayTextStyleFromInput(inputElement: HTMLElement, overlayElement: HTMLElement): void {
@@ -316,7 +513,7 @@ function syncOverlayTextStyleFromInput(inputElement: HTMLElement, overlayElement
 	overlayElement.style.letterSpacing = computed.letterSpacing;
 	overlayElement.style.lineHeight = computed.lineHeight;
 	overlayElement.style.textTransform = computed.textTransform;
-	overlayElement.style.textAlign = computed.textAlign as unknown as string;
+	overlayElement.style.textAlign = computed.textAlign;
 
 	overlayElement.style.color = computed.color;
 
@@ -329,23 +526,16 @@ function syncOverlayTextStyleFromInput(inputElement: HTMLElement, overlayElement
 	overlayElement.style.margin = computed.margin;
 
 	overlayElement.style.backgroundColor = computed.backgroundColor;
-
-	overlayElement.style.borderRadius = computed.borderRadius;}
+	overlayElement.style.borderRadius = computed.borderRadius;
+}
 
 function readPropertyName(rowElement: HTMLElement): string {
-	const fromAttribute = rowElement.getAttribute("data-property-key");
-	if (fromAttribute)
-		return fromAttribute.trim();
-
-	const fromDataset = (rowElement as any).dataset?.propertyKey;
-	if (typeof fromDataset === "string" && fromDataset.trim())
-		return fromDataset.trim();
-
-	const fromLabel = rowElement
-		.querySelector<HTMLElement>(".metadata-property-key")
-		?.textContent;
-
-	return (fromLabel ?? "").toString().trim();
+	return (
+		rowElement.getAttribute("data-property-key")?.trim() ||
+		(rowElement as any).dataset?.propertyKey?.trim() ||
+		rowElement.querySelector<HTMLElement>(".metadata-property-key")?.textContent?.trim() ||
+		""
+	);
 }
 
 function detectPropertyInputType(rowElement: HTMLElement): SupportedPropertyInputType | null {
@@ -353,12 +543,11 @@ function detectPropertyInputType(rowElement: HTMLElement): SupportedPropertyInpu
 		if (rowElement.querySelector(selector))
 			return type;
 	}
-
 	return null;
 }
 
 function isSupportedPropertyInputType(type: string): type is SupportedPropertyInputType {
-	return Object.prototype.hasOwnProperty.call(INPUT_SELECTORS, type);
+	return type in INPUT_SELECTORS;
 }
 export function getSupportedPropertyInputTypes(): string[] {
 	return Object.keys(INPUT_SELECTORS);
