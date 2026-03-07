@@ -55,7 +55,7 @@ export const renderCover = async (
 
 			const coverType = getCoverType(coverVal);
 
-			let coverItem;
+			let coverItem: HTMLElement | undefined;
 
 			if (coverType === CoverType.Pdf) {
 				const relativePath = extractPdfPath(coverVal);
@@ -65,19 +65,19 @@ export const renderCover = async (
 						coverItem = pdfCover;
 				}
 			} else {
+				let renderValue = coverVal;
+
 				if (coverType === CoverType.Url)
-					coverVal = `![](${coverVal})`;
+					renderValue = `![](${coverVal})`;
 				if (coverType === CoverType.Wikilink)
-					coverVal = `!${coverVal}`;
+					renderValue = `!${coverVal}`;
 
 				const coverTemp = document.createElement("div");
-				await MarkdownRenderer.render(plugin.app, coverVal, coverTemp, sourcePath, plugin);
+				await MarkdownRenderer.render(plugin.app, renderValue, coverTemp, sourcePath, plugin);
 
 				hookUpLinks(plugin.app, component, coverTemp, sourcePath);
 
-				coverTemp.classList.add("pp-cover-image");
-				addCoverMenuButton(component, coverTemp, plugin);
-				coverItem = coverTemp;
+				coverItem = styleCoverItem(coverTemp, component, plugin);
 			}
 
 			if (coverItem){
@@ -111,6 +111,34 @@ export const renderCover = async (
 	} else {
 		if (oldCoverDiv) oldCoverDiv.remove();
 	}
+};
+
+function styleCoverItem(
+	coverTemp: HTMLDivElement,
+	component: Component,
+	plugin: PrettyPropertiesPlugin
+): HTMLElement {
+	const img = coverTemp.querySelector("img");
+	if (img instanceof HTMLImageElement) {
+		img.classList.add("pp-cover-image");
+		return img;
+	}
+
+	const svg = coverTemp.querySelector("svg");
+	if (svg instanceof SVGElement) {
+		svg.classList.add("pp-cover-image");
+		return svg as unknown as HTMLElement;
+	}
+
+	const iframe = coverTemp.querySelector("iframe");
+	if (iframe instanceof HTMLIFrameElement) {
+		coverTemp.classList.add("pp-cover-image");
+		addCoverMenuButton(component, coverTemp, plugin);
+		return coverTemp;
+	}
+
+	coverTemp.classList.add("pp-cover-image");
+	return coverTemp;
 }
 
 function getCoverType(coverVal: string): CoverType{
