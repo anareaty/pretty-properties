@@ -4,11 +4,12 @@ import {
 	MarkdownRenderer,
 	loadPdfJs,
 	normalizePath,
-	Component
+	Component, setIcon
 } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { getNestedProperty } from "../propertyUtils";
 import { hookUpLinks } from "../internalLinksUtils";
+import {createCoverMenu} from "../../menus/coverMenu";
 
 enum CoverType {
 	Pdf,
@@ -75,6 +76,7 @@ export const renderCover = async (
 				hookUpLinks(plugin.app, component, coverTemp, sourcePath);
 
 				coverTemp.classList.add("pp-cover-image");
+				addCoverMenuButton(component, coverTemp, plugin);
 				coverItem = coverTemp;
 			}
 
@@ -219,6 +221,33 @@ export const renderPdfCover = async (relativePath: string, sourcePath: string, p
     return
 }
 
+function addCoverMenuButton(
+	component: Component,
+	coverItem: HTMLElement,
+	plugin: PrettyPropertiesPlugin
+) {
+	const iframe = coverItem.querySelector("iframe");
+	if (!(iframe instanceof HTMLIFrameElement))
+		return;
+
+	coverItem.classList.add("pp-cover-has-iframe");
+
+	const button = document.createElement("div");
+	button.classList.add("pp-cover-menu-button", "edit-block-button");
+
+	setIcon(button, "code-2");
+
+	const openMenu = (e: MouseEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
+		createCoverMenu(e, plugin);
+	};
+
+	component.registerDomEvent(button, "contextmenu", openMenu);
+	component.registerDomEvent(button, "click", openMenu);
+
+	coverItem.appendChild(button);
+}
 
 
 export const updateCoverForView = async (
