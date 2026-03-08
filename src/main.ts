@@ -42,10 +42,10 @@ import { patchMenu } from "./patches/patchMenu";
 
 export default class PrettyPropertiesPlugin extends Plugin {
 	settings: PPPluginSettings;
-	menuManager: MenuManager;
 	patches: Record<string, any>;
 	api: API;
 	formatter: PropertyFormatter;
+
 
 	async onload() {
 		await this.loadSettings();
