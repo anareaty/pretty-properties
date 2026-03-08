@@ -18,6 +18,7 @@ const colors = [
     "pink"
 ];
 
+
 export class API {
     plugin: PrettyPropertiesPlugin
 
