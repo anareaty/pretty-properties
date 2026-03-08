@@ -84,6 +84,7 @@ export const renderCover = async (
 				coverItem.setAttribute("data-property", coverVal);
 				coverItem.classList.add("pp-cover-item");
 				coverItems.push(coverItem);
+				break;
 			}
 		}
 
