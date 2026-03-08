@@ -215,5 +215,7 @@ export default {
   HIDE_PROPERTIES_TITLE: "Скрыть заголовок свойств",
   HIDE_ADD_PROPERTY_BUTTON: "Скрыть кнопку добавления свойств",
   DELETE_TAG: "Удалить тэг",
+  INSERT_IMAGE: "Вставить изображение",
+  INSERT_EMOJI: "Вставить эмодзи",
 };
 

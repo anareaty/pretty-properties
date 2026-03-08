@@ -75,27 +75,3 @@ export const removeInlineTagsColorStyles = () => {
 
 
 
-export const removeTagAtCursor = (plugin: PrettyPropertiesPlugin) => {
-    let editor = plugin.app.workspace.activeEditor?.editor
-    if (!editor) return
-    let cursor = editor.getCursor()
-    let lineText = editor.getLine(cursor.line)
-    let tagStart = 0
-
-    for (let i = 0; i < lineText.length; i++) {
-    let char = lineText[i]
-    if (char == " " && i < cursor.ch) {
-        tagStart = i + 1
-        }
-    }
-
-    let lineTextStart = lineText.slice(0, tagStart)
-    let lineTextRemaining = lineText
-    .replace(lineTextStart, "")
-    .replace(/^#[^ ]+$/, "")
-    .replace(/#[^ ]+ /, "")
-
-    lineText = lineTextStart + lineTextRemaining                        
-    editor.setLine(cursor.line, lineText)
-    editor.setSelection({line: cursor.line, ch: tagStart})
-}

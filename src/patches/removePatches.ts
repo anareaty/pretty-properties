@@ -19,6 +19,7 @@ export const unPatchWidgets = async (plugin: PrettyPropertiesPlugin) => {
   
   plugin.patches.uninstallPPMarkdownPatch()
   plugin.patches.uninstallPPPopoverPatch()
+  plugin.patches.uninstallPPMenuPatch()
 
   //@ts-ignore
 	let bases = plugin.app.internalPlugins.getEnabledPluginById("bases")

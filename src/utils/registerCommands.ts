@@ -1,5 +1,5 @@
 import PrettyPropertiesPlugin from "src/main";
-import { TFile, MarkdownView } from "obsidian";
+import { TFile, MarkdownView, Editor } from "obsidian";
 import { i18n } from "src/localization/localization";
 import { removeProperty } from "./propertyUtils";
 import { selectCoverImage } from "./imageUtils";
@@ -11,6 +11,8 @@ import { ImageSuggestModal } from "src/modals/imageSuggestModal";
 import { IconSuggestModal } from "src/modals/iconSuggestModal";
 import { updateTasksCount } from "./taskCount/taskCount";
 import { updateTaskNotesTaskCount } from "./taskCount/taskNotesTaskCount";
+import { LocalImageSuggestModal } from "src/modals/localImageSuggestModal";
+import { EmojiSuggestModal } from "src/modals/emojiSuggestModal";
 
 
 export function registerCommands(plugin: PrettyPropertiesPlugin) {
@@ -234,6 +236,67 @@ export function registerCommands(plugin: PrettyPropertiesPlugin) {
           return false;
         }
       });
+
+
+
+
+
+
+
+
+
+
+
+
+    plugin.addCommand({
+        id: "insert-image",
+        name: i18n.t("INSERT_IMAGE"),
+
+        editorCallback: (editor: Editor, view: MarkdownView) => {
+            let files = plugin.app.vault.getFiles()
+            let formats = [
+                "avif",
+                "bmp",
+                "gif",
+                "jpeg",
+                "jpg",
+                "png",
+                "svg",
+                "webp",
+            ];
+            files = files.filter((f: TFile) => formats.find((e) => e == f.extension));
+            let paths = files.map(f => f.path)
+            let names = files.map(f => f.basename)
+            new LocalImageSuggestModal(
+                plugin.app,
+                plugin,
+                "",
+                "basic",
+                paths,
+                names,
+                editor
+            ).open();
+        },
+    })
+
+
+
+
+
+
+
+
+
+
+
+
+    plugin.addCommand({
+        id: "insert-emoji",
+        name: i18n.t("INSERT_EMOJI"),
+        editorCallback: (editor: Editor, view: MarkdownView) => {
+            new EmojiSuggestModal(plugin.app, plugin, editor).open()
+        },
+    })
 
 
 

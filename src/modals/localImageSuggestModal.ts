@@ -1,4 +1,4 @@
-import { SuggestModal, TFile, App, MarkdownRenderer } from "obsidian";
+import { SuggestModal, TFile, App, MarkdownRenderer, Editor } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { setNestedProperty } from "src/utils/propertyUtils";
 
@@ -6,16 +6,25 @@ import { setNestedProperty } from "src/utils/propertyUtils";
 export class LocalImageSuggestModal extends SuggestModal<string> {
     plugin: PrettyPropertiesPlugin
     values: string[] 
-    names?: string[]
+    names: string[]
     shape: string
     propName: string
-    constructor(app: App, plugin: PrettyPropertiesPlugin, propName: string, shape: string, values: string[], names?: string[]) {
+    editor?: Editor
+    constructor(
+        app: App, 
+        plugin: PrettyPropertiesPlugin, 
+        propName: string, 
+        shape: string, 
+        values: string[], 
+        names: string[],
+        editor?: Editor) {
       super(app);
       this.plugin = plugin;
       this.values = values
       this.names = names 
       this.shape = shape
       this.propName = propName
+      this.editor = editor
     }
 
     getSuggestions(query:string): string[] {
@@ -27,9 +36,7 @@ export class LocalImageSuggestModal extends SuggestModal<string> {
         let path = val
         let nameParts = val.split("/")
         let name = nameParts[nameParts.length - 1].replace(/(.*)(\.[^\.]+)$/, "$1")
-        if (this.names) {
-            name = this.names[this.values.indexOf(val)]
-        }
+        name = this.names[this.values.indexOf(val)]
         let file = this.app.vault.getAbstractFileByPath(path)
         if (file instanceof TFile) {
             let link = this.app.fileManager.generateMarkdownLink(file, "")
@@ -52,18 +59,34 @@ export class LocalImageSuggestModal extends SuggestModal<string> {
 
             if (imageFile instanceof TFile && file instanceof TFile) {
                 let imageLink = imagePath
-                if (this.plugin.settings.imageLinkFormat != "raw") {
+
+
+
+
+
+                if (this.editor) {
                     imageLink = this.app.fileManager.generateMarkdownLink(imageFile, "").replace(/^\!/, "")
-                    if (this.plugin.settings.imageLinkFormat == "embed") {
-                        imageLink = "!" + imageLink
+                    imageLink = "!" + imageLink
+                    this.editor.replaceSelection(imageLink)
+                    
+                } else {
+
+                    if (this.plugin.settings.imageLinkFormat != "raw") {
+                        imageLink = this.app.fileManager.generateMarkdownLink(imageFile, "").replace(/^\!/, "")
+                        if (this.plugin.settings.imageLinkFormat == "embed") {
+                            imageLink = "!" + imageLink
+                        }
                     }
+                    if (imageLink.startsWith("[]")) {
+                        imageLink = imageLink.replace("[]", "[" + imageFile.basename + "]")
+                    }
+
+                    this.app.fileManager.processFrontMatter(file, fm => {
+                        setNestedProperty(fm, this.propName, imageLink);
+                    })
+
                 }
-                if (imageLink.startsWith("[]")) {
-                    imageLink = imageLink.replace("[]", "[" + imageFile.basename + "]")
-                }
-                this.app.fileManager.processFrontMatter(file, fm => {
-                    setNestedProperty(fm, this.propName, imageLink);
-                })
+                
             }
         }
     } 

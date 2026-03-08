@@ -90,7 +90,6 @@ export const renderIcon = async (
 
                 if (titleWrapper instanceof HTMLElement) {
                     titleWrapper.onclick = (e) => {
-                        console.log("click")
                         if (e.target instanceof HTMLElement && 
                             e.target?.classList.contains("title-wrapper") && 
                             inlineTitle instanceof HTMLElement) {

@@ -2,10 +2,9 @@ import { Menu, MenuItem, setIcon } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { i18n } from "src/localization/localization";
 import { ColorPickerModal } from "src/modals/colorPickerModal";
-import MenuManager from "src/utils/menuManager";
 import { updateRelativeDateColors } from "src/utils/updates/updateStyles";
 import { updateAllProperties } from "src/utils/updates/updateElements";
-import { removeTagAtCursor } from "src/utils/remove";
+
 
 
 
@@ -97,7 +96,7 @@ export const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string
 
 
 
-var createColorMenu = (pillVal: string, colorList: string, colorType: string, plugin: PrettyPropertiesPlugin, menu: Menu | MenuManager) => {
+export const createColorMenu = (pillVal: string, colorList: string, colorType: string, plugin: PrettyPropertiesPlugin, menu: Menu) => {
     let itemTitle = i18n.t("SELECT_COLOR")
     let iconName = "paintbrush"
   
@@ -106,35 +105,17 @@ var createColorMenu = (pillVal: string, colorList: string, colorType: string, pl
       iconName = "type"
     }
   
-    if (menu instanceof MenuManager) {
-      menu.addItemAfter(
-        ["clipboard"],
-        itemTitle,
-        (item) => {
-          if (pillVal)
-            item
-              .setTitle(itemTitle)
-              .setIcon(iconName)
-              .setSection("pretty-properties");
-            //@ts-ignore
-            let sub = item.setSubmenu();
-            setColorMenuItems(sub, pillVal, colorList, colorType, plugin);
-        }
-      );
-    } else if (menu instanceof Menu) {
-      menu.addItem(
-        (item: MenuItem) => {
-          if (pillVal)
-            item
-              .setTitle(itemTitle)
-              .setIcon(iconName)
-              .setSection("pretty-properties");
-            //@ts-ignore
-            let sub = item.setSubmenu();
-            setColorMenuItems(sub, pillVal, colorList, colorType, plugin);
-        }
-      );
-    }
+    menu.addItem(
+    (item: MenuItem) => {
+        if (pillVal)
+        item
+            .setTitle(itemTitle)
+            .setIcon(iconName)
+            .setSection("pretty-properties");
+        //@ts-ignore
+        let sub = item.setSubmenu();
+        setColorMenuItems(sub, pillVal, colorList, colorType, plugin);
+    });
 };
 
 
@@ -142,87 +123,6 @@ var createColorMenu = (pillVal: string, colorList: string, colorType: string, pl
 
 
 
-export const handlePillMenu = (e: MouseEvent, el: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-    let menuManager = plugin.menuManager
-    menuManager.closeAndFlush()
-    let pillEl = el.closest(".multi-select-pill");
-    if (pillEl instanceof HTMLElement) {
-        let pillVal = pillEl?.getAttribute("data-property-pill-value");
-        let tagVal = pillEl?.getAttribute("data-tag-value");
-
-        if (pillVal) {
-            createColorMenu(pillVal, "propertyPillColors", "pillColor", plugin, menuManager);
-            createColorMenu(pillVal, "propertyPillColors", "textColor", plugin, menuManager);
-        } else if (tagVal) {
-            createColorMenu(tagVal, "tagColors", "pillColor", plugin, menuManager);
-            createColorMenu(tagVal, "tagColors", "textColor", plugin, menuManager);
-        }
-    } 
-}
-
-export const handleTagMenu = (e: MouseEvent | TouchEvent, el: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-    let menuManager = plugin.menuManager
-    menuManager.closeAndFlush()
-    let tag = el.closest(".cm-hashtag");
-    if (tag?.classList.contains("cm-hashtag-begin") && tag?.classList.contains("cm-hashtag-inner")) {
-        tag = tag.parentElement?.nextElementSibling?.firstElementChild || null
-        
-    }
-
-
-    if (tag instanceof HTMLElement) {
-        let tagText = tag.getAttribute("data-tag-value") || ""
-        if (tagText) {
-            createColorMenu(tagText, "tagColors", "pillColor", plugin, menuManager);
-            createColorMenu(tagText, "tagColors", "textColor", plugin, menuManager);
-        }
-
-        menuManager.addItem((item) => item
-            .setTitle(i18n.t("DELETE_TAG"))
-            .setIcon("delete")
-            .setSection("selection")
-            .onClick(() => {
-                removeTagAtCursor(plugin)
-            })
-        );
-    }
-
-
-}
-
-
-
-export const handleTagPaneMenu = (e: MouseEvent | TouchEvent, el: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-    //@ts-ignore
-    let menuExist = plugin.app.plugins.getPlugin("tag-wrangler")
-
-    let wrapper = el.closest(".tag-pane-tag")
-    if (wrapper instanceof HTMLElement) {
-        let tag = wrapper.querySelector("span.tree-item-inner-text")
-        let parent = wrapper.querySelector("span.tag-pane-tag-parent")
-        let parentText = ""
-        if (parent instanceof HTMLElement) {
-            parentText = parent.innerText
-        }
-        if (tag instanceof HTMLElement) {
-            let tagText = parentText + tag.innerText
-            if (tagText) {
-                if (menuExist) {
-                    let menuManager = plugin.menuManager
-                    menuManager.closeAndFlush()
-                    createColorMenu(tagText, "tagColors", "pillColor", plugin, menuManager);
-                    createColorMenu(tagText, "tagColors", "textColor", plugin, menuManager);
-                } else {
-                    let ev = e as MouseEvent
-                    let menu = new Menu();
-                    createColorMenu(tagText, "tagColors", "pillColor", plugin, menu);
-                    createColorMenu(tagText, "tagColors", "textColor", plugin, menu);
-                    menu.showAtMouseEvent(ev)
-                }
-            }
-        }
-    }
-}
 
 
 export const createColorButton = async (parent: HTMLElement, value: string, plugin: PrettyPropertiesPlugin) => {

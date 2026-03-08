@@ -1,7 +1,7 @@
 import {
 	Plugin,
-	Platform,
-	loadMathJax
+	loadMathJax,
+	Menu
 } from "obsidian";
 import { 
 	updateAutoHideProps,
@@ -15,15 +15,9 @@ import {
 	updateRelativeDateColors,
 	updateTheme,
 } from "./utils/updates/updateStyles";
-import MenuManager from "src/utils/menuManager";
 import { i18n } from "./localization/localization";
 import { PPSettingTab, PPPluginSettings, DEFAULT_SETTINGS } from "./settings/settings";
 import { registerCommands } from "./utils/registerCommands";
-import { createCoverMenu } from "./menus/coverMenu";
-import { createBannerMenu } from "./menus/bannerMenu";
-import { createIconMenu } from "./menus/iconMenu";
-import { handlePropertyMenu } from "./menus/propertyMenu";
-import { handlePillMenu, handleTagMenu, handleTagPaneMenu } from "./menus/selectColorMenus";
 import { updateTaskNotesTaskCount, updateTaskNotesTaskCountOnCacheChanged } from "./utils/taskCount/taskNotesTaskCount";
 import { updateAllProperties, updateEmptyProperties, updateImagesOnCacheChanged } from "./utils/updates/updateElements";
 import { getPropertyValue } from "./utils/propertyUtils";
@@ -43,10 +37,10 @@ import { updateTaskCountOnCacheChanged } from "./utils/taskCount/taskCount";
 import { unPatchWidgets } from "./patches/removePatches";
 import { patchHoverPopover } from "./patches/patchHoverPopover";
 import { API, createApi } from "./utils/createApi";
+import { patchMenu } from "./patches/patchMenu";
 
 export default class PrettyPropertiesPlugin extends Plugin {
 	settings: PPPluginSettings;
-	menuManager: MenuManager
 	patches: Record<string, any>
 	api: API
 
@@ -59,7 +53,6 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 		createApi(this)
 		i18n.setLocale();
-		this.menuManager = new MenuManager
 		this.patches = {}
 
 		patchPropertyWidgets(this)
@@ -69,6 +62,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		patchBaseTable(this)
 		patchBaseCards(this)
 		patchBaseList(this)
+		patchMenu(this)
 
 		updateRelativeDateColors(this)
 		updateBannerStyles(this);
@@ -84,6 +78,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		updateHideMetadataAddButton(this)
 		updateBaseTagsStyle(this)
 		updateTheme(this)
+
+		
 		
 
 		this.app.workspace.onLayoutReady(async() => {
@@ -121,67 +117,13 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		);
 
 		const registerWindowEvents = (win: Window) => {
-			if (Platform.isMobile) {
-				this.registerDomEvent(win, "contextmenu", (e: MouseEvent) => {
-					if (
-						e.target instanceof HTMLElement &&
-						e.target.closest(".multi-select-pill") &&
-						this.settings.enableColoredProperties
-					) {
-						handlePillMenu(e, e.target, this);
-					}
-				});
 
-				this.registerDomEvent(win, "touchstart", (e: TouchEvent) => {
-					if (
-						(e.target instanceof HTMLElement ||
-							e.target instanceof SVGElement) &&
-						e.target.closest(".metadata-property-icon")
-					) {
-						handlePropertyMenu(e.target, this);
-					}
-					if (e.target instanceof HTMLElement && 
-						e.target.closest(".cm-hashtag") && 
-						this.settings.enableColoredInlineTags
-					) {
-                        handleTagMenu(e, e.target, this);
-					}
-				});
-			} else {
-
-				this.registerDomEvent(win, "mousedown", (e: MouseEvent) => {
-
-					let targetEl = e.target as HTMLElement;
-
-					if (e.button == 2) {
-						if (targetEl.closest(".multi-select-pill") || targetEl.closest(".metadata-input-longtext")) {
-							if (this.settings.enableColoredProperties) {
-								handlePillMenu(e, targetEl, this);
-							}
-						}
-						if (targetEl.closest(".cm-hashtag") &&
-						this.settings.enableColoredInlineTags) {
-							handleTagMenu(e, targetEl, this);
-						}
-
-					}
-					if (targetEl.closest(".metadata-property-icon")) {
-						handlePropertyMenu(targetEl, this);
-					}
-				});
-			}
+			//@ts-ignore
+    		let plugins = this.app.plugins
+			
 
 			this.registerDomEvent(win, "click", (e: MouseEvent) => {
 
-				
-
-				if (e.target instanceof HTMLElement && (
-					e.target.classList.contains("internal-link") || e.target.closest(".internal-link")
-				)) {
-					return
-				}
-
-				
 
 				//@ts-ignore
 				let searchPlugin = this.app.internalPlugins.getEnabledPluginById("global-search")
@@ -202,35 +144,35 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			this.registerDomEvent(
 				win,
 				"contextmenu",
-				(e: MouseEvent) => {
+				(e: PointerEvent) => {
+
+					let imageMenuExist = 
+						plugins.getPlugin("copy-url-in-preview") || 
+						plugins.getPlugin("pixel-perfect-image") 
 
 					let targetEl = e.target as HTMLElement
 
-					if (targetEl.closest(".pp-icon")) {
+					if (
+						targetEl.closest(".pp-icon") || 
+						targetEl.closest(".banner-image") || 
+						targetEl.closest(".metadata-side-image")
+					) {
 						e.preventDefault();
-						createIconMenu(e, this);
-					}
-					if (targetEl.closest(".banner-image")) {
-						e.preventDefault();
-						createBannerMenu(e, this);
-					}
-					if (targetEl.closest(".metadata-side-image")) {
-						e.preventDefault();
-						createCoverMenu(e, this);
-					}
-					if (targetEl.closest(".tag-pane-tag") &&
-					this.settings.enableColoredTagsInTagPane) {
-						handleTagPaneMenu(e, targetEl, this);
-					}
-					if (targetEl.closest(".multi-select-pill") || targetEl.closest(".metadata-input-longtext")) {
-						if (this.settings.enableColoredProperties) {
-							handlePillMenu(e, targetEl, this);
+						if (!imageMenuExist) {
+							let menu = new Menu();
+							menu.showAtMouseEvent(e)
 						}
 					}
-					if (targetEl.closest(".metadata-property-icon")) {
-						handlePropertyMenu(targetEl, this);
+
+
+					if (targetEl.closest(".tag-pane-tag") &&
+					this.settings.enableColoredTagsInTagPane) {
+						let tagPaneMenuExist = plugins.getPlugin("tag-wrangler")
+						if (!tagPaneMenuExist) {
+							let menu = new Menu();
+							menu.showAtMouseEvent(e)
+						}
 					}
-					
 				},
 				true
 			)

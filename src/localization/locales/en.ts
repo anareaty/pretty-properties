@@ -205,6 +205,8 @@ export default {
   HIDE_PROPERTIES_TITLE: "Hide properties title",
   HIDE_ADD_PROPERTY_BUTTON: "Hide add property button",
   DELETE_TAG: "Delete tag",
+  INSERT_IMAGE: "Insert image",
+  INSERT_EMOJI: "Insert emoji",
 };
 
 
