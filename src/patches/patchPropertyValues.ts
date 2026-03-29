@@ -15,16 +15,7 @@ const FORMATTED_WRAPPER_CLASS = "pp-formatted-value-wrapper";
 const FORMATTED_OVERLAY_CLASS = "pp-formatted-value-overlay";
 const HIDDEN_INPUT_CLASS = "pp-formatted-value-hidden";
 const LIVE_VALUE_MARKER = '<span data-pp-live-property-value></span>';
-
-const INPUT_BOUND_KEY = "ppFormattedValueBound";
-const CONTAINER_BOUND_KEY = "ppFormattedContainerBound";
 const LAST_RENDERED_KEY = "ppLastRendered";
-
-const refreshByInput = new WeakMap<HTMLElement, () => void>();
-const observerByContainer = new WeakMap<HTMLElement, MutationObserver>();
-const lastObservedValueByContainer = new WeakMap<HTMLElement, string | null>();
-const pendingRefreshByContainer = new WeakMap<HTMLElement, number>();
-const pendingReapplyByContainer = new WeakMap<HTMLElement, number>();
 
 const COPIED_TEXT_STYLES = [
 	"fontFamily",
@@ -46,6 +37,8 @@ const COPIED_TEXT_STYLES = [
 	"borderRadius",
 ] as const;
 
+const fieldByContainer = new WeakMap<HTMLElement, FormattedPropertyField>();
+
 export function updateAllPropertyFormats(plugin: PrettyPropertiesPlugin): void {
 	requestAnimationFrame(() => {
 		for (const leaf of plugin.app.workspace.getLeavesOfType("markdown")) {
@@ -63,13 +56,13 @@ export function updateAllPropertyFormats(plugin: PrettyPropertiesPlugin): void {
 				if (!propertyName || !propertyInputType)
 					continue;
 
-				applyPropertyFormatting(
+				getOrCreateField(
+					plugin,
 					findPropertyValueContainer(rowElement),
 					propertyName,
-					plugin,
 					propertyInputType,
 					sourcePath
-				);
+				).update();
 			}
 		}
 	});
@@ -86,153 +79,296 @@ export function applyPropertyFormatting(
 	if (!isSupportedPropertyInputType(propertyInputType))
 		return;
 
-	const inputElement = containerElement.querySelector<HTMLElement>(INPUT_SELECTORS[propertyInputType]);
-	if (!inputElement)
-		return;
+	getOrCreateField(
+		plugin,
+		containerElement,
+		propertyName,
+		propertyInputType,
+		sourcePath
+	).update(rawValue);
+}
 
-	const propertyFormat = plugin.settings.propertyFormats.find(
-		(candidate) => candidate.property.toLowerCase() === propertyName.toLowerCase()
-	)?.format?.trim();
+export function getSupportedPropertyInputTypes(): string[] {
+	return Object.keys(INPUT_SELECTORS);
+}
 
-	if (!propertyFormat) {
-		resetPropertyFormatting(containerElement, inputElement);
-		return;
+class FormattedPropertyField {
+	private observer: MutationObserver | null = null;
+	private inputElement: HTMLElement | null = null;
+	private boundInputElement: HTMLElement | null = null;
+	private refreshQueued = false;
+	private renderSequence = 0;
+	private lastObservedWidgetValue: string | null = null;
+	private propertyFormat: string | null = null;
+	private containerBound = false;
+
+	constructor(
+		private readonly plugin: PrettyPropertiesPlugin,
+		private readonly containerElement: HTMLElement,
+		private readonly propertyName: string,
+		private readonly propertyInputType: SupportedPropertyInputType,
+		private readonly sourcePath: string
+	) {}
+
+	update(rawValue?: unknown): void {
+		this.propertyFormat = this.lookupPropertyFormat();
+		this.rebindInput();
+
+		if (!this.propertyFormat || !this.inputElement) {
+			this.clearFormatting();
+			return;
+		}
+
+		this.ensureBound();
+		this.containerElement.classList.add(FORMATTED_WRAPPER_CLASS);
+
+		requestAnimationFrame(() => {
+			this.refresh(rawValue);
+		});
 	}
 
-	containerElement.classList.add(FORMATTED_WRAPPER_CLASS);
+	private clearFormatting(): void {
+		this.unbindInput();
+		this.disconnectObserver();
 
-	const overlayElement = ensureOverlayElement(containerElement);
-	const renderMarkdown = createMarkdownRenderer(plugin, overlayElement, sourcePath);
+		this.getExistingOverlayElement()?.remove();
+		this.inputElement?.classList.remove(HIDDEN_INPUT_CLASS);
+		this.containerElement.classList.remove(FORMATTED_WRAPPER_CLASS);
 
-	const refresh = () => {
-		syncOverlayTextStyleFromInput(inputElement, overlayElement);
+		this.inputElement = null;
+		this.propertyFormat = null;
+		this.lastObservedWidgetValue = null;
+		this.refreshQueued = false;
+	}
 
-		const active = document.activeElement as HTMLElement | null;
-		const isEditing = active === inputElement || (active != null && inputElement.contains(active));
-		overlayElement.style.display = isEditing ? "none" : "";
-		inputElement.classList.toggle(HIDDEN_INPUT_CLASS, !isEditing);
-		if (isEditing)
+	private lookupPropertyFormat(): string | null {
+		return this.plugin.settings.propertyFormats.find(
+			(candidate) => candidate.property.toLowerCase() === this.propertyName.toLowerCase()
+		)?.format?.trim() || null;
+	}
+
+	private ensureBound(): void {
+		if (!this.containerBound) {
+			this.containerElement.addEventListener("pointerdown", this.handlePointerDownOrFocusIn, true);
+			this.containerElement.addEventListener("focusin", this.handlePointerDownOrFocusIn, true);
+			this.containerElement.addEventListener("input", this.scheduleRefresh, true);
+			this.containerElement.addEventListener("change", this.scheduleRefresh, true);
+			this.containerElement.addEventListener("focusout", this.handleFocusOut);
+			this.containerBound = true;
+		}
+
+		if (!this.observer) {
+			this.observer = new MutationObserver(this.handleMutation);
+			this.observer.observe(this.containerElement, {
+				subtree: true,
+				childList: true,
+				characterData: true,
+				attributes: true,
+				attributeFilter: ["data-internal-value", "aria-selected", "class", "value"],
+			});
+		}
+	}
+
+	private disconnectObserver(): void {
+		this.observer?.disconnect();
+		this.observer = null;
+	}
+
+	private rebindInput(): HTMLElement | null {
+		const nextInput = this.findInputElement();
+		if (nextInput === this.inputElement)
+			return nextInput;
+
+		this.unbindInput();
+		this.inputElement = nextInput;
+
+		if (nextInput) {
+			nextInput.addEventListener("focus", this.handleInputFocusOrBlur);
+			nextInput.addEventListener("blur", this.handleInputFocusOrBlur);
+			this.boundInputElement = nextInput;
+		}
+
+		return nextInput;
+	}
+
+	private unbindInput(): void {
+		if (!this.boundInputElement)
 			return;
 
-		const liveValue =
-			readWidgetValueFromOverlay(overlayElement, propertyInputType) ??
-			getNativeTextValue(inputElement) ??
-			rawValue;
+		this.boundInputElement.removeEventListener("focus", this.handleInputFocusOrBlur);
+		this.boundInputElement.removeEventListener("blur", this.handleInputFocusOrBlur);
+		this.boundInputElement = null;
+	}
 
-		const liveText = String(liveValue ?? "");
-		const templateMarkdown = propertyFormat.includes("{{propertyValue}}")
-			? propertyFormat.replaceAll("{{propertyValue}}", LIVE_VALUE_MARKER)
-			: computeFormattedValue(plugin, propertyName, propertyFormat, liveValue);
+	private findInputElement(): HTMLElement | null {
+		return this.containerElement.querySelector(INPUT_SELECTORS[this.propertyInputType]);
+	}
+
+	private getExistingOverlayElement(): HTMLDivElement | null {
+		return this.containerElement.querySelector<HTMLDivElement>(`.${FORMATTED_OVERLAY_CLASS}`);
+	}
+
+	private getOverlayElement(): HTMLDivElement {
+		return ensureOverlayElement(this.containerElement);
+	}
+
+	private readOverlayWidgetValue(): string | null {
+		return readWidgetValueFromOverlay(this.getOverlayElement(), this.propertyInputType);
+	}
+
+	private chooseValueForNativeSync(
+		overlayValue: string | null,
+		frontmatterValue: string | null
+	): string | null {
+		return this.propertyInputType === "text"
+			? (overlayValue ?? frontmatterValue)
+			: (frontmatterValue ?? overlayValue);
+	}
+
+	private syncOverlayValueIntoNativeInput(): void {
+		const inputElement = this.rebindInput();
+		if (!inputElement)
+			return;
+
+		const overlayValue = this.readOverlayWidgetValue();
+		const frontmatterValue = readFrontmatterValue(this.plugin, this.sourcePath, this.propertyName);
+		const nextValue = this.chooseValueForNativeSync(overlayValue, frontmatterValue);
+
+		if (nextValue != null)
+			writeNativeValue(inputElement, nextValue, this.propertyInputType);
+	}
+
+	private resolveDisplayValue(rawValue?: unknown): string {
+		const overlayValue = this.readOverlayWidgetValue();
+		if (overlayValue != null)
+			return overlayValue;
+
+		const nativeValue = this.inputElement ? getNativeTextValue(this.inputElement) : "";
+		if (nativeValue)
+			return nativeValue;
+
+		return String(rawValue ?? "");
+	}
+
+	private buildTemplateMarkdown(liveValue: string): string {
+		if (!this.propertyFormat)
+			return "";
+
+		return this.propertyFormat.includes("{{propertyValue}}")
+			? this.propertyFormat.replaceAll("{{propertyValue}}", LIVE_VALUE_MARKER)
+			: computeFormattedValue(this.plugin, this.propertyName, this.propertyFormat, liveValue);
+	}
+
+	private async renderMarkdown(markdown: string): Promise<void> {
+		const overlayElement = this.getOverlayElement();
+		const currentSequence = ++this.renderSequence;
+
+		if (overlayElement.dataset[LAST_RENDERED_KEY] === markdown)
+			return;
+
+		overlayElement.empty();
+
+		await MarkdownRenderer.render(
+			this.plugin.app,
+			markdown,
+			overlayElement,
+			this.sourcePath,
+			this.plugin
+		);
+
+		if (currentSequence !== this.renderSequence)
+			return;
+
+		overlayElement.dataset[LAST_RENDERED_KEY] = markdown;
+	}
+
+	private refresh(rawValue?: unknown): void {
+		const inputElement = this.rebindInput();
+		const propertyFormat = this.propertyFormat;
+		if (!inputElement || !propertyFormat)
+			return;
+
+		const overlayElement = this.getOverlayElement();
+
+		syncOverlayTextStyleFromInput(inputElement, overlayElement);
+
+		if (setOverlayEditingState(inputElement, overlayElement))
+			return;
+
+		const liveValue = this.resolveDisplayValue(rawValue);
+		const templateMarkdown = this.buildTemplateMarkdown(liveValue);
 
 		if (
 			templateMarkdown === overlayElement.dataset[LAST_RENDERED_KEY] &&
 			overlayElement.hasChildNodes() &&
-			patchLiveValueMarkers(overlayElement, liveText)
+			patchLiveValueMarkers(overlayElement, liveValue)
 		) {
+			this.lastObservedWidgetValue = this.readOverlayWidgetValue();
 			return;
 		}
 
-		void renderMarkdown(templateMarkdown).then(() => {
-			patchLiveValueMarkers(overlayElement, liveText);
+		void this.renderMarkdown(templateMarkdown).then(() => {
+			patchLiveValueMarkers(overlayElement, liveValue);
+			this.lastObservedWidgetValue = this.readOverlayWidgetValue();
 		});
+	}
+
+	private readonly handleInputFocusOrBlur = (): void => {
+		this.refresh();
 	};
 
-	refreshByInput.set(inputElement, refresh);
-	bindInputRefreshOnce(inputElement);
-	bindContainerBehaviorOnce(containerElement, inputElement, propertyName, plugin, propertyInputType, sourcePath);
+	private readonly handleFocusOut = (): void => {
+		queueMicrotask(() => this.update());
+	};
 
-	requestAnimationFrame(refresh);
+	private readonly handlePointerDownOrFocusIn = (): void => {
+		this.syncOverlayValueIntoNativeInput();
+	};
+
+	private readonly handleMutation = (): void => {
+		this.rebindInput();
+
+		const nextWidgetValue = this.readOverlayWidgetValue();
+		if (nextWidgetValue === this.lastObservedWidgetValue)
+			return;
+
+		this.lastObservedWidgetValue = nextWidgetValue;
+		this.scheduleRefresh();
+	};
+
+	private readonly scheduleRefresh = (): void => {
+		if (this.refreshQueued)
+			return;
+
+		this.refreshQueued = true;
+		requestAnimationFrame(() => {
+			this.refreshQueued = false;
+			this.refresh();
+		});
+	};
 }
 
-function bindInputRefreshOnce(inputElement: HTMLElement): void {
-	const dataset = inputElement.dataset as Record<string, string | undefined>;
-	if (dataset[INPUT_BOUND_KEY])
-		return;
-
-	dataset[INPUT_BOUND_KEY] = "1";
-
-	const refresh = () => refreshByInput.get(inputElement)?.();
-	inputElement.addEventListener("focus", refresh);
-	inputElement.addEventListener("blur", refresh);
-}
-
-function bindContainerBehaviorOnce(
-	containerElement: HTMLElement,
-	inputElement: HTMLElement,
-	propertyName: string,
+function getOrCreateField(
 	plugin: PrettyPropertiesPlugin,
+	containerElement: HTMLElement,
+	propertyName: string,
 	propertyInputType: SupportedPropertyInputType,
 	sourcePath: string
-): void {
-	const dataset = containerElement.dataset as Record<string, string | undefined>;
-	if (dataset[CONTAINER_BOUND_KEY])
-		return;
+): FormattedPropertyField {
+	const existing = fieldByContainer.get(containerElement);
+	if (existing)
+		return existing;
 
-	dataset[CONTAINER_BOUND_KEY] = "1";
+	const field = new FormattedPropertyField(
+		plugin,
+		containerElement,
+		propertyName,
+		propertyInputType,
+		sourcePath
+	);
 
-	const getOverlayValue = () => {
-		const overlayElement = containerElement.querySelector<HTMLElement>(`.${FORMATTED_OVERLAY_CLASS}`);
-		return overlayElement ? readWidgetValueFromOverlay(overlayElement, propertyInputType) : null;
-	};
-
-	const scheduleRefresh = () => {
-		if (pendingRefreshByContainer.has(containerElement))
-			return;
-
-		pendingRefreshByContainer.set(containerElement, 1);
-		requestAnimationFrame(() => {
-			pendingRefreshByContainer.delete(containerElement);
-			refreshByInput.get(inputElement)?.();
-		});
-	};
-
-	const syncNativeInput = () => {
-		const widgetValue = getOverlayValue();
-		const frontmatterValue = readFrontmatterValue(plugin, sourcePath, propertyName);
-		const nextValue = propertyInputType === "text"
-			? (widgetValue ?? frontmatterValue)
-			: (frontmatterValue ?? widgetValue);
-
-		if (nextValue != null)
-			writeNativeValue(inputElement, nextValue, propertyInputType);
-	};
-
-	containerElement.addEventListener("pointerdown", syncNativeInput, true);
-	containerElement.addEventListener("focusin", syncNativeInput, true);
-	containerElement.addEventListener("input", scheduleRefresh, true);
-	containerElement.addEventListener("change", scheduleRefresh, true);
-
-	containerElement.addEventListener("focusout", () => {
-		if (pendingReapplyByContainer.has(containerElement))
-			return;
-
-		pendingReapplyByContainer.set(containerElement, 1);
-		queueMicrotask(() => {
-			pendingReapplyByContainer.delete(containerElement);
-			applyPropertyFormatting(containerElement, propertyName, plugin, propertyInputType, sourcePath);
-		});
-	});
-
-	const observer = new MutationObserver(() => {
-		const nextValue = getOverlayValue();
-		const previousValue = lastObservedValueByContainer.get(containerElement) ?? null;
-		if (nextValue === previousValue)
-			return;
-
-		lastObservedValueByContainer.set(containerElement, nextValue);
-		scheduleRefresh();
-	});
-
-	observer.observe(containerElement, {
-		subtree: true,
-		childList: true,
-		characterData: true,
-		attributes: true,
-		attributeFilter: ["data-internal-value", "aria-selected", "class", "value"],
-	});
-
-	observerByContainer.set(containerElement, observer);
-	lastObservedValueByContainer.set(containerElement, getOverlayValue());
+	fieldByContainer.set(containerElement, field);
+	return field;
 }
 
 function patchLiveValueMarkers(overlayElement: HTMLElement, value: string): boolean {
@@ -262,34 +398,42 @@ function readFrontmatterValue(
 }
 
 function readWidgetValueFromOverlay(
-	overlay: HTMLElement,
+	overlayElement: HTMLElement,
 	propertyInputType: SupportedPropertyInputType
 ): string | null {
-	const value =
-		overlay.querySelector<HTMLInputElement>('input[type="range"]')?.value ??
-		overlay.querySelector<HTMLSelectElement>("select")?.value ??
-		overlay.querySelector<HTMLInputElement>('input[type="text"], input:not([type]), textarea')?.value ??
-		overlay.querySelector<HTMLElement>(".mb-suggest-text span")?.textContent?.trim() ??
-		overlay.querySelector<HTMLInputElement>('input[type="radio"]:checked')?.value;
+	for (const value of [
+		overlayElement.querySelector<HTMLInputElement>('input[type="range"]')?.value,
+		overlayElement.querySelector<HTMLSelectElement>("select")?.value,
+		overlayElement.querySelector<HTMLInputElement>('input[type="text"], input:not([type]), textarea')?.value,
+		overlayElement.querySelector<HTMLElement>(".mb-suggest-text span")?.textContent?.trim(),
+		overlayElement.querySelector<HTMLInputElement>('input[type="radio"]:checked')?.value,
+	]) {
+		if (value)
+			return value;
+	}
 
-	if (value)
-		return value;
-
-	const checkedCheckboxes = Array.from(
-		overlay.querySelectorAll<HTMLInputElement>('input[type="checkbox"]:checked'),
+	const checkedCheckboxValues = Array.from(
+		overlayElement.querySelectorAll<HTMLInputElement>('input[type="checkbox"]:checked'),
 		(input) => input.value
 	);
 
-	if (checkedCheckboxes.length)
-		return propertyInputType === "text" ? checkedCheckboxes.join(", ") : String(checkedCheckboxes);
+	if (checkedCheckboxValues.length) {
+		return propertyInputType === "text"
+			? checkedCheckboxValues.join(", ")
+			: String(checkedCheckboxValues);
+	}
 
-	return (
-		overlay.querySelector<HTMLElement>('[aria-selected="true"]')?.textContent?.trim() ??
-		overlay.querySelector<HTMLElement>(".is-selected")?.textContent?.trim() ??
-		overlay.querySelector<HTMLElement>(".mod-selected")?.textContent?.trim() ??
-		overlay.querySelector<HTMLElement>("[data-internal-value]")?.getAttribute("data-internal-value") ??
-		null
-	);
+	for (const value of [
+		overlayElement.querySelector<HTMLElement>('[aria-selected="true"]')?.textContent?.trim(),
+		overlayElement.querySelector<HTMLElement>(".is-selected")?.textContent?.trim(),
+		overlayElement.querySelector<HTMLElement>(".mod-selected")?.textContent?.trim(),
+		overlayElement.querySelector<HTMLElement>("[data-internal-value]")?.getAttribute("data-internal-value"),
+	]) {
+		if (value)
+			return value;
+	}
+
+	return null;
 }
 
 function getNativeTextValue(inputElement: HTMLElement): string {
@@ -330,42 +474,6 @@ function writeNativeValue(
 		input.defaultValue = value;
 }
 
-function resetPropertyFormatting(containerElement: HTMLElement, inputElement: HTMLElement): void {
-	containerElement.querySelector<HTMLDivElement>(`.${FORMATTED_OVERLAY_CLASS}`)?.remove();
-	containerElement.classList.remove(FORMATTED_WRAPPER_CLASS);
-	inputElement.classList.remove(HIDDEN_INPUT_CLASS);
-	refreshByInput.delete(inputElement);
-
-	observerByContainer.get(containerElement)?.disconnect();
-	observerByContainer.delete(containerElement);
-	lastObservedValueByContainer.delete(containerElement);
-
-	const dataset = containerElement.dataset as Record<string, string | undefined>;
-	delete dataset[CONTAINER_BOUND_KEY];
-}
-
-function createMarkdownRenderer(
-	plugin: PrettyPropertiesPlugin,
-	overlayElement: HTMLDivElement,
-	sourcePath: string
-): (markdown: string) => Promise<void> {
-	let renderSequence = 0;
-
-	return async (markdown: string) => {
-		const currentSequence = ++renderSequence;
-		if (overlayElement.dataset[LAST_RENDERED_KEY] === markdown)
-			return;
-
-		overlayElement.empty();
-		await MarkdownRenderer.render(plugin.app, markdown, overlayElement, sourcePath, plugin);
-
-		if (currentSequence !== renderSequence)
-			return;
-
-		overlayElement.dataset[LAST_RENDERED_KEY] = markdown;
-	};
-}
-
 function computeFormattedValue(
 	plugin: PrettyPropertiesPlugin,
 	propertyName: string,
@@ -380,15 +488,26 @@ function computeFormattedValue(
 	}
 }
 
-function ensureOverlayElement(container: HTMLElement): HTMLDivElement {
-	const existing = container.querySelector<HTMLDivElement>(`.${FORMATTED_OVERLAY_CLASS}`);
+function ensureOverlayElement(containerElement: HTMLElement): HTMLDivElement {
+	const existing = containerElement.querySelector<HTMLDivElement>(`.${FORMATTED_OVERLAY_CLASS}`);
 	if (existing)
 		return existing;
 
-	const overlay = document.createElement("div");
-	overlay.className = FORMATTED_OVERLAY_CLASS;
-	container.appendChild(overlay);
-	return overlay;
+	const overlayElement = document.createElement("div");
+	overlayElement.className = FORMATTED_OVERLAY_CLASS;
+	containerElement.appendChild(overlayElement);
+	return overlayElement;
+}
+
+function setOverlayEditingState(inputElement: HTMLElement, overlayElement: HTMLElement): boolean {
+	const activeElement = document.activeElement as HTMLElement | null;
+	const isEditing =
+		activeElement === inputElement ||
+		(activeElement != null && inputElement.contains(activeElement));
+
+	overlayElement.style.display = isEditing ? "none" : "";
+	inputElement.classList.toggle(HIDDEN_INPUT_CLASS, !isEditing);
+	return isEditing;
 }
 
 function syncOverlayTextStyleFromInput(inputElement: HTMLElement, overlayElement: HTMLElement): void {
@@ -424,10 +543,6 @@ function detectPropertyInputType(rowElement: HTMLElement): SupportedPropertyInpu
 
 function isSupportedPropertyInputType(type: string): type is SupportedPropertyInputType {
 	return type in INPUT_SELECTORS;
-}
-
-export function getSupportedPropertyInputTypes(): string[] {
-	return Object.keys(INPUT_SELECTORS);
 }
 
 function findPropertyValueContainer(rowElement: HTMLElement): HTMLElement {
