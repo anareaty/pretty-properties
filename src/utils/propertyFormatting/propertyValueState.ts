@@ -1,14 +1,14 @@
 import { TFile } from "obsidian";
 import PrettyPropertiesPlugin from "../../main";
-import {SupportedPropertyInputType} from "../../patches/patchPropertyValues";
-import {getNestedProperty} from "../propertyUtils";
+import { SupportedPropertyInputType } from "../../patches/patchPropertyValues";
+import { getNestedProperty } from "../propertyUtils";
 
 export function readFrontmatterValue(
 	plugin: PrettyPropertiesPlugin,
-	sourcePath: string,
+	filePath: string,
 	propertyName: string
 ): string | null {
-	const file = plugin.app.vault.getAbstractFileByPath(sourcePath);
+	const file = plugin.app.vault.getAbstractFileByPath(filePath);
 	if (!(file instanceof TFile))
 		return null;
 
@@ -18,43 +18,22 @@ export function readFrontmatterValue(
 	);
 }
 
-export function readWidgetValueFromOverlay(
+export function readInteractiveValueFromOverlay(
 	overlayElement: HTMLElement,
 	propertyInputType: SupportedPropertyInputType
 ): string | null {
-	for (const value of [
-		overlayElement.querySelector<HTMLInputElement>('input[type="range"]')?.value,
-		overlayElement.querySelector<HTMLSelectElement>("select")?.value,
-		overlayElement.querySelector<HTMLInputElement>('input[type="text"], input:not([type]), textarea')?.value,
-		overlayElement.querySelector<HTMLElement>(".mb-suggest-text span")?.textContent?.trim(),
-		overlayElement.querySelector<HTMLInputElement>('input[type="radio"]:checked')?.value,
-	]) {
-		if (value)
-			return value;
-	}
+	const directValue = readDirectControlValue(overlayElement);
+	if (directValue)
+		return directValue;
 
-	const checkedCheckboxValues = Array.from(
-		overlayElement.querySelectorAll<HTMLInputElement>('input[type="checkbox"]:checked'),
-		(input) => input.value
-	);
-
+	const checkedCheckboxValues = readCheckedCheckboxValues(overlayElement);
 	if (checkedCheckboxValues.length) {
 		return propertyInputType === "text"
 			? checkedCheckboxValues.join(", ")
 			: String(checkedCheckboxValues);
 	}
 
-	for (const value of [
-		overlayElement.querySelector<HTMLElement>('[aria-selected="true"]')?.textContent?.trim(),
-		overlayElement.querySelector<HTMLElement>(".is-selected")?.textContent?.trim(),
-		overlayElement.querySelector<HTMLElement>(".mod-selected")?.textContent?.trim(),
-		overlayElement.querySelector<HTMLElement>("[data-internal-value]")?.getAttribute("data-internal-value"),
-	]) {
-		if (value)
-			return value;
-	}
-
-	return null;
+	return readSelectedValue(overlayElement);
 }
 
 export function getNativeTextValue(inputElement: HTMLElement): string {
@@ -67,6 +46,8 @@ export function chooseValueForNativeSync(
 	overlayValue: string | null,
 	frontmatterValue: string | null
 ): string | null {
+	// Long-text fields prefer the live interactive value; other field types
+	// prefer persisted frontmatter when both are available.
 	return propertyInputType === "text"
 		? (overlayValue ?? frontmatterValue)
 		: (frontmatterValue ?? overlayValue);
@@ -78,15 +59,15 @@ export function writeNativeValue(
 	propertyInputType: SupportedPropertyInputType
 ): void {
 	if (propertyInputType === "text") {
-		const editable = inputElement as HTMLDivElement;
+		const editableElement = inputElement as HTMLDivElement;
 		if (
-			editable.textContent === value &&
-			editable.getAttribute("data-property-longtext-value") === value
+			editableElement.textContent === value &&
+			editableElement.getAttribute("data-property-longtext-value") === value
 		) {
 			return;
 		}
 
-		editable.textContent = value;
+		editableElement.textContent = value;
 		return;
 	}
 
@@ -103,4 +84,40 @@ export function writeNativeValue(
 
 	if ("defaultValue" in input)
 		input.defaultValue = value;
+}
+
+function readDirectControlValue(rootElement: HTMLElement): string | null {
+	for (const value of [
+		rootElement.querySelector<HTMLInputElement>('input[type="range"]')?.value,
+		rootElement.querySelector<HTMLSelectElement>("select")?.value,
+		rootElement.querySelector<HTMLInputElement>('input[type="text"], input:not([type]), textarea')?.value,
+		rootElement.querySelector<HTMLElement>(".mb-suggest-text span")?.textContent?.trim(),
+		rootElement.querySelector<HTMLInputElement>('input[type="radio"]:checked')?.value,
+	]) {
+		if (value)
+			return value;
+	}
+
+	return null;
+}
+
+function readCheckedCheckboxValues(rootElement: HTMLElement): string[] {
+	return Array.from(
+		rootElement.querySelectorAll<HTMLInputElement>('input[type="checkbox"]:checked'),
+		(input) => input.value
+	);
+}
+
+function readSelectedValue(rootElement: HTMLElement): string | null {
+	for (const value of [
+		rootElement.querySelector<HTMLElement>('[aria-selected="true"]')?.textContent?.trim(),
+		rootElement.querySelector<HTMLElement>(".is-selected")?.textContent?.trim(),
+		rootElement.querySelector<HTMLElement>(".mod-selected")?.textContent?.trim(),
+		rootElement.querySelector<HTMLElement>("[data-internal-value]")?.getAttribute("data-internal-value"),
+	]) {
+		if (value)
+			return value;
+	}
+
+	return null;
 }

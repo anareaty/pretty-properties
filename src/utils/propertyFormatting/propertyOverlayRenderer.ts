@@ -5,7 +5,7 @@ const FORMATTED_OVERLAY_CLASS = "pp-formatted-value-overlay";
 const HIDDEN_INPUT_CLASS = "pp-formatted-value-hidden";
 const FORMATTED_WRAPPER_CLASS = "pp-formatted-value-wrapper";
 
-const COPIED_TEXT_STYLES = [
+const STYLE_PROPERTIES_TO_COPY = [
 	"fontFamily",
 	"fontSize",
 	"fontWeight",
@@ -25,17 +25,10 @@ const COPIED_TEXT_STYLES = [
 	"borderRadius",
 ] as const;
 
-export interface OverlayRenderContext {
-	plugin: PrettyPropertiesPlugin;
-	containerElement: HTMLElement;
-	sourcePath: string;
-	lastRenderedKey: string;
-}
-
 export function getOrCreateOverlayElement(containerElement: HTMLElement): HTMLDivElement {
-	const existing = containerElement.querySelector<HTMLDivElement>(`.${FORMATTED_OVERLAY_CLASS}`);
-	if (existing)
-		return existing;
+	const existingOverlay = containerElement.querySelector<HTMLDivElement>(`.${FORMATTED_OVERLAY_CLASS}`);
+	if (existingOverlay)
+		return existingOverlay;
 
 	const overlayElement = document.createElement("div");
 	overlayElement.className = FORMATTED_OVERLAY_CLASS;
@@ -73,51 +66,56 @@ export function syncOverlayTextStyleFromInput(
 	overlayElement: HTMLElement
 ): void {
 	const wasHidden = inputElement.classList.contains(HIDDEN_INPUT_CLASS);
+
+	// Hidden inputs can report the wrong computed styles, so temporarily show it.
 	if (wasHidden)
 		inputElement.classList.remove(HIDDEN_INPUT_CLASS);
 
-	const computed = window.getComputedStyle(inputElement);
+	const computedStyle = window.getComputedStyle(inputElement);
 
 	if (wasHidden)
 		inputElement.classList.add(HIDDEN_INPUT_CLASS);
 
-	for (const property of COPIED_TEXT_STYLES)
-		(overlayElement.style as CSSStyleDeclaration)[property] = computed[property];
+	for (const property of STYLE_PROPERTIES_TO_COPY)
+		(overlayElement.style as CSSStyleDeclaration)[property] = computedStyle[property];
 }
 
 export function patchLiveValueMarkers(
 	overlayElement: HTMLElement,
 	value: string
 ): boolean {
-	const markers = overlayElement.querySelectorAll<HTMLElement>("[data-pp-live-property-value]");
-	if (!markers.length)
+	const liveValueMarkers = overlayElement.querySelectorAll<HTMLElement>("[data-pp-live-property-value]");
+	if (!liveValueMarkers.length)
 		return false;
 
-	for (const marker of markers)
+	for (const marker of liveValueMarkers)
 		marker.textContent = value;
 
 	return true;
 }
 
 export async function renderMarkdownIntoOverlay(
-	context: OverlayRenderContext,
+	plugin: PrettyPropertiesPlugin,
+	containerElement: HTMLElement,
+	filePath: string,
+	lastRenderedKey: string,
 	markdown: string
 ): Promise<boolean> {
-	const overlayElement = getOrCreateOverlayElement(context.containerElement);
+	const overlayElement = getOrCreateOverlayElement(containerElement);
 
-	if (overlayElement.dataset[context.lastRenderedKey] === markdown)
+	if (overlayElement.dataset[lastRenderedKey] === markdown)
 		return false;
 
 	overlayElement.empty();
 
 	await MarkdownRenderer.render(
-		context.plugin.app,
+		plugin.app,
 		markdown,
 		overlayElement,
-		context.sourcePath,
-		context.plugin
+		filePath,
+		plugin
 	);
 
-	overlayElement.dataset[context.lastRenderedKey] = markdown;
+	overlayElement.dataset[lastRenderedKey] = markdown;
 	return true;
 }

@@ -5,17 +5,16 @@ import {
 	renderMarkdownIntoOverlay,
 	setOverlayEditingState,
 	syncOverlayTextStyleFromInput,
-	type OverlayRenderContext,
 } from "./propertyOverlayRenderer";
 import {
 	chooseValueForNativeSync,
 	getNativeTextValue,
 	readFrontmatterValue,
-	readWidgetValueFromOverlay,
+	readInteractiveValueFromOverlay,
 	writeNativeValue,
 } from "./propertyValueState";
 import PrettyPropertiesPlugin from "../../main";
-import {INPUT_SELECTORS, SupportedPropertyInputType} from "../../patches/patchPropertyValues";
+import { INPUT_SELECTORS, SupportedPropertyInputType } from "../../patches/patchPropertyValues";
 
 const FORMATTED_WRAPPER_CLASS = "pp-formatted-value-wrapper";
 const LIVE_VALUE_MARKER = '<span data-pp-live-property-value></span>';
@@ -26,21 +25,21 @@ export class FormattedPropertyField {
 	private inputElement: HTMLElement | null = null;
 	private boundInputElement: HTMLElement | null = null;
 	private refreshQueued = false;
-	private renderSequence = 0;
-	private lastObservedWidgetValue: string | null = null;
+	private renderVersion = 0;
+	private lastObservedInteractiveValue: string | null = null;
 	private propertyFormat: string | null = null;
-	private containerBound = false;
+	private isContainerBound = false;
 
 	constructor(
 		private readonly plugin: PrettyPropertiesPlugin,
 		private readonly containerElement: HTMLElement,
 		private readonly propertyName: string,
 		private readonly propertyInputType: SupportedPropertyInputType,
-		private readonly sourcePath: string
+		private readonly filePath: string
 	) {}
 
 	update(rawValue?: unknown): void {
-		this.propertyFormat = this.lookupPropertyFormat();
+		this.propertyFormat = this.findPropertyFormat();
 		this.rebindInput();
 
 		if (!this.propertyFormat || !this.inputElement) {
@@ -50,10 +49,40 @@ export class FormattedPropertyField {
 
 		this.ensureBound();
 		this.containerElement.classList.add(FORMATTED_WRAPPER_CLASS);
+		this.scheduleRefresh(rawValue);
+	}
 
-		requestAnimationFrame(() => {
-			this.refresh(rawValue);
-		});
+	dispose(): void {
+		this.unbindInput();
+		this.disconnectObserver();
+
+		if (this.isContainerBound) {
+			this.containerElement.removeEventListener("pointerdown", this.handlePointerDownOrFocusIn, true);
+			this.containerElement.removeEventListener("focusin", this.handlePointerDownOrFocusIn, true);
+			this.containerElement.removeEventListener("input", this.handleContainerInputOrChange, true);
+			this.containerElement.removeEventListener("change", this.handleContainerInputOrChange, true);
+			this.containerElement.removeEventListener("focusout", this.handleFocusOut);
+			this.isContainerBound = false;
+		}
+
+		clearFormattingUI(this.containerElement, this.inputElement);
+
+		this.inputElement = null;
+		this.propertyFormat = null;
+		this.lastObservedInteractiveValue = null;
+		this.refreshQueued = false;
+	}
+
+	matches(
+		propertyName: string,
+		propertyInputType: SupportedPropertyInputType,
+		filePath: string
+	): boolean {
+		return (
+			this.propertyName === propertyName &&
+			this.propertyInputType === propertyInputType &&
+			this.filePath === filePath
+		);
 	}
 
 	private clearFormatting(): void {
@@ -64,24 +93,24 @@ export class FormattedPropertyField {
 
 		this.inputElement = null;
 		this.propertyFormat = null;
-		this.lastObservedWidgetValue = null;
+		this.lastObservedInteractiveValue = null;
 		this.refreshQueued = false;
 	}
 
-	private lookupPropertyFormat(): string | null {
+	private findPropertyFormat(): string | null {
 		return this.plugin.settings.propertyFormats.find(
-			(candidate) => candidate.property.toLowerCase() === this.propertyName.toLowerCase()
+			(formatConfig) => formatConfig.property.toLowerCase() === this.propertyName.toLowerCase()
 		)?.format?.trim() || null;
 	}
 
 	private ensureBound(): void {
-		if (!this.containerBound) {
+		if (!this.isContainerBound) {
 			this.containerElement.addEventListener("pointerdown", this.handlePointerDownOrFocusIn, true);
 			this.containerElement.addEventListener("focusin", this.handlePointerDownOrFocusIn, true);
-			this.containerElement.addEventListener("input", this.scheduleRefresh, true);
-			this.containerElement.addEventListener("change", this.scheduleRefresh, true);
+			this.containerElement.addEventListener("input", this.handleContainerInputOrChange, true);
+			this.containerElement.addEventListener("change", this.handleContainerInputOrChange, true);
 			this.containerElement.addEventListener("focusout", this.handleFocusOut);
-			this.containerBound = true;
+			this.isContainerBound = true;
 		}
 
 		if (!this.observer) {
@@ -102,20 +131,20 @@ export class FormattedPropertyField {
 	}
 
 	private rebindInput(): HTMLElement | null {
-		const nextInput = this.findInputElement();
-		if (nextInput === this.inputElement)
-			return nextInput;
+		const nextInputElement = this.findInputElement();
+		if (nextInputElement === this.inputElement)
+			return nextInputElement;
 
 		this.unbindInput();
-		this.inputElement = nextInput;
+		this.inputElement = nextInputElement;
 
-		if (nextInput) {
-			nextInput.addEventListener("focus", this.handleInputFocusOrBlur);
-			nextInput.addEventListener("blur", this.handleInputFocusOrBlur);
-			this.boundInputElement = nextInput;
+		if (nextInputElement) {
+			nextInputElement.addEventListener("focus", this.handleInputFocusOrBlur);
+			nextInputElement.addEventListener("blur", this.handleInputFocusOrBlur);
+			this.boundInputElement = nextInputElement;
 		}
 
-		return nextInput;
+		return nextInputElement;
 	}
 
 	private unbindInput(): void {
@@ -131,9 +160,9 @@ export class FormattedPropertyField {
 		return this.containerElement.querySelector(INPUT_SELECTORS[this.propertyInputType]);
 	}
 
-	private readOverlayWidgetValue(): string | null {
+	private readInteractiveValue(): string | null {
 		const overlayElement = getOrCreateOverlayElement(this.containerElement);
-		return readWidgetValueFromOverlay(overlayElement, this.propertyInputType);
+		return readInteractiveValueFromOverlay(overlayElement, this.propertyInputType);
 	}
 
 	private syncOverlayValueIntoNativeInput(): void {
@@ -141,8 +170,8 @@ export class FormattedPropertyField {
 		if (!inputElement)
 			return;
 
-		const overlayValue = this.readOverlayWidgetValue();
-		const frontmatterValue = readFrontmatterValue(this.plugin, this.sourcePath, this.propertyName);
+		const overlayValue = this.readInteractiveValue();
+		const frontmatterValue = readFrontmatterValue(this.plugin, this.filePath, this.propertyName);
 		const nextValue = chooseValueForNativeSync(
 			this.propertyInputType,
 			overlayValue,
@@ -154,9 +183,9 @@ export class FormattedPropertyField {
 	}
 
 	private resolveDisplayValue(rawValue?: unknown): string {
-		const overlayValue = this.readOverlayWidgetValue();
-		if (overlayValue != null)
-			return overlayValue;
+		const interactiveValue = this.readInteractiveValue();
+		if (interactiveValue != null)
+			return interactiveValue;
 
 		const nativeValue = this.inputElement ? getNativeTextValue(this.inputElement) : "";
 		if (nativeValue)
@@ -166,22 +195,26 @@ export class FormattedPropertyField {
 	}
 
 	private buildTemplateMarkdown(liveValue: string): string {
-		if (!this.propertyFormat)
+		const propertyFormat = this.propertyFormat;
+		if (!propertyFormat)
 			return "";
 
-		return this.propertyFormat.includes("{{propertyValue}}")
-			? this.propertyFormat.replaceAll("{{propertyValue}}", LIVE_VALUE_MARKER)
+		return propertyFormat.includes("{{propertyValue}}")
+			? propertyFormat.replaceAll("{{propertyValue}}", LIVE_VALUE_MARKER)
 			: this.computeFormattedValue(liveValue);
 	}
 
 	private computeFormattedValue(currentValue: unknown): string {
 		const rawText = String(currentValue ?? "");
+		const propertyFormat = this.propertyFormat;
+		if (!propertyFormat)
+			return rawText;
 
 		try {
 			return this.plugin.formatter.format(
 				this.propertyName,
 				rawText,
-				this.propertyFormat as any
+				propertyFormat
 			);
 		} catch {
 			return rawText;
@@ -189,17 +222,17 @@ export class FormattedPropertyField {
 	}
 
 	private async renderMarkdown(markdown: string): Promise<void> {
-		const context: OverlayRenderContext = {
-			plugin: this.plugin,
-			containerElement: this.containerElement,
-			sourcePath: this.sourcePath,
-			lastRenderedKey: LAST_RENDERED_KEY,
-		};
+		const currentRenderVersion = ++this.renderVersion;
 
-		const currentSequence = ++this.renderSequence;
-		const rendered = await renderMarkdownIntoOverlay(context, markdown);
+		const didRender = await renderMarkdownIntoOverlay(
+			this.plugin,
+			this.containerElement,
+			this.filePath,
+			LAST_RENDERED_KEY,
+			markdown
+		);
 
-		if (currentSequence !== this.renderSequence || !rendered)
+		if (!didRender || currentRenderVersion !== this.renderVersion)
 			return;
 	}
 
@@ -224,47 +257,52 @@ export class FormattedPropertyField {
 			overlayElement.hasChildNodes() &&
 			patchLiveValueMarkers(overlayElement, liveValue)
 		) {
-			this.lastObservedWidgetValue = this.readOverlayWidgetValue();
+			this.lastObservedInteractiveValue = this.readInteractiveValue();
 			return;
 		}
 
 		void this.renderMarkdown(templateMarkdown).then(() => {
 			patchLiveValueMarkers(overlayElement, liveValue);
-			this.lastObservedWidgetValue = this.readOverlayWidgetValue();
+			this.lastObservedInteractiveValue = this.readInteractiveValue();
 		});
 	}
 
-	private readonly handleInputFocusOrBlur = (): void => {
+	private handleInputFocusOrBlur = (): void => {
 		this.refresh();
 	};
 
-	private readonly handleFocusOut = (): void => {
+	private handleFocusOut = (): void => {
 		queueMicrotask(() => this.update());
 	};
 
-	private readonly handlePointerDownOrFocusIn = (): void => {
+	private handlePointerDownOrFocusIn = (): void => {
 		this.syncOverlayValueIntoNativeInput();
 	};
 
-	private readonly handleMutation = (): void => {
-		this.rebindInput();
+	private handleMutation = (): void => {
+		if (!this.inputElement || !this.containerElement.contains(this.inputElement))
+			this.rebindInput();
 
-		const nextWidgetValue = this.readOverlayWidgetValue();
-		if (nextWidgetValue === this.lastObservedWidgetValue)
+		const nextInteractiveValue = this.readInteractiveValue();
+		if (nextInteractiveValue === this.lastObservedInteractiveValue)
 			return;
 
-		this.lastObservedWidgetValue = nextWidgetValue;
+		this.lastObservedInteractiveValue = nextInteractiveValue;
 		this.scheduleRefresh();
 	};
 
-	private readonly scheduleRefresh = (): void => {
+	private handleContainerInputOrChange = (): void => {
+		this.scheduleRefresh();
+	};
+
+	private scheduleRefresh(rawValue?: unknown): void {
 		if (this.refreshQueued)
 			return;
 
 		this.refreshQueued = true;
 		requestAnimationFrame(() => {
 			this.refreshQueued = false;
-			this.refresh();
+			this.refresh(rawValue);
 		});
-	};
+	}
 }

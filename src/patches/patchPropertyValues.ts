@@ -1,6 +1,6 @@
 import PrettyPropertiesPlugin from "../main";
 import { MarkdownView } from "obsidian";
-import {FormattedPropertyField} from "../utils/propertyFormatting/formattedPropertyField";
+import { FormattedPropertyField } from "../utils/propertyFormatting/formattedPropertyField";
 
 export type SupportedPropertyInputType = "text" | "number" | "date" | "datetime";
 
@@ -12,74 +12,99 @@ export const INPUT_SELECTORS: Record<SupportedPropertyInputType, string> = {
 };
 
 const fieldByContainer = new WeakMap<HTMLElement, FormattedPropertyField>();
+const activeContainers = new Set<HTMLElement>();
 
 export function updateAllPropertyFormats(plugin: PrettyPropertiesPlugin): void {
 	requestAnimationFrame(() => {
+		const seenContainers = new Set<HTMLElement>();
+
 		for (const leaf of plugin.app.workspace.getLeavesOfType("markdown")) {
 			if (!(leaf.view instanceof MarkdownView))
 				continue;
 
-			const sourcePath = leaf.view.file?.path;
+			const filePath = leaf.view.file?.path;
 			const metadataContainer = leaf.view.contentEl.querySelector<HTMLElement>(".metadata-container");
-			if (!sourcePath || !metadataContainer)
+			if (!filePath || !metadataContainer)
 				continue;
 
 			for (const rowElement of metadataContainer.querySelectorAll<HTMLElement>(".metadata-property")) {
 				const propertyName = readPropertyName(rowElement);
-				const propertyInputType = detectPropertyInputType(rowElement);
-				if (!propertyName || !propertyInputType)
+				const inputType = findPropertyInputType(rowElement);
+				if (!propertyName || !inputType)
 					continue;
 
-				getOrCreateField(
+				const containerElement = findValueContainer(rowElement);
+				seenContainers.add(containerElement);
+
+				getOrCreateFormattedField(
 					plugin,
-					findPropertyValueContainer(rowElement),
+					containerElement,
 					propertyName,
-					propertyInputType,
-					sourcePath
+					inputType,
+					filePath
 				).update();
 			}
 		}
+
+		disposeDetachedFormattedFields(seenContainers);
 	});
 }
 
-export function applyPropertyFormatting(
+export function updateFormattedProperty(
 	containerElement: HTMLElement,
 	propertyName: string,
 	plugin: PrettyPropertiesPlugin,
 	propertyInputType: string,
-	sourcePath: string,
+	filePath: string,
 	rawValue?: unknown
 ): void {
 	if (!isSupportedPropertyInputType(propertyInputType))
 		return;
 
-	getOrCreateField(
+	getOrCreateFormattedField(
 		plugin,
 		containerElement,
 		propertyName,
 		propertyInputType,
-		sourcePath
+		filePath
 	).update(rawValue);
 }
 
-export function getSupportedPropertyInputTypes(): string[] {
-	return Object.keys(INPUT_SELECTORS);
+export function disposeFormattedField(containerElement: HTMLElement): void {
+	const field = fieldByContainer.get(containerElement);
+	if (!field)
+		return;
+
+	field.dispose();
+	fieldByContainer.delete(containerElement);
+	activeContainers.delete(containerElement);
 }
 
-export function isSupportedPropertyInputType(type: string): type is SupportedPropertyInputType {
-	return type in INPUT_SELECTORS;
+export function disposeAllFormattedFields(): void {
+	for (const containerElement of activeContainers)
+		fieldByContainer.get(containerElement)?.dispose();
+
+	activeContainers.clear();
+}
+
+export function getSupportedPropertyInputTypes(): SupportedPropertyInputType[] {
+	return Object.keys(INPUT_SELECTORS) as SupportedPropertyInputType[];
+}
+
+export function isSupportedPropertyInputType(value: string): value is SupportedPropertyInputType {
+	return value in INPUT_SELECTORS;
 }
 
 export function readPropertyName(rowElement: HTMLElement): string {
 	return (
+		rowElement.dataset.propertyKey?.trim() ||
 		rowElement.getAttribute("data-property-key")?.trim() ||
-		(rowElement as any).dataset?.propertyKey?.trim() ||
 		rowElement.querySelector<HTMLElement>(".metadata-property-key")?.textContent?.trim() ||
 		""
 	);
 }
 
-export function detectPropertyInputType(rowElement: HTMLElement): SupportedPropertyInputType | null {
+export function findPropertyInputType(rowElement: HTMLElement): SupportedPropertyInputType | null {
 	for (const [type, selector] of Object.entries(INPUT_SELECTORS) as Array<[SupportedPropertyInputType, string]>) {
 		if (rowElement.querySelector(selector))
 			return type;
@@ -88,7 +113,7 @@ export function detectPropertyInputType(rowElement: HTMLElement): SupportedPrope
 	return null;
 }
 
-export function findPropertyValueContainer(rowElement: HTMLElement): HTMLElement {
+export function findValueContainer(rowElement: HTMLElement): HTMLElement {
 	return (
 		rowElement.querySelector<HTMLElement>(".metadata-property-value") ??
 		rowElement.querySelector<HTMLElement>(".metadata-property-value-container") ??
@@ -96,25 +121,44 @@ export function findPropertyValueContainer(rowElement: HTMLElement): HTMLElement
 	);
 }
 
-function getOrCreateField(
+function getOrCreateFormattedField(
 	plugin: PrettyPropertiesPlugin,
 	containerElement: HTMLElement,
 	propertyName: string,
 	propertyInputType: SupportedPropertyInputType,
-	sourcePath: string
+	filePath: string
 ): FormattedPropertyField {
-	const existing = fieldByContainer.get(containerElement);
-	if (existing)
-		return existing;
+	const existingField = fieldByContainer.get(containerElement);
+	if (existingField) {
+		if (existingField.matches(propertyName, propertyInputType, filePath))
+			return existingField;
+
+		existingField.dispose();
+		fieldByContainer.delete(containerElement);
+		activeContainers.delete(containerElement);
+	}
 
 	const field = new FormattedPropertyField(
 		plugin,
 		containerElement,
 		propertyName,
 		propertyInputType,
-		sourcePath
+		filePath
 	);
 
 	fieldByContainer.set(containerElement, field);
+	activeContainers.add(containerElement);
 	return field;
+}
+
+function disposeDetachedFormattedFields(seenContainers: Set<HTMLElement>): void {
+	for (const containerElement of Array.from(activeContainers)) {
+		if (seenContainers.has(containerElement))
+			continue;
+
+		if (document.body.contains(containerElement))
+			continue;
+
+		disposeFormattedField(containerElement);
+	}
 }

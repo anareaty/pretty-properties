@@ -44,6 +44,7 @@ import { unPatchWidgets } from "./patches/removePatches";
 import { patchHoverPopover } from "./patches/patchHoverPopover";
 import { API, createApi } from "./utils/createApi";
 import {PropertyFormatter} from "./utils/propertyFormatter";
+import {disposeAllFormattedFields} from "./patches/patchPropertyValues";
 
 export default class PrettyPropertiesPlugin extends Plugin {
 	settings: PPPluginSettings;
@@ -256,6 +257,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 	}
 
 	onunload() {
+		disposeAllFormattedFields();
 		unPatchWidgets(this)
 		removeAll()
 		this.formatter.clearCache();
