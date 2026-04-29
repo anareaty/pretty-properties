@@ -21,6 +21,7 @@ export const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string
         "blue",
         "purple",
         "pink",
+        "accent",
         "none",
         "default"
     ];
@@ -30,15 +31,17 @@ export const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string
             
             item.setIcon("square");
 
-            if (color != "default" && color != "none") {
+            if (color != "default" && color != "none" && color != "accent") {
                 //@ts-ignore
                 item.iconEl.style =
                     "color: transparent; background-color: rgba(var(--color-" +
                     color +
                     "-rgb), 0.3);";
-            }
-
-            if (color == "none") {
+            } else if (color == "accent") {
+                //@ts-ignore
+                item.iconEl.style =
+                    "color: transparent; background-color: hsla(var(--interactive-accent-hsl), 0.3);";
+            } else if (color == "none") {
                 //@ts-ignore
                 item.iconEl.style = "opacity: 0.2;";
             }

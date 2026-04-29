@@ -11,8 +11,8 @@ export class CoverShapeSuggestModal extends SuggestModal<string> {
         this.file = file
         this.shapes = {
             "initial": i18n.t("INITIAL_DEFAULT_WIDTH"),
-            "initial-width-2": i18n.t("INITIAL_WIDTH_2"),
-            "initial-width-3": i18n.t("INITIAL_WIDTH_3"),
+            "initial-2": i18n.t("INITIAL_WIDTH_2"),
+            "initial-3": i18n.t("INITIAL_WIDTH_3"),
             "vertical-cover": i18n.t("VERTICAL_COVER"),
             "vertical-contain": i18n.t("VERTICAL_CONTAIN"),
             "horizontal-cover": i18n.t("HORIZONTAL_COVER"),
@@ -35,15 +35,7 @@ export class CoverShapeSuggestModal extends SuggestModal<string> {
     onChooseSuggestion(key: string) {
         if (key && this.file instanceof TFile) {
             this.app.fileManager.processFrontMatter(this.file, (fm) => {
-                let cssclasses = fm.cssclasses || [];
-                cssclasses = cssclasses.filter(
-                    (c: string) =>
-                        !Object.keys(this.shapes).find(
-                            (s) => c == "cover-" + s || c == "cover-vertical" || c == "cover-horizontal"
-                        )
-                );
-                cssclasses.push("cover-" + key);
-                fm.cssclasses = cssclasses;
+                fm.cover_shape = key
             });
         }
     }

@@ -52,6 +52,7 @@ export const showPropSettings = (settingTab: PPSettingTab) => {
 				plugin.settings.propertyFormats.push({
 					property: "",
 					format: "",
+                    textFormat: "raw"
 				});
 				await plugin.saveSettings();
 				settingTab.display();
@@ -85,11 +86,24 @@ export const showPropSettings = (settingTab: PPSettingTab) => {
 			})
 			.addTextArea((text) => {
 				enhanceFormatTextArea(plugin, text, entry.format, async (value) => {
+                   
 					plugin.settings.propertyFormats[i].format = value;
 					await plugin.saveSettings();
 					updateAllPropertyFormats(plugin);
 				});
 			})
+            .addDropdown(drop => drop
+                .addOptions({
+                    "raw": i18n.t("TEXT"),
+                    "markdown": i18n.t("MARKDOWN")
+                })
+                .setValue(plugin.settings.propertyFormats[i].textFormat || "raw")
+                .onChange(async (value) => {
+                    plugin.settings.propertyFormats[i].textFormat = value || "raw"
+                    await plugin.saveSettings();
+					updateAllPropertyFormats(plugin);
+                })
+            )
 			.addButton(button =>
 				button.setIcon("x").onClick(async () => {
 					plugin.settings.propertyFormats.splice(i, 1);

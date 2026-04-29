@@ -29,7 +29,7 @@ export class PropertyNameSuggest extends AbstractInputSuggest<string> {
 		const cacheAny = this.app.metadataCache as any;
 		if (typeof cacheAny.getAllPropertyInfos === "function") {
 			const infos = cacheAny.getAllPropertyInfos() as Record<string,PropertyInfo>;
-			console.log(infos);
+			
 			const names = Object.values(infos)
 				.filter((p): p is PropertyInfo => !allowedTypes || allowedTypes.has(p?.widget))
 				.map((p) => p?.name)

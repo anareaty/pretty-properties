@@ -1,7 +1,7 @@
 import PrettyPropertiesPlugin from "src/main"
 import { updateImagesForView } from "src/utils/updates/updateElements"
 import { around, dedupe } from "monkey-around";
-import { MarkdownView } from "obsidian";
+import { MarkdownView, View } from "obsidian";
 import { renderTitleIcon } from "src/utils/updates/updateIcons";
 import { updateAllMetadataContainers } from "src/utils/updates/updateHiddenProperties";
 import { updateCoverForView } from "src/utils/updates/updateCovers";
@@ -92,6 +92,15 @@ export const patchMarkdownView = async (plugin: PrettyPropertiesPlugin) => {
     }
   })
 }
+
+
+
+
+
+
+
+
+
 
 
 

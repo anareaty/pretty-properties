@@ -9,6 +9,7 @@ import { renderBanner, updateBannerForView } from "./updateBanners";
 import { getNestedProperty } from "../propertyUtils";
 import { updateAllMetadataContainers } from "./updateHiddenProperties";
 import { querySelectorsWithIframes, querySelectorsWithIframesForContainer } from "../querySelectorsHelper";
+import { getPropertyFormatObj, updatePropertyFormatting } from "./updatePropertyFormattings";
 
 
 
@@ -17,45 +18,67 @@ import { querySelectorsWithIframes, querySelectorsWithIframesForContainer } from
 
 export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => { 
 
-    let multitexts = querySelectorsWithIframes(".metadata-property:not([data-property-key='tags']) .multi-select-pill")
-    
-    for (let pill of multitexts) {
-        if (pill instanceof HTMLElement) updateMultiselectPill(pill, plugin) 
-    }
-    
-    let tagPills = querySelectorsWithIframes(".metadata-property[data-property-key='tags'] .multi-select-pill")
-    for (let pill of tagPills) {
-        if (pill instanceof HTMLElement) updateTagPill(pill, plugin)
-    }
-
-
-    let baseMultitexts = document.querySelectorAll(".bases-metadata-value[data-property-type='multitext'] .multi-select-pill")
-    
-    for (let pill of baseMultitexts) {
-        if (pill instanceof HTMLElement) updateMultiselectPill(pill, plugin) 
-    }
-
     
 
-    let baseCardMultitexts = document.querySelectorAll(".bases-rendered-value[data-property-type='multitext'] .value-list-element:not(:has(a.tag))")
-
-    for (let pill of baseCardMultitexts) {
-        if (pill instanceof HTMLElement) updateValueListElement(pill, "data-property-pill-value", "multiselect-pill", plugin) 
-    }
-
+    let mdLeaves = plugin.app.workspace.getLeavesOfType("markdown");
+    for (let leaf of mdLeaves) {
         
+        let view = leaf.view
 
-    
+        if (view instanceof MarkdownView) {
+            //@ts-ignore
+            view.metadataEditor?.rendered?.forEach(p => {
+                p.renderProperty(p.entry, !0)
+            })
 
-    let baseTagPills = document.querySelectorAll(".bases-metadata-value[data-property-type='tags'] .multi-select-pill")
-    
-    for (let pill of baseTagPills) {
-        if (pill instanceof HTMLElement) updateTagPill(pill, plugin) 
+            updateBannerForView(view, plugin);
+            updateIconForView(view, plugin);
+            updateCoverForView(view, plugin);
+            
+            let state = view.getState()
+
+            if (state.mode == "source") {
+                // @ts-expect-error, not typed
+                const editorView = view.editor.cm as EditorView;
+                editorView.dispatch({
+                    userEvent: "updatePillColors"
+                })
+            }
+        }
     }
 
     
+    let canvasLeaves = plugin.app.workspace.getLeavesOfType("canvas");
+    for (let leaf of canvasLeaves) {
+        //@ts-ignore
+        leaf.view.canvas?.nodes?.forEach(n => {
 
-    
+            let nodeView = n.child
+
+
+            if (nodeView) {
+           
+                updateCoverForView(nodeView, plugin);
+            }
+            //@ts-ignore
+            
+
+
+
+            n.child?.metadataEditor?.rendered?.forEach(p => {
+                p.renderProperty(p.entry, !0)
+            })
+        })
+    }
+
+
+    let baseLeaves = plugin.app.workspace.getLeavesOfType("bases");
+    for (let leaf of baseLeaves) {
+        //@ts-ignore
+        leaf.rebuildView()
+    }
+
+
 
     let tags = querySelectorsWithIframes("a.tag")
     
@@ -63,136 +86,45 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
         if (pill instanceof HTMLElement) updateTag(pill, plugin)
     }
 
-    
 
-    let dates = querySelectorsWithIframes(".metadata-input.mod-date")
-    for (let input of dates) {
-        if (input instanceof HTMLInputElement) {
-            updateDateInput(input, plugin)
-            input.onchange = () => {
-                if (input instanceof HTMLInputElement) updateDateInput(input, plugin)
-            }
-            input.onblur = () => {
-                if (input instanceof HTMLInputElement) updateDateInput(input, plugin)
-            }
-        }
-    }
 
-    let datetimes = querySelectorsWithIframes(".metadata-input.mod-datetime")
-    for (let input of datetimes) {
-        if (input instanceof HTMLInputElement) {
-            updateDateTimeInput(input, plugin)
-            input.onchange = () => {
-                if (input instanceof HTMLInputElement) updateDateTimeInput(input, plugin)
-            }
-            input.onblur = () => {
-                if (input instanceof HTMLInputElement) updateDateTimeInput(input, plugin)
-            }
-        }
+
+
+    // Also dispatch active editor (useful for canvas)
+    let editor = plugin.app.workspace.activeEditor?.editor
+    if (editor) {
+        // @ts-expect-error, not typed
+        const editorView = editor.cm as EditorView;
+        editorView.dispatch({
+            userEvent: "updatePillColors"
+        })
     }
 
     
-
     
-
-    let longtexts = querySelectorsWithIframes(".metadata-input-longtext")
-
-    for (let input of longtexts) {
-        if (input instanceof HTMLElement) {
-            updateLongtext(input, plugin);
-            input.onblur = () => {
-                if (input instanceof HTMLElement) updateLongtext(input, plugin);
-            }
-        }
-    }
+    updateTagPaneTagsAll(plugin)
+    updateSettingPills(plugin)
+    updateAllMetadataContainers(plugin)
 
 
 
-    let mdLinks = querySelectorsWithIframes(".metadata-property-value > .metadata-link")
 
-    for (let link of mdLinks) {
-        if (link instanceof HTMLElement) {
-            let parent = link.parentElement
-            if (parent instanceof HTMLElement) {
-                let clickEvent = () => {
-                    let longtext = parent!.querySelector(".metadata-input-longtext")
-                    if (longtext instanceof HTMLElement) {
-                        updateLongtext(longtext, plugin);
-                        longtext.onblur = () => {
-                            if (longtext instanceof HTMLElement) updateLongtext(longtext, plugin);
-                        }
-                    }
-                    parent!.removeEventListener('click', clickEvent)
-                }
-                parent.addEventListener("click", clickEvent)
-            }
-        }
-    }
-
-
-    let unknown = querySelectorsWithIframes(".metadata-property-value-item.mod-unknown")
-
-    for (let el of unknown) {
-        if (el instanceof HTMLElement) {
-            let property = el.parentElement?.parentElement
-            if (el.innerText == "null") {
-                property?.classList.add("is-empty")
-            } else {
-                property?.classList.remove("is-empty")
-            }
-        }
-        
-        
-    }
+    /*
 
 
 
-    let cardLongTexts = document.querySelectorAll(".bases-rendered-value[data-property-type='text']")
-    for (let el of cardLongTexts) {
-        if (el instanceof HTMLElement) {
-            updateCardLongtext(el, plugin);
-        }
-    }
-
-
-    
 
     plugin.app.workspace.iterateAllLeaves((leaf) => {
+
+        
         let view = leaf.view
 
+
+
+    
         //@ts-ignore
         let file = view.file
 
-        if (file instanceof TFile) {
-            let numbers = querySelectorsWithIframesForContainer("input.metadata-input-number", view.containerEl)
-            for (let input of numbers) {
-                if (input instanceof HTMLInputElement) {
-                    
-                    let num = input.closest(".metadata-property")
-                    let sourcePath = file.path
-                    if (num instanceof HTMLElement) {
-                        updateProgress(num, plugin, sourcePath)
-                        if (input.value === "") {
-                            num.classList.add("is-empty")
-                        } else {
-                            num.classList.remove("is-empty")
-                        }
-                        input.onchange = () => {
-                            if (num instanceof HTMLElement) {
-                                updateProgress(num, plugin, sourcePath)
-                                if (input instanceof HTMLInputElement && input.value === "") {
-                                    num.classList.add("is-empty")
-                                } else {
-                                    num.classList.remove("is-empty")
-                                }
-                            }
-                            updateAllMetadataContainers(plugin)
-                            
-                        }
-                    }
-                }
-            }
-        }
 
 
         if (view instanceof MarkdownView) {
@@ -229,8 +161,9 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
     
     updateTagPaneTagsAll(plugin)
     updateSettingPills(plugin)
-    
     updateAllMetadataContainers(plugin)
+
+    */
     
 }
 

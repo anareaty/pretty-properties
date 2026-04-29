@@ -1,13 +1,34 @@
 import { moment } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { hideMetadataContainerIfAllPropertiesHidden } from "./updateHiddenProperties";
-
+import { computeFormattedValue, getPropertyFormatObj, setOverlayContent } from "./updatePropertyFormattings";
+import { MarkdownRenderer } from "obsidian";
 
 export const updateDateInput = async (input: HTMLInputElement, plugin: PrettyPropertiesPlugin) => {
 	let value = input.value;
 	let parent = input.parentElement
-
 	let grandParent = parent?.parentElement
+
+	if (!grandParent) return
+
+
+
+
+	let propName = grandParent.getAttribute("data-property-key")
+	
+	if (!propName) {
+		propName = grandParent.getAttribute("data-property") || ""
+		propName = propName?.replace("note.", "")
+	}
+
+	if (!propName) return
+
+	let propertyFormatObj = getPropertyFormatObj(propName, plugin)
+
+
+
+
+
 
 	let customDateFormat = plugin.settings.customDateFormat
 
@@ -16,22 +37,60 @@ export const updateDateInput = async (input: HTMLInputElement, plugin: PrettyPro
 		let existingCustomDateElement = parent.querySelector(".custom-date")
 
 		if (plugin.settings.enableCustomDateFormat && 
-			customDateFormat && 
+			(customDateFormat || propertyFormatObj.format) && 
 			(!isBase || plugin.settings.enableCustomDateFormatInBases)) {
 
 				
-			let customDate = moment(value).format(customDateFormat);
+
+
+
+			let customDate = ""
+
+			if (propertyFormatObj.format) {
+				
+				customDate = computeFormattedValue(plugin, propName, propertyFormatObj.format, value)
+			} else if (customDateFormat) {
+				
+				customDate = moment(value).format(customDateFormat);
+			}
+
 			
+			
+
+
+
+
+
+
+
+
 			if (existingCustomDateElement instanceof HTMLElement &&
 				existingCustomDateElement.innerText != customDate && 
 				customDate != "Invalid date") {
-				existingCustomDateElement.textContent = customDate
+
+
+
+				//existingCustomDateElement.textContent = customDate
+				existingCustomDateElement.empty()
+
+
+				setOverlayContent(customDate, propertyFormatObj.textFormat, existingCustomDateElement, grandParent, plugin)
+
+
+
+				
+
+
+
 				parent.classList.add("has-custom-date")
 				
 			} else if (!existingCustomDateElement && customDate != "Invalid date") {
 				let customDateEl = document.createElement("span")
 				customDateEl.classList.add("custom-date")
-				customDateEl.append(customDate)
+
+
+				setOverlayContent(customDate, propertyFormatObj.textFormat, customDateEl, grandParent, plugin)
+
 				input.after(customDateEl)
 				parent.classList.add("has-custom-date")
 	
@@ -68,9 +127,6 @@ export const updateDateInput = async (input: HTMLInputElement, plugin: PrettyPro
 		}
 		
 	}
-
-
-	
 }
 
 

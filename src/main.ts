@@ -18,7 +18,6 @@ import {
 import { i18n } from "./localization/localization";
 import { PPSettingTab, PPPluginSettings, DEFAULT_SETTINGS } from "./settings/settings";
 import { registerCommands } from "./utils/registerCommands";
-import { updateTaskNotesTaskCount, updateTaskNotesTaskCountOnCacheChanged } from "./utils/taskCount/taskNotesTaskCount";
 import { updateAllProperties, updateEmptyProperties, updateImagesOnCacheChanged } from "./utils/updates/updateElements";
 import { getPropertyValue } from "./utils/propertyUtils";
 import { registerTagFixExtension } from "./extensions/tagFixExtension";
@@ -33,18 +32,19 @@ import { patchBaseCards } from "./patches/patchBaseCards";
 import { updateAllProgressElsOnMaxChange } from "./utils/updates/updateProgress";
 import { patchBaseList } from "./patches/patchBaseList";
 import { patchBaseTable } from "./patches/patchBaseTable";
-import { updateTaskCountOnCacheChanged } from "./utils/taskCount/taskCount";
 import { unPatchWidgets } from "./patches/removePatches";
 import { patchHoverPopover } from "./patches/patchHoverPopover";
 import { API, createApi } from "./utils/createApi";
-import {PropertyFormatter} from "./utils/propertyFormatter";
+import {PropertyFormatter, registerPropertyFormatter} from "./utils/propertyFormatter";
 import { patchMenu } from "./patches/patchMenu";
+import { reloadAllTabs } from "./utils/reload";
 
 export default class PrettyPropertiesPlugin extends Plugin {
 	settings: PPPluginSettings;
 	patches: Record<string, any>;
 	api: API;
 	formatter: PropertyFormatter;
+	propertyListeners: any[]
 
 
 	async onload() {
@@ -57,8 +57,9 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		createApi(this)
 		i18n.setLocale();
 		this.patches = {}
+		this.propertyListeners = []
+		registerPropertyFormatter(this)
 
-		this.formatter = new PropertyFormatter();
 
 		patchPropertyWidgets(this)
 		patchTagView(this)
@@ -69,6 +70,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		patchBaseList(this)
 		patchMenu(this)
 
+
+		
 		updateRelativeDateColors(this)
 		updateBannerStyles(this);
 		updateIconStyles(this);
@@ -82,14 +85,17 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		updateHidePropTitle(this)
 		updateHideMetadataAddButton(this)
 		updateBaseTagsStyle(this)
+		
 		updateTheme(this)
 
 		
 		
 
+		
 		this.app.workspace.onLayoutReady(async() => {
 			updateAllProperties(this)
 		})
+		
 		
 		registerCommands(this)
 		
@@ -100,8 +106,6 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			this.app.metadataCache.on("changed", async (file, data, cache) => {
 				updateImagesOnCacheChanged(file, cache, this)
 				updateAllProgressElsOnMaxChange(file, cache, this)
-				updateTaskCountOnCacheChanged(file, cache, this)
-				updateTaskNotesTaskCountOnCacheChanged(file, cache, this)
 			})
 		);
 
@@ -113,13 +117,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			})
 		);
 
-		this.registerEvent(
-			this.app.workspace.on("file-open", async (file) => {
-				if (file && this.settings.enableTaskNotesCount && this.settings.autoTasksCount) {
-					updateTaskNotesTaskCount(this, file)
-				}
-			})
-		);
+
 
 		const registerWindowEvents = (win: Window) => {
 
@@ -196,12 +194,22 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		this.addSettingTab(new PPSettingTab(this.app, this));
 
 
+
+		// We need to reload all tabs to update existing properties
+		this.app.workspace.onLayoutReady(() => {
+			//reloadAllTabs(this)
+		})
+		
+
 	}
 
 	onunload() {
 		unPatchWidgets(this)
-		removeAll()
-		this.formatter.clearCache();
+		removeAll(this)
+		if (this.formatter) {
+			this.formatter.clearCache();
+		}
+		
 	}
 
 

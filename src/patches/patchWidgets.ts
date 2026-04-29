@@ -6,6 +6,7 @@ import { updateProgress } from "src/utils/updates/updateProgress"
 import { around, dedupe } from "monkey-around";
 import { updateAllMetadataContainers } from "src/utils/updates/updateHiddenProperties";
 import {applyPropertyFormatting} from "./patchPropertyValues";
+import { getPropertyFormatObj, updatePropertyFormatting } from "src/utils/updates/updatePropertyFormattings";
 
 
 const updateWidgets = async (type: string, rendered: any, args: any[], plugin: PrettyPropertiesPlugin) => {
@@ -22,7 +23,14 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
       value = value.value;
     }
 
-    applyPropertyFormatting(el, propName, plugin, type, sourcePath, value);
+    //applyPropertyFormatting(el, propName, plugin, type, sourcePath, value);
+    
+
+
+
+    
+
+    
 
     if (type == "multitext" || type == "aliases") {
       let elements = rendered?.multiselect.elements 
@@ -53,6 +61,8 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
     }
 
     if (type == "date") {
+      let parent = el.parentElement
+      parent.setAttribute("data-source-path", sourcePath)
       let input = el.querySelector("input");
       updateDateInput(input, plugin)
       input.onchange = () => {
@@ -61,9 +71,14 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
       input.onblur = () => {
         updateDateInput(input, plugin)
       }
+
+      
+
     }
 
     if (type == "datetime") {
+      let parent = el.parentElement
+      parent.setAttribute("data-source-path", sourcePath)
       let input = el.querySelector("input");
       updateDateTimeInput(input, plugin)
       input.onchange = () => {
@@ -78,7 +93,18 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
       let parent = el.parentElement
       parent.setAttribute("data-source-path", sourcePath)
       updateProgress(parent, plugin, sourcePath)
+
+
+      
+
+
       let input = el.querySelector("input");
+
+
+      let propertyFormatObj = getPropertyFormatObj(propName, plugin)
+      updatePropertyFormatting(parent, propName, input.value, type, propertyFormatObj.format, propertyFormatObj.textFormat, plugin)
+
+
       if (input.value === "") {
         parent.classList.add("is-empty")
       } else {
@@ -101,11 +127,12 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
       let link = el.querySelector(".metadata-link");
 
       let parent = el.parentElement
-      
+      parent.setAttribute("data-source-path", sourcePath)
+
       if (longText) {
-        updateLongtext(longText, plugin);
+        updateLongtext(longText, plugin, propName);
         longText.onblur = () => {
-          updateLongtext(longText, plugin);
+          updateLongtext(longText, plugin, propName);
           let link = el.querySelector(".metadata-link");
           if (link) {
             parent.classList.remove("is-empty")
@@ -117,7 +144,7 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
         updateAllMetadataContainers(plugin)
       }
 
-      parent.setAttribute("data-source-path", sourcePath)
+      
 
       if (propName == plugin.settings.bannerProperty) {
         el.classList.add("banner-property-value")

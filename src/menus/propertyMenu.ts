@@ -94,6 +94,56 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
             propertyType = propertyTypeObject.widget || propertyTypeObject.type;
         }
 
+        if (propertyType == "text" || 
+            propertyType == "number" || 
+            propertyType == "date" || 
+            propertyType == "datetime") {
+
+            let propertyFormatObj = plugin.settings.propertyFormats.find(p => p.property == propName)
+
+            
+
+            if (propertyFormatObj && propertyFormatObj.textFormat == "markdown") {
+                menu.addItem((item: MenuItem) =>
+                    item
+                    .setTitle(i18n.t("DO_NOT_RENDER_MARKDOWN"))
+                    .setIcon("code-2")
+                    .setSection("pretty-properties")
+                    .onClick(() => {
+                        propertyFormatObj.textFormat = "raw"
+                        plugin.saveSettings();
+                        updateAllProperties(plugin);
+                    })  
+                );
+            } else if (propertyType == "text" || (propertyFormatObj && propertyFormatObj.format)) {
+                menu.addItem((item: MenuItem) =>
+                    item
+                    .setTitle(i18n.t("RENDER_MARKDOWN"))
+                    .setIcon("book-open")
+                    .setSection("pretty-properties")
+                    .onClick(() => {
+                        if (propertyFormatObj) {
+                            propertyFormatObj.textFormat = "markdown"
+                        } else {
+                            plugin.settings.propertyFormats.push({
+                                property: propName,
+                                format: "",
+                                textFormat: "markdown"
+                            });
+                        }
+
+                        plugin.saveSettings();
+                        updateAllProperties(plugin);
+                    })  
+                );
+            }
+
+        }
+
+
+
+
+
         if (
             propertyType == "number" &&
             !plugin.settings.progressProperties[propName]

@@ -1,5 +1,5 @@
 import PrettyPropertiesPlugin from "src/main";
-import { TFile, MarkdownView, Editor } from "obsidian";
+import { TFile, MarkdownView, Editor, MarkdownFileInfo } from "obsidian";
 import { i18n } from "src/localization/localization";
 import { removeProperty } from "./propertyUtils";
 import { selectCoverImage } from "./imageUtils";
@@ -9,8 +9,6 @@ import { selectCoverShape } from "./imageUtils";
 import { FileImageSuggestModal } from "src/modals/fileImageSuggestModal";
 import { ImageSuggestModal } from "src/modals/imageSuggestModal";
 import { IconSuggestModal } from "src/modals/iconSuggestModal";
-import { updateTasksCount } from "./taskCount/taskCount";
-import { updateTaskNotesTaskCount } from "./taskCount/taskNotesTaskCount";
 import { LocalImageSuggestModal } from "src/modals/localImageSuggestModal";
 import { EmojiSuggestModal } from "src/modals/emojiSuggestModal";
 
@@ -204,37 +202,7 @@ export function registerCommands(plugin: PrettyPropertiesPlugin) {
 
 
 
-    plugin.addCommand({
-        id: "update-tasks-count",
-        name: i18n.t("UPDATE_TASK_COUNT"),
-        checkCallback: (checking: boolean) => {
-          if (plugin.settings.enableTasksCount || plugin.settings.enableTaskNotesCount) {
-            if (!checking) {
-              let leaves = plugin.app.workspace.getLeavesOfType("markdown");
-              for (let leaf of leaves) {
-                if (leaf.view instanceof MarkdownView) {
-                  let view = leaf.view
-                  let file = view.file
-                  if (file instanceof TFile) {
-                    let cache = plugin.app.metadataCache.getFileCache(file)
-    
-                    if (plugin.settings.enableTaskNotesCount) {
-                        updateTaskNotesTaskCount(plugin, null, view);
-                    }
-        
-                    if (plugin.settings.enableTasksCount && cache) {
-                        updateTasksCount(view, cache, plugin);
-                    }
-                  }
-                  
-                }
-              }
-            }
-            return true;
-          }
-          return false;
-        }
-      });
+
 
 
 
@@ -251,7 +219,7 @@ export function registerCommands(plugin: PrettyPropertiesPlugin) {
         id: "insert-image",
         name: i18n.t("INSERT_IMAGE"),
 
-        editorCallback: (editor: Editor, view: MarkdownView) => {
+        editorCallback: (editor: Editor, view: MarkdownView | MarkdownFileInfo) => {
             let files = plugin.app.vault.getFiles()
             let formats = [
                 "avif",
@@ -292,7 +260,7 @@ export function registerCommands(plugin: PrettyPropertiesPlugin) {
     plugin.addCommand({
         id: "insert-emoji",
         name: i18n.t("INSERT_EMOJI"),
-        editorCallback: (editor: Editor, view: MarkdownView) => {
+        editorCallback: (editor: Editor, view: MarkdownView | MarkdownFileInfo) => {
             new EmojiSuggestModal(plugin.app, plugin, editor).open()
         },
     })

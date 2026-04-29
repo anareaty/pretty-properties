@@ -30,15 +30,7 @@ export class CoverPositionSuggestModal extends SuggestModal<string> {
     onChooseSuggestion(key: string) {
         if (key && this.file instanceof TFile) {
             this.app.fileManager.processFrontMatter(this.file, (fm) => {
-                let cssclasses = fm.cssclasses || [];
-                cssclasses = cssclasses.filter(
-                    (c: string) =>
-                        !Object.keys(this.positions).find(
-                            (s) => c == "cover-" + s
-                        )
-                );
-                cssclasses.push("cover-" + key);
-                fm.cssclasses = cssclasses;
+                fm.cover_position = key
             });
         }
     }

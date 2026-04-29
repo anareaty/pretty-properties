@@ -4,6 +4,7 @@ import { createColorButton } from "src/menus/selectColorMenus";
 import { finishRenderMath, loadMathJax, renderMath } from "obsidian"
 import { hideMetadataContainerIfAllPropertiesHidden } from "./updateHiddenProperties";
 import { querySelectorsWithIframesForContainer } from "../querySelectorsHelper";
+import { getPropertyFormatObj, updatePropertyFormatting } from "./updatePropertyFormattings";
 
 
 export const getTextLightness = (color: any) => {
@@ -58,9 +59,11 @@ export const generateInlineStyles = (text: string, type: string, plugin: PrettyP
 				"--pp-color-rgb": "var(--color-" + color + "-rgb)"
 			  };
 			  colorClass = "theme-color";
+			} else if (color == "accent") {
+			  colorClass = "accent-color";
 			} else if (color == "none") {
 			  colorClass = "transparent-color";
-			} else {
+			} else if (color != "default") {
 			  let textLightness = getTextLightness(color);
 			  let hslString = color.h + " ," + color.s + "% ," + color.l + "%";
 			  let hslStringHover = color.h + " ," + color.s + "% ," + (color.l - 5) + "%";
@@ -80,6 +83,8 @@ export const generateInlineStyles = (text: string, type: string, plugin: PrettyP
 			  styleProps["--pp-text-rgb"] = "var(--color-" + textColor + "-rgb)"
 			  textColorClass = "theme-text-color";
 			  
+			} else if (textColor == "accent") {
+			  textColorClass = "accent-text-color";
 			} else if (textColor == "none") {
 			  textColorClass = "none-text-color";
 			} else if (textColor != "default") {
@@ -198,8 +203,13 @@ const updateColorButton = async(parent: HTMLElement, value:string, isBase: boole
 }
 
 
-export const updateLongtext = async (pill: HTMLElement, plugin: PrettyPropertiesPlugin) => {
+export const updateLongtext = async (pill: HTMLElement, plugin: PrettyPropertiesPlugin, propName?: string) => {
+
+	
+
+
 	let parent = pill.parentElement
+	if (!parent) return
 	let grandParent = parent?.parentElement
 	let text = pill.innerText
 
@@ -208,8 +218,9 @@ export const updateLongtext = async (pill: HTMLElement, plugin: PrettyProperties
 	} else {
 		grandParent?.classList.remove("is-empty")
 	}
+	
 
-	if (plugin.settings.enableColoredProperties || plugin.settings.enableMath /* || plugin.settings.enableMarkdown */) {
+	if (plugin.settings.enableColoredProperties || plugin.settings.enableMath) {
 		
 		let isBase = parent?.classList.contains("bases-table-cell") 
 
@@ -219,30 +230,35 @@ export const updateLongtext = async (pill: HTMLElement, plugin: PrettyProperties
 		let text = pill.innerText
 
 		let propEl = parent?.parentElement
+		let propName = propEl?.getAttribute("data-property-key") || ""
+
+		if (isBase) {
+			propName = propEl?.getAttribute("data-property") || ""
+			propName = propName.replace(/^note./, "")
+		}
+
+		let propertyFormatObj = getPropertyFormatObj(propName, plugin)
+
+
+
 		let existingMathWrapper = propEl?.querySelector(".math-wrapper")
-		//let existingMdWrapper = propEl?.querySelector(".md-wrapper")
 		let match: any
 
 
 		
 
 		if (plugin.settings.enableMath) {
-
-			
-
 			//@ts-ignore
 			if (!window.MathJax) {
 				await loadMathJax()
 			}
-
-
 			match = text?.match(/^(\$\$)(.+)(\$\$)$/)
 			if (!match) {
 				match = text?.match(/^(\$)(.+)(\$)$/)
 			}
 		}
 
-		if (match) {
+		if (match && !propertyFormatObj.format) {
 			//render math
 
 			let existingValue = existingMathWrapper?.getAttribute("data-math") || ""
@@ -277,57 +293,13 @@ export const updateLongtext = async (pill: HTMLElement, plugin: PrettyProperties
 				}
             }
 
-		
-		/*
 
-		// Wikilinks don't work if we render markdown this way
-		
-		} else if (plugin.settings.enableMarkdown) {
-
-			let existingMdValue = existingMdWrapper?.getAttribute("data-md") || ""
-
-			//if (existingMdValue == text) { return }
-
-			existingMdWrapper?.remove()
-
-			if (!text) return
-			
-			propEl?.classList.add("has-md")
-			let mdWrapper = document.createElement("div")
-			mdWrapper.classList.add("md-wrapper")
-			mdWrapper.setAttribute("data-md", text)
-			MarkdownRenderer.render(plugin.app, text, mdWrapper, "", plugin)
-
-			if (isBase) {
-				propEl?.prepend(mdWrapper)
-				mdWrapper.onclick = () => {
-					pill.focus()
-				}
-			} else {
-				let mdKeyEl = propEl?.querySelector(".metadata-property-key");
-				mdKeyEl?.after(mdWrapper);
-			}
-
-
-
-			if (plugin.settings.enableColoredProperties) {
-				if (text) {
-					text = text.slice(0, 200).trim()
-				}
-				setPillStyles(mdWrapper, "data-property-longtext-value", text, "longtext", plugin)				
-				if (parent) {
-	
-					updateColorButton(parent, text, isBase, plugin)
-				}
-				
-			}
-	*/
 		} else {
 			
 			existingMathWrapper?.remove()
-			//existingMdWrapper?.remove()
+			
 			propEl?.classList.remove("has-math")
-            //propEl?.classList.remove("has-md")
+            
 
 			if (plugin.settings.enableColoredProperties) {
 				if (text) {
@@ -339,8 +311,17 @@ export const updateLongtext = async (pill: HTMLElement, plugin: PrettyProperties
 				}
 				
 			}
-
 		}
+
+		
+
+		if (grandParent) {
+			updatePropertyFormatting(grandParent, propName, text, "text", propertyFormatObj.format, propertyFormatObj.textFormat, plugin)
+		}
+		
+
+
+
 	}
 
 

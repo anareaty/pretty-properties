@@ -4,12 +4,13 @@ import {
 	MarkdownRenderer,
 	loadPdfJs,
 	normalizePath,
-	Component, setIcon
+	Component, setIcon,
+	Menu
 } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { getNestedProperty } from "../propertyUtils";
 import { hookUpLinks } from "../internalLinksUtils";
-import {createCoverMenu} from "../../menus/coverMenu";
+import {handleCoverMenu} from "../../menus/coverMenu";
 
 enum CoverType {
 	Pdf,
@@ -20,6 +21,7 @@ enum CoverType {
 
 const pdfRegex = /^(\!)?(?:\[\[(.+\.pdf)\]\]|\[([^\]]*)\]\((.+\.pdf)\))$/;
 const urlRegex = /^(?:http[s]?:\/\/.)?(?:www\.)?[-a-zA-Z0-9@%._\+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)$/i;
+const localFileRegex = /^(file:\/\/\/\/.)[-a-zA-Z0-9@%._\+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)$/i;
 const wikiLinkRegex = /^\[\[(.+?)\]\]$/;
 
 export const renderCover = async (
@@ -29,6 +31,8 @@ export const renderCover = async (
 	sourcePath: string,
 	plugin: PrettyPropertiesPlugin
 ) => {
+
+	
 	const mdContainer = contentEl.querySelector(".metadata-container");
 	if (!(mdContainer instanceof HTMLElement))
 		return;
@@ -68,6 +72,7 @@ export const renderCover = async (
 				let renderValue = coverVal;
 
 				if (coverType === CoverType.Url)
+					coverVal = coverVal.replace(/(https:\/\/www\.youtube\.com\/watch\?v\=)(.*)/, "https://img.youtube.com/vi/$2/maxresdefault.jpg")
 					renderValue = `![](${coverVal})`;
 				if (coverType === CoverType.Wikilink)
 					renderValue = `!${coverVal}`;
@@ -94,8 +99,23 @@ export const renderCover = async (
 
 			applyCoverCssClasses(frontmatter, coverDiv, plugin);
 
-			for (const coverItem of coverItems)
+			for (const coverItem of coverItems) {
 				coverDiv.appendChild(coverItem);
+
+				if (coverItem.classList.contains("pp-cover-img") || 
+				coverItem.classList.contains("pp-cover-svg")) {
+					coverDiv.classList.add("mode-image")
+				} else if (coverItem.classList.contains("pp-pdf-cover-container")) {
+					coverDiv.classList.add("mode-pdf")
+				} else if (coverItem.classList.contains("pp-cover-markdown")) {
+					coverDiv.classList.add("mode-markdown")
+				} else if (coverItem.classList.contains("pp-cover-has-iframe")) {
+					coverDiv.classList.add("mode-iframe")
+				}
+
+				
+			}
+				
 		}
 	}
 
@@ -122,12 +142,14 @@ function styleCoverItem(
 	const img = coverTemp.querySelector("img");
 	if (img instanceof HTMLImageElement) {
 		img.classList.add("pp-cover-image");
+		img.classList.add("pp-cover-img");
 		return img;
 	}
 
 	const svg = coverTemp.querySelector("svg");
 	if (svg instanceof SVGElement) {
 		svg.classList.add("pp-cover-image");
+		svg.classList.add("pp-cover-svg");
 		return svg as unknown as HTMLElement;
 	}
 
@@ -139,6 +161,7 @@ function styleCoverItem(
 	}
 
 	coverTemp.classList.add("pp-cover-image");
+	coverTemp.classList.add("pp-cover-markdown");
 	return coverTemp;
 }
 
@@ -147,7 +170,7 @@ function getCoverType(coverVal: string): CoverType{
 	if(pdfRegex.test(coverVal))
 		return CoverType.Pdf;
 
-	if (urlRegex.test(coverVal))
+	if (urlRegex.test(coverVal) || localFileRegex.test(coverVal))
 		return CoverType.Url;
 
 	if (wikiLinkRegex.test(coverVal))
@@ -161,37 +184,19 @@ function applyCoverCssClasses(
 	coverDiv: HTMLElement,
 	plugin: PrettyPropertiesPlugin
 ) {
-	const cssVal = frontmatter?.cssclasses;
+	const coverShapeVal = frontmatter?.cover_shape
 
-	if (cssVal && (cssVal.includes("cover-vertical") || cssVal.includes("cover-vertical-cover")))
-		coverDiv.classList.add("vertical-cover");
-	else if (cssVal && cssVal.includes("cover-vertical-contain"))
-		coverDiv.classList.add("vertical-contain");
-	else if (cssVal && cssVal.includes("cover-horizontal-contain"))
-		coverDiv.classList.add("horizontal-contain");
-	else if (cssVal && (cssVal.includes("cover-horizontal") || cssVal.includes("cover-horizontal-cover")))
-		coverDiv.classList.add("horizontal-cover");
-	else if (cssVal && cssVal.includes("cover-square"))
-		coverDiv.classList.add("square");
-	else if (cssVal && cssVal.includes("cover-circle"))
-		coverDiv.classList.add("circle");
-	else if (cssVal && cssVal.includes("cover-initial-width-2"))
-		coverDiv.classList.add("initial-2");
-	else if (cssVal && cssVal.includes("cover-initial-width-3"))
-		coverDiv.classList.add("initial-3");
+	if (coverShapeVal)
+		coverDiv.classList.add(coverShapeVal);
 	else
 		coverDiv.classList.add("initial");
 
-	if (cssVal && cssVal.includes("cover-top"))
-		coverDiv.classList.add("top");
-	else if (cssVal && cssVal.includes("cover-bottom"))
-		coverDiv.classList.add("bottom");
-	else if (cssVal && cssVal.includes("cover-right"))
-		coverDiv.classList.add("right");
-	else if (cssVal && cssVal.includes("cover-left"))
-		coverDiv.classList.add("left");
+	let coverPositionVal = frontmatter?.cover_position
+
+	if (coverPositionVal)
+		coverDiv.classList.add(coverPositionVal);
 	else
-		coverDiv.classList.add(plugin.settings.coverPosition);
+		coverDiv.classList.add(plugin.settings.coverPosition)
 }
 
 function extractPdfPath(valueStr: string): string | null {
@@ -266,10 +271,12 @@ function addCoverMenuButton(
 
 	setIcon(button, "code-2");
 
-	const openMenu = (e: MouseEvent) => {
+	const openMenu = (e: PointerEvent) => {
 		e.preventDefault();
 		e.stopPropagation();
-		createCoverMenu(e, plugin);
+		let menu = new Menu();
+		//handleCoverMenu(menu, plugin);
+		menu.showAtMouseEvent(e)
 	};
 
 	component.registerDomEvent(button, "contextmenu", openMenu);
@@ -291,6 +298,13 @@ export const updateCoverForView = async (
     let cache = plugin.app.metadataCache.getFileCache(file);
     let frontmatter = cache?.frontmatter;
     let contentEl = view.contentEl;
+
+	if (!contentEl) {
+		contentEl = view.containerEl
+	}
+
+
+
     let sourcePath = view.file?.path || ""
     if (frontmatter) {
       renderCover(view, contentEl, frontmatter, sourcePath, plugin)

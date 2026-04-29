@@ -1,6 +1,6 @@
 # Pretty properties
 
-This plugin makes metadata block on the top of the file more visually appealing with images and colors.
+This plugin makes metadata block on the top of the note more visually appealing with images, colors and custom visual elements.
 
 ![book note](images/image-1.png)
 
@@ -112,15 +112,6 @@ Add simple progress bar to any number property. By default maximum value of prog
 
 ![progress bar](images/image-6.png)
 
-### Sync tasks count to properties
-
-If you set special properties for tasks, completed tasks and uncompleted tasks and add this properties to your note, the plugin will count existing tasks in the active note and periodically save the count number to the properties. It is useful if you want to show task count in Bases or see task progress inside your note.
-
-  
-
-### TaskNotes integration
-
-Task count can also work with the task created by TaskNotes plugin. You can count both inline tasks and project tasks. You will have to set up specific properties for this in the settings.
 
   
 
@@ -241,6 +232,3 @@ Untill this plugin is made availiable in the official plugins menu it can be ins
 6.  Make sure that "Enable after installing the plugin" is checked.
 7.  Click "Add Plugin" button.
 
-## Acknowledgments
-
-This plugin uses a bit of code from the [Iconic plugin](https://github.com/gfxholo/iconic) to be able to add new items to menus.

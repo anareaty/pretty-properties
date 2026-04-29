@@ -1,7 +1,7 @@
 import PrettyPropertiesPlugin from "src/main"
 import { querySelectorsWithIframes } from "./querySelectorsHelper"
 
-export const removeAll = async() => {
+export const removeAll = async(plugin: PrettyPropertiesPlugin) => {
     let formulaProps = querySelectorsWithIframes(".has-math")
     for (let formulaProp of formulaProps) {
         let formula = formulaProp.querySelector(".math-wrapper")
@@ -39,6 +39,19 @@ export const removeAll = async() => {
     let covers = document.querySelectorAll(".metadata-side-image")
     for (let cover of covers) {
         cover.remove()
+    }
+
+    let formatOverlays = document.querySelectorAll(".pp-formatted-value-overlay")
+    for (let overlay of formatOverlays) {
+        overlay.remove()
+    }
+
+    let propertyValues = document.querySelectorAll(".metadata-property-value")
+    for (let el of propertyValues) {
+        for (let listener of plugin.propertyListeners) {
+            el.removeEventListener("focusout", listener)
+        }
+        
     }
 }
 

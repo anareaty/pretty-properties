@@ -31,6 +31,9 @@ const pendingLiveRefreshByContainer = new WeakMap<HTMLElement, number>();
 const LIVE_VALUE_MARKER = '<span data-pp-live-property-value></span>';
 
 export function updateAllPropertyFormats(plugin: PrettyPropertiesPlugin): void {
+
+
+	/*
 	requestAnimationFrame(() => {
 		const markdownLeaves = plugin.app.workspace.getLeavesOfType("markdown");
 
@@ -69,6 +72,8 @@ export function updateAllPropertyFormats(plugin: PrettyPropertiesPlugin): void {
 			}
 		}
 	});
+
+	*/
 }
 
 export function applyPropertyFormatting(
@@ -98,6 +103,8 @@ export function applyPropertyFormatting(
 	containerElement.classList.add(FORMATTED_WRAPPER_CLASS);
 
 	const overlayElement = ensureOverlayElement(containerElement);
+
+
 	const renderMarkdown = createMarkdownRenderer(plugin, overlayElement, sourcePath);
 
 	bindContainerReapplyOnce(containerElement, propertyName, plugin, propertyInputType, sourcePath);
@@ -180,7 +187,7 @@ function bindContainerReapplyOnce(
 
 	dataset[BOUND_CONTAINER_KEY] = "1";
 
-	containerElement.addEventListener("focusout", () => {
+	let reapply = () => {
 		if (pendingReapplyByContainer.has(containerElement))
 			return;
 
@@ -190,7 +197,11 @@ function bindContainerReapplyOnce(
 			pendingReapplyByContainer.delete(containerElement);
 			applyPropertyFormatting(containerElement, propertyName, plugin, propertyInputType, sourcePath);
 		});
-	});
+	}
+
+	plugin.propertyListeners.push(reapply)
+
+	containerElement.addEventListener("focusout", reapply);
 }
 
 function bindLiveOverlayRefreshOnce(

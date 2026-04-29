@@ -5,7 +5,6 @@ import PrettyPropertiesPlugin from "../main";
 import { showBannerSettings } from './bannerSettings';
 import { showIconSettings } from './iconSettings';
 import { showCoverSettings } from './coversettings';
-import { showTasksSettings } from './tasksSettings';
 import { showPropSettings } from './propSettings';
 import { showDatesSettings } from './datesSettings';
 import { showOtherSettings } from './otherSettings';
@@ -41,11 +40,6 @@ export interface PPPluginSettings {
     coverCircleWidth: number;
 	coverMaxWidthPopover: number;
     progressProperties: any;
-    allTasksCount: string;
-    completedTasksCount: string;
-    uncompletedTasksCount: string;
-    completedTasksStatuses: string[];
-    uncompletedTasksStatuses: string[];
 	bannersFolder: string;
 	coversFolder: string;
 	iconsFolder: string;
@@ -67,7 +61,6 @@ export interface PPPluginSettings {
 	bannerPositionProperty: string;
 	addPillPadding: string;
 	addBaseTagColor: boolean;
-	enableTasksCount: boolean;
 	enableColorButtonInBases:boolean;
 	customDateFormat: string;
   	customDateTimeFormat: string;
@@ -75,20 +68,7 @@ export interface PPPluginSettings {
 	enableCustomDateFormatInBases: boolean;
 	enableRelativeDateColors: boolean;
 	settingsTab: string;
-	enableTaskNotesCount: boolean;
-	allTNTasksCount: string;
-    completedTNTasksCount: string;
-    uncompletedTNTasksCount: string;
-	allTNProjectTasksCount: string;
-    completedTNProjectTasksCount: string;
-    uncompletedTNProjectTasksCount: string;
-	allTNInlineTasksCount: string;
-    completedTNInlineTasksCount: string;
-    uncompletedTNInlineTasksCount: string;
-	allTNAndCheckboxTasksCount: string;
-    completedTNAndCheckboxTasksCount: string;
-    uncompletedTNAndCheckboxTasksCount: string;
-	propertyFormats: Array<{ property: string; format: string }>;
+	propertyFormats: Array<{ property: string; format: string; textFormat: string }>;
 	enableColoredProperties: boolean;
 	enableColoredInlineTags: boolean;
 	nonLatinTagsSupport: boolean;
@@ -98,7 +78,6 @@ export interface PPPluginSettings {
 	iconSizeMobile: number;
 	iconSizePopover: number;
 	hidePropertiesInPropTab: boolean;
-	autoTasksCount: boolean
 	enableColoredTagsInTagPane: boolean;
 	mathProperties: string[];
 	enableMath: boolean;
@@ -154,11 +133,6 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
     coverCircleWidth: 250,
 	coverMaxWidthPopover: 150,
     progressProperties: {},
-    allTasksCount: "tasks",
-    completedTasksCount: "tasks_completed",
-    uncompletedTasksCount: "tasks_uncompleted",
-    completedTasksStatuses: ["x"],
-    uncompletedTasksStatuses: [" "],
 	bannersFolder: "",
 	coversFolder: "",
 	showColorSettings: false,
@@ -180,7 +154,6 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	bannerPositionProperty: "banner_position",
 	addPillPadding: "all",
 	addBaseTagColor: true,
-	enableTasksCount: true,
 	enableColorButtonInBases: false,
 	customDateFormat: "",
     customDateTimeFormat: "",
@@ -188,19 +161,6 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	enableCustomDateFormatInBases: false,
 	enableRelativeDateColors: false,
 	settingsTab: "BANNERS",
-	enableTaskNotesCount: false,
-	allTNTasksCount: "tn_tasks",
-    completedTNTasksCount: "tn_tasks_completed",
-    uncompletedTNTasksCount: "tn_tasks_uncompleted",
-	allTNProjectTasksCount: "tn_project_tasks",
-    completedTNProjectTasksCount: "tn_project_tasks_completed",
-    uncompletedTNProjectTasksCount: "tn_project_tasks_uncompleted",
-	allTNInlineTasksCount: "tn_inline_tasks",
-    completedTNInlineTasksCount: "tn_inline_tasks_completed",
-    uncompletedTNInlineTasksCount: "tn_inline_tasks_uncompleted",
-	allTNAndCheckboxTasksCount: "tn_and_checkbox_tasks",
-    completedTNAndCheckboxTasksCount: "tn_and_checkbox_tasks_completed",
-    uncompletedTNAndCheckboxTasksCount: "tn_and_checkbox_tasks_uncompleted",
 	propertyFormats: [],
 	enableColoredProperties: true,
 	enableColoredInlineTags: false,
@@ -212,7 +172,6 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	iconSizeMobile: 70,
 	iconSizePopover: 50,
 	hidePropertiesInPropTab: false,
-	autoTasksCount: true,
 	enableColoredTagsInTagPane: false,
 	mathProperties: [],
 	enableMath: false,
@@ -263,7 +222,7 @@ export class PPSettingTab extends PluginSettingTab {
 		const {containerEl} = this;
 		containerEl.empty();
 
-		let tabNames = ["BANNERS", "ICONS", "COVERS", "TASKS", "PROPERTY_SETTINGS", "DATES", "OTHER"]
+		let tabNames = ["BANNERS", "ICONS", "COVERS", "PROPERTY_SETTINGS", "DATES", "OTHER"]
 		let tabsEl = containerEl.createEl("div", {cls: "pp-settings-tabs"})
 		for (let tabName of tabNames) {
 			let button = tabsEl.createEl("button", {cls: "pp-settings-tab"})
@@ -290,9 +249,6 @@ export class PPSettingTab extends PluginSettingTab {
 			showCoverSettings(this)
 		}
 
-		else if (this.plugin.settings.settingsTab == "TASKS") {
-			showTasksSettings(this)
-		}
 
 		else if (this.plugin.settings.settingsTab == "PROPERTY_SETTINGS") {
 			showPropSettings(this)
