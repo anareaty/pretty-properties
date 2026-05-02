@@ -29,20 +29,7 @@ export const showColoredTagsSettings = (settingTab: PPSettingTab) => {
         setPillStyles(pillEl, "data-tag-value", property, "tag", plugin)
         pillEl.createEl("div", {text: property, cls: "multi-select-pill-content"})
 
-        propertyColorSetting.addText(text => {
-            text.setValue(property)
-            let inputEl = text.inputEl
-            inputEl.onblur = () => {
-                let value = inputEl.value
-                if (value && !plugin.settings.tagColors[value]) {
-                    plugin.settings.tagColors[value] = plugin.settings.tagColors[property]
-                    delete plugin.settings.tagColors[property]
-                    plugin.saveSettings()
-                    updateAllProperties(plugin)
-                    settingTab.display()
-                }
-            }
-        })
+        propertyColorSetting
         .addButton((btn) => {
             btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
                 let menu = new Menu();

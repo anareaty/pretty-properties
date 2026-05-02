@@ -40,41 +40,74 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
                 await plugin.saveSettings();
             }));
 
-		new Setting(containerEl)
+
+        
+
+
+
+        let coverSettingsWrapper = containerEl.createEl("div")
+
+        coverSettingsWrapper.setCssProps({
+            border: "1px solid var(--text-accent)",
+            "border-radius": "4px"
+        })
+
+        new Setting(coverSettingsWrapper)
+        .setName(i18n.t("COVER_PROPERTIES"))
+        .setHeading()
+
+        let coverSettingsEl = coverSettingsWrapper.createEl("div")
+
+
+
+
+
+
+
+        
+        let newProperty = ""
+		new Setting(coverSettingsWrapper)
 			.setName(i18n.t("ADD_COVER_PROPERTY"))
+
+
+            
+            .addSearch((search) => {
+                search.setValue("");
+                search.setPlaceholder(i18n.t("PROPERTY_SEARCH_PLACEHOLDER"));
+
+                const persist = async (value: string) => {
+                    newProperty = value;
+                };
+                search.onChange(async (value) => {
+                    await persist(value);
+                });
+
+                const suggester = new PropertyNameSuggest(plugin.app, search.inputEl, ["text"]);
+                suggester.onSelect(async (value) => {
+                    await persist(value);
+                    suggester.setValue(value);
+                    suggester.close();
+                });
+            })
+
+            
 			.addButton((button) =>
 				button.setIcon("plus").onClick(async () => {
-					if (plugin.settings.coverProperties.find((c) => c.property === "") === undefined) {
-						plugin.settings.coverProperties.push({ property: "", format: "" });
-						await plugin.saveSettings();
-						settingTab.display();
-					}
+                    if (newProperty && !plugin.settings.coverProperties.find(c => c.property == newProperty)) {
+                        plugin.settings.coverProperties.push({ property: newProperty, format: "" });
+                        plugin.saveSettings()
+                        settingTab.display();
+                    }
+
+
+
 				}),
 			);
 
 		for (let i = 0; i < plugin.settings.coverProperties.length; i++) {
 			const cover = plugin.settings.coverProperties[i];
-			new Setting(containerEl)
-				.setName(i18n.t("COVER_PROPERTY"))
-				.addSearch((search) => {
-					search.setValue(cover.property);
-					search.setPlaceholder(i18n.t("PROPERTY_SEARCH_PLACEHOLDER"));
-
-					const persist = async (value: string) => {
-						plugin.settings.coverProperties[i].property = value;
-						await plugin.saveSettings();
-						updateAllCovers(plugin);
-					};
-					search.onChange(async (value) => {
-						await persist(value);
-					});
-					const suggester = new PropertyNameSuggest(plugin.app, search.inputEl);
-					suggester.onSelect(async (value) => {
-						await persist(value);
-						suggester.setValue(value);
-						suggester.close();
-					});
-				})
+			new Setting(coverSettingsEl)
+				.setName(cover.property)
 				.addTextArea((text) => {
 					enhanceFormatTextArea(plugin, text, cover.format, async (value) => {
 						plugin.settings.coverProperties[i].format = value;
@@ -124,6 +157,26 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
 					}),
 				);
 		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
         new Setting(containerEl)

@@ -30,21 +30,7 @@ export const showColoredListSettings = (settingTab: PPSettingTab) => {
 
         pillEl.createEl("div", {text: property, cls: "multi-select-pill-content"})
 
-        propertyColorSetting.addText(text => {
-            text.setValue(property)
-            let inputEl = text.inputEl
-            inputEl.onblur = () => {
-                let value = inputEl.value
-                if (value && !plugin.settings.propertyPillColors[value]) {
-                    plugin.settings.propertyPillColors[value] = plugin.settings.propertyPillColors[property]
-                    delete plugin.settings.propertyPillColors[property]
-                    plugin.saveSettings()
-                    updateAllProperties(plugin)
-                    
-                    settingTab.display()
-                }
-            }
-        })
+        propertyColorSetting
         .addButton((btn) => {
             btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
                 let menu = new Menu();

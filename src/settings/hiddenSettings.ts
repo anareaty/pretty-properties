@@ -17,22 +17,7 @@ export const showHiddenSettings = (settingTab: PPSettingTab) => {
     let hiddenSettingsEl = hiddenSettingsWrapper.createEl("div")
     const addHiddenSetting = (property: string) => {
         let propertyHiddenSetting = new Setting(hiddenSettingsEl)
-
-        propertyHiddenSetting.addText(text => {
-            text.setValue(property)
-            let inputEl = text.inputEl
-            inputEl.onblur = () => {
-                let value = inputEl.value
-                if (value && !plugin.settings.hiddenProperties.find(p => p == value)) {
-                    plugin.settings.hiddenProperties.push(value)
-                    plugin.settings.hiddenProperties = plugin.settings.hiddenProperties.filter(p => p != property)
-                    plugin.saveSettings()
-                    updateHiddenProperties(plugin)
-                    settingTab.display()
-                }
-            }
-        })
-
+        .setName(property)
         .addButton(btn => btn
             .setIcon("x")
             .onClick(() => {
@@ -88,22 +73,7 @@ export const showHiddenEmptySettings = (settingTab: PPSettingTab) => {
     let hiddenSettingsEl = hiddenSettingsWrapper.createEl("div")
     const addHiddenSetting = (property: string) => {
         let propertyHiddenSetting = new Setting(hiddenSettingsEl)
-
-        propertyHiddenSetting.addText(text => {
-            text.setValue(property)
-            let inputEl = text.inputEl
-            inputEl.onblur = () => {
-                let value = inputEl.value
-                if (value && !plugin.settings.hiddenWhenEmptyProperties.find(p => p == value)) {
-                    plugin.settings.hiddenWhenEmptyProperties.push(value)
-                    plugin.settings.hiddenWhenEmptyProperties = plugin.settings.hiddenWhenEmptyProperties.filter(p => p != property)
-                    plugin.saveSettings()
-                    updateHiddenProperties(plugin)
-                    settingTab.display()
-                }
-            }
-        })
-
+        .setName(property)
         .addButton(btn => btn
             .setIcon("x")
             .onClick(() => {

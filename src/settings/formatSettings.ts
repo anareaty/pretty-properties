@@ -123,24 +123,6 @@ export const showFormatSettingsTab = (settingTab: PPSettingTab) => {
 
 
 
-type SupportedPropertyInputType = "text" | "number" | "date" | "datetime";
-
-	const INPUT_SELECTORS: Record<SupportedPropertyInputType, string> = {
-		text: ".metadata-input-longtext",
-		number: ".metadata-input-number",
-		date: ".metadata-input.metadata-input-text.mod-date",
-		datetime: ".metadata-input.metadata-input-text.mod-datetime",
-	};
-
-
-
-
-	function getSupportedPropertyInputTypes(): string[] {
-		return Object.keys(INPUT_SELECTORS);
-	}
-
-
-
 
 
 
@@ -231,7 +213,7 @@ const showFormatSettings = (settingTab: PPSettingTab) => {
 				await persist(value);
 			});
 
-			const suggester = new PropertyNameSuggest(plugin.app, search.inputEl, getSupportedPropertyInputTypes());
+			const suggester = new PropertyNameSuggest(plugin.app, search.inputEl, ["text", "number", "date", "datetime"]);
 			suggester.onSelect(async (value) => {
 				await persist(value);
 				suggester.setValue(value);

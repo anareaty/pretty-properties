@@ -1,4 +1,3 @@
-import { MarkdownRenderer, MarkdownView } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { createColorButton } from "src/menus/selectColorMenus";
 import { finishRenderMath, loadMathJax, renderMath } from "obsidian"
@@ -60,44 +59,54 @@ export const generateInlineStyles = (text: string, type: string, plugin: PrettyP
 		  let color = colorSetting.pillColor
 		  let textColor = colorSetting.textColor
 	
-		  if (color) {
+		  if (color && color != "default") {
+			colorClass = "colored";
+
 			if (colors.find((c) => c == color)) {
 			  styleProps = {
-				"--pp-color-rgb": "var(--color-" + color + "-rgb)"
+				"--pp-color": "rgb(var(--color-" + color + "-rgb))",
+				"--pp-bg": "rgba(var(--color-" + color + "-rgb), 0.15)",
+				"--pp-bg-hov": "rgba(var(--color-" + color + "-rgb), 0.25)"
 			  };
-			  colorClass = "theme-color";
 			} else if (color == "accent") {
-			  colorClass = "accent-color";
+			  styleProps = {
+				"--pp-color": "var(--text-accent)",
+				"--pp-bg": "hsla(var(--interactive-accent-hsl), 0.15)",
+				"--pp-bg-hov": "hsla(var(--interactive-accent-hsl), 0.25)"
+			  };
 			} else if (color == "none") {
-			  colorClass = "transparent-color";
-			} else if (color != "default") {
+			  colorClass = "transparent-color"
+			} else {
 			  let textLightness = getTextLightness(color);
 			  let hslString = color.h + " ," + color.s + "% ," + color.l + "%";
 			  let hslStringHover = color.h + " ," + color.s + "% ," + (color.l - 5) + "%";
 			  let hslStringText = color.h + " ," + color.s + "% ," + textLightness + "%";
 			  styleProps = {
-				"--pp-background-hsl": hslString,
-				"--pp-background-hover-hsl": hslStringHover,
-				"--pp-text-hsl": hslStringText
+				"--pp-color": "hsl(" + hslStringText + ")",
+				"--pp-bg": "hsl(" + hslString + ")",
+				"--pp-bg-hov": "hsl(" + hslStringHover + ")"
 			  };
-			  colorClass = "custom-color";
 			}
 		  }
 	
 	
-		  if (textColor) {
+		  if (textColor && textColor != "default") {
+			textColorClass = "text-colored";
 			if (colors.find((c) => c == textColor)) {
-			  styleProps["--pp-text-rgb"] = "var(--color-" + textColor + "-rgb)"
-			  textColorClass = "theme-text-color";
+			  //styleProps["--pp-text-rgb"] = "var(--color-" + textColor + "-rgb)"
+			  //textColorClass = "theme-text-color";
+			  styleProps["--pp-color"] = "rgb(var(--color-" + textColor + "-rgb))"
 			  
 			} else if (textColor == "accent") {
-			  textColorClass = "accent-text-color";
+			  //textColorClass = "accent-text-color";
+			  styleProps["--pp-color"] = "var(--text-accent)"
 			} else if (textColor == "none") {
 			  textColorClass = "none-text-color";
-			} else if (textColor != "default") {
+			} else {
 			  let hslStringText = textColor.h + " ," + textColor.s + "% ," + textColor.l + "%";
-			  styleProps["--pp-text-hsl"] = hslStringText
-			  textColorClass = "custom-text-color";
+			  //styleProps["--pp-text-hsl"] = hslStringText
+			  //textColorClass = "custom-text-color";
+			  styleProps["--pp-color"] = "hsl(" + hslStringText + ")"
 			}
 		  }
 	

@@ -28,22 +28,7 @@ export const showColoredTextSettings = (settingTab: PPSettingTab) => {
         })
         setPillStyles(pill, "data-property-longtext-value", property, "longtext", plugin)
 
-        propertyColorSetting.addText(text => {
-            text.setValue(property)
-            let inputEl = text.inputEl
-            inputEl.maxLength = 200
-            inputEl.onblur = () => {
-                let value = inputEl.value.trim()
-                if (value && !plugin.settings.propertyLongtextColors[value]) {
-                    plugin.settings.propertyLongtextColors[value] = plugin.settings.propertyLongtextColors[property]
-                    delete plugin.settings.propertyLongtextColors[property]
-                    plugin.saveSettings()
-                    updateAllProperties(plugin)
-                    settingTab.display()
-                }
-            }
-        })
-
+        propertyColorSetting
         .addButton((btn) => {
             btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
                 let menu = new Menu();
