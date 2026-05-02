@@ -193,7 +193,7 @@ export const registerPropertyFormatter = (plugin: PrettyPropertiesPlugin, regist
 	let propertyFormats = plugin.settings.propertyFormats
 	let coverFormats = plugin.settings.coverProperties.filter(p => p.format)
 
-	if (register || propertyFormats.length > 0 || coverFormats.length > 0) {
+	if (register || Object.keys(propertyFormats).length > 0 || coverFormats.length > 0) {
 		plugin.formatter = new PropertyFormatter();
 	}
 }

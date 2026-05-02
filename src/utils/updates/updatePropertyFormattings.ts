@@ -107,7 +107,7 @@ const getCurrentPropertyElValue = (propValueEl: HTMLElement, type: string) => {
 
 
 export const getPropertyFormatObj = (propName: string, plugin: PrettyPropertiesPlugin) => {
-    let propertyFormatObj = plugin.settings.propertyFormats.find(p => p.property == propName)
+    let propertyFormatObj = plugin.settings.propertyFormats[propName]
     let propertyFormat = propertyFormatObj?.format
     let propertyTextFormat = propertyFormatObj?.textFormat || "raw"
 

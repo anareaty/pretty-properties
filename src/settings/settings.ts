@@ -5,13 +5,11 @@ import PrettyPropertiesPlugin from "../main";
 import { showBannerSettings } from './bannerSettings';
 import { showIconSettings } from './iconSettings';
 import { showCoverSettings } from './coversettings';
-import { showPropSettings } from './propSettings';
 import { showDatesSettings } from './datesSettings';
 import { showOtherSettings } from './otherSettings';
 import { showColorSettings } from './colorSettings';
 import { showHiddenSettingsTab } from './hiddenSettingsTab';
-import { showPropSettings2 } from './propSettings2';
-import { showFormatSettings } from './formatSettings';
+import { showFormatSettingsTab } from './formatSettings';
 
 
 export interface PPPluginSettings {
@@ -52,6 +50,7 @@ export interface PPPluginSettings {
 	showTextColorSettings: boolean;
 	showHiddenSettings: boolean;
 	showHiddenEmptySettings: boolean;
+	showExtraFormattings: boolean;
 	iconSize: number;
 	iconTopMargin: number;
 	iconTopMarginMobile: number;
@@ -73,7 +72,7 @@ export interface PPPluginSettings {
 	enableCustomDateFormatInBases: boolean;
 	enableRelativeDateColors: boolean;
 	settingsTab: string;
-	propertyFormats: Array<{ property: string; format: string; textFormat: string }>;
+	propertyFormats: Record<string, { format: string; textFormat: string }>;
 	enableColoredProperties: boolean;
 	enableColoredInlineTags: boolean;
 	nonLatinTagsSupport: boolean;
@@ -145,6 +144,7 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	showTextColorSettings: false,
 	showHiddenSettings: false,
 	showHiddenEmptySettings: false,
+	showExtraFormattings: false,
 	iconsFolder: "",
 	iconSize: 70,
 	iconTopMargin: 70,
@@ -167,7 +167,7 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	enableCustomDateFormatInBases: false,
 	enableRelativeDateColors: false,
 	settingsTab: "BANNERS",
-	propertyFormats: [],
+	propertyFormats: {},
 	enableColoredProperties: true,
 	enableColoredInlineTags: false,
 	nonLatinTagsSupport: false,
@@ -256,9 +256,7 @@ export class PPSettingTab extends PluginSettingTab {
 		}
 
 
-		else if (this.plugin.settings.settingsTab == "PROPERTY_SETTINGS") {
-			showPropSettings2(this)
-		}
+
 
 
 		else if (this.plugin.settings.settingsTab == "COLORED_PROPERTIES") {
@@ -272,7 +270,7 @@ export class PPSettingTab extends PluginSettingTab {
 
 
 		else if (this.plugin.settings.settingsTab == "PROPERTY_FORMATTINGS") {
-			showFormatSettings(this)
+			showFormatSettingsTab(this)
 		}
 
 		

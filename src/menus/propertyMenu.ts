@@ -97,7 +97,7 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
             propertyType == "date" || 
             propertyType == "datetime") {
 
-            let propertyFormatObj = plugin.settings.propertyFormats.find(p => p.property == propName)
+            let propertyFormatObj = plugin.settings.propertyFormats[propName]
 
             
 
@@ -123,11 +123,10 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                         if (propertyFormatObj) {
                             propertyFormatObj.textFormat = "markdown"
                         } else {
-                            plugin.settings.propertyFormats.push({
-                                property: propName!,
+                            plugin.settings.propertyFormats[propName!] = {
                                 format: "",
                                 textFormat: "markdown"
-                            });
+                            }
                         }
 
                         plugin.saveSettings();

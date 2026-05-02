@@ -1,4 +1,4 @@
-import { Setting } from 'obsidian';
+import { Setting, TextComponent } from 'obsidian';
 import { i18n } from 'src/localization/localization';
 import { updateAllProperties } from 'src/utils/updates/updateElements';
 import { PPSettingTab } from 'src/settings/settings';
@@ -9,7 +9,7 @@ import {enhanceFormatTextArea} from "../utils/settingsHelper";
 
 
 
-export const showFormatSettings = (settingTab: PPSettingTab) => {
+export const showFormatSettingsTab = (settingTab: PPSettingTab) => {
     const {containerEl, plugin} = settingTab
 
 	new Setting(containerEl)
@@ -68,9 +68,9 @@ export const showFormatSettings = (settingTab: PPSettingTab) => {
 
 
 	let propertyFormatSetting = new Setting(containerEl)
-    .setHeading()
-	.setName(i18n.t("EXTRA_FORMATTINGS"))
-	.setDesc(i18n.t("PROPERTY_FORMAT_DESC"));
+		.setHeading()
+		.setName(i18n.t("EXTRA_FORMATTINGS"))
+		.setDesc(i18n.t("PROPERTY_FORMAT_DESC"));
 
 	propertyFormatSetting.descEl.createEl("a", {
 		text: "README",
@@ -81,31 +81,49 @@ export const showFormatSettings = (settingTab: PPSettingTab) => {
 
     
 
-	const addPropertyFormatSetting = new Setting(containerEl)
-		.setName(i18n.t("ADD_PROPERTY_FORMAT"))
-		.setDesc(i18n.t("PROPERTY_FORMAT_DESC"));
-	addPropertyFormatSetting.descEl.createEl("a", {
-		text: "README",
-		href: "https://github.com/anareaty/pretty-properties/blob/master/README.md",
-	});
-	addPropertyFormatSetting.addButton(button =>
-		button.setIcon("plus").onClick(async () => {
-			if (plugin.settings.propertyFormats.find(pf => pf.property === "") === undefined) {
-				plugin.settings.propertyFormats.push({
-					property: "",
-					format: "",
-                    textFormat: "raw"
-				});
-				await plugin.saveSettings();
-				settingTab.display();
-			}
-		})
-	);
+
+	
+
+
+
+	new Setting(containerEl)
+    .setName(i18n.t("SHOW_EXTRA_PROPERTY_FORMATTINGS"))
+    .addButton(button =>
+        {
+            let icon = "chevron-right"
+            if (plugin.settings.showExtraFormattings) {
+                icon = "chevron-down"
+            }
+            button.setIcon(icon)
+            .setClass("bare-button")
+            .onClick(async () => {
+                plugin.settings.showExtraFormattings = !plugin.settings.showExtraFormattings
+                plugin.saveSettings()
+                settingTab.display()
+            })
+        }
+    );
 
 
 
 
-	type SupportedPropertyInputType = "text" | "number" | "date" | "datetime";
+
+    if (plugin.settings.showExtraFormattings) { 
+        showFormatSettings(settingTab)
+    }
+
+
+
+    
+
+
+}
+
+
+
+
+
+type SupportedPropertyInputType = "text" | "number" | "date" | "datetime";
 
 	const INPUT_SELECTORS: Record<SupportedPropertyInputType, string> = {
 		text: ".metadata-input-longtext",
@@ -125,64 +143,115 @@ export const showFormatSettings = (settingTab: PPSettingTab) => {
 
 
 
-	for (let i = 0; i < plugin.settings.propertyFormats.length; i++) {
-		const entry = plugin.settings.propertyFormats[i];
 
-		new Setting(containerEl)
-			.setName(i18n.t("PROPERTY_FORMAT"))
-			.addSearch((search) => {
-				search.setValue(entry.property);
-				search.setPlaceholder(i18n.t("PROPERTY_SEARCH_PLACEHOLDER"));
 
-				const persist = async (value: string) => {
-					plugin.settings.propertyFormats[i].property = value;
-					await plugin.saveSettings();
-                    updateAllProperties(plugin);
-				};
-				search.onChange(async (value) => {
-					await persist(value);
-				});
 
-				const suggester = new PropertyNameSuggest(plugin.app, search.inputEl, getSupportedPropertyInputTypes());
-				suggester.onSelect(async (value) => {
-					await persist(value);
-					suggester.setValue(value);
-					suggester.close();
-				});
+const showFormatSettings = (settingTab: PPSettingTab) => {
+    const {containerEl, plugin} = settingTab
+
+    let formatSettingsWrapper = containerEl.createEl("div")
+
+    formatSettingsWrapper.setCssProps({
+        border: "1px solid var(--text-accent)",
+        "border-radius": "4px"
+    })
+
+    let formatSettingsEl = formatSettingsWrapper.createEl("div")
+
+
+	const addFormatSetting = (property: string) => {
+        let propertyFormatSetting = new Setting(formatSettingsEl)
+
+
+		const entry = plugin.settings.propertyFormats[property]
+
+        propertyFormatSetting
+		.setName(property)
+
+
+
+
+		
+
+
+
+
+		.addTextArea((text) => {
+			enhanceFormatTextArea(plugin, text, entry.format, async (value) => {
+				
+				plugin.settings.propertyFormats[property].format = value;
+				await plugin.saveSettings();
+				updateAllProperties(plugin);
+			});
+		})
+		.addDropdown(drop => drop
+			.addOptions({
+				"raw": i18n.t("TEXT"),
+				"markdown": i18n.t("MARKDOWN")
 			})
-			.addTextArea((text) => {
-				enhanceFormatTextArea(plugin, text, entry.format, async (value) => {
-                   
-					plugin.settings.propertyFormats[i].format = value;
-					await plugin.saveSettings();
-                    updateAllProperties(plugin);
-				});
+			.setValue(plugin.settings.propertyFormats[property].textFormat || "raw")
+			.onChange(async (value) => {
+				plugin.settings.propertyFormats[property].textFormat = value || "raw"
+				await plugin.saveSettings();
+				updateAllProperties(plugin);
 			})
-            .addDropdown(drop => drop
-                .addOptions({
-                    "raw": i18n.t("TEXT"),
-                    "markdown": i18n.t("MARKDOWN")
-                })
-                .setValue(plugin.settings.propertyFormats[i].textFormat || "raw")
-                .onChange(async (value) => {
-                    plugin.settings.propertyFormats[i].textFormat = value || "raw"
-                    await plugin.saveSettings();
-					updateAllProperties(plugin);
-                })
-            )
-			.addButton(button =>
-				button.setIcon("x").onClick(async () => {
-					plugin.settings.propertyFormats.splice(i, 1);
-					await plugin.saveSettings();
-                    updateAllProperties(plugin);
-					settingTab.display();
-				})
-			);
+		)
+
+        
+
+        .addButton(btn => btn
+            .setIcon("x")
+            .onClick(() => {
+                delete plugin.settings.propertyFormats[property]
+                plugin.saveSettings()
+                settingTab.display();
+                updateAllProperties(plugin)
+            })
+        )
+    }
+
+
+	for (let property in plugin.settings.propertyFormats) {
+		addFormatSetting(property)
 	}
 
 
 
-    
+    let newProperty = ""
+    new Setting(formatSettingsWrapper)
+        .setName(i18n.t("ADD_PROPERTY_FORMAT"))
+		.addSearch((search) => {
+			search.setValue("");
+			search.setPlaceholder(i18n.t("PROPERTY_SEARCH_PLACEHOLDER"));
+
+			const persist = async (value: string) => {
+				newProperty = value;
+			};
+			search.onChange(async (value) => {
+				await persist(value);
+			});
+
+			const suggester = new PropertyNameSuggest(plugin.app, search.inputEl, getSupportedPropertyInputTypes());
+			suggester.onSelect(async (value) => {
+				await persist(value);
+				suggester.setValue(value);
+				suggester.close();
+			});
+		})
 
 
+        .addButton(btn => btn
+            .setIcon("plus")
+            .onClick(() => {
+				newProperty = newProperty.trim()
+                if (newProperty && !plugin.settings.propertyFormats[newProperty]) {
+                    plugin.settings.propertyFormats[newProperty] = {
+						format: "",
+						textFormat: "raw"
+					}
+                    plugin.saveSettings()
+                    settingTab.display();
+                }
+            })
+        )
 }

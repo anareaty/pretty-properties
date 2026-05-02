@@ -1,35 +1,13 @@
 import PrettyPropertiesPlugin from "src/main"
 
 export const unPatchWidgets = async (plugin: PrettyPropertiesPlugin) => {
-  //@ts-ignore
-  let widgets = plugin.app.metadataTypeManager.registeredTypeWidgets
-  for (let type in widgets) {
-    plugin.patches.uninstallWidgetPatch[type]()
-  }
-
-  //@ts-ignore
-  if (plugin.app.viewRegistry.viewByType.tag) {
-    plugin.patches.uninstallPPTagViewPatch()
-    let tagLeaves = plugin.app.workspace.getLeavesOfType("tag")
-    for (let tagLeaf of tagLeaves) {
-      //@ts-ignore
-      tagLeaf.rebuildView()
+  for (let p in plugin.patches) {
+    if (typeof plugin.patches[p] == "object") {
+      for (let w in plugin.patches[p]) {
+        plugin.patches[p][w]()
+      }
+    } else {
+      plugin.patches[p]()
     }
-  }
-  
-  plugin.patches.uninstallPPMarkdownPatch()
-  plugin.patches.uninstallPPEmbedPatch()
-  plugin.patches.uninstallPPPopoverPatch()
-  plugin.patches.uninstallPPMenuPatch()
-
-  //@ts-ignore
-	let bases = plugin.app.internalPlugins.getEnabledPluginById("bases")
-  if (bases) {
-    plugin.patches.uninstallPPBaseCardsPatch()
-    plugin.patches.uninstallPPBaseTablePatch()
-    if (bases.registrations.list) {
-      plugin.patches.uninstallPPBaseListPatch()
-    }
-  }
-  
+  }  
 }

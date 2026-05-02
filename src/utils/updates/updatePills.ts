@@ -225,9 +225,6 @@ const updateColorButton = async(parent: HTMLElement, value:string, isBase: boole
 
 export const updateLongtext = async (pill: HTMLElement, plugin: PrettyPropertiesPlugin, propName?: string) => {
 
-	
-
-
 	let parent = pill.parentElement
 	if (!parent) return
 	let grandParent = parent?.parentElement
@@ -421,6 +418,7 @@ export const updateCardLongtext = async (pill: HTMLElement, plugin: PrettyProper
 
 export const updateLongTexts = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
 
+	
 	
 	let longtexts = querySelectorsWithIframesForContainer(".metadata-input-longtext", container);
 
