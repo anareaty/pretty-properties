@@ -72,6 +72,7 @@ export const showPropSettings = (settingTab: PPSettingTab) => {
 					plugin.settings.propertyFormats[i].property = value;
 					await plugin.saveSettings();
 					updateAllPropertyFormats(plugin);
+                    updateAllProperties(plugin);
 				};
 				search.onChange(async (value) => {
 					await persist(value);
@@ -90,6 +91,7 @@ export const showPropSettings = (settingTab: PPSettingTab) => {
 					plugin.settings.propertyFormats[i].format = value;
 					await plugin.saveSettings();
 					updateAllPropertyFormats(plugin);
+                    updateAllProperties(plugin);
 				});
 			})
             .addDropdown(drop => drop
@@ -110,6 +112,7 @@ export const showPropSettings = (settingTab: PPSettingTab) => {
 
 					await plugin.saveSettings();
 					updateAllPropertyFormats(plugin);
+                    updateAllProperties(plugin);
 					settingTab.display();
 				})
 			);

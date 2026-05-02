@@ -18,7 +18,7 @@ export const unPatchWidgets = async (plugin: PrettyPropertiesPlugin) => {
   }
   
   plugin.patches.uninstallPPMarkdownPatch()
-
+  plugin.patches.uninstallPPEmbedPatch()
   plugin.patches.uninstallPPPopoverPatch()
   plugin.patches.uninstallPPMenuPatch()
 

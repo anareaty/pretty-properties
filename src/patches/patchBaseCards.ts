@@ -20,11 +20,7 @@ export const patchBaseCards = (plugin: PrettyPropertiesPlugin) => {
                 view.updateVirtualDisplay = new Proxy(view.updateVirtualDisplay, {
                     apply(updateVirtualDisplay, thisArg2, args2) {
                         let update = updateVirtualDisplay.call(thisArg2, ...args2)
-                        for (let item of view.items) {
-                            for (let property of item.props) {
-                                processBaseCardProperty(property, plugin)
-                            }
-                        }
+                        processBaseCardProperties(view, plugin)
                         return update
                     }
                 })
@@ -39,10 +35,21 @@ export const patchBaseCards = (plugin: PrettyPropertiesPlugin) => {
 
 
 
+export const processBaseCardProperties = (view: any, plugin: PrettyPropertiesPlugin) => {
+    for (let item of view.items) {
+        for (let property of item.props) {
+            processBaseCardProperty(property, plugin)
+        }
+    }
+}
+
+
 const processBaseCardProperty = (property: any, plugin: PrettyPropertiesPlugin) => {
     let prop = property.prop
 
-    if (prop == "note.tags" || prop == "file.tags" || prop == "formula.tags") {
+    console.log(property)
+
+    if (prop == "note.tags" || prop == "file.tags" || prop.startsWith("formula.")) {
         let elements = property.lineEl.querySelectorAll("a.tag")
         for (let el of elements) {
             updateValueListElement(el, "data-tag-value", "tag", plugin)

@@ -161,6 +161,7 @@ export default {
   BANNER_HEIGHT_POPOVER: "Banner height in page preview",
   ICON_SIZE_POPOVER: "Icon size in page preview",
   MAX_COVER_WIDTH_POPOVER: "Maximal cover width in page preview",
+  MAX_COVER_WIDTH_CANVAS: "Maximal cover width on canvas",
   HIDE_ALL_EMPTY_PROPERTIES: "Hide all empty properties",
   HIDE_WHEN_EMPTY: "Hide empty property", 
   NOT_HIDE_WHEN_EMPTY: "Not hide empty property",

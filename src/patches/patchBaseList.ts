@@ -19,23 +19,7 @@ export const patchBaseList = (plugin: PrettyPropertiesPlugin) => {
                 view.updateVirtualDisplay = new Proxy(view.updateVirtualDisplay, {
                     apply(updateVirtualDisplay, thisArg2, args2) {
                         let update = updateVirtualDisplay.call(thisArg2, ...args2)
-
-                        
-                        let data = view.data?.data
-
-                        if (data) {
-                            for (let entry of data) {
-                                let row = view.rowsMap.get(entry)
-                                if (row) {
-                                    for (let cell of row.cells) {
-                                        processBaseListProperty(cell, plugin)
-                                    }
-                                }
-                                
-                            }
-                        }
-                            
-                        
+                        processBaseListProperties(view, plugin)
                         return update
                     }
                 })
@@ -56,11 +40,27 @@ export const patchBaseList = (plugin: PrettyPropertiesPlugin) => {
 
 
 
+
+export const processBaseListProperties = (view: any, plugin: PrettyPropertiesPlugin) => {
+    let data = view.data?.data
+    if (data) {
+        for (let entry of data) {
+            let row = view.rowsMap.get(entry)
+            if (row) {
+                for (let cell of row.cells) {
+                    processBaseListProperty(cell, plugin)
+                }
+            }
+        }
+    }
+}
+
+
 const processBaseListProperty = (property: any, plugin: PrettyPropertiesPlugin) => {
     
     let prop = property.propertyId
 
-    if (prop == "note.tags" || prop == "file.tags" || prop == "formula.tags") {
+    if (prop == "note.tags" || prop == "file.tags" || prop.startsWith("formula.")) {
         let elements = property.el.querySelectorAll("a.tag")
         for (let el of elements) {
             updateValueListElement(el, "data-tag-value", "tag", plugin)

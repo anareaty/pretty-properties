@@ -38,6 +38,7 @@ import { API, createApi } from "./utils/createApi";
 import {PropertyFormatter, registerPropertyFormatter} from "./utils/propertyFormatter";
 import { patchMenu } from "./patches/patchMenu";
 import { reloadAllTabs } from "./utils/reload";
+import { patchEmbed } from "./patches/patchEmbed";
 
 export default class PrettyPropertiesPlugin extends Plugin {
 	settings: PPPluginSettings;
@@ -64,6 +65,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		patchPropertyWidgets(this)
 		patchTagView(this)
 		patchMarkdownView(this)
+		patchEmbed(this)
 		patchHoverPopover(this)
 		patchBaseTable(this)
 		patchBaseCards(this)
@@ -88,13 +90,13 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		
 		updateTheme(this)
 
+
+
 		
 		
 
 		
-		this.app.workspace.onLayoutReady(async() => {
-			updateAllProperties(this)
-		})
+
 		
 		
 		registerCommands(this)
@@ -197,7 +199,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 		// We need to reload all tabs to update existing properties
 		this.app.workspace.onLayoutReady(() => {
-			//reloadAllTabs(this)
+			reloadAllTabs(this)
 		})
 		
 
@@ -205,11 +207,10 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 	onunload() {
 		unPatchWidgets(this)
-		removeAll(this)
+		reloadAllTabs(this)
 		if (this.formatter) {
 			this.formatter.clearCache();
 		}
-		
 	}
 
 
@@ -218,6 +219,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		await this.migrateSettings(data);
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
 	}
+
+	
 
 	async migrateSettings(data: any){
 		if (!Array.isArray(data.coverProperties)) {

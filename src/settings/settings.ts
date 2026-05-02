@@ -39,6 +39,7 @@ export interface PPPluginSettings {
     coverSquareWidth: number;
     coverCircleWidth: number;
 	coverMaxWidthPopover: number;
+	coverMaxWidthCanvas: number;
     progressProperties: any;
 	bannersFolder: string;
 	coversFolder: string;
@@ -132,6 +133,7 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
     coverSquareWidth: 250,
     coverCircleWidth: 250,
 	coverMaxWidthPopover: 150,
+	coverMaxWidthCanvas: 150,
     progressProperties: {},
 	bannersFolder: "",
 	coversFolder: "",

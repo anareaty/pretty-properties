@@ -26,6 +26,11 @@ export const generateInlineStyles = (text: string, type: string, plugin: PrettyP
 	let textColorClass = "";
 	let styleProps: any = {}
 
+
+
+
+	
+
     if (type == "tag") {
         colorSettings = plugin.settings.tagColors
     }
@@ -41,6 +46,12 @@ export const generateInlineStyles = (text: string, type: string, plugin: PrettyP
 	if (type == "tag-pane-tag") {
 		colorSettings = plugin.settings.tagColors
 	}
+
+
+
+
+
+	//console.log(colorSettings)
 
     if (colorSettings) {
 
@@ -111,7 +122,11 @@ export const setPillStyles = async (
 	type: string,
 	plugin: PrettyPropertiesPlugin
 ) => {
-	let colorClasses = ["theme-color", "custom-color", "transparent-color", "default-color", "theme-text-color", "custom-text-color", "none-text-color", "default-text-color"];
+
+	
+
+
+	let colorClasses = ["theme-color", "accent-color", "custom-color", "transparent-color", "default-color", "theme-text-color", "accent-text-color", "custom-text-color", "none-text-color", "default-text-color"];
 	
 	pill.removeAttribute("data-property-pill-value")
 	pill.removeAttribute("data-tag-value")
@@ -145,6 +160,10 @@ export const setPillStyles = async (
 
 
 export const updateMultiselectPill = async (pill: HTMLElement, plugin: PrettyPropertiesPlugin) => {
+
+	//console.log("update multiselect pill")
+
+
 	if (plugin.settings.enableColoredProperties) {
 		let content = pill.querySelector(".multi-select-pill-content");
 		if (content instanceof HTMLElement) {
@@ -156,6 +175,8 @@ export const updateMultiselectPill = async (pill: HTMLElement, plugin: PrettyPro
 
 
 export const updateValueListElement = async (pill: HTMLElement, dataValueString: string, styleType: string, plugin: PrettyPropertiesPlugin) => {
+	//console.log("update Value List Element")
+	
 	if (plugin.settings.enableColoredProperties) {
 		let value = pill.innerText;
 		setPillStyles(pill, dataValueString, value, styleType, plugin);
@@ -164,6 +185,10 @@ export const updateValueListElement = async (pill: HTMLElement, dataValueString:
 
 
 export const updateTagPill = async (pill: HTMLElement, plugin: PrettyPropertiesPlugin) => {
+
+	//console.log("update Tag Pill")
+
+
 	if (plugin.settings.enableColoredProperties) {
 		let content = pill.querySelector(".multi-select-pill-content");
 		if (content instanceof HTMLElement) {
@@ -178,6 +203,11 @@ export const updateTagPill = async (pill: HTMLElement, plugin: PrettyPropertiesP
 
 
 export const updateTag = (tag: HTMLElement, plugin: PrettyPropertiesPlugin) => {
+
+
+	//console.log("update Tag")
+
+
 	let value = tag.innerText.replace("#", "")
 	let parent = tag.parentElement
 	let isBase = parent?.classList.contains("value-list-element")
@@ -431,6 +461,9 @@ export const updateLongTexts = async (container: HTMLElement, plugin: PrettyProp
 
 export const updateSettingPills = async (plugin: PrettyPropertiesPlugin) => {
 
+
+	//console.log("update Setting Pills")
+
 	let pills = document.querySelectorAll(".setting-multi-select-pill");
 	for (let pill of pills) {
 	  if (pill instanceof HTMLElement) {
@@ -485,6 +518,10 @@ export const updateSettingPills = async (plugin: PrettyPropertiesPlugin) => {
 
 
 export const updateTagPaneTags = async(container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
+
+
+	//console.log("update Tag Pane Tags")
+
     let tags = container.querySelectorAll(".tag-pane-tag span.tree-item-inner-text")
     for (let tag of tags) {
 		if (tag instanceof HTMLElement) {

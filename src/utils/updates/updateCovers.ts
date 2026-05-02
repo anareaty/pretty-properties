@@ -32,12 +32,23 @@ export const renderCover = async (
 	plugin: PrettyPropertiesPlugin
 ) => {
 
+
+	
+
 	
 	const mdContainer = contentEl.querySelector(".metadata-container");
+
+
+
+
+
 	if (!(mdContainer instanceof HTMLElement))
 		return;
 
 	let coverDiv: HTMLDivElement | undefined;
+
+
+	
 
 	if (plugin.settings.enableCover) {
 		const coverItems: HTMLElement[] = [];
@@ -83,6 +94,10 @@ export const renderCover = async (
 				hookUpLinks(plugin.app, component, coverTemp, sourcePath);
 
 				coverItem = styleCoverItem(coverTemp, component, plugin);
+
+				if (contentEl.classList.contains("canvas-node-content")) {
+					coverItem.classList.add("canvas-cover-image")
+				}
 			}
 
 			if (coverItem){
@@ -293,6 +308,8 @@ export const updateCoverForView = async (
 
 
 
+
+
   let file = view.file
   if (file) {
     let cache = plugin.app.metadataCache.getFileCache(file);
@@ -303,6 +320,7 @@ export const updateCoverForView = async (
 		contentEl = view.containerEl
 	}
 
+	
 
 
     let sourcePath = view.file?.path || ""

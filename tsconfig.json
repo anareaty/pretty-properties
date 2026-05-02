@@ -7,7 +7,6 @@
     "target": "es2018",
     "allowJs": true,
     "noImplicitAny": true,
-    "noImplicitThis": false,
     "moduleResolution": "node",
     "importHelpers": true,
     "isolatedModules": true,

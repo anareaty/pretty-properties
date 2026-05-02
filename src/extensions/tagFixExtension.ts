@@ -8,8 +8,7 @@ EditorView,
 PluginSpec,
 PluginValue,
 ViewPlugin,
-ViewUpdate,
-WidgetType
+ViewUpdate
 } from '@codemirror/view';
 import { editorLivePreviewField } from 'obsidian';
 import PrettyPropertiesPlugin from 'src/main';
@@ -30,7 +29,6 @@ export const registerTagFixExtension = (plugin: PrettyPropertiesPlugin) => {
         }
 
         update(update: ViewUpdate) {
-
             //@ts-ignore
             if (update.docChanged || update.viewportChanged || update.transactions?.[0]?.annotations?.[0]?.value) {
                 this.decorations = this.buildDecorations(update.view);
@@ -49,12 +47,10 @@ export const registerTagFixExtension = (plugin: PrettyPropertiesPlugin) => {
     
                         let tagTextStart = 0
                         
-    
                         syntaxTree(view.state).iterate({
                             from,
                             to,
                             enter(node: any) {
-    
                                 if (node.type.name.includes('hashtag-begin')) {
                                     tagTextStart = node.to
                                 }
@@ -69,9 +65,6 @@ export const registerTagFixExtension = (plugin: PrettyPropertiesPlugin) => {
                                         styleText = styleText + key + ": " + styleProps[key] + "; "
                                     }
     
-
-
-                                    
                                     let decoBegin = Decoration.mark({ 
                                         attributes: {
                                             "data-tag-value": tagId, 
@@ -88,7 +81,6 @@ export const registerTagFixExtension = (plugin: PrettyPropertiesPlugin) => {
                                         class: "cm-hashtag-inner cm-hashtag cm-hashtag-middle cm-meta cm-tag-" + tagId + " " + colorClass + " " + textColorClass
                                     })
     
-                                    
                                     let decoEnd = Decoration.mark({ 
                                         attributes: {
                                             "data-tag-value": tagId, 
@@ -97,9 +89,6 @@ export const registerTagFixExtension = (plugin: PrettyPropertiesPlugin) => {
                                         class: "cm-hashtag-inner cm-hashtag cm-hashtag-end cm-meta cm-tag-" + tagId + " " + colorClass + " " + textColorClass
                                     })
                                     
-
-
-    
                                     builder.add(tagTextStart - 1, tagTextStart, decoBegin);
     
                                     if (tagTextStart < node.from) {
@@ -116,8 +105,6 @@ export const registerTagFixExtension = (plugin: PrettyPropertiesPlugin) => {
                 console.error("Can not build tag decorations")
             }
 
-            
-
             return builder.finish();
         }
     }
@@ -131,12 +118,7 @@ export const registerTagFixExtension = (plugin: PrettyPropertiesPlugin) => {
         pluginSpec
     )
 
-    
     plugin.registerEditorExtension(tagFixPlugin)
-    
-
-    
-
 }
 
 

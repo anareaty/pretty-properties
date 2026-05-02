@@ -4,17 +4,24 @@ import { setPillStyles } from "src/utils/updates/updatePills";
 
 export const registerTagPostProcessor = (plugin: PrettyPropertiesPlugin) => {
     plugin.registerMarkdownPostProcessor((el, ctx) => {
+        processTagsInPreviewElement(el, plugin)
+    });
+}
 
-        if (plugin.settings.enableColoredInlineTags) {
-            const tags = el.findAll("a.tag")
 
-            for (let tag of tags) {
-                if (tag instanceof HTMLElement) {
-                    let value = tag.innerText.replace("#", "")
-                    setPillStyles(tag, "data-tag-value", value, "tag", plugin)
-                }
+export const processTagsInPreviewElement = (el: HTMLElement, plugin: PrettyPropertiesPlugin) => {
+
+    
+
+    if (plugin.settings.enableColoredInlineTags) {
+        const tags = el.findAll("a.tag")
+
+        for (let tag of tags) {
+            if (tag instanceof HTMLElement) {
+                let value = tag.innerText.replace("#", "")
+                setPillStyles(tag, "data-tag-value", value, "tag", plugin)
             }
         }
-    });
+    }
 }
 

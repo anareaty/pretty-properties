@@ -1,6 +1,6 @@
 import PrettyPropertiesPlugin from "src/main";
-import { updateTag } from "src/utils/updates/updatePills";
 import { around, dedupe } from "monkey-around";
+import { processTagsInPreviewElement } from "src/extensions/tagPostProcessor";
 
 
 export const patchBaseTable = (plugin: PrettyPropertiesPlugin) => {
@@ -13,27 +13,24 @@ export const patchBaseTable = (plugin: PrettyPropertiesPlugin) => {
               return dedupe("pp-patch-base-table-around-key", oldFactory, (...args: any[]) => {
                 let view = oldFactory && oldFactory.apply(this, args)
 
+
                 view.updateVirtualDisplay = new Proxy(view.updateVirtualDisplay, {
                     apply(updateVirtualDisplay, thisArg2, args2) {
+                        
                         let update = updateVirtualDisplay.call(thisArg2, ...args2)
 
                         if (plugin.settings.enableColoredProperties) {
                             for (let row of view.rows) {
                                 for (let cell of row.cells) {
-                                    if (cell.prop == "file.tags" || cell.prop.startsWith("formula.")) {
-                                        let elements = cell.el.querySelectorAll("a.tag")
-                                        for (let el of elements) {
-                                            updateTag(el, plugin)
-                                        }
-                                    }
-
+                                    processBaseTableCellTags(cell, plugin)
                                 }
                             }
                         }
                         return update
                     }
                 })
-
+  
+                
                 return view
               })
             }
@@ -41,6 +38,13 @@ export const patchBaseTable = (plugin: PrettyPropertiesPlugin) => {
 
 
 
+    }
+}
+
+
+export const processBaseTableCellTags = (cell: any, plugin: PrettyPropertiesPlugin) => {
+    if (cell.prop == "file.tags" || cell.prop.startsWith("formula.")) {
+        processTagsInPreviewElement(cell.el, plugin)
     }
 }
 

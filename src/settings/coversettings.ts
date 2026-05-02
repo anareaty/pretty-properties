@@ -309,5 +309,21 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
         });
 
 
+        new Setting(containerEl)
+        .setName(i18n.t("MAX_COVER_WIDTH_CANVAS"))
+        .addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverMaxWidthCanvas.toString())
+            .setPlaceholder('150')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverMaxWidthCanvas = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+
+
     }
 }

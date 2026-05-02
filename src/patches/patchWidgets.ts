@@ -5,11 +5,15 @@ import { updateDateInput, updateDateTimeInput } from "src/utils/updates/updateDa
 import { updateProgress } from "src/utils/updates/updateProgress"
 import { around, dedupe } from "monkey-around";
 import { updateAllMetadataContainers } from "src/utils/updates/updateHiddenProperties";
-import {applyPropertyFormatting} from "./patchPropertyValues";
 import { getPropertyFormatObj, updatePropertyFormatting } from "src/utils/updates/updatePropertyFormattings";
 
 
-const updateWidgets = async (type: string, rendered: any, args: any[], plugin: PrettyPropertiesPlugin) => {
+export const updateWidgets = async (rendered: any, args: any[], plugin: PrettyPropertiesPlugin) => {
+
+  let type = rendered.type
+
+  
+
 
   try {
     let el = args[0]
@@ -17,6 +21,11 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
     let sourcePath = args[2].sourcePath;
     let value = args[1]
     let parent = el.parentElement
+
+
+
+
+    //console.log("update widget " + propName)
 
 
     if (value && value.value) {
@@ -46,9 +55,14 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
       }
     }
 
-    if (type == "tags") {
-      let elements = rendered?.multiselect.elements 
 
+
+
+
+
+
+    if (type == "tags") {
+      let elements = rendered?.multiselect.elements
       if (elements.length == 0) {
         parent.classList.add("is-empty")
       } else {
@@ -59,6 +73,12 @@ const updateWidgets = async (type: string, rendered: any, args: any[], plugin: P
         updateTagPill(element, plugin)
       }
     }
+
+
+
+
+
+
 
     if (type == "date") {
       let parent = el.parentElement
@@ -233,17 +253,35 @@ export const patchPropertyWidgets = async (plugin: PrettyPropertiesPlugin) => {
       plugin.patches.uninstallWidgetPatch[type] = around(widget, {
 
         render(oldRender: any) {
+
+
+
           return dedupe("pp-patch-widgets-around-key", oldRender, (...args: any[]) => {
+
+
+            //console.log("render")
+          
             
             let rendered = oldRender && oldRender.apply(this, args)
 
-            updateWidgets(type, rendered, args, plugin)
+
+
+           
+            //console.log(args[2].key)
+            //console.log(args[2].blur)
+            //console.log(args[2].onChange)
+            
+
+           
+
+            updateWidgets(rendered, args, plugin)
+
             let renderValues = rendered?.multiselect?.renderValues
             if (renderValues) {
               rendered.multiselect.renderValues = new Proxy(renderValues, {
                 apply(renderValues, thisArg2, args2) {
                   let renderedValues = renderValues.call(thisArg2, ...args2)
-                  updateWidgets(type, rendered, args, plugin)
+                  updateWidgets(rendered, args, plugin)
                   return renderedValues
                 }
               })

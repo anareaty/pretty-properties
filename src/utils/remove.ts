@@ -76,7 +76,7 @@ export const removeColorStyles = () => {
 
 
 export const removeInlineTagsColorStyles = () => {
-    let colorClasses = ["theme-color", "custom-color", "transparent-color", "default-color", "theme-text-color", "custom-text-color", "none-text-color", "default-text-color"];
+    let colorClasses = ["theme-color", "accent-color", "custom-color", "transparent-color", "default-color", "theme-text-color", "accent-text-color", "custom-text-color", "none-text-color", "default-text-color"];
     for (let colorClass of colorClasses) {
         let queryString = ".markdown-preview-sizer a.tag:not(.metadata-container a.tag)"
         let elements = querySelectorsWithIframes(queryString)

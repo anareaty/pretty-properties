@@ -91,7 +91,8 @@ export const updateCoverStyles = (plugin: PrettyPropertiesPlugin) => {
     "--cover-width-initial-3": plugin.settings.coverDefaultWidth3 + "px",
     "--cover-width-square": plugin.settings.coverSquareWidth + "px",
     "--cover-width-circle": plugin.settings.coverCircleWidth + "px",
-    "--cover-max-width-popover": plugin.settings.coverMaxWidthPopover + "px"
+    "--cover-max-width-popover": plugin.settings.coverMaxWidthPopover + "px",
+    "--cover-max-width-canvas": plugin.settings.coverMaxWidthCanvas + "px"
     }
   document.body.setCssProps(coverProps);
 

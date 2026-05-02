@@ -1,4 +1,4 @@
-import { TFile, CachedMetadata, MarkdownView, HoverPopover } from "obsidian";
+import { TFile, CachedMetadata, MarkdownView, HoverPopover, BasesView } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { renderCover, updateCoverForView } from "./updateCovers";
 import { renderIcon, updateIconForView } from "./updateIcons";
@@ -10,15 +10,15 @@ import { getNestedProperty } from "../propertyUtils";
 import { updateAllMetadataContainers } from "./updateHiddenProperties";
 import { querySelectorsWithIframes, querySelectorsWithIframesForContainer } from "../querySelectorsHelper";
 import { getPropertyFormatObj, updatePropertyFormatting } from "./updatePropertyFormattings";
-
-
-
+import { processTagsInPreviewElement } from "src/extensions/tagPostProcessor";
+import { updateWidgets } from "src/patches/patchWidgets";
+import { processBaseCardProperties } from "src/patches/patchBaseCards";
+import { processBaseListProperties } from "src/patches/patchBaseList";
+import { processBaseTableCellTags } from "src/patches/patchBaseTable";
 
 
 
 export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => { 
-
-    
 
     let mdLeaves = plugin.app.workspace.getLeavesOfType("markdown");
     for (let leaf of mdLeaves) {
@@ -34,6 +34,7 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
             updateBannerForView(view, plugin);
             updateIconForView(view, plugin);
             updateCoverForView(view, plugin);
+            processTagsInPreviewElement(view.containerEl, plugin)
             
             let state = view.getState()
 
@@ -47,124 +48,74 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
         }
     }
 
+
     
     let canvasLeaves = plugin.app.workspace.getLeavesOfType("canvas");
     for (let leaf of canvasLeaves) {
         //@ts-ignore
-        leaf.view.canvas?.nodes?.forEach(n => {
-
-            let nodeView = n.child
-
-
+        leaf.view.canvas?.nodes?.forEach(node => {
+            let nodeView = node.child
             if (nodeView) {
-           
+                //@ts-ignore
+                nodeView.metadataEditor?.rendered?.forEach(p => {
+                    p.renderProperty(p.entry, !0)
+                })
+
                 updateCoverForView(nodeView, plugin);
+                processTagsInPreviewElement(nodeView.containerEl, plugin)
+
+                if (nodeView.editor) {
+                    // @ts-expect-error, not typed
+                    const editorView = nodeView.editor.cm as EditorView;
+                    editorView.dispatch({
+                        userEvent: "updatePillColors"
+                    })
+                }
             }
-            //@ts-ignore
-            
-
-
-
-            n.child?.metadataEditor?.rendered?.forEach(p => {
-                p.renderProperty(p.entry, !0)
-            })
         })
     }
 
 
     let baseLeaves = plugin.app.workspace.getLeavesOfType("bases");
     for (let leaf of baseLeaves) {
+
         //@ts-ignore
-        leaf.rebuildView()
-    }
+        let baseView = leaf.view.controller?.view
 
+        if (baseView.type == "table") {
+            for (let row of baseView.rows) {
+                for (let cell of row.cells) {
+                    let propertyEditor = cell.renderer.propertyEditor
 
+                    if (propertyEditor) {
+                        let value = propertyEditor.value || propertyEditor.multiselect?.values || cell.renderer.val
+                        let ctx = propertyEditor.ctx || {
+                            key: cell.prop.replace("note.", ""),
+                            sourcePath: cell.renderer.entry.file.path
+                        }
 
-    let tags = querySelectorsWithIframes("a.tag")
-    
-    for (let pill of tags) {
-        if (pill instanceof HTMLElement) updateTag(pill, plugin)
-    }
+                        let args = [propertyEditor.containerEl, value, ctx]
+                        updateWidgets(propertyEditor, args, plugin)
 
-
-
-
-
-    // Also dispatch active editor (useful for canvas)
-    let editor = plugin.app.workspace.activeEditor?.editor
-    if (editor) {
-        // @ts-expect-error, not typed
-        const editorView = editor.cm as EditorView;
-        editorView.dispatch({
-            userEvent: "updatePillColors"
-        })
-    }
-
-    
-    
-    updateTagPaneTagsAll(plugin)
-    updateSettingPills(plugin)
-    updateAllMetadataContainers(plugin)
-
-
-
-
-    /*
-
-
-
-
-    plugin.app.workspace.iterateAllLeaves((leaf) => {
-
-        
-        let view = leaf.view
-
-
-
-    
-        //@ts-ignore
-        let file = view.file
-
-
-
-        if (view instanceof MarkdownView) {
-
-            updateBannerForView(view, plugin);
-            updateIconForView(view, plugin);
-            updateCoverForView(view, plugin);
-            
-            let state = view.getState()
-
-            if (state.mode == "source") {
-                // @ts-expect-error, not typed
-                const editorView = view.editor.cm as EditorView;
-                editorView.dispatch({
-                    userEvent: "updatePillColors"
-                })
+                    } else {
+                        processBaseTableCellTags(cell, plugin)
+                    }
+                }
             }
         }
 
-    })
+        else if (baseView.type == "cards") {
+            processBaseCardProperties(baseView, plugin)
+        }
 
-
-    // Also dispatch active editor (useful for canvas)
-    let editor = plugin.app.workspace.activeEditor?.editor
-    if (editor) {
-        // @ts-expect-error, not typed
-        const editorView = editor.cm as EditorView;
-        editorView.dispatch({
-            userEvent: "updatePillColors"
-        })
+        else if (baseView.type == "list") {
+            processBaseListProperties(baseView, plugin)
+        }
     }
 
-    
-    
     updateTagPaneTagsAll(plugin)
     updateSettingPills(plugin)
     updateAllMetadataContainers(plugin)
-
-    */
-    
 }
 
 
