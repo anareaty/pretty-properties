@@ -70,7 +70,7 @@ export const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string
 
                 plugin.saveSettings();
                 updateAllProperties(plugin)
-				//updateAllPropertyFormats(plugin);
+
 
                 if (colorList == "dateColors") {
                     updateRelativeDateColors(plugin)

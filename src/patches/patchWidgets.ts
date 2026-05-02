@@ -25,19 +25,11 @@ export const updateWidgets = async (rendered: any, args: any[], plugin: PrettyPr
 
 
 
-    //console.log("update widget " + propName)
-
-
     if (value && value.value) {
       value = value.value;
     }
 
-    //applyPropertyFormatting(el, propName, plugin, type, sourcePath, value);
-    
 
-
-
-    
 
     
 
@@ -258,21 +250,7 @@ export const patchPropertyWidgets = async (plugin: PrettyPropertiesPlugin) => {
 
           return dedupe("pp-patch-widgets-around-key", oldRender, (...args: any[]) => {
 
-
-            //console.log("render")
-          
-            
             let rendered = oldRender && oldRender.apply(this, args)
-
-
-
-           
-            //console.log(args[2].key)
-            //console.log(args[2].blur)
-            //console.log(args[2].onChange)
-            
-
-           
 
             updateWidgets(rendered, args, plugin)
 

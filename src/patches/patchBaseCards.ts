@@ -47,8 +47,6 @@ export const processBaseCardProperties = (view: any, plugin: PrettyPropertiesPlu
 const processBaseCardProperty = (property: any, plugin: PrettyPropertiesPlugin) => {
     let prop = property.prop
 
-    console.log(property)
-
     if (prop == "note.tags" || prop == "file.tags" || prop.startsWith("formula.")) {
         let elements = property.lineEl.querySelectorAll("a.tag")
         for (let el of elements) {

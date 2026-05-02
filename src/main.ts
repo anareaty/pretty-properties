@@ -24,7 +24,6 @@ import { registerTagFixExtension } from "./extensions/tagFixExtension";
 import { updatePillPaddings } from "./utils/updates/updateStyles";
 import { registerTagPostProcessor } from "./extensions/tagPostProcessor";
 import { updateHiddenPropertiesInPropTab, updateBaseTagsStyle } from "./utils/updates/updateStyles";
-import { removeAll } from "./utils/remove";
 import { patchPropertyWidgets } from "./patches/patchWidgets";
 import { patchTagView } from "./patches/patchTagView";
 import { patchMarkdownView } from "./patches/patchMarkdownView";

@@ -10,7 +10,14 @@ import { updateAllProperties } from 'src/utils/updates/updateElements';
 export const showColoredListSettings = (settingTab: PPSettingTab) => {
     const {containerEl, plugin} = settingTab
 
-    let colorSettingsEl = containerEl.createEl("div")
+    let colorSettingsWrapper = containerEl.createEl("div")
+
+    colorSettingsWrapper.setCssProps({
+        border: "1px solid var(--text-accent)",
+        "border-radius": "4px"
+    })
+
+    let colorSettingsEl = colorSettingsWrapper.createEl("div")
 
     const addColorSetting = (property: string) => {
         
@@ -70,7 +77,7 @@ export const showColoredListSettings = (settingTab: PPSettingTab) => {
 
 
     let newProperty = ""
-    let newPropertySetting = new Setting(containerEl)
+    let newPropertySetting = new Setting(colorSettingsWrapper)
         .setName(i18n.t("ADD_COLORED_PROPERTY"))
         .addText(text => text
             .setValue("")

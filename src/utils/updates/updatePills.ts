@@ -49,10 +49,6 @@ export const generateInlineStyles = (text: string, type: string, plugin: PrettyP
 
 
 
-
-
-	//console.log(colorSettings)
-
     if (colorSettings) {
 
 		
@@ -161,7 +157,6 @@ export const setPillStyles = async (
 
 export const updateMultiselectPill = async (pill: HTMLElement, plugin: PrettyPropertiesPlugin) => {
 
-	//console.log("update multiselect pill")
 
 
 	if (plugin.settings.enableColoredProperties) {
@@ -175,7 +170,7 @@ export const updateMultiselectPill = async (pill: HTMLElement, plugin: PrettyPro
 
 
 export const updateValueListElement = async (pill: HTMLElement, dataValueString: string, styleType: string, plugin: PrettyPropertiesPlugin) => {
-	//console.log("update Value List Element")
+
 	
 	if (plugin.settings.enableColoredProperties) {
 		let value = pill.innerText;
@@ -186,7 +181,6 @@ export const updateValueListElement = async (pill: HTMLElement, dataValueString:
 
 export const updateTagPill = async (pill: HTMLElement, plugin: PrettyPropertiesPlugin) => {
 
-	//console.log("update Tag Pill")
 
 
 	if (plugin.settings.enableColoredProperties) {
@@ -203,10 +197,6 @@ export const updateTagPill = async (pill: HTMLElement, plugin: PrettyPropertiesP
 
 
 export const updateTag = (tag: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-
-
-	//console.log("update Tag")
-
 
 	let value = tag.innerText.replace("#", "")
 	let parent = tag.parentElement
@@ -461,9 +451,6 @@ export const updateLongTexts = async (container: HTMLElement, plugin: PrettyProp
 
 export const updateSettingPills = async (plugin: PrettyPropertiesPlugin) => {
 
-
-	//console.log("update Setting Pills")
-
 	let pills = document.querySelectorAll(".setting-multi-select-pill");
 	for (let pill of pills) {
 	  if (pill instanceof HTMLElement) {
@@ -518,9 +505,6 @@ export const updateSettingPills = async (plugin: PrettyPropertiesPlugin) => {
 
 
 export const updateTagPaneTags = async(container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-
-
-	//console.log("update Tag Pane Tags")
 
     let tags = container.querySelectorAll(".tag-pane-tag span.tree-item-inner-text")
     for (let tag of tags) {

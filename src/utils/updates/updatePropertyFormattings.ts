@@ -26,6 +26,7 @@ export const updatePropertyFormatting = (
     let activeInput = existingOverlay?.querySelector(".mb-input input:active")
     if (activeInput) {
         let mouseUpEvent = () => {
+            if (!(propValueEl instanceof HTMLElement)) return
             let currentValue = getCurrentPropertyElValue(propValueEl, type)
             updatePropertyFormatting(el, propName, currentValue, type, propertyFormat, propertyTextFormat, plugin)
             document.removeEventListener("mouseup", mouseUpEvent)
@@ -123,20 +124,3 @@ export const getPropertyFormatObj = (propName: string, plugin: PrettyPropertiesP
 }
 
 
-/*
-
-
-const preventRefreshingForActiveMetaBind = (overlayEl: HTMLElement, type: string, plugin: PrettyPropertiesPlugin) => {
-    let activeInput = overlayEl.querySelector(".mb-input input:active")
-    if (activeInput) {
-        let mouseUpEvent = () => {
-            let currentValue = getCurrentPropertyElValue(propValueEl, type)
-            updatePropertyFormatting(el, propName, currentValue, type, propertyFormat, propertyTextFormat, plugin)
-            document.removeEventListener("mouseup", mouseUpEvent)
-        }
-        document.addEventListener("mouseup", mouseUpEvent)
-        return
-    }
-}
-
-*/

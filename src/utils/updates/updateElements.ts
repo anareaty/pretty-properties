@@ -1,15 +1,12 @@
-import { TFile, CachedMetadata, MarkdownView, HoverPopover, BasesView } from "obsidian";
+import { TFile, CachedMetadata, MarkdownView, HoverPopover } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { renderCover, updateCoverForView } from "./updateCovers";
 import { renderIcon, updateIconForView } from "./updateIcons";
-import { updateDateInput, updateDateTimeInput } from "./updateDates";
-import { updateProgress  } from "./updateProgress";
-import { updateCardLongtext, updateLongtext, updateMultiselectPill, updateSettingPills, updateTag, updateTagPaneTagsAll, updateTagPill, updateValueListElement } from "./updatePills";
+import { updateSettingPills, updateTagPaneTagsAll } from "./updatePills";
 import { renderBanner, updateBannerForView } from "./updateBanners";
 import { getNestedProperty } from "../propertyUtils";
 import { updateAllMetadataContainers } from "./updateHiddenProperties";
-import { querySelectorsWithIframes, querySelectorsWithIframesForContainer } from "../querySelectorsHelper";
-import { getPropertyFormatObj, updatePropertyFormatting } from "./updatePropertyFormattings";
+import { querySelectorsWithIframes } from "../querySelectorsHelper";
 import { processTagsInPreviewElement } from "src/extensions/tagPostProcessor";
 import { updateWidgets } from "src/patches/patchWidgets";
 import { processBaseCardProperties } from "src/patches/patchBaseCards";

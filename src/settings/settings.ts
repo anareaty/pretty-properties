@@ -8,6 +8,10 @@ import { showCoverSettings } from './coversettings';
 import { showPropSettings } from './propSettings';
 import { showDatesSettings } from './datesSettings';
 import { showOtherSettings } from './otherSettings';
+import { showColorSettings } from './colorSettings';
+import { showHiddenSettingsTab } from './hiddenSettingsTab';
+import { showPropSettings2 } from './propSettings2';
+import { showFormatSettings } from './formatSettings';
 
 
 export interface PPPluginSettings {
@@ -224,7 +228,7 @@ export class PPSettingTab extends PluginSettingTab {
 		const {containerEl} = this;
 		containerEl.empty();
 
-		let tabNames = ["BANNERS", "ICONS", "COVERS", "PROPERTY_SETTINGS", "DATES", "OTHER"]
+		let tabNames = ["BANNERS", "ICONS", "COVERS", "COLORED_PROPERTIES", "HIDDEN_PROPERTIES", "PROPERTY_FORMATTINGS", "OTHER"]
 		let tabsEl = containerEl.createEl("div", {cls: "pp-settings-tabs"})
 		for (let tabName of tabNames) {
 			let button = tabsEl.createEl("button", {cls: "pp-settings-tab"})
@@ -253,8 +257,27 @@ export class PPSettingTab extends PluginSettingTab {
 
 
 		else if (this.plugin.settings.settingsTab == "PROPERTY_SETTINGS") {
-			showPropSettings(this)
+			showPropSettings2(this)
 		}
+
+
+		else if (this.plugin.settings.settingsTab == "COLORED_PROPERTIES") {
+			showColorSettings(this)
+		}
+
+
+		else if (this.plugin.settings.settingsTab == "HIDDEN_PROPERTIES") {
+			showHiddenSettingsTab(this)
+		}
+
+
+		else if (this.plugin.settings.settingsTab == "PROPERTY_FORMATTINGS") {
+			showFormatSettings(this)
+		}
+
+		
+
+
 
 		else if (this.plugin.settings.settingsTab == "DATES") {
 			showDatesSettings(this)

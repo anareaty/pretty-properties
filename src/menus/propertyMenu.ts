@@ -1,10 +1,8 @@
-import { MarkdownView, Menu, MenuItem, View } from "obsidian";
+import { Menu, MenuItem } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { i18n } from "src/localization/localization";
 import { updateHiddenProperties } from "src/utils/updates/updateHiddenProperties";
 import { updateAllProperties } from "src/utils/updates/updateElements";
-import { around, dedupe } from "monkey-around";
-
 
 
 
@@ -110,7 +108,7 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                     .setIcon("code-2")
                     .setSection("pretty-properties")
                     .onClick(() => {
-                        propertyFormatObj.textFormat = "raw"
+                        propertyFormatObj!.textFormat = "raw"
                         plugin.saveSettings();
                         updateAllProperties(plugin);
                     })  
@@ -126,7 +124,7 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                             propertyFormatObj.textFormat = "markdown"
                         } else {
                             plugin.settings.propertyFormats.push({
-                                property: propName,
+                                property: propName!,
                                 format: "",
                                 textFormat: "markdown"
                             });

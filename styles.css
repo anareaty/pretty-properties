@@ -1045,6 +1045,7 @@ input.mod-datetime {
   border-bottom: 1px solid var(--background-modifier-border);
   overflow-x: scroll;
   white-space: nowrap;
+  margin-bottom: 16px;
 }
 
 button.pp-settings-tab {
@@ -1871,4 +1872,13 @@ button.longtext-color-button:hover {
 .custom-date > p {
   margin-block-start: 0;
   margin-block-end: 0;
+}
+
+
+
+
+
+button.bare-button {
+  box-shadow: none;
+  background-color: transparent;
 }

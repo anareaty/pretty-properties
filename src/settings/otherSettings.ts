@@ -3,11 +3,33 @@ import { i18n } from 'src/localization/localization';
 import { DEFAULT_SETTINGS, PPSettingTab } from 'src/settings/settings';
 import { updateAutoHideProps, updateBannerStyles, updateBaseTagsStyle, updateCoverStyles, updateHiddenEmptyProperties, updateHiddenMetadataContainer, updateHiddenPropertiesInPropTab, updateHideMetadataAddButton, updateHidePropTitle, updateIconStyles, updatePillPaddings, updateRelativeDateColors } from 'src/utils/updates/updateStyles';
 import { updateAllProperties } from 'src/utils/updates/updateElements';
+import { updateLongTexts } from 'src/utils/updates/updatePills';
 
 
 
 export const showOtherSettings = (settingTab: PPSettingTab) => {
     const {containerEl, plugin} = settingTab
+
+
+    
+
+    new Setting(containerEl)
+    .setName(i18n.t("ADD_PADDINGS_TO_LIST_PROPERTIES"))
+    .setDesc(i18n.t("ADD_PADDINGS_DESC"))
+    .addDropdown(drop => drop
+        .addOptions({
+            "all": i18n.t("ALL"),
+            "none": i18n.t("NONE"),
+            "colored": i18n.t("ONLY_COLORED"),
+            "non-transparent": i18n.t("ONLY_NON_TRANSPARENT")
+        })
+        .setValue(plugin.settings.addPillPadding)
+        .onChange((value) => {
+            plugin.settings.addPillPadding = value
+            plugin.saveSettings()
+            updatePillPaddings(plugin)
+        })
+    )
 
     new Setting(containerEl)
     .setName(i18n.t("IMAGE_LINK_FORMAT"))
@@ -24,6 +46,21 @@ export const showOtherSettings = (settingTab: PPSettingTab) => {
             plugin.saveSettings()
         })
     )
+
+
+    new Setting(containerEl)
+        .setName(i18n.t("ENABLE_MATH"))
+        .addToggle(toggle => toggle
+            .setValue(plugin.settings.enableMath)
+            .onChange(async (value) => {
+                plugin.settings.enableMath = value
+                await plugin.saveSettings();
+                //@ts-ignore
+                if (plugin.settings.enableMath && !window.MathJax) {
+                    loadMathJax()
+                }
+                updateLongTexts(document.body, plugin)			
+            }));
 
 
     new Setting(containerEl)

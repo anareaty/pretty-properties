@@ -197,4 +197,7 @@ export default {
   MARKDOWN: "Markdown",
   RENDER_MARKDOWN: "Отображать как Markdown",
   DO_NOT_RENDER_MARKDOWN: "Не отображать как Markdown",
+  COLORED_PROPERTIES: "Цвета",
+  HIDDEN_PROPERTIES: "Скрытые свойства",
+  PROPERTY_FORMATTINGS: "Форматы свойств"
 };

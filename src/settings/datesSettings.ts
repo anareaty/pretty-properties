@@ -54,7 +54,7 @@ export const showDatesSettings = (settingTab: PPSettingTab) => {
             await plugin.saveSettings();
             settingTab.display();
             updateAllProperties(plugin);
-        }));
+    }));
 
         let format = plugin.settings.customDateFormat
         if (!format) {format = "L"}
