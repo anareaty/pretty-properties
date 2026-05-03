@@ -93,19 +93,14 @@ export const generateInlineStyles = (text: string, type: string, plugin: PrettyP
 		  if (textColor && textColor != "default") {
 			textColorClass = "text-colored";
 			if (colors.find((c) => c == textColor)) {
-			  //styleProps["--pp-text-rgb"] = "var(--color-" + textColor + "-rgb)"
-			  //textColorClass = "theme-text-color";
 			  styleProps["--pp-color"] = "rgb(var(--color-" + textColor + "-rgb))"
 			  
 			} else if (textColor == "accent") {
-			  //textColorClass = "accent-text-color";
 			  styleProps["--pp-color"] = "var(--text-accent)"
 			} else if (textColor == "none") {
 			  textColorClass = "none-text-color";
 			} else {
 			  let hslStringText = textColor.h + " ," + textColor.s + "% ," + textColor.l + "%";
-			  //styleProps["--pp-text-hsl"] = hslStringText
-			  //textColorClass = "custom-text-color";
 			  styleProps["--pp-color"] = "hsl(" + hslStringText + ")"
 			}
 		  }
@@ -131,7 +126,7 @@ export const setPillStyles = async (
 	
 
 
-	let colorClasses = ["theme-color", "accent-color", "custom-color", "transparent-color", "default-color", "theme-text-color", "accent-text-color", "custom-text-color", "none-text-color", "default-text-color"];
+	let colorClasses = ["colored", "transparent-color", "text-colored", "none-text-color"];
 	
 	pill.removeAttribute("data-property-pill-value")
 	pill.removeAttribute("data-tag-value")
@@ -331,6 +326,8 @@ export const updateLongtext = async (pill: HTMLElement, plugin: PrettyProperties
 				if (text) {
 					text = text.slice(0, 200).trim()
 				}
+
+				
 				setPillStyles(pill, "data-property-longtext-value", text, "longtext", plugin)
 				if (parent) {
 					updateColorButton(parent, text, isBase, plugin)
@@ -512,6 +509,8 @@ export const updateSettingPills = async (plugin: PrettyPropertiesPlugin) => {
 
 
 export const updateTagPaneTags = async(container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
+
+
 
     let tags = container.querySelectorAll(".tag-pane-tag span.tree-item-inner-text")
     for (let tag of tags) {

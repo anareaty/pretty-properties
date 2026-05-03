@@ -1,4 +1,4 @@
-import { Setting } from 'obsidian';
+import { Menu, Setting, moment } from 'obsidian';
 import { i18n } from 'src/localization/localization';
 import { updateAllProperties } from 'src/utils/updates/updateElements';
 import { PPSettingTab } from 'src/settings/settings';
@@ -6,6 +6,7 @@ import { showColoredListSettings } from './coloredListSettings';
 import { showColoredTagsSettings } from './coloredTagsSettings';
 import { showColoredTextSettings } from './coloredTextSettings';
 import { updateTagPaneTagsAll } from 'src/utils/updates/updatePills';
+import { setColorMenuItems } from 'src/menus/selectColorMenus';
 
 
 
@@ -167,6 +168,83 @@ export const showColorSettings = (settingTab: PPSettingTab) => {
     if (plugin.settings.showTextColorSettings) { 
         showColoredTextSettings(settingTab)
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    let format = plugin.settings.customDateFormat
+        if (!format) {format = "L"}
+
+        let pastDate = moment().subtract(1, "days").format(format)
+        let presentDate = moment().format(format)
+        let futureDate = moment().add(1, "days").format(format)
+
+        let pastSetting = new Setting(containerEl)
+        pastSetting.controlEl.createEl("span", {text: pastDate, cls: "setting-custom-date-past"})
+        pastSetting.setName(i18n.t("PAST_DATE_COLOR"))
+
+        .addButton((btn) => {
+            btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
+                let menu = new Menu();
+                setColorMenuItems(menu, "past", "dateColors", "pillColor", plugin);
+                menu.showAtMouseEvent(e);
+            });
+        })
+        .addButton((btn) => {
+            btn.setIcon("type").setClass("property-color-setting-button").onClick((e) => {
+                let menu = new Menu();
+                setColorMenuItems(menu, "past", "dateColors", "textColor", plugin);
+                menu.showAtMouseEvent(e);
+            });
+        })
+
+
+        
+        let presentSEtting = new Setting(containerEl)
+        presentSEtting.controlEl.createEl("span", {text: presentDate, cls: "setting-custom-date-present"})
+        presentSEtting.setName(i18n.t("PRESENT_DATE_COLOR"))
+        .addButton((btn) => {
+            btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
+                let menu = new Menu();
+                setColorMenuItems(menu, "present", "dateColors", "pillColor", plugin);
+                menu.showAtMouseEvent(e);
+            });
+        })
+        .addButton((btn) => {
+            btn.setIcon("type").setClass("property-color-setting-button").onClick((e) => {
+                let menu = new Menu();
+                setColorMenuItems(menu, "present", "dateColors", "textColor", plugin);
+                menu.showAtMouseEvent(e);
+            });
+        })
+        
+        let futureSetting = new Setting(containerEl)
+        futureSetting.controlEl.createEl("span", {text: futureDate, cls: "setting-custom-date-future"})
+        futureSetting.setName(i18n.t("FUTURE_DATE_COLOR"))
+        .addButton((btn) => {
+            btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
+                let menu = new Menu();
+                setColorMenuItems(menu, "future", "dateColors", "pillColor", plugin);
+                menu.showAtMouseEvent(e);
+            });
+        })
+        .addButton((btn) => {
+            btn.setIcon("type").setClass("property-color-setting-button").onClick((e) => {
+                let menu = new Menu();
+                setColorMenuItems(menu, "future", "dateColors", "textColor", plugin);
+                menu.showAtMouseEvent(e);
+            });
+        })
 
 
 

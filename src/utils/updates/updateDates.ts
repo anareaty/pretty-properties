@@ -5,6 +5,8 @@ import { computeFormattedValue, getPropertyFormatObj, setOverlayContent } from "
 import { MarkdownRenderer } from "obsidian";
 
 export const updateDateInput = async (input: HTMLInputElement, plugin: PrettyPropertiesPlugin) => {
+
+
 	let value = input.value;
 	let parent = input.parentElement
 	let grandParent = parent?.parentElement
@@ -31,6 +33,7 @@ export const updateDateInput = async (input: HTMLInputElement, plugin: PrettyPro
 
 
 	let customDateFormat = plugin.settings.customDateFormat
+
 
 	if (parent instanceof HTMLElement) {
 		let isBase = parent.classList.contains("bases-table-cell")

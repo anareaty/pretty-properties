@@ -17,6 +17,8 @@ import { processBaseTableCellTags } from "src/patches/patchBaseTable";
 
 export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => { 
 
+    
+
     let mdLeaves = plugin.app.workspace.getLeavesOfType("markdown");
     for (let leaf of mdLeaves) {
         
@@ -78,13 +80,18 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
 
         //@ts-ignore
         let baseView = leaf.view.controller?.view
+        if (!baseView) return
 
         if (baseView.type == "table") {
             for (let row of baseView.rows) {
                 for (let cell of row.cells) {
+
+
                     let propertyEditor = cell.renderer.propertyEditor
 
                     if (propertyEditor) {
+
+                        let type = cell.renderer.inferredType.type
                         let value = propertyEditor.value || propertyEditor.multiselect?.values || cell.renderer.val
                         let ctx = propertyEditor.ctx || {
                             key: cell.prop.replace("note.", ""),
@@ -92,7 +99,7 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
                         }
 
                         let args = [propertyEditor.containerEl, value, ctx]
-                        updateWidgets(propertyEditor, args, plugin)
+                        updateWidgets(type, propertyEditor, args, plugin)
 
                     } else {
                         processBaseTableCellTags(cell, plugin)

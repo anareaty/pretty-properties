@@ -131,35 +131,44 @@ export const updateRelativeDateColors = (plugin: PrettyPropertiesPlugin) => {
   let presentTextColor = ""
   let pastBgColor = ""
   let pastTextColor = ""
+
+  let coloredDatesClass = ""
+
  
   if (colors.find((c) => c == futureColor)) {
     futureBgColor = "rgba(var(--color-" + futureColor + "-rgb), 0.2)"
+    coloredDatesClass = "colored-dates"
   } else if (futureColor && futureColor.h !== undefined) {
       let textLightness = getTextLightness(futureColor);
       let hslString = futureColor.h + " ," + futureColor.s + "% ," + futureColor.l + "%";
       let hslStringText = futureColor.h + " ," + futureColor.s + "% ," + textLightness + "%";
       futureBgColor = "hsl(" + hslString + ")"
       futureTextColor = "hsl(" + hslStringText + ")"
+      coloredDatesClass = "colored-dates"
   }
 
   if (colors.find((c) => c == presentColor)) {
     presentBgColor = "rgba(var(--color-" + presentColor + "-rgb), 0.2)"
+    coloredDatesClass = "colored-dates"
   } else if (presentColor && presentColor.h !== undefined) {
     let textLightness = getTextLightness(presentColor);
     let hslString = presentColor.h + " ," + presentColor.s + "% ," + presentColor.l + "%";
     let hslStringText = presentColor.h + " ," + presentColor.s + "% ," + textLightness + "%";
     presentBgColor = "hsl(" + hslString + ")"
     presentTextColor = "hsl(" + hslStringText + ")"
+    coloredDatesClass = "colored-dates"
   }
 
   if (colors.find((c) => c == pastColor)) {
     pastBgColor = "rgba(var(--color-" + pastColor + "-rgb), 0.2)"
+    coloredDatesClass = "colored-dates"
   } else if (pastColor && pastColor.h !== undefined) {
     let textLightness = getTextLightness(pastColor);
     let hslString = pastColor.h + " ," + pastColor.s + "% ," + pastColor.l + "%";
     let hslStringText = pastColor.h + " ," + pastColor.s + "% ," + textLightness + "%";
     pastBgColor = "hsl(" + hslString + ")"
     pastTextColor = "hsl(" + hslStringText + ")"
+    coloredDatesClass = "colored-dates"
   }
 
   if (colors.find((c) => c == futureBaseTextColor)) {
@@ -196,10 +205,11 @@ export const updateRelativeDateColors = (plugin: PrettyPropertiesPlugin) => {
     "--date-present-background": presentBgColor,
     "--date-present-color": presentTextColor,
     "--date-past-background": pastBgColor,
-    "--date-past-color": pastTextColor
+    "--date-past-color": pastTextColor,
 
   }
   document.body.setCssProps(relativeDatesProps);
+  document.body.classList.add(coloredDatesClass)
 }
 
 

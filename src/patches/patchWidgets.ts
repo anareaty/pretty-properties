@@ -8,11 +8,7 @@ import { updateAllMetadataContainers } from "src/utils/updates/updateHiddenPrope
 import { getPropertyFormatObj, updatePropertyFormatting } from "src/utils/updates/updatePropertyFormattings";
 
 
-export const updateWidgets = async (rendered: any, args: any[], plugin: PrettyPropertiesPlugin) => {
-
-  let type = rendered.type
-
-  
+export const updateWidgets = async (type: string, rendered: any, args: any[], plugin: PrettyPropertiesPlugin) => {
 
 
   try {
@@ -68,14 +64,14 @@ export const updateWidgets = async (rendered: any, args: any[], plugin: PrettyPr
 
 
 
-
-
-
+    
 
     if (type == "date") {
       let parent = el.parentElement
       parent.setAttribute("data-source-path", sourcePath)
       let input = el.querySelector("input");
+
+
       updateDateInput(input, plugin)
       input.onchange = () => {
         updateDateInput(input, plugin)
@@ -135,6 +131,8 @@ export const updateWidgets = async (rendered: any, args: any[], plugin: PrettyPr
     }
 
     if (type == "text") {
+
+
       let longText = el.querySelector(".metadata-input-longtext");
       let link = el.querySelector(".metadata-link");
 
@@ -252,14 +250,15 @@ export const patchPropertyWidgets = async (plugin: PrettyPropertiesPlugin) => {
 
             let rendered = oldRender && oldRender.apply(this, args)
 
-            updateWidgets(rendered, args, plugin)
+
+            updateWidgets(type, rendered, args, plugin)
 
             let renderValues = rendered?.multiselect?.renderValues
             if (renderValues) {
               rendered.multiselect.renderValues = new Proxy(renderValues, {
                 apply(renderValues, thisArg2, args2) {
                   let renderedValues = renderValues.call(thisArg2, ...args2)
-                  updateWidgets(rendered, args, plugin)
+                  updateWidgets(type, rendered, args, plugin)
                   return renderedValues
                 }
               })
