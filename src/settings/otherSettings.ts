@@ -84,7 +84,7 @@ export const showOtherSettings = (settingTab: PPSettingTab) => {
                                 .setButtonText(exportFileButtonName)
                                 .onClick(() => {
                                     if (Platform.isDesktop) {
-                                        let exportLink = document.createElement("a")
+                                        let exportLink = createEl("a")
                                         exportLink.setAttrs({
                                                 download: fileName,
                                                 href: `data:application/json;charset=utf-8,${encodeURIComponent(settingsText)}`,

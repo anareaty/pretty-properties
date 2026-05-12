@@ -25,7 +25,7 @@ export class EmojiSuggestModal extends SuggestModal<string> {
         });
     }
     async renderSuggestion(emoji: string, el: Element) {
-        el.createEl("div", { text: emoji });
+        el.createDiv({ text: emoji });
         el.classList.add("image-suggestion-item");
         el.classList.add("emoji-icon");
     }

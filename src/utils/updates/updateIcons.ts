@@ -68,7 +68,7 @@ export const renderIcon = async (
                         titleIconWrapper?.empty()
                         titleIconWrapper?.append(image)
                     } else {
-                        titleIconWrapper = document.createElement("span")
+                        titleIconWrapper = createSpan()
                         titleIconWrapper.classList.add("title-icon-wrapper")
                         titleIconWrapper.setAttribute("data-value", iconVal)
                         titleIconWrapper.append(image)
@@ -79,7 +79,7 @@ export const renderIcon = async (
                     titleWrapper.remove()
                 }
 
-                titleWrapper = document.createElement("div")
+                titleWrapper = createDiv()
                 titleWrapper.classList.add("title-wrapper")
                 parent?.prepend(titleWrapper)
                 titleWrapper.append(inlineTitle)
@@ -110,19 +110,19 @@ export const renderIcon = async (
                 titleIconWrapper.remove()
             }
 
-            let iconDiv = document.createElement("div");
+            let iconDiv = createDiv();
             iconDiv.setAttribute("data-value", iconVal)
             iconDiv.classList.add("icon-wrapper");
 
             if (image) {
                 
-                let iconOuter = iconDiv.createEl("div", {
+                let iconOuter = iconDiv.createDiv({
                     cls: "icon-outer",
                 });
-                let iconSizer = iconOuter.createEl("div", {
+                let iconSizer = iconOuter.createDiv({
                     cls: "icon-sizer",
                 });
-                let iconImage = iconSizer.createEl("div", {
+                let iconImage = iconSizer.createDiv({
                     cls: "icon-image",
                 });
                 iconImage.append(image);
@@ -192,7 +192,7 @@ export const getIconImage = (iconVal: string, sourcePath: string, plugin: Pretty
             iconLink = "![](" + iconLink + ")";
         if (iconLink.startsWith("[") && !iconLink.startsWith("!")) iconLink = "!" + iconLink;
         if (!iconLink.startsWith("![")) iconLink = "![[" + iconLink + "]]"
-        let iconTemp = document.createElement("div");
+        let iconTemp = createDiv();
         MarkdownRenderer.render(
             plugin.app,
             iconLink,
@@ -204,7 +204,7 @@ export const getIconImage = (iconVal: string, sourcePath: string, plugin: Pretty
     }
 
     if (!image) {
-        image = document.createElement("div");
+        image = createDiv();
         image.classList.add("pp-text-icon");
         image.append(iconVal);
     }
@@ -302,7 +302,7 @@ export const renderTitleIcon = (view: any, plugin: PrettyPropertiesPlugin) => {
             titleIconWrapper?.empty()
             titleIconWrapper?.append(iconImage)
           } else {
-            titleIconWrapper = document.createElement("span")
+            titleIconWrapper = createSpan()
             titleIconWrapper.classList.add("title-icon-wrapper")
             titleIconWrapper.append(iconImage)
           }
@@ -313,7 +313,7 @@ export const renderTitleIcon = (view: any, plugin: PrettyPropertiesPlugin) => {
         }
 
         let parent = inlineTitle.parentElement
-        titleWrapper = document.createElement("div")
+        titleWrapper = createDiv()
         titleWrapper.classList.add("title-wrapper")
         parent.prepend(titleWrapper)
         titleWrapper.append(inlineTitle)

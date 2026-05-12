@@ -67,7 +67,7 @@ export const renderBanner = async (
       return
     }
 
-    let bannerDiv = document.createElement("div");
+    let bannerDiv = createDiv();
     bannerDiv.setAttribute("data-value", bannerVal)
     bannerDiv.setAttribute("data-position", positionVal.toString())
 
@@ -78,7 +78,7 @@ export const renderBanner = async (
         if (bannerVal.startsWith("[") && !bannerVal.startsWith("!")) bannerVal = "!" + bannerVal;
         if (!bannerVal.startsWith("![")) bannerVal = "![[" + bannerVal + "]]"
 
-        let bannerTemp = document.createElement("div");
+        let bannerTemp = createDiv();
 
         MarkdownRenderer.render(
             plugin.app,

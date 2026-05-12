@@ -47,7 +47,7 @@ export const updateProgress = async (propertyEl: HTMLElement, plugin: PrettyProp
             let value = 0
             let valueString = ""
             let valueEl = propertyEl.querySelector(".metadata-input-number")
-            if (valueEl instanceof HTMLInputElement) {
+            if (valueEl?.instanceOf(HTMLInputElement)) {
                 valueString = valueEl.value
                 value = Number(valueString)
                 if (!valueString || !value) value = 0
@@ -72,10 +72,10 @@ export const updateProgress = async (propertyEl: HTMLElement, plugin: PrettyProp
 
             } else {
                 //create new progress
-                let progressWrapper = document.createElement("div");
+                let progressWrapper = createDiv();
                 progressWrapper.classList.add("metadata-progress-wrapper");
                 progressWrapper.setAttribute("data-progress-percent", percent)
-                progress = document.createElement("progress");
+                progress = createEl("progress");
                 progress.classList.add("metadata-progress");
                 progress.value = value;
                 progress.max = maxVal;

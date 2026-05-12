@@ -9,25 +9,25 @@ import { updateAllProperties } from 'src/utils/updates/updateElements';
 export const showColoredTagsSettings = (settingTab: PPSettingTab) => {
     const {containerEl, plugin} = settingTab
 
-    let colorSettingsWrapper = containerEl.createEl("div")
+    let colorSettingsWrapper = containerEl.createDiv()
 
     colorSettingsWrapper.setCssProps({
         border: "1px solid var(--text-accent)",
         "border-radius": "4px"
     })
 
-    let colorSettingsEl = colorSettingsWrapper.createEl("div")
+    let colorSettingsEl = colorSettingsWrapper.createDiv()
 
     const addColorSetting = (property: string) => {
         
         let propertyColorSetting = new Setting(colorSettingsEl)
 
-        let pillEl = propertyColorSetting.nameEl.createEl("div", {
+        let pillEl = propertyColorSetting.nameEl.createDiv({
             cls: "multi-select-pill setting-tag-pill",
             
         })
         setPillStyles(pillEl, "data-tag-value", property, "tag", plugin)
-        pillEl.createEl("div", {text: property, cls: "multi-select-pill-content"})
+        pillEl.createDiv({text: property, cls: "multi-select-pill-content"})
 
         propertyColorSetting
         .addButton((btn) => {

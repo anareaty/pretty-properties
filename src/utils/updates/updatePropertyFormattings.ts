@@ -49,7 +49,7 @@ export const updatePropertyFormatting = (
 
     
 
-    let overlayElement = document.createElement("span")
+    let overlayElement = createSpan()
     overlayElement.classList.add("pp-formatted-value-overlay")
     overlayElement.classList.add(type + "-overlay")
     propValueEl.before(overlayElement)
@@ -92,7 +92,7 @@ export const setOverlayContent = (rawContent: string, propertyTextFormat: string
 const getCurrentPropertyElValue = (propValueEl: HTMLElement, type: string) => {
     if (type == "number") {
         let valueInput = propValueEl?.querySelector("input")
-        if (valueInput instanceof HTMLInputElement) {
+        if (valueInput?.instanceOf(HTMLInputElement)) {
             return valueInput.value
         }
     } else if (type == "text") {

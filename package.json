@@ -23,6 +23,7 @@
 	},
 	"dependencies": {
 		"@budibase/handlebars-helpers": "^0.14.2",
+		"@codemirror/state": "^6.6.0",
 		"dayjs": "^1.11.19",
 		"emojilib": "^4.0.2",
 		"handlebars": "^4.7.8",

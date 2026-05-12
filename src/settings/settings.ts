@@ -229,7 +229,7 @@ export class PPSettingTab extends PluginSettingTab {
 		containerEl.empty();
 
 		let tabNames = ["BANNERS", "ICONS", "COVERS", "COLORED_PROPERTIES", "HIDDEN_PROPERTIES", "PROPERTY_FORMATTINGS", "OTHER"]
-		let tabsEl = containerEl.createEl("div", {cls: "pp-settings-tabs"})
+		let tabsEl = containerEl.createDiv({cls: "pp-settings-tabs"})
 		for (let tabName of tabNames) {
 			let button = tabsEl.createEl("button", {cls: "pp-settings-tab"})
 			if (this.plugin.settings.settingsTab == tabName) {

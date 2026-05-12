@@ -135,7 +135,7 @@ export const createColorButton = async (parent: HTMLElement, value: string, plug
         let isBase = parent.classList.contains("bases-table-cell")
 
         if (value && (!isBase || plugin.settings.enableColorButtonInBases)) {
-            let colorButton = document.createElement("button")
+            let colorButton = createEl("button")
             setIcon(colorButton, "palette")
             colorButton.classList.add("longtext-color-button")
             parent.append(colorButton)

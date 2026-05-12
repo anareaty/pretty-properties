@@ -123,7 +123,7 @@ export const getPropertyValue = (e: MouseEvent, plugin: PrettyPropertiesPlugin) 
 
         if (valueTextEl instanceof HTMLElement) {
             text = valueTextEl.innerText;
-        } else if (valueInputEl instanceof HTMLInputElement) {
+        } else if (valueInputEl?.instanceOf(HTMLInputElement)) {
             text = valueInputEl.value;
         } else if (checkboxEl) {
             e.preventDefault();

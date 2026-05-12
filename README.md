@@ -1,20 +1,29 @@
 # Pretty properties
 
-This plugin makes metadata block on the top of the note more visually appealing with images, colors and custom visual elements.
+This plugin makes note properties more visually appealing with images, colors and custom visual elements.
+
+Main features:
+- Add custom colors to properties and tags.
+- Insert cover image near the metadata block.
+- Add banner and icon to the note.
+- Hide specific properties from the note.
+- Set custom date format for date properties.
+- Show number property as progress-bar.
+- Apply your own custom formatting to any property using the template language. 
 
 ![book note](images/image-1.png)
 
-## Features
+## More about the features
 
 ### Cover image
 
 Add image to the left of metadata block to save space in the note. Works great for book notes, people profiles etc. You can change the shape and size of the image.
 
-To add cover image you can use command "Select cover image" from the command pallete. Then you can select a local image from your vault or add a link to the external image. You can set specific folder to look for the local cover images.
+To add cover image you can use command "Select cover image" from the command pallete. Then you can select a local image from your vault or add a link to the external image. You can set specific folder in the settings to look for the local cover images.
 
 Adding the cover will add the "cover" property to your note. Do not delete the property, it is needed for the image to show. You can hide the property instead. You can also change this property name in the setting.
 
-Right-click on the cover to change it's shape or select another image. You can use initial shape with 3 custom widths, vertical, horizontal, square and circle. Shapes are stored in cssclasses property. You can set the custom width for every shape.
+Right-click on the cover to change it's shape or select another image. You can use initial shape with 3 custom widths, vertical, horizontal, square and circle. You can set the custom width for every shape in the settings.
 
 You can also show arbitrary markdown as a cover. See [Formatting](#Formatting) for more infos.
 

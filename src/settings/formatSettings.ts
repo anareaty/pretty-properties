@@ -131,14 +131,14 @@ export const showFormatSettingsTab = (settingTab: PPSettingTab) => {
 const showFormatSettings = (settingTab: PPSettingTab) => {
     const {containerEl, plugin} = settingTab
 
-    let formatSettingsWrapper = containerEl.createEl("div")
+    let formatSettingsWrapper = containerEl.createDiv()
 
     formatSettingsWrapper.setCssProps({
         border: "1px solid var(--text-accent)",
         "border-radius": "4px"
     })
 
-    let formatSettingsEl = formatSettingsWrapper.createEl("div")
+    let formatSettingsEl = formatSettingsWrapper.createDiv()
 
 
 	const addFormatSetting = (property: string) => {

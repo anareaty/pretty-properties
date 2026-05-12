@@ -88,7 +88,7 @@ export const renderCover = async (
 				if (coverType === CoverType.Wikilink)
 					renderValue = `!${coverVal}`;
 
-				const coverTemp = document.createElement("div");
+				const coverTemp = createDiv();
 				await MarkdownRenderer.render(plugin.app, renderValue, coverTemp, sourcePath, plugin);
 
 				hookUpLinks(plugin.app, component, coverTemp, sourcePath);
@@ -109,7 +109,7 @@ export const renderCover = async (
 		}
 
 		if (coverItems.length > 0) {
-			coverDiv = document.createElement("div");
+			coverDiv = createDiv();
 			coverDiv.classList.add("metadata-side-image");
 
 			applyCoverCssClasses(frontmatter, coverDiv, plugin);
@@ -251,7 +251,7 @@ export const renderPdfCover = async (relativePath: string, sourcePath: string, p
         let firstPage = await pdf.getPage(1)
         if (firstPage) {
             let viewport = firstPage.getViewport({scale: 1});
-            canvas = document.createElement("canvas")
+            canvas = createEl("canvas")
             canvas.classList.add("pp-pdf-cover-canvas")
             canvas.classList.add("pp-cover-image")
             let context = canvas.getContext('2d')
@@ -261,7 +261,7 @@ export const renderPdfCover = async (relativePath: string, sourcePath: string, p
                 canvasContext: context,
                 viewport: viewport
             });
-            let pdfContainer = document.createElement("div")
+            let pdfContainer = createDiv()
             pdfContainer.classList.add("pp-pdf-cover-container")
             pdfContainer.append(canvas)
             return pdfContainer
@@ -281,7 +281,7 @@ function addCoverMenuButton(
 
 	coverItem.classList.add("pp-cover-has-iframe");
 
-	const button = document.createElement("div");
+	const button = createDiv();
 	button.classList.add("pp-cover-menu-button", "edit-block-button");
 
 	setIcon(button, "code-2");

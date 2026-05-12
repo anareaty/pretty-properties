@@ -9,19 +9,19 @@ import { updateAllProperties } from 'src/utils/updates/updateElements';
 export const showColoredTextSettings = (settingTab: PPSettingTab) => {
     const {containerEl, plugin} = settingTab
 
-    let colorSettingsWrapper = containerEl.createEl("div")
+    let colorSettingsWrapper = containerEl.createDiv()
 
     colorSettingsWrapper.setCssProps({
         border: "1px solid var(--text-accent)",
         "border-radius": "4px"
     })
 
-    let colorSettingsEl = colorSettingsWrapper.createEl("div")
+    let colorSettingsEl = colorSettingsWrapper.createDiv()
 
     const addColorSetting = (property: string) => {
         let propertyColorSetting = new Setting(colorSettingsEl)
 
-        let pill = propertyColorSetting.nameEl.createEl("div", {
+        let pill = propertyColorSetting.nameEl.createDiv({
             text: property,
             cls: "metadata-input-longtext setting-longtext-pill",
             

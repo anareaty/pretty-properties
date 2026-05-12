@@ -79,14 +79,14 @@ const processBaseCardProperty = (property: any, plugin: PrettyPropertiesPlugin) 
 
         else if (type == "date") {
             let input = property.lineEl.querySelector("input");
-            if (input instanceof HTMLInputElement) {
+            if (input.instanceOf(HTMLInputElement)) {
                 updateDateInput(input, plugin)
             }
         }
 
         else if (type == "datetime") {
             let input = property.lineEl.querySelector("input");
-            if (input instanceof HTMLInputElement) {
+            if (input.instanceOf(HTMLInputElement)) {
                 updateDateTimeInput(input, plugin)
             }
         }

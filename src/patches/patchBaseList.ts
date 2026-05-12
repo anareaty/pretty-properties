@@ -94,14 +94,14 @@ const processBaseListProperty = (property: any, plugin: PrettyPropertiesPlugin) 
 
         else if (type == "date") {
             let input = property.el.querySelector("input");
-            if (input instanceof HTMLInputElement) {
+            if (input.instanceOf(HTMLInputElement)) {
                 updateDateInput(input, plugin)
             }
         }
 
         else if (type == "datetime") {
             let input = property.el.querySelector("input");
-            if (input instanceof HTMLInputElement) {
+            if (input.instanceOf(HTMLInputElement)) {
                 updateDateTimeInput(input, plugin)
             }
         }

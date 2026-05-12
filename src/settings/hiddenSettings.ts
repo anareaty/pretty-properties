@@ -7,14 +7,14 @@ import { updateHiddenProperties } from 'src/utils/updates/updateHiddenProperties
 export const showHiddenSettings = (settingTab: PPSettingTab) => {
     const {containerEl, plugin} = settingTab
 
-    let hiddenSettingsWrapper = containerEl.createEl("div")
+    let hiddenSettingsWrapper = containerEl.createDiv()
 
     hiddenSettingsWrapper.setCssProps({
         border: "1px solid var(--text-accent)",
         "border-radius": "4px"
     })
 
-    let hiddenSettingsEl = hiddenSettingsWrapper.createEl("div")
+    let hiddenSettingsEl = hiddenSettingsWrapper.createDiv()
     const addHiddenSetting = (property: string) => {
         let propertyHiddenSetting = new Setting(hiddenSettingsEl)
         .setName(property)
@@ -63,14 +63,14 @@ export const showHiddenSettings = (settingTab: PPSettingTab) => {
 export const showHiddenEmptySettings = (settingTab: PPSettingTab) => {
     const {containerEl, plugin} = settingTab
 
-    let hiddenSettingsWrapper = containerEl.createEl("div")
+    let hiddenSettingsWrapper = containerEl.createDiv()
 
     hiddenSettingsWrapper.setCssProps({
         border: "1px solid var(--text-accent)",
         "border-radius": "4px"
     })
 
-    let hiddenSettingsEl = hiddenSettingsWrapper.createEl("div")
+    let hiddenSettingsEl = hiddenSettingsWrapper.createDiv()
     const addHiddenSetting = (property: string) => {
         let propertyHiddenSetting = new Setting(hiddenSettingsEl)
         .setName(property)

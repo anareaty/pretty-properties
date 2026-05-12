@@ -88,7 +88,7 @@ export const updateDateInput = async (input: HTMLInputElement, plugin: PrettyPro
 				parent.classList.add("has-custom-date")
 				
 			} else if (!existingCustomDateElement && customDate != "Invalid date") {
-				let customDateEl = document.createElement("span")
+				let customDateEl = createSpan()
 				customDateEl.classList.add("custom-date")
 
 
@@ -158,7 +158,7 @@ export const updateDateTimeInput = async (input: HTMLInputElement, plugin: Prett
 				parent.classList.add("has-custom-date")
 				
 			} else if (!existingCustomDateElement && customDate != "Invalid date") {
-				let customDateEl = document.createElement("span")
+				let customDateEl = createSpan()
 				customDateEl.classList.add("custom-date")
 				customDateEl.append(customDate)
 				input.after(customDateEl)

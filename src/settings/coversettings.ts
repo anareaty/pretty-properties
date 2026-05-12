@@ -45,7 +45,7 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
 
 
 
-        let coverSettingsWrapper = containerEl.createEl("div")
+        let coverSettingsWrapper = containerEl.createDiv()
 
         coverSettingsWrapper.setCssProps({
             border: "1px solid var(--text-accent)",
@@ -56,7 +56,7 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
         .setName(i18n.t("COVER_PROPERTIES"))
         .setHeading()
 
-        let coverSettingsEl = coverSettingsWrapper.createEl("div")
+        let coverSettingsEl = coverSettingsWrapper.createDiv()
 
 
 
@@ -81,6 +81,7 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
                 search.onChange(async (value) => {
                     await persist(value);
                 });
+
 
                 const suggester = new PropertyNameSuggest(plugin.app, search.inputEl, ["text"]);
                 suggester.onSelect(async (value) => {

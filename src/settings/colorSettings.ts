@@ -190,7 +190,7 @@ export const showColorSettings = (settingTab: PPSettingTab) => {
         let futureDate = moment().add(1, "days").format(format)
 
         let pastSetting = new Setting(containerEl)
-        pastSetting.controlEl.createEl("span", {text: pastDate, cls: "setting-custom-date-past"})
+        pastSetting.controlEl.createSpan({text: pastDate, cls: "setting-custom-date-past"})
         pastSetting.setName(i18n.t("PAST_DATE_COLOR"))
 
         .addButton((btn) => {
@@ -211,7 +211,7 @@ export const showColorSettings = (settingTab: PPSettingTab) => {
 
         
         let presentSEtting = new Setting(containerEl)
-        presentSEtting.controlEl.createEl("span", {text: presentDate, cls: "setting-custom-date-present"})
+        presentSEtting.controlEl.createSpan({text: presentDate, cls: "setting-custom-date-present"})
         presentSEtting.setName(i18n.t("PRESENT_DATE_COLOR"))
         .addButton((btn) => {
             btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
@@ -229,7 +229,7 @@ export const showColorSettings = (settingTab: PPSettingTab) => {
         })
         
         let futureSetting = new Setting(containerEl)
-        futureSetting.controlEl.createEl("span", {text: futureDate, cls: "setting-custom-date-future"})
+        futureSetting.controlEl.createSpan({text: futureDate, cls: "setting-custom-date-future"})
         futureSetting.setName(i18n.t("FUTURE_DATE_COLOR"))
         .addButton((btn) => {
             btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {

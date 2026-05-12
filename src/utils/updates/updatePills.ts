@@ -298,7 +298,7 @@ export const updateLongtext = async (pill: HTMLElement, plugin: PrettyProperties
 
 			if (math) {
                 propEl?.classList.add("has-math")
-                let mathWrapper = document.createElement("div")
+                let mathWrapper = createDiv()
                 mathWrapper.classList.add("math-wrapper")
                 mathWrapper.setAttribute("data-math", text)
                 mathWrapper.append(math)
@@ -396,7 +396,7 @@ export const updateCardLongtext = async (pill: HTMLElement, plugin: PrettyProper
 
 			if (math) {
                 propEl?.classList.add("has-math")
-                let mathWrapper = document.createElement("div")
+                let mathWrapper = createDiv()
                 mathWrapper.classList.add("math-wrapper")
                 mathWrapper.setAttribute("data-math", text)
                 mathWrapper.append(math)

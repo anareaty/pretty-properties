@@ -17,12 +17,12 @@ export function enhanceFormatTextArea(
 	const parent = textareaEl.parentElement;
 	if (!parent) return;
 
-	const wrapper = document.createElement("div");
+	const wrapper = createDiv();
 	wrapper.addClass("pp-format-wrapper");
 	parent.insertBefore(wrapper, textareaEl);
 	wrapper.appendChild(textareaEl);
 
-	const errorEl = document.createElement("div");
+	const errorEl = createDiv();
 	errorEl.addClass("pp-format-error");
 	errorEl.style.display = "none";
 	wrapper.appendChild(errorEl);
