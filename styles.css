@@ -262,7 +262,7 @@
 
 /* SIDE IMAGES*/
   
-.cm-sizer,
+.markdown-source-view .cm-sizer,
 .mod-header {
   container-type: inline-size;
 }
