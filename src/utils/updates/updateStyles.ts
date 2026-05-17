@@ -103,6 +103,7 @@ export const updateCoverStyles = (plugin: PrettyPropertiesPlugin) => {
   }
     
   
+  
 }
 
 
@@ -135,10 +136,10 @@ export const updateRelativeDateColors = (plugin: PrettyPropertiesPlugin) => {
   let coloredDatesClass = ""
 
  
-  if (colors.find((c) => c == futureColor)) {
+  if (colors.find((c) => c == futureColor) && typeof futureColor == "string") {
     futureBgColor = "rgba(var(--color-" + futureColor + "-rgb), 0.2)"
     coloredDatesClass = "colored-dates"
-  } else if (futureColor && futureColor.h !== undefined) {
+  } else if (futureColor && typeof futureColor != "string") {
       let textLightness = getTextLightness(futureColor);
       let hslString = futureColor.h + " ," + futureColor.s + "% ," + futureColor.l + "%";
       let hslStringText = futureColor.h + " ," + futureColor.s + "% ," + textLightness + "%";
@@ -147,10 +148,10 @@ export const updateRelativeDateColors = (plugin: PrettyPropertiesPlugin) => {
       coloredDatesClass = "colored-dates"
   }
 
-  if (colors.find((c) => c == presentColor)) {
+  if (colors.find((c) => c == presentColor) && typeof presentColor == "string") {
     presentBgColor = "rgba(var(--color-" + presentColor + "-rgb), 0.2)"
     coloredDatesClass = "colored-dates"
-  } else if (presentColor && presentColor.h !== undefined) {
+  } else if (presentColor && typeof presentColor != "string") {
     let textLightness = getTextLightness(presentColor);
     let hslString = presentColor.h + " ," + presentColor.s + "% ," + presentColor.l + "%";
     let hslStringText = presentColor.h + " ," + presentColor.s + "% ," + textLightness + "%";
@@ -159,10 +160,10 @@ export const updateRelativeDateColors = (plugin: PrettyPropertiesPlugin) => {
     coloredDatesClass = "colored-dates"
   }
 
-  if (colors.find((c) => c == pastColor)) {
+  if (colors.find((c) => c == pastColor) && typeof pastColor == "string") {
     pastBgColor = "rgba(var(--color-" + pastColor + "-rgb), 0.2)"
     coloredDatesClass = "colored-dates"
-  } else if (pastColor && pastColor.h !== undefined) {
+  } else if (pastColor && typeof pastColor != "string") {
     let textLightness = getTextLightness(pastColor);
     let hslString = pastColor.h + " ," + pastColor.s + "% ," + pastColor.l + "%";
     let hslStringText = pastColor.h + " ," + pastColor.s + "% ," + textLightness + "%";
@@ -171,18 +172,18 @@ export const updateRelativeDateColors = (plugin: PrettyPropertiesPlugin) => {
     coloredDatesClass = "colored-dates"
   }
 
-  if (colors.find((c) => c == futureBaseTextColor)) {
+  if (colors.find((c) => c == futureBaseTextColor) && typeof futureBaseTextColor == "string") {
     futureTextColor = "rgb(var(--color-" + futureBaseTextColor + "-rgb))"
-  } else if (futureBaseTextColor && futureBaseTextColor.h !== undefined) {
+  } else if (futureBaseTextColor && typeof futureBaseTextColor != "string") {
     let hslStringText = futureBaseTextColor.h + " ," + futureBaseTextColor.s + "% ," + futureBaseTextColor.l + "%";
     futureTextColor = "hsl(" + hslStringText + ")"
   } else if (futureBaseTextColor == "none") {
     futureTextColor = "var(--text-normal)"
   }
 
-  if (colors.find((c) => c == presentBaseTextColor)) {
+  if (colors.find((c) => c == presentBaseTextColor) && typeof presentBaseTextColor == "string") {
     presentTextColor = "rgb(var(--color-" + presentBaseTextColor + "-rgb))"
-  } else if (presentBaseTextColor && presentBaseTextColor.h !== undefined) {
+  } else if (presentBaseTextColor && typeof presentBaseTextColor != "string") {
     let hslStringText = presentBaseTextColor.h + " ," + presentBaseTextColor.s + "% ," + presentBaseTextColor.l + "%";
     presentTextColor = "hsl(" + hslStringText + ")"
   } else if (presentBaseTextColor == "none") {
@@ -190,9 +191,9 @@ export const updateRelativeDateColors = (plugin: PrettyPropertiesPlugin) => {
   }
 
 
-  if (colors.find((c) => c == pastBaseTextColor)) {
+  if (colors.find((c) => c == pastBaseTextColor) && typeof pastBaseTextColor == "string") {
     pastTextColor = "rgb(var(--color-" + pastBaseTextColor + "-rgb))"
-  } else if (pastBaseTextColor && pastBaseTextColor.h !== undefined) {
+  } else if (pastBaseTextColor && typeof pastBaseTextColor != "string") {
     let hslStringText = pastBaseTextColor.h + " ," + pastBaseTextColor.s + "% ," + pastBaseTextColor.l + "%";
     pastTextColor = "hsl(" + hslStringText + ")"
   } else if (pastBaseTextColor == "none") {
@@ -269,7 +270,7 @@ export const updateHideMetadataAddButton = (plugin: PrettyPropertiesPlugin) => {
 
 export const updateTheme = (plugin: PrettyPropertiesPlugin) => {
   //@ts-ignore
-  let theme = plugin.app.customCss?.theme
+  let theme = (plugin.app.customCss as {theme: string} | undefined)?.theme
   if (theme) {
     document.body.setAttr('data-theme', theme);
   } else {

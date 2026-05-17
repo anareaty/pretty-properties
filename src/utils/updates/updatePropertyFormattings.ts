@@ -1,21 +1,23 @@
-import { MarkdownRenderer } from "obsidian";
+import { Component, MarkdownRenderer } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 
 
 export const updatePropertyFormatting = (
     el: HTMLElement, 
     propName: string, 
-    value: any,
+    value: string | null,
     type: string,
-    propertyFormat: any, 
+    propertyFormat: string | undefined, 
     propertyTextFormat: string,
+
     plugin: PrettyPropertiesPlugin
 ) => {
 
- 
+
+
 
     let propValueEl = el.querySelector(".metadata-property-value")
-    if (!(propValueEl instanceof HTMLElement)) return
+    if (!(propValueEl?.instanceOf(HTMLElement))) return
     let existingOverlay = el.querySelector(".pp-formatted-value-overlay")
 
 
@@ -26,7 +28,7 @@ export const updatePropertyFormatting = (
     let activeInput = existingOverlay?.querySelector(".mb-input input:active")
     if (activeInput) {
         let mouseUpEvent = () => {
-            if (!(propValueEl instanceof HTMLElement)) return
+            if (!(propValueEl?.instanceOf(HTMLElement))) return
             let currentValue = getCurrentPropertyElValue(propValueEl, type)
             updatePropertyFormatting(el, propName, currentValue, type, propertyFormat, propertyTextFormat, plugin)
             document.removeEventListener("mouseup", mouseUpEvent)
@@ -66,12 +68,12 @@ export const updatePropertyFormatting = (
 export const computeFormattedValue = (
     plugin: PrettyPropertiesPlugin,
     propertyName: string,
-    propertyFormat: unknown,
-    currentValue: unknown
+    propertyFormat: string,
+    currentValue: string | null 
 ): string =>  {
-    const rawText = String(currentValue ?? "");
+    const rawText = currentValue || ""
     try {
-        return plugin.formatter.format(propertyName, rawText, propertyFormat as any);
+        return plugin.formatter.format(propertyName, rawText, propertyFormat);
     } catch {
         return rawText;
     }
@@ -82,11 +84,16 @@ export const computeFormattedValue = (
 export const setOverlayContent = (rawContent: string, propertyTextFormat: string, overlayEl: HTMLElement, propertyEl: HTMLElement, plugin: PrettyPropertiesPlugin) => {
 	if (propertyTextFormat == "markdown") {
 		let sourcePath = propertyEl.getAttribute("data-source-path") || ""
-		MarkdownRenderer.render(plugin.app, rawContent, overlayEl, sourcePath, plugin)
+
+        let renderComponent = new Component()
+		void MarkdownRenderer.render(plugin.app, rawContent, overlayEl, sourcePath, renderComponent)
+        renderComponent.unload()
+
 	} else {
 		overlayEl.append(rawContent)
 	}
 }
+
 
 
 const getCurrentPropertyElValue = (propValueEl: HTMLElement, type: string) => {
@@ -97,7 +104,7 @@ const getCurrentPropertyElValue = (propValueEl: HTMLElement, type: string) => {
         }
     } else if (type == "text") {
         let valueInput = propValueEl?.querySelector(".metadata-input-longtext")
-        if (valueInput instanceof HTMLElement) {
+        if (valueInput?.instanceOf(HTMLElement)) {
             return valueInput.textContent
         }
     }

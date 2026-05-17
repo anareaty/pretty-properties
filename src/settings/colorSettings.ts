@@ -20,9 +20,9 @@ export const showColorSettings = (settingTab: PPSettingTab) => {
     .setName(i18n.t("ENABLE_COLORED_PROPERTIES"))
     .addToggle(toggle => {
         toggle.setValue(plugin.settings.enableColoredProperties)
-        .onChange(value => {
+        .onChange(async (value) => {
             plugin.settings.enableColoredProperties = value
-            plugin.saveSettings()
+            await plugin.saveSettings()
             updateAllProperties(plugin);
         })
     });
@@ -31,9 +31,9 @@ export const showColorSettings = (settingTab: PPSettingTab) => {
     .setName(i18n.t("ENABLE_COLORED_INLINE_TAGS"))
     .addToggle(toggle => {
         toggle.setValue(plugin.settings.enableColoredInlineTags)
-        .onChange(value => {
+        .onChange(async (value) => {
             plugin.settings.enableColoredInlineTags = value
-            plugin.saveSettings()
+            await plugin.saveSettings()
             updateAllProperties(plugin)
         })
     });
@@ -45,9 +45,9 @@ export const showColorSettings = (settingTab: PPSettingTab) => {
     .addToggle((toggle) => {
         toggle
         .setValue(plugin.settings.enableColoredTagsInTagPane)
-        .onChange((value) => {
+        .onChange(async (value) => {
             plugin.settings.enableColoredTagsInTagPane = value;
-            plugin.saveSettings();
+            await plugin.saveSettings();
             updateTagPaneTagsAll(plugin)
         });
     });
@@ -96,7 +96,7 @@ export const showColorSettings = (settingTab: PPSettingTab) => {
             .setClass("bare-button")
             .onClick(async () => {
                 plugin.settings.showColorSettings = !plugin.settings.showColorSettings
-                plugin.saveSettings()
+                await plugin.saveSettings()
                 settingTab.display()
             })
         }
@@ -125,7 +125,7 @@ export const showColorSettings = (settingTab: PPSettingTab) => {
             .setClass("bare-button")
             .onClick(async () => {
                 plugin.settings.showTagColorSettings = !plugin.settings.showTagColorSettings
-                plugin.saveSettings()
+                await plugin.saveSettings()
                 settingTab.display()
             })
         }
@@ -156,7 +156,7 @@ export const showColorSettings = (settingTab: PPSettingTab) => {
             .setClass("bare-button")
             .onClick(async () => {
                 plugin.settings.showTextColorSettings = !plugin.settings.showTextColorSettings
-                plugin.saveSettings()
+                await plugin.saveSettings()
                 settingTab.display()
             })
         }

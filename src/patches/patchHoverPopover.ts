@@ -2,30 +2,40 @@ import PrettyPropertiesPlugin from "src/main"
 import { updateImagesInPopover } from "src/utils/updates/updateElements"
 import { around, dedupe } from "monkey-around";
 import { HoverPopover } from "obsidian";
+import { EmbeddedEditorView } from "@obsidian-typings/obsidian-public-latest";
 
 
-export const patchHoverPopover = async (plugin: PrettyPropertiesPlugin) => {
+interface Popover extends HoverPopover {
+    embed: EmbeddedEditorView
+}
+
+export const patchHoverPopover = (plugin: PrettyPropertiesPlugin) => {
   plugin.patches.uninstallPPPopoverPatch = around(HoverPopover.prototype, {
     load(old) {
-      return dedupe("pp-patch-popover-show-around-key", old, function(...args) {
-        if (this.embed) {
+      return dedupe("pp-patch-popover-show-around-key", old, function(this: Popover, ...args) {
+
+        let embed = this.embed
+
+       
+
+        if (embed) {
           let popover = this
 
-          if (popover?.embed.containerEl?.classList.contains("markdown-embed")) {
-            updateImagesInPopover(popover, plugin)
+          if (embed.containerEl?.classList.contains("markdown-embed")) {
+            updateImagesInPopover(this, plugin)
 
-            if (this.embed.previewMode) {
-              this.embed.previewMode.onRenderComplete = new Proxy(this.embed.previewMode.onRenderComplete, {
-                apply(old2, thisArg2, args2) {
+            if (embed.previewMode) {
+              embed.previewMode.onRenderComplete = new Proxy(embed.previewMode.onRenderComplete, {
+                apply(old2, thisArg2) {
                   updateImagesInPopover(popover, plugin)
-                  return old2.call(thisArg2, ...args2)
+                  return old2.call(thisArg2)
                 }
               })
             }
             
-            if (this.embed.showEditor) {
-              this.embed.showEditor = new Proxy(this.embed.showEditor, {
-                apply(old2, thisArg2, args2) {
+            if (embed.showEditor) {
+              embed.showEditor = new Proxy(embed.showEditor, {
+                apply(old2, thisArg2, args2: {x: number, y: number}[]) {
                   let result = old2.call(thisArg2, ...args2)
                   updateImagesInPopover(popover, plugin)
                   return result

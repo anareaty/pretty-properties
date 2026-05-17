@@ -1,4 +1,5 @@
-import { TFile, CachedMetadata, MarkdownView, HoverPopover } from "obsidian";
+import { TFile, CachedMetadata, MarkdownView, BasesView, HoverPopover } from "obsidian";
+
 import PrettyPropertiesPlugin from "src/main";
 import { renderCover, updateCoverForView } from "./updateCovers";
 import { renderIcon, updateIconForView } from "./updateIcons";
@@ -12,10 +13,42 @@ import { updateWidgets } from "src/patches/patchWidgets";
 import { processBaseCardProperties } from "src/patches/patchBaseCards";
 import { processBaseListProperties } from "src/patches/patchBaseList";
 import { processBaseTableCellTags } from "src/patches/patchBaseTable";
+import { AliasesPropertyWidgetComponent, 
+    BasesView as BasesLeafView, 
+    CanvasView, 
+    DatePropertyWidgetComponentBase,  
+    MetadataEditor, 
+    MultitextPropertyWidgetComponent, 
+    PropertyWidgetComponentBase, 
+    TagsPropertyWidgetComponent, 
+    TextPropertyWidgetComponent 
+} from "@obsidian-typings/obsidian-public-latest";
+
+
+interface TableBasesView extends BasesView {
+    updateVirtualDisplay: () => void
+    rows: {
+        cells: {
+            prop: string,
+            el: HTMLElement,
+            renderer: {
+                propertyEditor: PropertyWidgetComponentBase,
+                inferredType: {type: string},
+                entry: {file: {path: string}},
+                el: HTMLElement,
+                val: string
+            }
+        }[]
+    }[],
+}
+
+interface Popover extends HoverPopover {
+    embed: {file: TFile}
+}
 
 
 
-export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => { 
+export const updateAllProperties = (plugin:PrettyPropertiesPlugin) => { 
 
     
 
@@ -25,6 +58,7 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
         let view = leaf.view
 
         if (view instanceof MarkdownView) {
+            
             //@ts-ignore
             view.metadataEditor?.rendered?.forEach(p => {
                 p.renderProperty(p.entry, !0)
@@ -38,8 +72,7 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
             let state = view.getState()
 
             if (state.mode == "source") {
-                // @ts-expect-error, not typed
-                const editorView = view.editor.cm as EditorView;
+                const editorView = view.editor.cm
                 editorView.dispatch({
                     userEvent: "updatePillColors"
                 })
@@ -51,12 +84,13 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
     
     let canvasLeaves = plugin.app.workspace.getLeavesOfType("canvas");
     for (let leaf of canvasLeaves) {
-        //@ts-ignore
-        leaf.view.canvas?.nodes?.forEach(node => {
+        let view = leaf.view as CanvasView
+
+        view.canvas?.nodes?.forEach(node => {
             let nodeView = node.child
             if (nodeView) {
                 //@ts-ignore
-                nodeView.metadataEditor?.rendered?.forEach(p => {
+                (nodeView.metadataEditor as MetadataEditor)?.rendered?.forEach(p => {
                     p.renderProperty(p.entry, !0)
                 })
 
@@ -64,8 +98,7 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
                 processTagsInPreviewElement(nodeView.containerEl, plugin)
 
                 if (nodeView.editor) {
-                    // @ts-expect-error, not typed
-                    const editorView = nodeView.editor.cm as EditorView;
+                    const editorView = nodeView.editor.cm
                     editorView.dispatch({
                         userEvent: "updatePillColors"
                     })
@@ -78,43 +111,80 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
     let baseLeaves = plugin.app.workspace.getLeavesOfType("bases");
     for (let leaf of baseLeaves) {
 
-        //@ts-ignore
-        let baseView = leaf.view.controller?.view
-        if (!baseView) return
+        let view = leaf.view as BasesLeafView
 
-        if (baseView.type == "table") {
-            for (let row of baseView.rows) {
-                for (let cell of row.cells) {
+        
+
+        
+        let baseView = view.controller?.view
+
+        if (baseView instanceof BasesView) {
+          
 
 
-                    let propertyEditor = cell.renderer.propertyEditor
+            
 
-                    if (propertyEditor) {
+            if (baseView.type == "table") {
 
-                        let type = cell.renderer.inferredType.type
-                        let value = propertyEditor.value || propertyEditor.multiselect?.values || cell.renderer.val
-                        let ctx = propertyEditor.ctx || {
-                            key: cell.prop.replace("note.", ""),
-                            sourcePath: cell.renderer.entry.file.path
+                let tableBaseView = baseView as unknown as TableBasesView
+
+                
+                for (let row of tableBaseView.rows) {
+                    for (let cell of row.cells) {
+
+
+                        let propertyEditor = cell.renderer.propertyEditor
+
+                        if (propertyEditor) {
+                            let type = cell.renderer.inferredType.type
+                            let value: string | string[] | number | boolean | null | undefined
+                            
+                            let ctx = {
+                                key: cell.prop.replace("note.", ""),
+                                sourcePath: cell.renderer.entry.file.path
+                            }
+                            
+                            if (propertyEditor.type == "multitext" || propertyEditor.type == "tags" || propertyEditor.type == "aliases") {
+                                let rendered = propertyEditor as MultitextPropertyWidgetComponent | AliasesPropertyWidgetComponent | TagsPropertyWidgetComponent
+                                value = rendered.multiselect?.values
+                            } else if (propertyEditor.type == "text" || propertyEditor.type == "datetime") {
+                                let rendered = propertyEditor as TextPropertyWidgetComponent | DatePropertyWidgetComponentBase
+                                value = rendered.value
+                            } else if (propertyEditor.type == "number" || propertyEditor.type == "checkbox") {
+                                value = cell.renderer.val
+                            } 
+
+
+                            
+
+                            let args = [cell.renderer.el, value, ctx]
+                            updateWidgets(type, propertyEditor, args, plugin)
+
+
+
+                            
+
+                        } else {
+                            processBaseTableCellTags(cell, plugin)
                         }
-
-                        let args = [propertyEditor.containerEl, value, ctx]
-                        updateWidgets(type, propertyEditor, args, plugin)
-
-                    } else {
-                        processBaseTableCellTags(cell, plugin)
                     }
                 }
             }
+
+            else if (baseView.type == "cards") {
+                processBaseCardProperties(baseView, plugin)
+            }
+
+            else if (baseView.type == "list") {
+                processBaseListProperties(baseView, plugin)
+            }
         }
 
-        else if (baseView.type == "cards") {
-            processBaseCardProperties(baseView, plugin)
-        }
+        
+        
 
-        else if (baseView.type == "list") {
-            processBaseListProperties(baseView, plugin)
-        }
+        
+        
     }
 
     updateTagPaneTagsAll(plugin)
@@ -125,21 +195,24 @@ export const updateAllProperties = async (plugin:PrettyPropertiesPlugin) => {
 
 
 
-export const updateEmptyProperties = async (plugin: PrettyPropertiesPlugin) => {
+export const updateEmptyProperties = (plugin: PrettyPropertiesPlugin) => {
     let propertyEls = querySelectorsWithIframes(".metadata-property")
     for (let propertyEl of propertyEls) {
         let emptyLongtext = propertyEl.querySelector(".metadata-input-longtext:empty")
     }
+    //??????????????????????
 }
 
 
 
 
 
+export const updateImagesInPopover = (popover: HoverPopover, plugin: PrettyPropertiesPlugin) => {
 
-export const updateImagesInPopover = async (popover: HoverPopover, plugin: PrettyPropertiesPlugin) => {
-    //@ts-ignore
-    let embed = popover.embed
+    let embed = (popover as Popover).embed
+    
+
+    
 
     if (embed) {
         let file = embed.file
@@ -151,12 +224,13 @@ export const updateImagesInPopover = async (popover: HoverPopover, plugin: Prett
             let sourcePath = file.path || "";
                 
             if (frontmatter && getNestedProperty(frontmatter, plugin.settings.bannerProperty)  && plugin.settings.enableBanner && plugin.settings.enableBannersInPopover) {
-                renderBanner(contentEl, frontmatter, sourcePath, plugin);
+                void renderBanner(contentEl, frontmatter, sourcePath, popover, plugin);
             } else {
                 let oldBannerDivSource = contentEl?.querySelector(".cm-scroller .banner-image");
                 let oldBannerDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .banner-image");
                 oldBannerDivSource?.remove();
                 oldBannerDivPreview?.remove();
+                contentEl.classList.remove("has-banner")
             }
 
             
@@ -176,13 +250,13 @@ export const updateImagesInPopover = async (popover: HoverPopover, plugin: Prett
 
             if (frontmatter && hasCover  && plugin.settings.enableCover && plugin.settings.enableCoversInPopover) {
                 
-                renderCover(popover, contentEl, frontmatter, sourcePath, plugin);
+                void renderCover(popover, contentEl, frontmatter, sourcePath, plugin);
             } else {    
                 let oldCoverDiv = contentEl?.querySelector(".metadata-side-image");
                 oldCoverDiv?.remove();
             }
             if (frontmatter && getNestedProperty(frontmatter, plugin.settings.iconProperty)  && plugin.settings.enableIcon && plugin.settings.enableIconsInPopover) {
-                renderIcon(contentEl, frontmatter, sourcePath, plugin);
+                renderIcon(contentEl, frontmatter, sourcePath, popover, plugin);
             } else {
                 let oldIconDivSource = contentEl?.querySelector(".cm-scroller .icon-wrapper");
                 let oldIconDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .icon-wrapper");
@@ -204,7 +278,7 @@ export const updateImagesInPopover = async (popover: HoverPopover, plugin: Prett
 
 
 
-export const updateImagesForView = async (view: MarkdownView, plugin: PrettyPropertiesPlugin) => {
+export const updateImagesForView = (view: MarkdownView, plugin: PrettyPropertiesPlugin) => {
 
     
 
@@ -217,7 +291,7 @@ export const updateImagesForView = async (view: MarkdownView, plugin: PrettyProp
         let sourcePath = file.path || "";
           
         if (frontmatter && getNestedProperty(frontmatter, plugin.settings.bannerProperty)  && plugin.settings.enableBanner) {
-            renderBanner(contentEl, frontmatter, sourcePath, plugin);
+            void renderBanner(contentEl, frontmatter, sourcePath, view, plugin);
         } else {
             let oldBannerDivSource = contentEl?.querySelector(".cm-scroller .banner-image");
             let oldBannerDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .banner-image");
@@ -242,13 +316,13 @@ export const updateImagesForView = async (view: MarkdownView, plugin: PrettyProp
         
     
         if (frontmatter && hasCover  && plugin.settings.enableCover) {
-            renderCover(view, contentEl, frontmatter, sourcePath, plugin);
+            void renderCover(view, contentEl, frontmatter, sourcePath, plugin);
         } else {    
             let oldCoverDiv = contentEl?.querySelector(".metadata-side-image");
             oldCoverDiv?.remove();
         }
         if (frontmatter && getNestedProperty(frontmatter, plugin.settings.iconProperty)  && plugin.settings.enableIcon) {
-            renderIcon(contentEl, frontmatter, sourcePath, plugin);
+            renderIcon(contentEl, frontmatter, sourcePath, view, plugin);
             
         } else {
             let oldIconDivSource = contentEl?.querySelector(".cm-scroller .icon-wrapper");
@@ -273,7 +347,7 @@ export const updateImagesForView = async (view: MarkdownView, plugin: PrettyProp
 
 
 
-export const updateImagesOnCacheChanged = async (file: TFile, cache: CachedMetadata, plugin: PrettyPropertiesPlugin) => {
+export const updateImagesOnCacheChanged = (file: TFile, cache: CachedMetadata, plugin: PrettyPropertiesPlugin) => {
 
     let sourcePath = file.path || ""
     let leaves = plugin.app.workspace.getLeavesOfType("markdown");
@@ -284,7 +358,7 @@ export const updateImagesOnCacheChanged = async (file: TFile, cache: CachedMetad
         let contentEl = view.contentEl;
       
         if (frontmatter && getNestedProperty(frontmatter, plugin.settings.bannerProperty)  && plugin.settings.enableBanner) {
-          renderBanner(contentEl, frontmatter, sourcePath, plugin);
+          void renderBanner(contentEl, frontmatter, sourcePath, view, plugin);
         } else {
             let oldBannerDivSource = contentEl?.querySelector(".cm-scroller .banner-image");
             let oldBannerDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .banner-image");
@@ -309,13 +383,13 @@ export const updateImagesOnCacheChanged = async (file: TFile, cache: CachedMetad
         
 
         if (frontmatter && hasCover && plugin.settings.enableCover) {
-          renderCover(view, contentEl, frontmatter, sourcePath, plugin);
+          void renderCover(view, contentEl, frontmatter, sourcePath, plugin);
         } else {
           let oldCoverDiv = contentEl?.querySelector(".metadata-side-image");
           oldCoverDiv?.remove();
         }
         if (frontmatter && getNestedProperty(frontmatter, plugin.settings.iconProperty)  && plugin.settings.enableIcon) {
-          renderIcon(contentEl, frontmatter, sourcePath, plugin);
+          renderIcon(contentEl, frontmatter, sourcePath, view, plugin);
          
         } else {
             let oldIconDivSource = contentEl?.querySelector(".cm-scroller .icon-wrapper");

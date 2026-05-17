@@ -10,7 +10,7 @@ import { IconSuggestModal } from "./iconSuggestModal";
 
 export class FileImageSuggestModal extends SuggestModal<string> {
     plugin: PrettyPropertiesPlugin
-    options: any
+    options: Record<string, string>
 
     constructor(app: App, plugin: PrettyPropertiesPlugin) {
         super(app)
@@ -29,13 +29,13 @@ export class FileImageSuggestModal extends SuggestModal<string> {
 
     getSuggestions(query: string): string[] {
         return Object.keys(this.options).filter((key) => {
-            return this.options[key]
+            return this.options[key]!
                 .toLowerCase()
                 .includes(query.toLowerCase());
         });
     }
-    async renderSuggestion(key: string, el: Element) {
-        el.append(this.options[key]);
+    renderSuggestion(key: string, el: Element) {
+        el.append(this.options[key]!);
     }
     onChooseSuggestion(val: string) {
         if (val == "cover") {

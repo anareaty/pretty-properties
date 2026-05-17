@@ -3,6 +3,7 @@ import PrettyPropertiesPlugin from "src/main";
 import { i18n } from "src/localization/localization";
 import { updateHiddenProperties } from "src/utils/updates/updateHiddenProperties";
 import { updateAllProperties } from "src/utils/updates/updateElements";
+import { getPropertyType } from "src/utils/propertyUtils";
 
 
 
@@ -18,12 +19,12 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                 .setTitle(i18n.t("UNHIDE_PROPERTY"))
                 .setIcon("lucide-eye")
                 .setSection("pretty-properties")
-                .onClick(() => {
+                .onClick(async () => {
                     if (propName)
                         plugin.settings.hiddenProperties.remove(
                             propName
                         );
-                    plugin.saveSettings();
+                    await plugin.saveSettings();
                     updateHiddenProperties(plugin);
                 })
             );
@@ -35,12 +36,12 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                 .setTitle(i18n.t("HIDE_PROPERTY"))
                 .setIcon("lucide-eye-off")
                 .setSection("pretty-properties")
-                .onClick(() => {
+                .onClick(async () => {
                     if (propName)
                         plugin.settings.hiddenProperties.push(
                             propName
                         );
-                    plugin.saveSettings();
+                    await plugin.saveSettings();
                     updateHiddenProperties(plugin);
                 })
             );
@@ -55,12 +56,12 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                 .setTitle(i18n.t("NOT_HIDE_WHEN_EMPTY"))
                 .setIcon("lucide-eye")
                 .setSection("pretty-properties")
-                .onClick(() => {
+                .onClick(async () => {
                     if (propName)
                         plugin.settings.hiddenWhenEmptyProperties.remove(
                             propName
                         );
-                    plugin.saveSettings();
+                    await plugin.saveSettings();
                     updateHiddenProperties(plugin);
                 })
             );
@@ -70,12 +71,12 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                 .setTitle(i18n.t("HIDE_WHEN_EMPTY"))
                 .setIcon("lucide-eye-off")
                 .setSection("pretty-properties")
-                .onClick(() => {
+                .onClick(async () => {
                     if (propName)
                         plugin.settings.hiddenWhenEmptyProperties.push(
                             propName
                         );
-                    plugin.saveSettings();
+                    await plugin.saveSettings();
                     updateHiddenProperties(plugin);
                 })
             );
@@ -85,12 +86,10 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
 
 
 
-        //@ts-ignore
-        let propertyTypeObject = plugin.app.metadataTypeManager.getPropertyInfo(propName.toLowerCase());
-        let propertyType;
-        if (propertyTypeObject) {
-            propertyType = propertyTypeObject.widget || propertyTypeObject.type;
-        }
+        
+
+        let propertyType = getPropertyType(propName, plugin)
+
 
         if (propertyType == "text" || 
             propertyType == "number" || 
@@ -107,9 +106,9 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                     .setTitle(i18n.t("DO_NOT_RENDER_MARKDOWN"))
                     .setIcon("code-2")
                     .setSection("pretty-properties")
-                    .onClick(() => {
-                        propertyFormatObj!.textFormat = "raw"
-                        plugin.saveSettings();
+                    .onClick(async () => {
+                        propertyFormatObj.textFormat = "raw"
+                        await plugin.saveSettings();
                         updateAllProperties(plugin);
                     })  
                 );
@@ -119,17 +118,17 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                     .setTitle(i18n.t("RENDER_MARKDOWN"))
                     .setIcon("book-open")
                     .setSection("pretty-properties")
-                    .onClick(() => {
+                    .onClick(async () => {
                         if (propertyFormatObj) {
                             propertyFormatObj.textFormat = "markdown"
                         } else {
-                            plugin.settings.propertyFormats[propName!] = {
+                            plugin.settings.propertyFormats[propName] = {
                                 format: "",
                                 textFormat: "markdown"
                             }
                         }
 
-                        plugin.saveSettings();
+                        await plugin.saveSettings();
                         updateAllProperties(plugin);
                     })  
                 );
@@ -150,11 +149,11 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                 .setTitle(i18n.t("SHOW_PROGRESS_BAR"))
                 .setIcon("lucide-bar-chart-horizontal-big")
                 .setSection("pretty-properties")
-                .onClick(() => {
+                .onClick(async () => {
                     if (propName) {
                         plugin.settings.progressProperties[propName] = { maxNumber: 100 };
                     }
-                    plugin.saveSettings();
+                    await plugin.saveSettings();
                     updateAllProperties(plugin);
                 })  
             );
@@ -169,16 +168,18 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                     )
                     .setIcon("lucide-bar-chart-horizontal-big")
                     .setSection("pretty-properties")
-                    .onClick(() => {
+                    .onClick(async () => {
                         if (propName) {
-                            delete plugin.settings
-                                .progressProperties[propName]
-                                .maxProperty;
-                            plugin.settings.progressProperties[
-                                propName
-                            ].maxNumber = 100;
+                            let propSettings = plugin.settings.progressProperties[propName]
+                            if (!propSettings) {
+                                propSettings = {}
+                            }
+                            
+                            delete propSettings.maxProperty;
+                            propSettings.maxNumber = 100;
+                            
                         }
-                        plugin.saveSettings();
+                        await plugin.saveSettings();
                         updateAllProperties(plugin)
                     })
                 );
@@ -191,40 +192,38 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                     .setIcon("lucide-bar-chart-horizontal-big")
                     .setSection("pretty-properties");
 
-                //@ts-ignore
+               
                 let sub = item.setSubmenu();
-                //@ts-ignore
+                
                 let properties = plugin.app.metadataTypeManager.getAllProperties();
                 let numberProperties = Object.keys(properties)
                     .filter((p) => {
-                        let property = properties[p];
-                        let type = property.widget || property.type;
+                        let type = getPropertyType(p, plugin)
                         return type == "number";
                     })
-                    .map((p) => properties[p].name);
+                    //.map((p) => properties[p].name);
 
                 for (let numberProp of numberProperties) {
                     sub.addItem((subitem: MenuItem) => {
                         if (propName) {
+
+                            let propSettings = plugin.settings.progressProperties[propName]
                             subitem
                             .setTitle(numberProp)
                             .setChecked(
-                                plugin.settings
-                                    .progressProperties[
-                                    propName
-                                ].maxProperty == numberProp
+                                propSettings?.maxProperty == numberProp
                             )
-                            .onClick(() => {
-                                if (propName) {
-                                    delete plugin.settings
-                                        .progressProperties[
-                                        propName
-                                    ].maxNumber;
-                                    plugin.settings.progressProperties[
-                                        propName
-                                    ].maxProperty = numberProp;
+                            .onClick(async () => {
+
+                                if (!propSettings) {
+                                    propSettings = {}
                                 }
-                                plugin.saveSettings();
+
+                                if (propName) {
+                                    delete propSettings?.maxNumber;
+                                    propSettings.maxProperty = numberProp;
+                                }
+                                await plugin.saveSettings();
                                 updateAllProperties(plugin)
                             });
                         }
@@ -237,13 +236,13 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                 .setTitle(i18n.t("REMOVE_PROGRESS_BAR"))
                 .setIcon("lucide-bar-chart-horizontal-big")
                 .setSection("pretty-properties")
-                .onClick(() => {
+                .onClick(async () => {
                     if (propName) {
                         delete plugin.settings.progressProperties[
                             propName
                         ];
                     }
-                    plugin.saveSettings();
+                    await plugin.saveSettings();
                     updateAllProperties(plugin)
                 })
             );

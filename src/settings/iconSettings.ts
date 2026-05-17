@@ -40,10 +40,11 @@ export const showIconSettings = (settingTab: PPSettingTab) => {
             }));
 
 
+        let iconPlaceholder = 'icon'
         new Setting(containerEl)
         .setName(i18n.t("ICON_PROPERTY"))
         .addText(text => text
-            .setPlaceholder('icon')
+            .setPlaceholder(iconPlaceholder)
             .setValue(plugin.settings.iconProperty)
             .onChange(async (value) => {
                 plugin.settings.iconProperty = value;
@@ -154,7 +155,7 @@ export const showIconSettings = (settingTab: PPSettingTab) => {
             .setIcon("rotate-ccw")
             .onClick(async (e) => {
                 plugin.settings.iconColor = ""
-                plugin.saveSettings();
+                await plugin.saveSettings();
                 updateIconStyles(plugin);
                 settingTab.display()
             })
@@ -174,7 +175,7 @@ export const showIconSettings = (settingTab: PPSettingTab) => {
             .setIcon("rotate-ccw")
             .onClick(async (e) => {
                 plugin.settings.iconColorDark = ""
-                plugin.saveSettings();
+                await plugin.saveSettings();
                 updateIconStyles(plugin);
                 settingTab.display()
             })

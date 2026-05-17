@@ -5,13 +5,15 @@
 
 import { moment } from "obsidian";
 
+import lodash from "lodash"
+
 (function (moduleFactory) {
     if (typeof exports === "object") {
         
         // We replace require("moment") with the moment imported from "obsidian"
         // It is the only change we need to do
         //module.exports = moduleFactory(require("lodash"), require("moment"));
-        module.exports = moduleFactory(require("lodash"), moment);
+        module.exports = moduleFactory(lodash, moment);
 
     } else if (typeof define === "function" && define.amd) {
         define(["lodash", "moment"], moduleFactory);

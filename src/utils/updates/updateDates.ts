@@ -2,9 +2,9 @@ import { moment } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { hideMetadataContainerIfAllPropertiesHidden } from "./updateHiddenProperties";
 import { computeFormattedValue, getPropertyFormatObj, setOverlayContent } from "./updatePropertyFormattings";
-import { MarkdownRenderer } from "obsidian";
 
-export const updateDateInput = async (input: HTMLInputElement, plugin: PrettyPropertiesPlugin) => {
+
+export const updateDateInput = (input: HTMLInputElement, plugin: PrettyPropertiesPlugin) => {
 
 
 	let value = input.value;
@@ -35,7 +35,7 @@ export const updateDateInput = async (input: HTMLInputElement, plugin: PrettyPro
 	let customDateFormat = plugin.settings.customDateFormat
 
 
-	if (parent instanceof HTMLElement) {
+	if (parent?.instanceOf(HTMLElement)) {
 		let isBase = parent.classList.contains("bases-table-cell")
 		let existingCustomDateElement = parent.querySelector(".custom-date")
 
@@ -67,7 +67,7 @@ export const updateDateInput = async (input: HTMLInputElement, plugin: PrettyPro
 
 
 
-			if (existingCustomDateElement instanceof HTMLElement &&
+			if (existingCustomDateElement?.instanceOf(HTMLElement) &&
 				existingCustomDateElement.innerText != customDate && 
 				customDate != "Invalid date") {
 
@@ -125,7 +125,7 @@ export const updateDateInput = async (input: HTMLInputElement, plugin: PrettyPro
 
 		
 		let metadataContainer = parent.closest(".metadata-container")
-		if (metadataContainer instanceof HTMLElement) {
+		if (metadataContainer?.instanceOf(HTMLElement)) {
 			hideMetadataContainerIfAllPropertiesHidden(metadataContainer)
 		}
 		
@@ -134,13 +134,13 @@ export const updateDateInput = async (input: HTMLInputElement, plugin: PrettyPro
 
 
 
-export const updateDateTimeInput = async (input: HTMLInputElement, plugin: PrettyPropertiesPlugin) => {
+export const updateDateTimeInput = (input: HTMLInputElement, plugin: PrettyPropertiesPlugin) => {
 	let value = input.value;
 	let parent = input.parentElement
 	let grandParent = parent?.parentElement
 	let customDateTimeFormat = plugin.settings.customDateTimeFormat
 
-	if (parent instanceof HTMLElement) {
+	if (parent?.instanceOf(HTMLElement)) {
 		let isBase = parent.classList.contains("bases-table-cell")
 		let existingCustomDateElement = parent.querySelector(".custom-date")
 
@@ -150,7 +150,7 @@ export const updateDateTimeInput = async (input: HTMLInputElement, plugin: Prett
 
 			let customDate = moment(value).format(customDateTimeFormat);
 			
-			if (existingCustomDateElement instanceof HTMLElement && 
+			if (existingCustomDateElement?.instanceOf(HTMLElement) && 
 				existingCustomDateElement.innerText != customDate && 
 				customDate != "Invalid date") {
 	
@@ -191,7 +191,7 @@ export const updateDateTimeInput = async (input: HTMLInputElement, plugin: Prett
 
 		
 		let metadataContainer = parent.closest(".metadata-container")
-		if (metadataContainer instanceof HTMLElement) {
+		if (metadataContainer?.instanceOf(HTMLElement)) {
 			hideMetadataContainerIfAllPropertiesHidden(metadataContainer)
 		}
 		

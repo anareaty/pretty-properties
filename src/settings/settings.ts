@@ -1,4 +1,4 @@
-import { App, PluginSettingTab } from 'obsidian';
+import { App, PluginSettingTab, HSL } from 'obsidian';
 import { i18n } from '../localization/localization';
 import PrettyPropertiesPlugin from "../main";
 
@@ -12,11 +12,18 @@ import { showHiddenSettingsTab } from './hiddenSettingsTab';
 import { showFormatSettingsTab } from './formatSettings';
 
 
+
+
+
+export interface PillColorSettings {
+	pillColor: HSL | string | undefined,
+	textColor: HSL | string | undefined
+}
 export interface PPPluginSettings {
     hiddenProperties: string[];
-    propertyPillColors: any;
-	propertyLongtextColors: any;
-	tagColors: any;
+    propertyPillColors: Record<string, PillColorSettings>;
+	propertyLongtextColors: Record<string, PillColorSettings>;
+	tagColors: Record<string, PillColorSettings>; 
     enableBanner: boolean;
 	enableIcon: boolean;
     enableCover: boolean;
@@ -42,7 +49,7 @@ export interface PPPluginSettings {
     coverCircleWidth: number;
 	coverMaxWidthPopover: number;
 	coverMaxWidthCanvas: number;
-    progressProperties: any;
+    progressProperties: Record<string, {maxNumber?: number, maxProperty?: string}>;
 	bannersFolder: string;
 	coversFolder: string;
 	iconsFolder: string;
@@ -86,7 +93,11 @@ export interface PPPluginSettings {
 	mathProperties: string[];
 	enableMath: boolean;
 	dataVersion: number;
-	dateColors: any;
+	dateColors: {
+		past: PillColorSettings,
+		present: PillColorSettings,
+		future: PillColorSettings
+	}
 	coverPosition: string;
 	enableBannersInPopover: boolean
 	enableIconsInPopover: boolean
@@ -236,9 +247,9 @@ export class PPSettingTab extends PluginSettingTab {
 				button.classList.add("pp-settings-tab-selected")
 			}
 			button.append(i18n.t(tabName))
-			button.onclick = () => {
+			button.onclick = async () => {
 				this.plugin.settings.settingsTab = tabName
-				this.plugin.saveSettings()
+				await this.plugin.saveSettings()
 				this.display()
 			}
 		}

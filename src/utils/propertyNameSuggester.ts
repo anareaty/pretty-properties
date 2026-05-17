@@ -1,11 +1,11 @@
-import { AbstractInputSuggest } from "obsidian";
+import { AbstractInputSuggest, App } from "obsidian";
 
 type PropertyInfo = { name: string; widget: string; };
 
 export class PropertyNameSuggest extends AbstractInputSuggest<string> {
 	private allowedTypes?: Set<string>;
 
-	constructor(app: any, inputEl: HTMLInputElement, allowedTypes?: Iterable<string>) {
+	constructor(app: App, inputEl: HTMLInputElement, allowedTypes?: Iterable<string>) {
 		super(app, inputEl);
 		if (allowedTypes)
 			this.allowedTypes = new Set(allowedTypes);
@@ -26,7 +26,7 @@ export class PropertyNameSuggest extends AbstractInputSuggest<string> {
 	}
 
 	private getAllPropertyNamesRestricted(allowedTypes: Set<string> | undefined): string[] {
-		const cacheAny = this.app.metadataCache as any;
+		const cacheAny = this.app.metadataCache
 		if (typeof cacheAny.getAllPropertyInfos === "function") {
 			const infos = cacheAny.getAllPropertyInfos() as Record<string,PropertyInfo>;
 			

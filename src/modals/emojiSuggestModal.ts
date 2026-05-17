@@ -1,4 +1,4 @@
-import { SuggestModal, TFile, App, Editor } from "obsidian";
+import { SuggestModal, TFile, App, Editor, FrontMatterCache } from "obsidian";
 import Emojilib from "emojilib";
 import PrettyPropertiesPlugin from "src/main";
 import { setNestedProperty } from "src/utils/propertyUtils";
@@ -17,14 +17,14 @@ export class EmojiSuggestModal extends SuggestModal<string> {
     getSuggestions(query: string): string[] {
         return Object.keys(Emojilib).filter((emoji) => {
             let keywords = Emojilib[emoji];
-            return keywords.find((keyword) => {
+            return keywords?.find((keyword) => {
                 return keyword
                     .toLowerCase()
                     .includes(query.toLowerCase());
             });
         });
     }
-    async renderSuggestion(emoji: string, el: Element) {
+    renderSuggestion(emoji: string, el: Element) {
         el.createDiv({ text: emoji });
         el.classList.add("image-suggestion-item");
         el.classList.add("emoji-icon");
@@ -36,7 +36,7 @@ export class EmojiSuggestModal extends SuggestModal<string> {
                 if (this.editor) {
                     this.editor.replaceSelection(emoji)
                 } else {
-                    this.app.fileManager.processFrontMatter(file, (fm) => {
+                    void this.app.fileManager.processFrontMatter(file, (fm: FrontMatterCache) => {
                         setNestedProperty(fm, this.propName, emoji);
                     });
                 }

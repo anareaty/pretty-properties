@@ -1,13 +1,14 @@
-import { MarkdownView, FrontMatterCache, getIcon, MarkdownRenderer } from "obsidian";
+import { MarkdownView, FrontMatterCache, getIcon, MarkdownRenderer, Component } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { getNestedProperty } from "../propertyUtils";
 
 
 
-export const renderIcon = async (
+export const renderIcon = (
   contentEl: HTMLElement, 
   frontmatter: FrontMatterCache,
   sourcePath: string,
+  component: Component,
   plugin: PrettyPropertiesPlugin) => {
 
     let preview = contentEl.querySelector(".markdown-reading-view > .markdown-preview-view");
@@ -38,7 +39,7 @@ export const renderIcon = async (
 
     if (iconVal && plugin.settings.enableIcon) {
         if (iconVal == oldIconValue) return
-        let image = getIconImage(iconVal, sourcePath, plugin)
+        let image = getIconImage(iconVal, sourcePath, component, plugin)
 
      
 
@@ -88,11 +89,11 @@ export const renderIcon = async (
                     titleWrapper.prepend(titleIconWrapper)
                 }
 
-                if (titleWrapper instanceof HTMLElement) {
+                if (titleWrapper?.instanceOf(HTMLElement)) {
                     titleWrapper.onclick = (e) => {
                         if (e.target instanceof HTMLElement && 
                             e.target?.classList.contains("title-wrapper") && 
-                            inlineTitle instanceof HTMLElement) {
+                            inlineTitle?.instanceOf(HTMLElement)) {
                                 inlineTitle.focus()
                                 // @ts-ignore: Property 'modify' is a non-standard API
                                 document.getSelection()?.modify("move", "forward", "documentboundary")
@@ -161,15 +162,16 @@ export const renderIcon = async (
 
 
 
-export const getIconValue = (frontmatter: FrontMatterCache, plugin: PrettyPropertiesPlugin) => {
-    let iconVal = getNestedProperty(frontmatter, plugin.settings.iconProperty);
+export const getIconValue = (frontmatter: FrontMatterCache, plugin: PrettyPropertiesPlugin) : string |  null | undefined => {
+    let iconValInitial = getNestedProperty(frontmatter, plugin.settings.iconProperty);
+    let iconVal: string | null | undefined
 
     // Fix wrong property types
-    if (Array.isArray(iconVal)) {
-        iconVal = iconVal[0]
-    }
-    
-    if (iconVal && typeof iconVal != "string") {
+    if (Array.isArray(iconValInitial)) {
+        iconVal = iconValInitial[0]
+    } else if (typeof iconValInitial == "string") {
+        iconVal = iconValInitial
+    } else {
         iconVal = null
     }
 
@@ -178,7 +180,7 @@ export const getIconValue = (frontmatter: FrontMatterCache, plugin: PrettyProper
 
 
 
-export const getIconImage = (iconVal: string, sourcePath: string, plugin: PrettyPropertiesPlugin) => {
+export const getIconImage = (iconVal: string, sourcePath: string, component: Component, plugin: PrettyPropertiesPlugin) => {
     if (!iconVal) return
     let image:
         | HTMLDivElement
@@ -193,12 +195,12 @@ export const getIconImage = (iconVal: string, sourcePath: string, plugin: Pretty
         if (iconLink.startsWith("[") && !iconLink.startsWith("!")) iconLink = "!" + iconLink;
         if (!iconLink.startsWith("![")) iconLink = "![[" + iconLink + "]]"
         let iconTemp = createDiv();
-        MarkdownRenderer.render(
+        void MarkdownRenderer.render(
             plugin.app,
             iconLink,
             iconTemp,
             sourcePath,
-            plugin
+            component
         );
         image = iconTemp.querySelector("img");
     }
@@ -214,7 +216,7 @@ export const getIconImage = (iconVal: string, sourcePath: string, plugin: Pretty
 }
 
 
-export const updateIconForView = async (
+export const updateIconForView = (
     view: MarkdownView,
     plugin: PrettyPropertiesPlugin
 ) => {
@@ -227,11 +229,9 @@ export const updateIconForView = async (
         let sourcePath = view.file?.path || ""
         if (frontmatter) {
 
-        await renderIcon(contentEl, frontmatter, sourcePath, plugin)
+        renderIcon(contentEl, frontmatter, sourcePath, view, plugin)
         }
     }
-
-    
 }
 
 
@@ -250,17 +250,21 @@ export const updateAllIcons = (plugin: PrettyPropertiesPlugin) => {
 
 
 
-export const renderTitleIcon = (view: any, plugin: PrettyPropertiesPlugin) => {
+export const renderTitleIcon = (view: MarkdownView, plugin: PrettyPropertiesPlugin) => {
   if (plugin.settings.enableIcon && plugin.settings.iconInTitle) {
 
-    
-    let currentMode = view.currentMode
-    let containerEl = currentMode.containerEl
-    if (currentMode.type == "source") {
-      containerEl = currentMode.editorEl
+    let currentMode = view.getMode()
+    let containerEl: HTMLElement
+
+    if (currentMode == "preview") {
+        //@ts-expect-error, not typed
+        containerEl = (view.previewMode.renderer as {header: {el: HTMLElement}}).header.el
     } else {
-      containerEl = currentMode.renderer.header.el
+        //@ts-expect-error, not typed
+        containerEl = (view.editMode as {editorEl: HTMLElement}).editorEl
     }
+    
+    
 
     
 
@@ -284,8 +288,10 @@ export const renderTitleIcon = (view: any, plugin: PrettyPropertiesPlugin) => {
         
         if (frontmatter) {
           iconVal = getIconValue(frontmatter, plugin)
+          if (iconVal) {
+            iconImage = getIconImage(iconVal, sourcePath, view, plugin)
+          }
           
-          iconImage = getIconImage(iconVal, sourcePath, plugin)
           
         }
     }
@@ -296,7 +302,7 @@ export const renderTitleIcon = (view: any, plugin: PrettyPropertiesPlugin) => {
       if (inlineTitle) {
         let titleWrapper = containerEl.querySelector(".title-wrapper")
         
-        if (iconImage) {
+        if (iconVal && iconImage) {
           if (titleIconWrapper) {
             titleIconWrapper?.setAttribute("data-value", iconVal)
             titleIconWrapper?.empty()
@@ -315,14 +321,14 @@ export const renderTitleIcon = (view: any, plugin: PrettyPropertiesPlugin) => {
         let parent = inlineTitle.parentElement
         titleWrapper = createDiv()
         titleWrapper.classList.add("title-wrapper")
-        parent.prepend(titleWrapper)
+        parent?.prepend(titleWrapper)
         titleWrapper.append(inlineTitle)
 
         if (titleWrapper && titleIconWrapper) {
           titleWrapper.prepend(titleIconWrapper)
         }
 
-        if (titleWrapper instanceof HTMLElement) {
+        if (titleWrapper?.instanceOf(HTMLElement)) {
 
             titleWrapper.onmousedown = (e) => {
                 if (e.target instanceof HTMLElement && e.target?.classList.contains("title-wrapper")) {
@@ -342,7 +348,7 @@ export const renderTitleIcon = (view: any, plugin: PrettyPropertiesPlugin) => {
 
                 if (e.target instanceof HTMLElement && 
                 e.target?.classList.contains("title-wrapper") && 
-                inlineTitle instanceof HTMLElement) {
+                inlineTitle?.instanceOf(HTMLElement)) {
                     inlineTitle.focus()
                     // @ts-ignore: Property 'modify' is a non-standard API
                     document.getSelection()?.modify("move", "forward", "documentboundary")

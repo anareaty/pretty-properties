@@ -116,7 +116,7 @@ export const showHiddenSettingsTab = (settingTab: PPSettingTab) => {
             .setClass("bare-button")
             .onClick(async () => {
                 plugin.settings.showHiddenSettings = !plugin.settings.showHiddenSettings
-                plugin.saveSettings()
+                await plugin.saveSettings()
                 settingTab.display()
             })
         }
@@ -146,7 +146,7 @@ export const showHiddenSettingsTab = (settingTab: PPSettingTab) => {
             .setClass("bare-button")
             .onClick(async () => {
                 plugin.settings.showHiddenEmptySettings = !plugin.settings.showHiddenEmptySettings
-                plugin.saveSettings()
+                await plugin.saveSettings()
                 settingTab.display()
             })
         }

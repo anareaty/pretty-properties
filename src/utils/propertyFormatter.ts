@@ -2,9 +2,79 @@ import * as Handlebars from "handlebars";
 import { getLanguage } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 
+import dayjs from "dayjs"
+import durationPlugin, { DurationUnitType } from "dayjs/plugin/duration"
+import relativeTimePlugin from "dayjs/plugin/relativeTime"
+import utcPlugin from "dayjs/plugin/utc"
+
+import am from 'dayjs/locale/am'
+import ar from 'dayjs/locale/ar'
+import be from 'dayjs/locale/be'
+import bn from 'dayjs/locale/bn'
+import ca from 'dayjs/locale/ca'
+import cs from 'dayjs/locale/cs'
+import da from 'dayjs/locale/da'
+import de from 'dayjs/locale/de'
+import en from 'dayjs/locale/en'
+import enGB from 'dayjs/locale/en-gb'
+import es from 'dayjs/locale/es'
+import fa from 'dayjs/locale/fa'
+import fi from 'dayjs/locale/fi'
+import fr from 'dayjs/locale/fr'
+import ga from 'dayjs/locale/ga'
+import he from 'dayjs/locale/he'
+import hu from 'dayjs/locale/hu'
+import id from 'dayjs/locale/id'
+import it from 'dayjs/locale/it'
+import ja from 'dayjs/locale/ja'
+import ka from 'dayjs/locale/ka'
+import ko from 'dayjs/locale/ko'
+import lv from 'dayjs/locale/lv'
+import ms from 'dayjs/locale/ms'
+import ne from 'dayjs/locale/ne'
+import nl from 'dayjs/locale/nl'
+import pl from 'dayjs/locale/pl'
+import pt from 'dayjs/locale/pt'
+import ptBR from 'dayjs/locale/pt-br'
+import ro from 'dayjs/locale/ro'
+import ru from 'dayjs/locale/ru'
+import sk from 'dayjs/locale/sk'
+import sq from 'dayjs/locale/sq'
+import sr from 'dayjs/locale/sr'
+import sv from 'dayjs/locale/sv'
+import th from 'dayjs/locale/th'
+import tr from 'dayjs/locale/tr'
+import uk from 'dayjs/locale/uk'
+import uz from 'dayjs/locale/uz'
+import vi from 'dayjs/locale/vi'
+import zh from 'dayjs/locale/zh'
+import zhTW from 'dayjs/locale/zh-tw'
+import * as hb from "src/utils/handlebars_moment.cjs"
+
+//@ts-expect-error, no typings
+import helperFactory from "@budibase/handlebars-helpers"
 
 
 
+interface HBHelperImport {
+	default: {registerHelpers: (hbars: typeof Handlebars) => void}
+}
+
+
+
+
+const locales: Record<string, ILocale> = {
+	am, ar, be, bn, ca, cs, da, de, en, "en-GB" : enGB,
+	es, fa, fi, fr, ga, he, hu, id, it, ja, ka, ko, 
+	lv, ms, ne, nl, pl, pt, "pt-BR": ptBR, ro, ru, 
+	sk, sq, sr, sv, th, tr, uk, uz, vi, zh,"zh-TW": zhTW,
+}
+
+
+
+
+
+type HelperFactory = (obj: {handlebars: typeof Handlebars}) => void
 export class PropertyFormatter {
 	private readonly compiledCache = new Map<string, Handlebars.TemplateDelegate>();
 	private readonly handlebars: typeof Handlebars;
@@ -13,20 +83,9 @@ export class PropertyFormatter {
 
 
 		this.handlebars = Handlebars.create();
-
-		const helperFactory = require("@budibase/handlebars-helpers");
-		helperFactory({handlebars: this.handlebars});
-
-		var momentHelper = require("./handlebars_moment");
-		
+		(helperFactory as HelperFactory)({handlebars: this.handlebars});
+		let momentHelper = (hb as HBHelperImport).default
 		momentHelper.registerHelpers(this.handlebars);
-
-
-
-		
-
-
-
 		this.registerCustomHelpers();
 	}
 
@@ -34,62 +93,17 @@ export class PropertyFormatter {
 
 
 
-		const dayjs = require("dayjs");
-		const durationPlugin = require("dayjs/plugin/duration");
-		const relativeTimePlugin = require("dayjs/plugin/relativeTime");
-		const utcPlugin = require("dayjs/plugin/utc");
+		
+		
+		
+		
 
 		let locale: string
 		if (getLanguage) locale = getLanguage();
-		else locale = window.localStorage.language;
+		else locale = window.localStorage.language as string
 
-		let loadLocales: Record<string, any> = {
-			"am": () => {require('dayjs/locale/am')},
-			"ar": () => {require('dayjs/locale/ar')},
-			"be": () => {require('dayjs/locale/be')},
-			"bn": () => {require('dayjs/locale/bn')},
-			"ca": () => {require('dayjs/locale/ca')},
-			"cs": () => {require('dayjs/locale/cs')},
-			"da": () => {require('dayjs/locale/da')},
-			"de": () => {require('dayjs/locale/de')},
-			"en": () => {require('dayjs/locale/en')},
-			"en-GB": () => {require('dayjs/locale/en-gb')},
-			"es": () => {require('dayjs/locale/es')},
-			"fa": () => {require('dayjs/locale/fa')},
-			"fi": () => {require('dayjs/locale/fi')},
-			"fr": () => {require('dayjs/locale/fr')},
-			"ga": () => {require('dayjs/locale/ga')},
-			"he": () => {require('dayjs/locale/he')},
-			"hu": () => {require('dayjs/locale/hu')},
-			"id": () => {require('dayjs/locale/id')},
-			"it": () => {require('dayjs/locale/it')},
-			"ja": () => {require('dayjs/locale/ja')},
-			"ka": () => {require('dayjs/locale/ka')},
-			"ko": () => {require('dayjs/locale/ko')},
-			"lv": () => {require('dayjs/locale/lv')},
-			"ms": () => {require('dayjs/locale/ms')},
-			"ne": () => {require('dayjs/locale/ne')},
-			"nl": () => {require('dayjs/locale/nl')},
-			"pl": () => {require('dayjs/locale/pl')},
-			"pt": () => {require('dayjs/locale/pt')},
-			"pt-BR": () => {require('dayjs/locale/pt-br')},
-			"ro": () => {require('dayjs/locale/ro')},
-			"ru": () => {require('dayjs/locale/ru')},
-			"sk": () => {require('dayjs/locale/sk')},
-			"sq": () => {require('dayjs/locale/sq')},
-			"sr": () => {require('dayjs/locale/sr')},
-			"sv": () => {require('dayjs/locale/sv')},
-			"th": () => {require('dayjs/locale/th')},
-			"tr": () => {require('dayjs/locale/tr')},
-			"uk": () => {require('dayjs/locale/uk')},
-			"uz": () => {require('dayjs/locale/uz')},
-			"vi": () => {require('dayjs/locale/vi')},
-			"zh": () => {require('dayjs/locale/zh')},
-			"zh-TW": () => {require('dayjs/locale/zh-tw')},
-		}
 
-		if (locale && loadLocales[locale]) {
-			loadLocales[locale]()
+		if (locale && locales[locale]) {
 			dayjs.locale(locale)
 		}
 
@@ -98,18 +112,18 @@ export class PropertyFormatter {
 		dayjs.extend(relativeTimePlugin);
 		dayjs.extend(utcPlugin);
 
-		this.handlebars.registerHelper("durationHumanized", (time: number, unit: string, withSuffixOrOptions?: boolean | Handlebars.HelperOptions) => {
+		this.handlebars.registerHelper("durationHumanized", (time: number, unit: DurationUnitType | undefined, withSuffixOrOptions?: boolean | Handlebars.HelperOptions) => {
 			const withSuffix = typeof withSuffixOrOptions === "boolean" ? withSuffixOrOptions : false;
 			return dayjs.duration(time, unit).humanize(withSuffix);
 		});
-		this.handlebars.registerHelper("durationFormatted", (time: number, unit: string, formatOrOptions?: string | Handlebars.HelperOptions) => {
+		this.handlebars.registerHelper("durationFormatted", (time: number, unit: DurationUnitType | undefined, formatOrOptions?: string | Handlebars.HelperOptions) => {
 			const format = typeof formatOrOptions === "string" ? formatOrOptions : "HH:mm:ss";
 			return dayjs.duration(time, unit).format(format);
 		});
 
 		this.handlebars.registerHelper(
 			"durationAbbreviated",
-			(time: number, unit: string) => {
+			(time: number, unit: DurationUnitType | undefined) => {
 				const duration = dayjs.duration(time, unit);
 
 				const parts: string[] = [];

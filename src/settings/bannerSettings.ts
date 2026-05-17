@@ -24,11 +24,14 @@ export const showBannerSettings = (settingTab: PPSettingTab) => {
                 updateBannerStyles(plugin);
             }));
 
+    let bannerPlaceholder = 'banner'
+    let bannerPositionPlaceholder = 'banner_position'
+
     if (plugin.settings.enableBanner) {
         new Setting(containerEl)
         .setName(i18n.t("BANNER_PROPERTY"))
         .addText(text => text
-            .setPlaceholder('banner')
+            .setPlaceholder(bannerPlaceholder)
             .setValue(plugin.settings.bannerProperty)
             .onChange(async (value) => {
                 plugin.settings.bannerProperty = value;
@@ -39,7 +42,7 @@ export const showBannerSettings = (settingTab: PPSettingTab) => {
         new Setting(containerEl)
         .setName(i18n.t("BANNER_POSITION_PROPERTY"))
         .addText(text => text
-            .setPlaceholder('banner_position')
+            .setPlaceholder(bannerPositionPlaceholder)
             .setValue(plugin.settings.bannerPositionProperty)
             .onChange(async (value) => {
                 plugin.settings.bannerPositionProperty = value;

@@ -20,12 +20,16 @@ export const showDatesSettings = (settingTab: PPSettingTab) => {
             settingTab.display();
             updateAllProperties(plugin);
         }));
+
+
+    let datePlaceholder = "DD.MM.YYYY"
+    let dateTimePlaceholder = "DD.MM.YYYY HH:mm"
     
     if (plugin.settings.enableCustomDateFormat) {
         new Setting(containerEl)
         .setName(i18n.t("CUSTOM_DATE_FORMAT"))
         .addText(text => text
-            .setPlaceholder("DD.MM.YYYY")
+            .setPlaceholder(datePlaceholder)
             .setValue(plugin.settings.customDateFormat)
             .onChange(async (value) => {
                 plugin.settings.customDateFormat = value;
@@ -36,7 +40,7 @@ export const showDatesSettings = (settingTab: PPSettingTab) => {
         new Setting(containerEl)
         .setName(i18n.t("CUSTOM_DATETIME_FORMAT"))
         .addText(text => text
-            .setPlaceholder("DD.MM.YYYY HH:mm")
+            .setPlaceholder(dateTimePlaceholder)
             .setValue(plugin.settings.customDateTimeFormat)
             .onChange(async (value) => {
                 plugin.settings.customDateTimeFormat = value;

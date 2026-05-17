@@ -47,9 +47,9 @@ export const showColoredTagsSettings = (settingTab: PPSettingTab) => {
             })
         .addButton(btn => btn
             .setIcon("x")
-            .onClick(() => {
+            .onClick(async () => {
                 delete plugin.settings.tagColors[property]
-                plugin.saveSettings()
+                await plugin.saveSettings()
                 propertyColorSetting.settingEl.remove()
                 updateAllProperties(plugin)
             })
@@ -70,11 +70,11 @@ export const showColoredTagsSettings = (settingTab: PPSettingTab) => {
         )
         .addButton(btn => btn
             .setIcon("plus")
-            .onClick(() => {
+            .onClick(async () => {
                 newProperty = newProperty.trim()
                 if (newProperty && !plugin.settings.tagColors[newProperty]) {
                     plugin.settings.tagColors[newProperty] = {}
-                    plugin.saveSettings()
+                    await plugin.saveSettings()
                     addColorSetting(newProperty)
                     let inputSetting = newPropertySetting.components[0]
                     if (inputSetting instanceof TextComponent) {

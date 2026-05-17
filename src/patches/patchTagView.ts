@@ -1,23 +1,32 @@
 import PrettyPropertiesPlugin from "src/main"
 import { updateTagPaneTags } from "src/utils/updates/updatePills"
 import { around, dedupe } from "monkey-around";
+import { TagView } from "@obsidian-typings/obsidian-public-latest";
 
 
-export const patchTagView = async (plugin: PrettyPropertiesPlugin) => {
+
+
+interface TagViewExtended extends TagView {
+  requestUpdateTags: () => unknown,
+  tagDoms: Record<string, HTMLElement>[]
+}
+
+
+export const patchTagView = (plugin: PrettyPropertiesPlugin) => {
     
-    //@ts-ignore
     let tagViewCreator = plugin.app.viewRegistry.getViewCreatorByType("tag")
     if (tagViewCreator) {
 
-      //@ts-ignore
       plugin.patches.uninstallPPTagViewPatch = around(plugin.app.viewRegistry.viewByType, {
-        tag(oldTag: any) {
-          return dedupe("pp-patch-tag-view-around-key", oldTag, (...args: any[]) => {
-            let view = oldTag && oldTag.apply(this, args)
+        tag(oldTag) {
+          return dedupe("pp-patch-tag-view-around-key", oldTag, (...args) => {
+            let view = oldTag && oldTag.apply(this, args) as TagViewExtended
 
             view.requestUpdateTags = new Proxy(view.requestUpdateTags, {
-              apply(requestUpdateTags, thisArg2, args2) {
-                let update = requestUpdateTags.call(thisArg2, ...args2)
+              apply(requestUpdateTags, thisArg2) {
+
+               
+                let update = requestUpdateTags.call(thisArg2)
                 updateTagPaneTags(view.containerEl, plugin)   
                 return update
               }
@@ -25,21 +34,28 @@ export const patchTagView = async (plugin: PrettyPropertiesPlugin) => {
 
             view.updateTags()
             let tagDoms = view.tagDoms
-            for (let tag in tagDoms) {
-              updateTagPaneTags(tagDoms[tag].el, plugin)
-            }
 
+          
+            Object.keys(tagDoms).forEach((key) => {
+              let tag = Number(key)
+              let tagEl = tagDoms[tag]?.el
+              if (tagEl) {
+                updateTagPaneTags(tagEl, plugin)
+              }
+            })
+
+
+            
             return view
           })
         }
     })
 
 
-    plugin.app.workspace.onLayoutReady(() => {
+    plugin.app.workspace.onLayoutReady(async () => {
       let tagLeaves = plugin.app.workspace.getLeavesOfType("tag")
       for (let tagLeaf of tagLeaves) {
-        //@ts-ignore
-        tagLeaf.rebuildView()
+        await tagLeaf.rebuildView()
       }
     })
   }

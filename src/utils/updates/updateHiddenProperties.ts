@@ -2,7 +2,7 @@ import PrettyPropertiesPlugin from "src/main";
 import { querySelectorsWithIframes, querySelectorsWithIframesForContainer } from "../querySelectorsHelper";
 
 
-export const updateHiddenProperty = async (propEl: HTMLElement, plugin: PrettyPropertiesPlugin) => {
+export const updateHiddenProperty = (propEl: HTMLElement, plugin: PrettyPropertiesPlugin) => {
     let propName = propEl.getAttribute("data-property-key") || ""
     if (plugin.settings.hiddenProperties.find(p => p.toLowerCase() == propName.toLowerCase())) {
         propEl.classList.add("pp-property-hidden")
@@ -18,7 +18,7 @@ export const updateHiddenProperty = async (propEl: HTMLElement, plugin: PrettyPr
 
     let metadataContainer = propEl.closest(".metadata-container")
 
-    if (metadataContainer instanceof HTMLElement) {
+    if (metadataContainer?.instanceOf(HTMLElement)) {
         hideMetadataContainerIfAllPropertiesHidden(metadataContainer)
     }
 }
@@ -56,7 +56,7 @@ export const updateAllMetadataContainers = (plugin: PrettyPropertiesPlugin) => {
   
     
     for (let metadataContainer of metadataContainers) {
-        if (metadataContainer instanceof HTMLElement) {
+        if (metadataContainer?.instanceOf(HTMLElement)) {
 
             try {
                 hideMetadataContainerIfAllPropertiesHidden(metadataContainer)
@@ -72,19 +72,19 @@ export const updateAllMetadataContainers = (plugin: PrettyPropertiesPlugin) => {
 
 
 
-export const updateHiddenPropertiesForContainer = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
+export const updateHiddenPropertiesForContainer = (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
 
     let properties = querySelectorsWithIframesForContainer(".metadata-property", container)
 
     for (let propEl of properties) {
-        if (propEl instanceof HTMLElement) {
+        if (propEl?.instanceOf(HTMLElement)) {
             updateHiddenProperty(propEl, plugin);
         }
     }
 }
 
 
-export const updateHiddenProperties = async (plugin: PrettyPropertiesPlugin) => {
+export const updateHiddenProperties = (plugin: PrettyPropertiesPlugin) => {
     
     let leaves = plugin.app.workspace.getLeavesOfType("markdown");
     for (let leaf of leaves) {

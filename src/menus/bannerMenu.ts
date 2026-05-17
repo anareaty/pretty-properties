@@ -48,10 +48,10 @@ export const handleBannerMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => 
             .setTitle(i18n.t("UNHIDE_BANNER_PROPERTY"))
             .setIcon("lucide-eye")
             .setSection("pretty-properties")
-            .onClick(() => {
+            .onClick(async () => {
                 if (propName)
                     plugin.settings.hiddenProperties.remove(propName);
-                plugin.saveSettings();
+                await plugin.saveSettings();
                 updateHiddenProperties(plugin);
         }))
     } else {
@@ -59,10 +59,10 @@ export const handleBannerMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => 
             .setTitle(i18n.t("HIDE_BANNER_PROPERTY"))
             .setIcon("lucide-eye-off")
             .setSection("pretty-properties")
-            .onClick(() => {
+            .onClick(async () => {
                 if (propName)
                     plugin.settings.hiddenProperties.push(propName);
-                plugin.saveSettings();
+                await plugin.saveSettings();
                 updateHiddenProperties(plugin);
         }))
     }

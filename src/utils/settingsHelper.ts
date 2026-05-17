@@ -13,7 +13,7 @@ export function enhanceFormatTextArea(
 	text.setValue(initialValue);
 	text.setPlaceholder(i18n.t("PROPERTY_FORMAT_PLACEHOLDER"));
 
-	const textareaEl = text.inputEl as HTMLTextAreaElement;
+	const textareaEl = text.inputEl
 	const parent = textareaEl.parentElement;
 	if (!parent) return;
 
@@ -24,7 +24,7 @@ export function enhanceFormatTextArea(
 
 	const errorEl = createDiv();
 	errorEl.addClass("pp-format-error");
-	errorEl.style.display = "none";
+	
 	wrapper.appendChild(errorEl);
 
 	const applyValidationState = (tpl: string) => {
@@ -33,11 +33,11 @@ export function enhanceFormatTextArea(
 		if (err) {
 			textareaEl.addClass("pp-format-invalid");
 			errorEl.textContent = err;
-			errorEl.style.display = "";
+			
 		} else {
 			textareaEl.removeClass("pp-format-invalid");
 			errorEl.textContent = "";
-			errorEl.style.display = "none";
+			
 		}
 	};
 

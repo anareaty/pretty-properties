@@ -46,8 +46,6 @@ body {
 .banner-image img {
     width: 100% !important;
     max-width: 100% !important;
-    width: 100% !important;
-    max-width: 100% !important;
     height: var(--banner-height);
     object-fit: cover;
     border-top-left-radius: 10px !important;
@@ -64,46 +62,56 @@ body {
 
 
 
-.cm-scroller:has(.banner-image:not(:empty)) > .cm-sizer,
-.markdown-preview-view:has(.banner-image:not(:empty)) > .markdown-preview-sizer {
+
+
+
+
+
+
+
+
+.has-banner > .markdown-source-view > .cm-editor > .cm-scroller > .cm-sizer,
+.has-banner > .markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer {
   --pp-banner-top-spacing-phone: calc(var(--banner-height) + var(--banner-margin) - var(--view-top-spacing-markdown));
   --pp-banner-top-spacing: calc(var(--banner-height) + var(--banner-margin));
   margin-top: var(--pp-banner-top-spacing);
 }
 
-.is-phone .mod-root .workspace-leaf-content .view-content .markdown-source-view > .cm-editor > .cm-scroller:has(.banner-image:not(:empty)) > .cm-sizer,
-.is-phone .mod-root .workspace-leaf-content .view-content .markdown-reading-view > .markdown-preview-view:has(.banner-image:not(:empty)) > .markdown-preview-sizer {
+
+.is-phone .mod-root .workspace-leaf-content .has-banner > .markdown-source-view > .cm-editor > .cm-scroller > .cm-sizer,
+.is-phone .mod-root .workspace-leaf-content .has-banner > .markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer {
   margin-top: var(--pp-banner-top-spacing-phone, var(--pp-banner-top-spacing));
 }
 
 
 
-.cm-scroller:has(.icon-image:not(:empty)) > .cm-sizer,
-.markdown-preview-view:has(.icon-image:not(:empty)) > .markdown-preview-sizer {
+
+.has-icon > .markdown-source-view > .cm-editor > .cm-scroller > .cm-sizer,
+.has-icon > .markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer {
   margin-top: calc(var(--pp-icon-size) + var(--pp-icon-top-margin-wb) + var(--pp-icon-gap));
 }
 
 
-.cm-scroller:has(.banner-image:not(:empty)):has(.icon-image:not(:empty)) > .cm-sizer,
-.markdown-preview-view:has(.banner-image:not(:empty)):has(.icon-image:not(:empty)) > .markdown-preview-sizer {
+
+
+.has-banner.has-icon > .markdown-source-view > .cm-editor > .cm-scroller > .cm-sizer,
+.has-banner.has-icon > .markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer {
   --pp-banner-icon-top-spacing-phone: calc(var(--banner-height) + var(--pp-banner-icon-gap) - var(--view-top-spacing-markdown));
   --pp-banner-icon-top-spacing: calc(var(--banner-height) + var(--pp-banner-icon-gap));
   margin-top: var(--pp-banner-icon-top-spacing);
 }
 
 
-.is-phone .mod-root .workspace-leaf-content .view-content .markdown-source-view > .cm-editor > .cm-scroller:has(.banner-image:not(:empty)):has(.icon-image:not(:empty)) > .cm-sizer,
-.is-phone .mod-root .workspace-leaf-content .view-content .markdown-reading-view > .markdown-preview-view:has(.banner-image:not(:empty)):has(.icon-image:not(:empty)) > .markdown-preview-sizer {
+
+.is-phone .mod-root .workspace-leaf-content .has-banner.has-icon > .markdown-source-view > .cm-editor > .cm-scroller > .cm-sizer,
+.is-phone .mod-root .workspace-leaf-content .has-banner.has-icon > .markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer {
   margin-top: var(--pp-banner-icon-top-spacing-phone, var(--pp-banner-icon-top-spacing));
 }
 
 
 
-
-
-
-.cm-scroller:has(.banner-image:not(:empty)) .icon-image,
-.markdown-preview-view:has(.banner-image:not(:empty)) .icon-image {
+.has-banner > .markdown-source-view > .cm-editor > .cm-scroller .icon-image,
+.has-banner > .markdown-reading-view > .markdown-preview-view .icon-image {
   margin-top: var(--pp-icon-top-margin);
 }
 
@@ -114,8 +122,8 @@ body {
 /* Autohide properties when banner is enabled */
 
 
-.autohide-props-with-banner .cm-scroller:has(.banner-image:not(:empty)) .metadata-container,
-.autohide-props-with-banner .markdown-preview-view:has(.banner-image:not(:empty)) .metadata-container {
+.autohide-props-with-banner .has-banner > .markdown-source-view > .cm-editor > .cm-scroller .metadata-container,
+.autohide-props-with-banner .has-banner > .markdown-reading-view > .markdown-preview-view .metadata-container {
   position: absolute;
   top: 5px;
   border-radius: 10px;
@@ -126,43 +134,39 @@ body {
   background-color: var(--background-primary);
   padding: 8px 24px;
   z-index: 2;
-  box-shadow: 0 3px 3px #0003;
+  box-shadow: 0 3px 3px rgba(0, 0, 0, 0.2);
   margin-bottom: 0;
-}
-
-
-.autohide-props-with-banner .is-readable-line-width .cm-scroller:has(.banner-image:not(:empty)) .metadata-container,
-.autohide-props-with-banner .is-readable-line-width.markdown-preview-view:has(.banner-image:not(:empty)) .metadata-container {
-    max-width: var(--file-line-width);
-}
-
-.autohide-props-with-banner .cm-scroller:has(.banner-image:not(:empty)) .metadata-container,
-.autohide-props-with-banner .markdown-preview-view:has(.banner-image:not(:empty)) .metadata-container {
   opacity: 1;
   transition: opacity 0.15s;
 }
 
-.autohide-props-with-banner .cm-scroller:has(.banner-image:not(:empty)) .metadata-container:not(:hover, :focus, :focus-within),
-.autohide-props-with-banner .markdown-preview-view:has(.banner-image:not(:empty)) .metadata-container:not(:hover, :focus, :focus-within) {
+
+.autohide-props-with-banner .has-banner >  .is-readable-line-width  > .cm-editor > .cm-scroller .metadata-container,
+.autohide-props-with-banner .has-banner > .markdown-reading-view > .is-readable-line-width .metadata-container {
+    max-width: var(--file-line-width);
+}
+
+
+
+.autohide-props-with-banner .has-banner >  .is-readable-line-width  > .cm-editor > .cm-scroller .metadata-container:not(:hover, :focus, :focus-within),
+.autohide-props-with-banner .has-banner > .markdown-reading-view > .is-readable-line-width .metadata-container:not(:hover, :focus, :focus-within) {
   opacity: 0;
   transition: opacity 0.3s;
 }
 
-.autohide-props-with-banner .cm-scroller:has(.banner-image:not(:empty)) .metadata-container .metadata-content,
-.autohide-props-with-banner .markdown-preview-view:has(.banner-image:not(:empty)) .metadata-container .metadata-content {
+
+.autohide-props-with-banner .has-banner >  .is-readable-line-width  > .cm-editor > .cm-scroller .metadata-container .metadata-content,
+.autohide-props-with-banner .has-banner > .markdown-reading-view > .is-readable-line-width .metadata-container .metadata-content {
   overflow: hidden;
   max-height: 500px;  
 }
 
-.autohide-props-with-banner .cm-scroller:has(.banner-image:not(:empty)) .metadata-container:not(:hover, :focus, :focus-within) .metadata-content,
-.autohide-props-with-banner .markdown-preview-view:has(.banner-image:not(:empty)) .metadata-container:not(:hover, :focus, :focus-within) .metadata-content {
+
+.autohide-props-with-banner .has-banner >  .is-readable-line-width  > .cm-editor > .cm-scroller .metadata-container:not(:hover, :focus, :focus-within) .metadata-content,
+.autohide-props-with-banner .has-banner > .markdown-reading-view > .is-readable-line-width .metadata-container:not(:hover, :focus, :focus-within) .metadata-content {
   max-height: 0;
   transition-delay: 0.3s;
 }
-
-
-  
-
 
 
 
@@ -181,10 +185,18 @@ body {
 }
 
 
-.cm-scroller:has(.banner-image:not(:empty)):has(.icon-image:not(:empty)) > .icon-wrapper,
-.markdown-preview-view:has(.banner-image:not(:empty)):has(.icon-image:not(:empty)) > .icon-wrapper {
+
+
+
+.has-banner.has-icon > .markdown-source-view > .cm-editor > .cm-scroller > .icon-wrapper,
+.has-banner.has-icon > .markdown-reading-view > .markdown-preview-view > .icon-wrapper {
   top: 0px;
 }
+
+
+
+
+
 
 
 
@@ -210,6 +222,10 @@ body {
   height: var(--pp-icon-size);
   margin-top: var(--pp-icon-top-margin-wb);
   margin-left: var(--pp-icon-left-margin);
+  container-type: inline-size;
+  background-color: var(--pp-icon-background);
+  border-radius:8px;
+  padding: 6px;
 }
 
 
@@ -243,12 +259,6 @@ body {
 
 
 
-.icon-image {
-  container-type: inline-size;
-  background-color: var(--pp-icon-background);
-  border-radius:8px;
-  padding: 6px;
-}
 
 
 
@@ -1607,9 +1617,7 @@ button.longtext-color-button:hover {
   /*margin-left: 0;*/
 }
 
-.math-wrapper mjx-container {
-  /*margin: 0 !important;*/
-}
+
 
 
 .math-wrapper {

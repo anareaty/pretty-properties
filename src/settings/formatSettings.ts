@@ -1,4 +1,4 @@
-import { Setting, TextComponent } from 'obsidian';
+import { Setting } from 'obsidian';
 import { i18n } from 'src/localization/localization';
 import { updateAllProperties } from 'src/utils/updates/updateElements';
 import { PPSettingTab } from 'src/settings/settings';
@@ -27,12 +27,15 @@ export const showFormatSettingsTab = (settingTab: PPSettingTab) => {
             settingTab.display();
             updateAllProperties(plugin);
         }));
+
+    let datePlaceholder = "DD.MM.YYYY"
+    let dateTimePlaceholder = "DD.MM.YYYY HH:mm"
     
     if (plugin.settings.enableCustomDateFormat) {
         new Setting(containerEl)
         .setName(i18n.t("CUSTOM_DATE_FORMAT"))
         .addText(text => text
-            .setPlaceholder("DD.MM.YYYY")
+            .setPlaceholder(datePlaceholder)
             .setValue(plugin.settings.customDateFormat)
             .onChange(async (value) => {
                 plugin.settings.customDateFormat = value;
@@ -43,7 +46,7 @@ export const showFormatSettingsTab = (settingTab: PPSettingTab) => {
         new Setting(containerEl)
         .setName(i18n.t("CUSTOM_DATETIME_FORMAT"))
         .addText(text => text
-            .setPlaceholder("DD.MM.YYYY HH:mm")
+            .setPlaceholder(dateTimePlaceholder)
             .setValue(plugin.settings.customDateTimeFormat)
             .onChange(async (value) => {
                 plugin.settings.customDateTimeFormat = value;
@@ -98,7 +101,7 @@ export const showFormatSettingsTab = (settingTab: PPSettingTab) => {
             .setClass("bare-button")
             .onClick(async () => {
                 plugin.settings.showExtraFormattings = !plugin.settings.showExtraFormattings
-                plugin.saveSettings()
+                await plugin.saveSettings()
                 settingTab.display()
             })
         }
@@ -183,9 +186,9 @@ const showFormatSettings = (settingTab: PPSettingTab) => {
 
         .addButton(btn => btn
             .setIcon("x")
-            .onClick(() => {
+            .onClick(async () => {
                 delete plugin.settings.propertyFormats[property]
-                plugin.saveSettings()
+                await plugin.saveSettings()
                 settingTab.display();
                 updateAllProperties(plugin)
             })
@@ -224,14 +227,14 @@ const showFormatSettings = (settingTab: PPSettingTab) => {
 
         .addButton(btn => btn
             .setIcon("plus")
-            .onClick(() => {
+            .onClick(async () => {
 				newProperty = newProperty.trim()
                 if (newProperty && !plugin.settings.propertyFormats[newProperty]) {
                     plugin.settings.propertyFormats[newProperty] = {
 						format: "",
 						textFormat: "raw"
 					}
-                    plugin.saveSettings()
+                    await plugin.saveSettings()
                     settingTab.display();
                 }
             })

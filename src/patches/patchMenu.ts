@@ -11,12 +11,13 @@ import { handleIconMenu } from "src/menus/iconMenu";
 
 
 
-export const patchMenu = async (plugin: PrettyPropertiesPlugin) => {
+export const patchMenu = (plugin: PrettyPropertiesPlugin) => {
   plugin.patches.uninstallPPMenuPatch = around(Menu.prototype, {
     showAtMouseEvent(old) {
-      return dedupe("pp-patch-menu-around-key", old, function(e) {
 
-        let menu = this
+    
+      return dedupe("pp-patch-menu-around-key", old, function(this: Menu, e) {
+        
         let target = e.target
         
         if (target instanceof Element) {
@@ -24,16 +25,16 @@ export const patchMenu = async (plugin: PrettyPropertiesPlugin) => {
 
             // Tag menu
             let tag = target.closest(".cm-hashtag")
-            if (tag instanceof HTMLElement) {
-                handleTagMenu(menu, tag, plugin);
+            if (tag?.instanceOf(HTMLElement)) {
+                handleTagMenu(this, tag, plugin);
                 return old && old.apply(this, [e])
             }
 
 
             // Property pill menu
             let pill = target.closest(".multi-select-pill")
-            if (pill instanceof HTMLElement) {
-                handlePillMenu(menu, pill, plugin);
+            if (pill?.instanceOf(HTMLElement)) {
+                handlePillMenu(this, pill, plugin);
                 return old && old.apply(this, [e])
             }
 
@@ -42,8 +43,8 @@ export const patchMenu = async (plugin: PrettyPropertiesPlugin) => {
             let propertyIcon = target.closest(".metadata-property-icon")
             if (propertyIcon) {
                 let propEl = target.closest(".metadata-property");
-                if (propEl instanceof HTMLElement) {
-                    handlePropertyMenu(menu, propEl, plugin);
+                if (propEl?.instanceOf(HTMLElement)) {
+                    handlePropertyMenu(this, propEl, plugin);
                     return old && old.apply(this, [e])
                 }
             }
@@ -51,24 +52,24 @@ export const patchMenu = async (plugin: PrettyPropertiesPlugin) => {
 
             // Tag pane menu 
             let tagPaneTag = target.closest(".tag-pane-tag")
-            if (tagPaneTag instanceof HTMLElement) {
-                handleTagPaneMenu(menu, tagPaneTag, plugin);
+            if (tagPaneTag?.instanceOf(HTMLElement)) {
+                handleTagPaneMenu(this, tagPaneTag, plugin);
                 return old && old.apply(this, [e])
             }
 
 
             // Banner menu
             let banner = target.closest(".banner-image")
-            if (banner instanceof HTMLElement) {
-                handleBannerMenu(menu, plugin);
+            if (banner?.instanceOf(HTMLElement)) {
+                handleBannerMenu(this, plugin);
                 return old && old.apply(this, [e])
             }
 
 
             //Cover menu
             let cover = target.closest(".metadata-side-image")
-            if (cover instanceof HTMLElement) {
-                handleCoverMenu(menu, plugin);
+            if (cover?.instanceOf(HTMLElement)) {
+                handleCoverMenu(this, plugin);
                 return old && old.apply(this, [e])
             }
 
@@ -76,7 +77,7 @@ export const patchMenu = async (plugin: PrettyPropertiesPlugin) => {
             //Icon menu
             let icon = target.closest(".pp-icon")
             if (icon instanceof Element) {
-                handleIconMenu(menu, plugin);
+                handleIconMenu(this, plugin);
                 return old && old.apply(this, [e])
             }
 
@@ -99,7 +100,7 @@ const handleTagMenu = (menu: Menu, tag: Element | null, plugin: PrettyProperties
             tag = tag.parentElement?.nextElementSibling?.firstElementChild || null
         }
 
-        if (tag instanceof HTMLElement) {
+        if (tag?.instanceOf(HTMLElement)) {
             let tagText = tag.getAttribute("data-tag-value") || ""
             if (tagText) {
                 createColorMenu(tagText, "tagColors", "pillColor", plugin, menu);
@@ -170,14 +171,14 @@ const handlePillMenu = (menu: Menu, pill: HTMLElement, plugin: PrettyPropertiesP
 
 
 const handleTagPaneMenu = (menu: Menu, tagPaneTag: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-    if (tagPaneTag instanceof HTMLElement) {
+    if (tagPaneTag?.instanceOf(HTMLElement)) {
         let tag = tagPaneTag.querySelector("span.tree-item-inner-text")
         let parent = tagPaneTag.querySelector("span.tag-pane-tag-parent")
         let parentText = ""
-        if (parent instanceof HTMLElement) {
+        if (parent?.instanceOf(HTMLElement)) {
             parentText = parent.innerText
         }
-        if (tag instanceof HTMLElement) {
+        if (tag?.instanceOf(HTMLElement)) {
             let tagText = parentText + tag.innerText
             if (tagText) {
                 createColorMenu(tagText, "tagColors", "pillColor", plugin, menu);

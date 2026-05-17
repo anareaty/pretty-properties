@@ -1,4 +1,4 @@
-import { SuggestModal, TFile, getIcon, getIconIds, App } from "obsidian";
+import { SuggestModal, TFile, getIcon, getIconIds, App, FrontMatterCache } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { setNestedProperty } from "src/utils/propertyUtils";
 
@@ -18,7 +18,7 @@ export class SvgSuggestModal extends SuggestModal<string> {
             return val.toLowerCase().includes(query.toLowerCase());
         });
     }
-    async renderSuggestion(id: string, el: Element) {
+    renderSuggestion(id: string, el: Element) {
         let svg = getIcon(id) || "";
         el.append(svg);
         el.classList.add("image-suggestion-item");
@@ -28,7 +28,7 @@ export class SvgSuggestModal extends SuggestModal<string> {
         if (id) {
             let file = this.app.workspace.getActiveFile();
             if (file instanceof TFile) {
-                this.app.fileManager.processFrontMatter(file, (fm) => {
+                void this.app.fileManager.processFrontMatter(file, (fm: FrontMatterCache) => {
                     setNestedProperty(fm, this.propName, id);
                 });
             }

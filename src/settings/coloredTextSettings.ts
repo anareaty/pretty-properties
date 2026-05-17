@@ -46,9 +46,9 @@ export const showColoredTextSettings = (settingTab: PPSettingTab) => {
 
         .addButton(btn => btn
             .setIcon("x")
-            .onClick(() => {
+            .onClick(async () => {
                 delete plugin.settings.propertyLongtextColors[property]
-                plugin.saveSettings()
+                await plugin.saveSettings()
                 propertyColorSetting.settingEl.remove()
                 updateAllProperties(plugin)
             })
@@ -71,11 +71,11 @@ export const showColoredTextSettings = (settingTab: PPSettingTab) => {
         })
         .addButton(btn => btn
             .setIcon("plus")
-            .onClick(() => {
+            .onClick(async () => {
                 newProperty = newProperty.trim()
                 if (newProperty && !plugin.settings.propertyLongtextColors[newProperty]) {
                     plugin.settings.propertyLongtextColors[newProperty] = {}
-                    plugin.saveSettings()
+                    await plugin.saveSettings()
                     addColorSetting(newProperty)
                     let inputSetting = newPropertySetting.components[0]
                     if (inputSetting instanceof TextComponent) {

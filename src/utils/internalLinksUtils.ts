@@ -57,12 +57,18 @@ export function hookUpLinks(
 			evt.stopPropagation();
 
 			const menu = new Menu();
-			(app.workspace as any).handleLinkContextMenu?.(
-				menu,
-				linkText,
-				sourcePath,
-				app.workspace.getMostRecentLeaf()
-			);
+
+			let leaf = app.workspace.getMostRecentLeaf()
+
+			if (leaf) {
+				app.workspace.handleLinkContextMenu?.(
+					menu,
+					linkText,
+					sourcePath,
+					leaf
+				);
+			}
+			
 
 			menu.showAtMouseEvent(evt);
 			return;
@@ -79,7 +85,9 @@ export function hookUpLinks(
 		evt.stopPropagation();
 
 		const menu = new Menu();
-		(app.workspace as any).handleExternalLinkContextMenu?.(menu, url, app.workspace.getMostRecentLeaf());
+
+		
+		app.workspace.handleExternalLinkContextMenu?.(menu, url);
 		menu.showAtMouseEvent(evt);
 	});
 
@@ -92,7 +100,7 @@ export function hookUpLinks(
 		if (!file)
 			return;
 
-		const dragManager: any = (app as any).dragManager;
+		const dragManager = app.dragManager;
 		if (dragManager?.dragFile && dragManager?.onDragStart) {
 			const dragData = dragManager.dragFile(evt, file);
 

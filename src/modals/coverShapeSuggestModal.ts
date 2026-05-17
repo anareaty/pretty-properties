@@ -1,9 +1,9 @@
-import { SuggestModal, TFile, App } from "obsidian";
+import { SuggestModal, TFile, App, FrontMatterCache } from "obsidian";
 import { i18n } from "src/localization/localization";
 
 
 export class CoverShapeSuggestModal extends SuggestModal<string> {
-    shapes: any
+    shapes: Record<string, string>
     file: TFile
 
     constructor(app: App, file: TFile) {
@@ -24,17 +24,17 @@ export class CoverShapeSuggestModal extends SuggestModal<string> {
 
     getSuggestions(query: string): string[] {
         return Object.keys(this.shapes).filter((key) => {
-            return this.shapes[key]
+            return this.shapes[key]!
                 .toLowerCase()
                 .includes(query.toLowerCase());
         });
     }
-    async renderSuggestion(key: string, el: Element) {
-        el.append(this.shapes[key]);
+    renderSuggestion(key: string, el: Element) {
+        el.append(this.shapes[key]!);
     }
     onChooseSuggestion(key: string) {
         if (key && this.file instanceof TFile) {
-            this.app.fileManager.processFrontMatter(this.file, (fm) => {
+            void this.app.fileManager.processFrontMatter(this.file, (fm: FrontMatterCache) => {
                 fm.cover_shape = key
             });
         }

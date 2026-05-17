@@ -1,9 +1,9 @@
-import { SuggestModal, TFile, App } from "obsidian";
+import { SuggestModal, TFile, App, FrontMatterCache } from "obsidian";
 import { i18n } from "src/localization/localization";
 
 
 export class CoverPositionSuggestModal extends SuggestModal<string> {
-    positions: any
+    positions: Record<string, string>
     file: TFile
 
     constructor(app: App, file: TFile) {
@@ -19,17 +19,17 @@ export class CoverPositionSuggestModal extends SuggestModal<string> {
 
     getSuggestions(query: string): string[] {
         return Object.keys(this.positions).filter((key) => {
-            return this.positions[key]
+            return this.positions[key]!
                 .toLowerCase()
                 .includes(query.toLowerCase());
         });
     }
-    async renderSuggestion(key: string, el: Element) {
-        el.append(this.positions[key]);
+    renderSuggestion(key: string, el: Element) {
+        el.append(this.positions[key]!);
     }
     onChooseSuggestion(key: string) {
         if (key && this.file instanceof TFile) {
-            this.app.fileManager.processFrontMatter(this.file, (fm) => {
+            void this.app.fileManager.processFrontMatter(this.file, (fm: FrontMatterCache) => {
                 fm.cover_position = key
             });
         }

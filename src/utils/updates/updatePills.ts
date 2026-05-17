@@ -1,12 +1,12 @@
 import PrettyPropertiesPlugin from "src/main";
 import { createColorButton } from "src/menus/selectColorMenus";
-import { finishRenderMath, loadMathJax, renderMath } from "obsidian"
+import { finishRenderMath, HSL, renderMath } from "obsidian"
 import { hideMetadataContainerIfAllPropertiesHidden } from "./updateHiddenProperties";
 import { querySelectorsWithIframesForContainer } from "../querySelectorsHelper";
 import { getPropertyFormatObj, updatePropertyFormatting } from "./updatePropertyFormattings";
 
 
-export const getTextLightness = (color: any) => {
+export const getTextLightness = (color: HSL) => {
 	let textLightness = 30
 	if (color.l < 80) textLightness = 20
 	if (color.l < 70) textLightness = 10
@@ -20,10 +20,10 @@ export const getTextLightness = (color: any) => {
 
 export const generateInlineStyles = (text: string, type: string, plugin: PrettyPropertiesPlugin) => {
     let colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink"];
-    let colorSettings: any
+    let colorSettings
     let colorClass = ""
 	let textColorClass = "";
-	let styleProps: any = {}
+	let styleProps: Record<string, string> = {}
 
 
 
@@ -62,7 +62,7 @@ export const generateInlineStyles = (text: string, type: string, plugin: PrettyP
 		  if (color && color != "default") {
 			colorClass = "colored";
 
-			if (colors.find((c) => c == color)) {
+			if (colors.find((c) => c == color) && typeof color == "string") {
 			  styleProps = {
 				"--pp-color": "rgb(var(--color-" + color + "-rgb))",
 				"--pp-bg": "rgba(var(--color-" + color + "-rgb), 0.15)",
@@ -76,7 +76,7 @@ export const generateInlineStyles = (text: string, type: string, plugin: PrettyP
 			  };
 			} else if (color == "none") {
 			  colorClass = "transparent-color"
-			} else {
+			} else if (typeof color != "string") {
 			  let textLightness = getTextLightness(color);
 			  let hslString = color.h + " ," + color.s + "% ," + color.l + "%";
 			  let hslStringHover = color.h + " ," + color.s + "% ," + (color.l - 5) + "%";
@@ -92,14 +92,14 @@ export const generateInlineStyles = (text: string, type: string, plugin: PrettyP
 	
 		  if (textColor && textColor != "default") {
 			textColorClass = "text-colored";
-			if (colors.find((c) => c == textColor)) {
+			if (colors.find((c) => c == textColor) && typeof textColor == "string") {
 			  styleProps["--pp-color"] = "rgb(var(--color-" + textColor + "-rgb))"
 			  
 			} else if (textColor == "accent") {
 			  styleProps["--pp-color"] = "var(--text-accent)"
 			} else if (textColor == "none") {
 			  textColorClass = "none-text-color";
-			} else {
+			} else if (typeof textColor != "string") {
 			  let hslStringText = textColor.h + " ," + textColor.s + "% ," + textColor.l + "%";
 			  styleProps["--pp-color"] = "hsl(" + hslStringText + ")"
 			}
@@ -115,7 +115,7 @@ export const generateInlineStyles = (text: string, type: string, plugin: PrettyP
 }
 
 
-export const setPillStyles = async (
+export const setPillStyles = (
 	pill: HTMLElement,
 	attributeName: string,
 	value: string,
@@ -159,13 +159,13 @@ export const setPillStyles = async (
 
 
 
-export const updateMultiselectPill = async (pill: HTMLElement, plugin: PrettyPropertiesPlugin) => {
+export const updateMultiselectPill = (pill: HTMLElement, plugin: PrettyPropertiesPlugin) => {
 
 
 
 	if (plugin.settings.enableColoredProperties) {
 		let content = pill.querySelector(".multi-select-pill-content");
-		if (content instanceof HTMLElement) {
+		if (content?.instanceOf(HTMLElement)) {
 			let value = content.innerText;
 			setPillStyles(pill, "data-property-pill-value", value, "multiselect-pill", plugin);
 		}
@@ -173,7 +173,7 @@ export const updateMultiselectPill = async (pill: HTMLElement, plugin: PrettyPro
 }
 
 
-export const updateValueListElement = async (pill: HTMLElement, dataValueString: string, styleType: string, plugin: PrettyPropertiesPlugin) => {
+export const updateValueListElement = (pill: HTMLElement, dataValueString: string, styleType: string, plugin: PrettyPropertiesPlugin) => {
 
 	
 	if (plugin.settings.enableColoredProperties) {
@@ -183,13 +183,13 @@ export const updateValueListElement = async (pill: HTMLElement, dataValueString:
 }
 
 
-export const updateTagPill = async (pill: HTMLElement, plugin: PrettyPropertiesPlugin) => {
+export const updateTagPill = (pill: HTMLElement, plugin: PrettyPropertiesPlugin) => {
 
 
 
 	if (plugin.settings.enableColoredProperties) {
 		let content = pill.querySelector(".multi-select-pill-content");
-		if (content instanceof HTMLElement) {
+		if (content?.instanceOf(HTMLElement)) {
 			let value = content.innerText;
 			if (value.startsWith("#")) {
 			value = value.replace("#", "");
@@ -218,7 +218,7 @@ export const updateTag = (tag: HTMLElement, plugin: PrettyPropertiesPlugin) => {
 
 
 
-const updateColorButton = async(parent: HTMLElement, value:string, isBase: boolean | undefined, plugin:PrettyPropertiesPlugin) => {
+const updateColorButton = (parent: HTMLElement, value:string, isBase: boolean | undefined, plugin:PrettyPropertiesPlugin) => {
 	if (!isBase || plugin.settings.enableColorButtonInBases) {
 		if (parent) {
 			createColorButton(parent, value, plugin)
@@ -227,7 +227,7 @@ const updateColorButton = async(parent: HTMLElement, value:string, isBase: boole
 }
 
 
-export const updateLongtext = async (pill: HTMLElement, plugin: PrettyPropertiesPlugin, propName?: string) => {
+export const updateLongtext = (pill: HTMLElement, plugin: PrettyPropertiesPlugin, propName?: string) => {
 
 	let parent = pill.parentElement
 	if (!parent) return
@@ -263,16 +263,12 @@ export const updateLongtext = async (pill: HTMLElement, plugin: PrettyProperties
 
 
 		let existingMathWrapper = propEl?.querySelector(".math-wrapper")
-		let match: any
+		let match
 
 
 		
 
 		if (plugin.settings.enableMath) {
-			//@ts-ignore
-			if (!window.MathJax) {
-				await loadMathJax()
-			}
 			match = text?.match(/^(\$\$)(.+)(\$\$)$/)
 			if (!match) {
 				match = text?.match(/^(\$)(.+)(\$)$/)
@@ -293,26 +289,30 @@ export const updateLongtext = async (pill: HTMLElement, plugin: PrettyProperties
 				display = true
 			}
 			
-			let math = renderMath(formula, display)
-			finishRenderMath()
+			if (symbols && formula) {
 
-			if (math) {
-                propEl?.classList.add("has-math")
-                let mathWrapper = createDiv()
-                mathWrapper.classList.add("math-wrapper")
-                mathWrapper.setAttribute("data-math", text)
-                mathWrapper.append(math)
+				let math = renderMath(formula, display)
+				void finishRenderMath()
 
-				if (isBase) {
-					propEl?.prepend(mathWrapper)
-					mathWrapper.onclick = () => {
-						pill.focus()
+				if (math) {
+					propEl?.classList.add("has-math")
+					let mathWrapper = createDiv()
+					mathWrapper.classList.add("math-wrapper")
+					mathWrapper.setAttribute("data-math", text)
+					mathWrapper.append(math)
+
+					if (isBase) {
+						propEl?.prepend(mathWrapper)
+						mathWrapper.onclick = () => {
+							pill.focus()
+						}
+					} else {
+						let mathKeyEl = propEl?.querySelector(".metadata-property-key");
+						mathKeyEl?.after(mathWrapper);
 					}
-				} else {
-					let mathKeyEl = propEl?.querySelector(".metadata-property-key");
-					mathKeyEl?.after(mathWrapper);
 				}
-            }
+			}
+			
 
 
 		} else {
@@ -351,7 +351,7 @@ export const updateLongtext = async (pill: HTMLElement, plugin: PrettyProperties
 	
 	
 	let metadataContainer = pill.closest(".metadata-container")
-	if (metadataContainer instanceof HTMLElement) {
+	if (metadataContainer?.instanceOf(HTMLElement)) {
 		hideMetadataContainerIfAllPropertiesHidden(metadataContainer)
 	}
 	
@@ -359,14 +359,14 @@ export const updateLongtext = async (pill: HTMLElement, plugin: PrettyProperties
 }
 
 
-export const updateCardLongtext = async (pill: HTMLElement, plugin: PrettyPropertiesPlugin) => {
+export const updateCardLongtext = (pill: HTMLElement, plugin: PrettyPropertiesPlugin) => {
 
 	if (plugin.settings.enableColoredProperties || plugin.settings.enableMath) {
 		let parent = pill.parentElement
-		let prop = parent?.getAttribute("data-property") || ""
-		prop = prop.replace(/^note\./, "")
+		//let prop = parent?.getAttribute("data-property") || ""
+		//prop = prop.replace(/^note\./, "")
 		//@ts-ignore
-		let properties = plugin.app.metadataTypeManager.getAllProperties()
+		//let properties = plugin.app.metadataTypeManager.getAllProperties()
 		//let type = properties[prop]?.widget || properties[prop]?.type;
 		//if (type != "text") return
 		
@@ -374,7 +374,7 @@ export const updateCardLongtext = async (pill: HTMLElement, plugin: PrettyProper
 
 		let propEl = parent
 		let existingMathWrapper = propEl?.querySelector(".math-wrapper")
-		let match: any
+		let match
 
 		if (plugin.settings.enableMath) {
 			match = text?.match(/^(\$\$)(.+)(\$\$)$/)
@@ -388,20 +388,26 @@ export const updateCardLongtext = async (pill: HTMLElement, plugin: PrettyProper
 			let existingValue = existingMathWrapper?.getAttribute("data-math") || ""
 			if (existingValue == text) { return }
 			let formula = match[2]
-			let symbols = match[1]
+			//let symbols = match[1]
 			existingMathWrapper?.remove()
-			let display = false			
-			let math = renderMath(formula, display)
-			finishRenderMath()
+			let display = false	
+			
+			if (formula) {
+				let math = renderMath(formula, display)
+				void finishRenderMath()
 
-			if (math) {
-                propEl?.classList.add("has-math")
-                let mathWrapper = createDiv()
-                mathWrapper.classList.add("math-wrapper")
-                mathWrapper.setAttribute("data-math", text)
-                mathWrapper.append(math)
-				propEl?.append(mathWrapper)
-            }
+				if (math) {
+					propEl?.classList.add("has-math")
+					let mathWrapper = createDiv()
+					mathWrapper.classList.add("math-wrapper")
+					mathWrapper.setAttribute("data-math", text)
+					mathWrapper.append(math)
+					propEl?.append(mathWrapper)
+				}
+			}
+			
+
+
 		} else {
 			
 			existingMathWrapper?.remove()
@@ -422,7 +428,7 @@ export const updateCardLongtext = async (pill: HTMLElement, plugin: PrettyProper
 
 
 
-export const updateLongTexts = async (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
+export const updateLongTexts = (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
 
 	
 	
@@ -430,7 +436,7 @@ export const updateLongTexts = async (container: HTMLElement, plugin: PrettyProp
 
 	
 	for (let pill of longtexts) {
-		if (pill instanceof HTMLElement) {
+		if (pill?.instanceOf(HTMLElement)) {
 			updateLongtext(pill, plugin)
 		}
 	}
@@ -438,7 +444,7 @@ export const updateLongTexts = async (container: HTMLElement, plugin: PrettyProp
 	let cardsLongtexts = container.querySelectorAll(".bases-cards-line:not(:has(*))")
 
 	for (let pill of cardsLongtexts) {
-		if (pill instanceof HTMLElement) {
+		if (pill?.instanceOf(HTMLElement)) {
 			updateCardLongtext(pill, plugin)
 		}
 	}
@@ -446,20 +452,20 @@ export const updateLongTexts = async (container: HTMLElement, plugin: PrettyProp
 	let listLongtexts = container.querySelectorAll(".bases-list-property .bases-rendered-value[data-property-type='text']")
 
 	for (let pill of listLongtexts) {
-		if (pill instanceof HTMLElement) {
+		if (pill?.instanceOf(HTMLElement)) {
 			updateCardLongtext(pill, plugin)
 		}
 	}
 }
 
 
-export const updateSettingPills = async (plugin: PrettyPropertiesPlugin) => {
+export const updateSettingPills = (plugin: PrettyPropertiesPlugin) => {
 
 	let pills = document.querySelectorAll(".setting-multi-select-pill");
 	for (let pill of pills) {
-	  if (pill instanceof HTMLElement) {
+	  if (pill?.instanceOf(HTMLElement)) {
 		let content = pill.querySelector(".multi-select-pill-content");
-		if (content instanceof HTMLElement) {
+		if (content?.instanceOf(HTMLElement)) {
 			let text = content?.innerText
 			setPillStyles(pill, "data-property-pill-value", text, "multiselect-pill", plugin)
 		}
@@ -468,9 +474,9 @@ export const updateSettingPills = async (plugin: PrettyPropertiesPlugin) => {
   
 	let tagPills = document.querySelectorAll(".setting-tag-pill");
 	for (let pill of tagPills) {
-	  if (pill instanceof HTMLElement) {
+	  if (pill?.instanceOf(HTMLElement)) {
 		let content = pill.querySelector(".multi-select-pill-content");
-		if (content instanceof HTMLElement) {
+		if (content?.instanceOf(HTMLElement)) {
 			let text = content?.innerText
 			setPillStyles(pill, "data-tag-value", text, "tag", plugin)
 		}
@@ -480,7 +486,7 @@ export const updateSettingPills = async (plugin: PrettyPropertiesPlugin) => {
   
 	let longtextPills = document.querySelectorAll(".setting-longtext-pill");
 	for (let pill of longtextPills) {
-	  if (pill instanceof HTMLElement) {
+	  if (pill?.instanceOf(HTMLElement)) {
 		let text = pill.innerText
 		setPillStyles(pill, "data-property-longtext-value", text, "longtext", plugin);
 	  }
@@ -508,20 +514,20 @@ export const updateSettingPills = async (plugin: PrettyPropertiesPlugin) => {
 
 
 
-export const updateTagPaneTags = async(container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
+export const updateTagPaneTags = (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
 
 
 
     let tags = container.querySelectorAll(".tag-pane-tag span.tree-item-inner-text")
     for (let tag of tags) {
-		if (tag instanceof HTMLElement) {
+		if (tag?.instanceOf(HTMLElement)) {
 			let value = tag.innerText
 			if (!plugin.settings.enableColoredTagsInTagPane) {
 				value = ""
 			}
 			
 			let parentTag = tag.previousSibling
-			if (parentTag instanceof HTMLElement) {
+			if (parentTag?.instanceOf(HTMLElement)) {
 				let parentValue = parentTag.innerText
 				if (parentValue) {
 					value = parentValue + value
@@ -535,7 +541,7 @@ export const updateTagPaneTags = async(container: HTMLElement, plugin: PrettyPro
 }
 
 
-export const updateTagPaneTagsAll = async (plugin: PrettyPropertiesPlugin) => {
+export const updateTagPaneTagsAll = (plugin: PrettyPropertiesPlugin) => {
 	let leaves = plugin.app.workspace.getLeavesOfType("tag");
 	for (let leaf of leaves) {
 		let view = leaf.view

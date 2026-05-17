@@ -7,10 +7,12 @@ import { getCurrentProperty } from "./propertyUtils";
 import { getCurrentCoverProperty } from "./imageUtils";
 import { selectCoverShape } from "./imageUtils";
 import { FileImageSuggestModal } from "src/modals/fileImageSuggestModal";
-import { ImageSuggestModal } from "src/modals/imageSuggestModal";
+
 import { IconSuggestModal } from "src/modals/iconSuggestModal";
 import { LocalImageSuggestModal } from "src/modals/localImageSuggestModal";
 import { EmojiSuggestModal } from "src/modals/emojiSuggestModal";
+import { ImageSuggestModal } from "src/modals/imageSuggestModal";
+
 
 
 export function registerCommands(plugin: PrettyPropertiesPlugin) {

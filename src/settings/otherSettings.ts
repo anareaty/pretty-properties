@@ -1,4 +1,4 @@
-import { Setting, loadMathJax, Notice, Platform, Modal } from 'obsidian';
+import { Setting, Notice, Platform, Modal } from 'obsidian';
 import { i18n } from 'src/localization/localization';
 import { DEFAULT_SETTINGS, PPSettingTab } from 'src/settings/settings';
 import { updateAutoHideProps, updateBannerStyles, updateBaseTagsStyle, updateCoverStyles, updateHiddenEmptyProperties, updateHiddenMetadataContainer, updateHiddenPropertiesInPropTab, updateHideMetadataAddButton, updateHidePropTitle, updateIconStyles, updatePillPaddings, updateRelativeDateColors } from 'src/utils/updates/updateStyles';
@@ -24,9 +24,9 @@ export const showOtherSettings = (settingTab: PPSettingTab) => {
             "non-transparent": i18n.t("ONLY_NON_TRANSPARENT")
         })
         .setValue(plugin.settings.addPillPadding)
-        .onChange((value) => {
+        .onChange(async(value) => {
             plugin.settings.addPillPadding = value
-            plugin.saveSettings()
+            await plugin.saveSettings()
             updatePillPaddings(plugin)
         })
     )
@@ -41,9 +41,9 @@ export const showOtherSettings = (settingTab: PPSettingTab) => {
             "raw": i18n.t("RAW_PATH")
         })
         .setValue(plugin.settings.imageLinkFormat)
-        .onChange((value) => {
+        .onChange(async(value) => {
             plugin.settings.imageLinkFormat = value
-            plugin.saveSettings()
+            await plugin.saveSettings()
         })
     )
 
@@ -55,10 +55,6 @@ export const showOtherSettings = (settingTab: PPSettingTab) => {
             .onChange(async (value) => {
                 plugin.settings.enableMath = value
                 await plugin.saveSettings();
-                //@ts-ignore
-                if (plugin.settings.enableMath && !window.MathJax) {
-                    loadMathJax()
-                }
                 updateLongTexts(document.body, plugin)			
             }));
 
@@ -82,7 +78,7 @@ export const showOtherSettings = (settingTab: PPSettingTab) => {
                             .setName(i18n.t("EXPORT_OPTIONS"))
                             .addButton(btn => btn
                                 .setButtonText(exportFileButtonName)
-                                .onClick(() => {
+                                .onClick(async () => {
                                     if (Platform.isDesktop) {
                                         let exportLink = createEl("a")
                                         exportLink.setAttrs({
@@ -95,12 +91,12 @@ export const showOtherSettings = (settingTab: PPSettingTab) => {
                                     } else if (Platform.isMobile) {
                                         if (navigator.share) {
                                             let file = new File([settingsText], fileName, {type: 'application/json'})
-                                            navigator.share({
+                                            await navigator.share({
                                                 files: [file],
                                                 title: "Pretty properties settings backup"
                                             })
                                         } else {
-                                            plugin.app.vault.adapter.write(
+                                            await plugin.app.vault.adapter.write(
                                                 fileName,
                                                 settingsText
                                             ).then();
@@ -112,8 +108,8 @@ export const showOtherSettings = (settingTab: PPSettingTab) => {
                             )
                             .addButton(btn => btn
                                 .setButtonText(i18n.t("COPY_SETTINGS_TO_CLIPBOARD"))
-                                .onClick(() => {
-                                    navigator.clipboard.writeText(settingsText)
+                                .onClick(async() => {
+                                    await navigator.clipboard.writeText(settingsText)
                                     new Notice(i18n.t("SETTINGS_ARE_COPIED_TO_CLIPBOARD"))
                                 })
                             )
@@ -127,7 +123,7 @@ export const showOtherSettings = (settingTab: PPSettingTab) => {
         .addButton(button => {button
             .setButtonText(i18n.t("IMPORT"))
             .onClick(() => {
-                let input = document.createElement('input');
+                let input = createEl('input');
                 input.setAttrs({
                         type: "file",
                         accept: ".json"
@@ -144,11 +140,12 @@ export const showOtherSettings = (settingTab: PPSettingTab) => {
                             let content = readerEvent.target?.result
                             if (typeof content == "string") {
                                 try {
-                                    importedJson = JSON.parse(content)
+                                    importedJson = JSON.parse(content) as Record<string, string>
                                 } catch(error) {
                                     let errorString = i18n.t("INVALID_SETTING_IMPORT_FILE")
                                     new Notice(errorString)
                                     console.error(errorString)
+                                    console.error(error)
                                 }
                             }
 

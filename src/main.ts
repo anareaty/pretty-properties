@@ -1,6 +1,5 @@
 import {
 	Plugin,
-	loadMathJax,
 	Menu
 } from "obsidian";
 import { 
@@ -18,7 +17,7 @@ import {
 import { i18n } from "./localization/localization";
 import { PPSettingTab, PPPluginSettings, DEFAULT_SETTINGS } from "./settings/settings";
 import { registerCommands } from "./utils/registerCommands";
-import { updateAllProperties, updateEmptyProperties, updateImagesOnCacheChanged } from "./utils/updates/updateElements";
+import { updateEmptyProperties, updateImagesOnCacheChanged } from "./utils/updates/updateElements";
 import { getPropertyValue } from "./utils/propertyUtils";
 import { registerTagFixExtension } from "./extensions/tagFixExtension";
 import { updatePillPaddings } from "./utils/updates/updateStyles";
@@ -38,26 +37,28 @@ import {PropertyFormatter, registerPropertyFormatter} from "./utils/propertyForm
 import { patchMenu } from "./patches/patchMenu";
 import { reloadAllTabs } from "./utils/reload";
 import { patchEmbed } from "./patches/patchEmbed";
+import { GlobalSearchPluginInstance } from "@obsidian-typings/obsidian-public-latest";
 
+type Patch = () => void
+type PatchList = Record<string, Patch>
+
+
+interface GlobalSearchPluginInstanceExtended extends GlobalSearchPluginInstance {
+	openGlobalSearch: (search: string) => void
+}
 export default class PrettyPropertiesPlugin extends Plugin {
 	settings: PPPluginSettings;
-	patches: Record<string, any>;
+	patches: Record<string, PatchList | Patch>;
 	api: API;
 	formatter: PropertyFormatter;
-	propertyListeners: any[]
 
 
 	async onload() {
 		await this.loadSettings();
-		//@ts-ignore
-		if (this.settings.enableMath && !window.MathJax) {
-			await loadMathJax()
-		}
 
 		createApi(this)
 		i18n.setLocale();
 		this.patches = {}
-		this.propertyListeners = []
 		registerPropertyFormatter(this)
 
 
@@ -104,7 +105,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		registerTagPostProcessor(this)
 
 		this.registerEvent(
-			this.app.metadataCache.on("changed", async (file, data, cache) => {
+			this.app.metadataCache.on("changed", (file, data, cache) => {
 				updateImagesOnCacheChanged(file, cache, this)
 				updateAllProgressElsOnMaxChange(file, cache, this)
 			})
@@ -130,16 +131,20 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 				//@ts-ignore
-				let searchPlugin = this.app.internalPlugins.getEnabledPluginById("global-search")
+				let searchPlugin = this.app.internalPlugins.getEnabledPluginById("global-search") as GlobalSearchPluginInstanceExtended | null
 
+				
 				if (searchPlugin && e.target instanceof HTMLElement) {
 					if ((e.ctrlKey || e.metaKey)) {
 						let value = getPropertyValue(e, this);
 						if (value !== undefined) {
 							let propEl = e.target.closest(".metadata-property");
 							let prop = propEl!.getAttribute("data-property-key");
-							let search = "[" + prop + ': "' + value + '"]';
-							searchPlugin.openGlobalSearch(search);
+							if (prop && value && typeof value == "string") {
+								let search = "[" + prop + ': "' + value + '"]';
+								searchPlugin.openGlobalSearch(search);
+							}
+							
 						}
 					}
 				}
@@ -185,7 +190,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		registerWindowEvents(window);
 
 		this.registerEvent(
-			this.app.workspace.on("window-open", async (win, window) => {
+			this.app.workspace.on("window-open", (win, window) => {
 				registerWindowEvents(window);
 			})
 		);
@@ -214,25 +219,29 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 	async loadSettings() {
-		const data = (await this.loadData()) ?? {};
+		const data = ((await this.loadData()) ?? {}) as PPPluginSettings;
 		await this.migrateSettings(data);
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
 	}
 
 	
 
-	async migrateSettings(data: any){
+	async migrateSettings(data: PPPluginSettings){
 		if (!Array.isArray(data.coverProperties)) {
-			const coverProperty = data.coverProperty ?? DEFAULT_SETTINGS.coverProperties[0].property;
+			const coverProperty = data.coverProperty ?? DEFAULT_SETTINGS.coverProperties[0]?.property;
 			const extra = Array.isArray(data.extraCoverProperties) ? data.extraCoverProperties : [];
 
-			data.coverProperties = [
-				{ property: coverProperty, format: "" },
-				...extra.map((p: string) => ({ property: p, format: "" })),
-			];
+			if (coverProperty) {
+				data.coverProperties = [
+					{ property: coverProperty, format: "" },
+					...extra.map((p: string) => ({ property: p, format: "" })),
+				];
+				delete data.coverProperty;
+				delete data.extraCoverProperties;
+			}
+			
 
-			delete data.coverProperty;
-			delete data.extraCoverProperties;
+			
 
 			await this.saveData(data);
 		}

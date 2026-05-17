@@ -20,9 +20,9 @@ export const showHiddenSettings = (settingTab: PPSettingTab) => {
         .setName(property)
         .addButton(btn => btn
             .setIcon("x")
-            .onClick(() => {
+            .onClick(async() => {
                 plugin.settings.hiddenProperties = plugin.settings.hiddenProperties.filter(p => p != property)
-                plugin.saveSettings()
+                await plugin.saveSettings()
                 propertyHiddenSetting.settingEl.remove()
                 updateHiddenProperties(plugin)
             })
@@ -42,11 +42,11 @@ export const showHiddenSettings = (settingTab: PPSettingTab) => {
         )
         .addButton(btn => btn
             .setIcon("plus")
-            .onClick(() => {
+            .onClick(async () => {
                 newProperty = newProperty.trim()
                 if (newProperty && !plugin.settings.hiddenProperties.find(p => p == newProperty)) {
                     plugin.settings.hiddenProperties.push(newProperty)
-                    plugin.saveSettings()
+                    await plugin.saveSettings()
                     updateHiddenProperties(plugin)
                     addHiddenSetting(newProperty)
                     let inputSetting = newPropertySetting.components[0]
@@ -76,9 +76,9 @@ export const showHiddenEmptySettings = (settingTab: PPSettingTab) => {
         .setName(property)
         .addButton(btn => btn
             .setIcon("x")
-            .onClick(() => {
+            .onClick(async () => {
                 plugin.settings.hiddenWhenEmptyProperties = plugin.settings.hiddenWhenEmptyProperties.filter(p => p != property)
-                plugin.saveSettings()
+                await plugin.saveSettings()
                 propertyHiddenSetting.settingEl.remove()
                 updateHiddenProperties(plugin)
             })
@@ -98,11 +98,11 @@ export const showHiddenEmptySettings = (settingTab: PPSettingTab) => {
         )
         .addButton(btn => btn
             .setIcon("plus")
-            .onClick(() => {
+            .onClick(async() => {
                 newProperty = newProperty.trim()
                 if (newProperty && !plugin.settings.hiddenWhenEmptyProperties.find(p => p == newProperty)) {
                     plugin.settings.hiddenWhenEmptyProperties.push(newProperty)
-                    plugin.saveSettings()
+                    await plugin.saveSettings()
                     updateHiddenProperties(plugin)
                     addHiddenSetting(newProperty)
                     let inputSetting = newPropertySetting.components[0]

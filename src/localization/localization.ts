@@ -1,9 +1,9 @@
-import { getLanguage } from 'obsidian';
 import en from 'src/localization/locales/en';
 import ru from 'src/localization/locales/ru';
 
+type LocaleObj = Record<string, string>
 
-const locales: Record<string, any> = {
+const locales: Record<string, LocaleObj> = {
   en,
   ru
 };
@@ -12,14 +12,14 @@ export class LocalizationService {
   private currentLocale: string = 'en';
 
   setLocale() {
-    let locale: string
-		if (getLanguage) locale = getLanguage();
-		else locale = window.localStorage.language;
-    if (locales[locale]) this.currentLocale = locale;
+    let locale = window.localStorage.language as string | undefined
+    if (locale && locales[locale]) this.currentLocale = locale;
   }
 
   t(key: string): string {
-    const translation = locales[this.currentLocale][key] || locales['en'][key] || key;
+
+    let localeObj = locales[this.currentLocale] || locales['en']
+    const translation = localeObj![key] || key;
     return translation;
   }
 }

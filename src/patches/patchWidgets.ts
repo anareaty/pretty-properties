@@ -6,9 +6,18 @@ import { updateProgress } from "src/utils/updates/updateProgress"
 import { around, dedupe } from "monkey-around";
 import { updateAllMetadataContainers } from "src/utils/updates/updateHiddenProperties";
 import { getPropertyFormatObj, updatePropertyFormatting } from "src/utils/updates/updatePropertyFormattings";
+import { AliasesPropertyWidgetComponent, MultitextPropertyWidgetComponent, PropertyWidgetComponentBase, TagsPropertyWidgetComponent } from "@obsidian-typings/obsidian-public-latest";
 
 
-export const updateWidgets = async (type: string, rendered: any, args: any[], plugin: PrettyPropertiesPlugin) => {
+type WidgetArgs = [
+  HTMLElement, 
+  string | number | boolean | string[] | null | undefined, {
+    key: string;
+    sourcePath: string;
+}]
+
+export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBase, args: WidgetArgs, plugin: PrettyPropertiesPlugin) => {
+
 
 
   try {
@@ -19,10 +28,9 @@ export const updateWidgets = async (type: string, rendered: any, args: any[], pl
     let parent = el.parentElement
 
 
-
-
-    if (value && value.value) {
-      value = value.value;
+    let valueOldVersion = value as unknown
+    if (valueOldVersion && typeof valueOldVersion == "object" && "value" in valueOldVersion) {
+      value = valueOldVersion.value as string | number | boolean | string[] | null | undefined
     }
 
 
@@ -30,14 +38,14 @@ export const updateWidgets = async (type: string, rendered: any, args: any[], pl
     
 
     if (type == "multitext" || type == "aliases") {
-      let elements = rendered?.multiselect.elements 
+      let renderedTyped = rendered as MultitextPropertyWidgetComponent | AliasesPropertyWidgetComponent
+      let elements = renderedTyped?.multiselect.elements
 
       if (elements.length == 0) {
-        parent.classList.add("is-empty")
+        parent?.classList.add("is-empty")
       } else {
-        parent.classList.remove("is-empty")
+        parent?.classList.remove("is-empty")
       }
-
       for (let element of elements) {
         updateMultiselectPill(element, plugin)
       }
@@ -50,11 +58,12 @@ export const updateWidgets = async (type: string, rendered: any, args: any[], pl
 
 
     if (type == "tags") {
-      let elements = rendered?.multiselect.elements
+      let renderedTyped = rendered as TagsPropertyWidgetComponent
+      let elements = renderedTyped?.multiselect.elements
       if (elements.length == 0) {
-        parent.classList.add("is-empty")
+        parent?.classList.add("is-empty")
       } else {
-        parent.classList.remove("is-empty")
+        parent?.classList.remove("is-empty")
       }
 
       for (let element of elements) {
@@ -68,17 +77,21 @@ export const updateWidgets = async (type: string, rendered: any, args: any[], pl
 
     if (type == "date") {
       let parent = el.parentElement
-      parent.setAttribute("data-source-path", sourcePath)
+      parent?.setAttribute("data-source-path", sourcePath)
       let input = el.querySelector("input");
+      
+      if (input) {
+        updateDateInput(input, plugin)
+        input.onchange = () => {
+          updateDateInput(input, plugin)
+        }
+        input.onblur = () => {
+          updateDateInput(input, plugin)
+        }
+      }
 
 
-      updateDateInput(input, plugin)
-      input.onchange = () => {
-        updateDateInput(input, plugin)
-      }
-      input.onblur = () => {
-        updateDateInput(input, plugin)
-      }
+      
 
       
 
@@ -86,48 +99,53 @@ export const updateWidgets = async (type: string, rendered: any, args: any[], pl
 
     if (type == "datetime") {
       let parent = el.parentElement
-      parent.setAttribute("data-source-path", sourcePath)
+      parent?.setAttribute("data-source-path", sourcePath)
       let input = el.querySelector("input");
-      updateDateTimeInput(input, plugin)
-      input.onchange = () => {
+
+      if (input) {
         updateDateTimeInput(input, plugin)
+        input.onchange = () => {
+          updateDateTimeInput(input, plugin)
+        }
+        input.onblur = () => {
+          updateDateTimeInput(input, plugin)
+        }
       }
-      input.onblur = () => {
-        updateDateTimeInput(input, plugin)
-      }
+      
     }
 
     if (type == "number") {
       let parent = el.parentElement
-      parent.setAttribute("data-source-path", sourcePath)
-      updateProgress(parent, plugin, sourcePath)
+      parent?.setAttribute("data-source-path", sourcePath)
 
+      if (parent) {
 
-      
-
-
-      let input = el.querySelector("input");
-
-
-      let propertyFormatObj = getPropertyFormatObj(propName, plugin)
-      updatePropertyFormatting(parent, propName, input.value, type, propertyFormatObj.format, propertyFormatObj.textFormat, plugin)
-
-
-      if (input.value === "") {
-        parent.classList.add("is-empty")
-      } else {
-        parent.classList.remove("is-empty")
-      }
-      input.onchange = (value: number) => {
         updateProgress(parent, plugin, sourcePath)
-        if (input.value === "") {
-          parent.classList.add("is-empty")
-          updateAllMetadataContainers(plugin)
-        } else {
-          parent.classList.remove("is-empty")
-          updateAllMetadataContainers(plugin)
+        let input = el.querySelector("input");
+
+        if (input) {
+          let propertyFormatObj = getPropertyFormatObj(propName, plugin)
+          updatePropertyFormatting(parent, propName, input.value, type, propertyFormatObj.format, propertyFormatObj.textFormat, plugin)
+
+          if (input.value === "") {
+            parent.classList.add("is-empty")
+          } else {
+            parent.classList.remove("is-empty")
+          }
+          input.onchange = () => {
+            updateProgress(parent, plugin, sourcePath)
+            if (input.value === "") {
+              parent.classList.add("is-empty")
+              updateAllMetadataContainers(plugin)
+            } else {
+              parent.classList.remove("is-empty")
+              updateAllMetadataContainers(plugin)
+            }
+          }
         }
+        
       }
+      
     }
 
     if (type == "text") {
@@ -137,20 +155,20 @@ export const updateWidgets = async (type: string, rendered: any, args: any[], pl
       let link = el.querySelector(".metadata-link");
 
       let parent = el.parentElement
-      parent.setAttribute("data-source-path", sourcePath)
+      parent?.setAttribute("data-source-path", sourcePath)
 
-      if (longText) {
+      if (longText?.instanceOf(HTMLElement)) {
         updateLongtext(longText, plugin, propName);
         longText.onblur = () => {
           updateLongtext(longText, plugin, propName);
           let link = el.querySelector(".metadata-link");
           if (link) {
-            parent.classList.remove("is-empty")
+            parent?.classList.remove("is-empty")
             updateAllMetadataContainers(plugin)
           }
         };
       } else if (link) {
-        parent.classList.remove("is-empty")
+        parent?.classList.remove("is-empty")
         updateAllMetadataContainers(plugin)
       }
 
@@ -171,30 +189,30 @@ export const updateWidgets = async (type: string, rendered: any, args: any[], pl
 
     if (type == "unknown") {
       let input = el.querySelector(".mod-unknown")
-      if (input instanceof HTMLElement && input.innerText == "null") {
-        parent.classList.add("is-empty")
+      if (input?.instanceOf(HTMLElement) && input.innerText == "null") {
+        parent?.classList.add("is-empty")
       } else {
-        parent.classList.remove("is-empty")
+        parent?.classList.remove("is-empty")
       }
     }
 
 
     if (type == "checkbox") {
       let input = el.querySelector(".metadata-input-checkbox")
-      if (input instanceof HTMLElement) {
+      if (input?.instanceOf(HTMLElement)) {
         let indeterminate = input.getAttribute("data-indeterminate")
         if (indeterminate == "true") {
-          parent.classList.add("is-empty")
+          parent?.classList.add("is-empty")
         } else {
-          parent.classList.remove("is-empty")
+          parent?.classList.remove("is-empty")
         }
 
         input.onchange = () => {
           let indeterminate = input.getAttribute("data-indeterminate")
           if (indeterminate == "true") {
-            parent.classList.add("is-empty")
+            parent?.classList.add("is-empty")
           } else {
-            parent.classList.remove("is-empty")
+            parent?.classList.remove("is-empty")
           }
           updateAllMetadataContainers(plugin)
         }
@@ -204,11 +222,11 @@ export const updateWidgets = async (type: string, rendered: any, args: any[], pl
     
 
     if (plugin.settings.hiddenProperties.find(p => p.toLowerCase() == propName.toLowerCase())) {
-      parent.classList.add("pp-property-hidden")
+      parent?.classList.add("pp-property-hidden")
     }
 
     if (plugin.settings.hiddenWhenEmptyProperties.find(p => p.toLowerCase() == propName.toLowerCase())) {
-      parent.classList.add("pp-property-hidden-when-empty")
+      parent?.classList.add("pp-property-hidden-when-empty")
     }
 
     updateAllMetadataContainers(plugin)
@@ -220,7 +238,7 @@ export const updateWidgets = async (type: string, rendered: any, args: any[], pl
 }
 
 
-export const patchPropertyWidgets = async (plugin: PrettyPropertiesPlugin) => {
+export const patchPropertyWidgets = (plugin: PrettyPropertiesPlugin) => {
   //@ts-ignore
   let metadataTypeManager = plugin.app.metadataTypeManager
   let widgets = metadataTypeManager.registeredTypeWidgets
@@ -239,30 +257,38 @@ export const patchPropertyWidgets = async (plugin: PrettyPropertiesPlugin) => {
   for (let type in widgets) {
       let widget = widgets[type]
 
+      if (!widget) continue
+
 
       plugin.patches.uninstallWidgetPatch[type] = around(widget, {
 
-        render(oldRender: any) {
+        render(oldRender) {
 
 
 
-          return dedupe("pp-patch-widgets-around-key", oldRender, (...args: any[]) => {
+          return dedupe("pp-patch-widgets-around-key", oldRender, (...args) => {
 
             let rendered = oldRender && oldRender.apply(this, args)
 
+            let widgetArgs = args as WidgetArgs
 
-            updateWidgets(type, rendered, args, plugin)
+            updateWidgets(type, rendered, widgetArgs, plugin)
 
-            let renderValues = rendered?.multiselect?.renderValues
-            if (renderValues) {
-              rendered.multiselect.renderValues = new Proxy(renderValues, {
-                apply(renderValues, thisArg2, args2) {
-                  let renderedValues = renderValues.call(thisArg2, ...args2)
-                  updateWidgets(type, rendered, args, plugin)
-                  return renderedValues
-                }
-              })
+            if (rendered.type == "multitext") {
+              let multiRendered = rendered as MultitextPropertyWidgetComponent
+
+              let renderValues = multiRendered.multiselect.renderValues
+
+                multiRendered.multiselect.renderValues = new Proxy(renderValues, {
+                  apply(renderValues, thisArg2) {
+                    renderValues.call(thisArg2)
+                    updateWidgets(type, rendered, widgetArgs, plugin)
+                    return undefined
+                  }
+                })
             }
+
+            
             return rendered
           })
         }

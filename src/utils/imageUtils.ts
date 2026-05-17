@@ -8,7 +8,7 @@ import { CoverPositionSuggestModal } from "src/modals/coverPositionSuggestModal"
 import { ImageSuggestModal } from "src/modals/imageSuggestModal";
 
 
-export const selectLocalImage = async (propName: string, folder: string, shape: string, plugin: PrettyPropertiesPlugin) => {
+export const selectLocalImage = (propName: string, folder: string, shape: string, plugin: PrettyPropertiesPlugin) => {
     let file = plugin.app.workspace.getActiveFile();
     if (file instanceof TFile) {
         let formats = [
@@ -50,7 +50,7 @@ export const selectLocalImage = async (propName: string, folder: string, shape: 
 
 
 
-export const selectBannerPosition = async(plugin: PrettyPropertiesPlugin) => {
+export const selectBannerPosition = (plugin: PrettyPropertiesPlugin) => {
     let file = plugin.app.workspace.getActiveFile()
     let bannerPositionProperty = plugin.settings.bannerPositionProperty
     if (file instanceof TFile && bannerPositionProperty) {
@@ -60,7 +60,7 @@ export const selectBannerPosition = async(plugin: PrettyPropertiesPlugin) => {
 
 
 
-export const selectCoverShape = async(plugin: PrettyPropertiesPlugin) => {
+export const selectCoverShape = (plugin: PrettyPropertiesPlugin) => {
     let file = plugin.app.workspace.getActiveFile();
     if (file instanceof TFile) {
         new CoverShapeSuggestModal(plugin.app, file).open();
@@ -69,7 +69,7 @@ export const selectCoverShape = async(plugin: PrettyPropertiesPlugin) => {
 
 
 
-export const selectCoverPosition = async(plugin: PrettyPropertiesPlugin) => {
+export const selectCoverPosition = (plugin: PrettyPropertiesPlugin) => {
     let file = plugin.app.workspace.getActiveFile();
     if (file instanceof TFile) {
         new CoverPositionSuggestModal(plugin.app, file).open();
@@ -100,7 +100,7 @@ export const getCurrentCoverProperty = (plugin: PrettyPropertiesPlugin) => {
 
 
 
-export const selectCoverImage = async (plugin: PrettyPropertiesPlugin) => {
+export const selectCoverImage = (plugin: PrettyPropertiesPlugin) => {
     let file = plugin.app.workspace.getActiveFile();
     if (file instanceof TFile) {
         let propName = getCurrentCoverProperty(plugin);

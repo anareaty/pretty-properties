@@ -1,6 +1,6 @@
 //@ts-ignore
 import { syntaxTree } from '@codemirror/language';
-import { RangeSetBuilder } from '@codemirror/state';
+import { EditorState, RangeSetBuilder, Transaction } from '@codemirror/state';
 import {
 Decoration,
 DecorationSet,
@@ -10,12 +10,21 @@ PluginValue,
 ViewPlugin,
 ViewUpdate
 } from '@codemirror/view';
+import { LezerTree, SyntaxNode } from '@obsidian-typings/obsidian-public-latest';
 import { editorLivePreviewField } from 'obsidian';
 import PrettyPropertiesPlugin from 'src/main';
 import { generateInlineStyles } from 'src/utils/updates/updatePills';
 
 
+interface Tree extends LezerTree {
+    iterate: (item: { from: number; to: number; enter(node: SyntaxNode): void; }) => void
+}
 
+interface TransectionExtended extends Transaction {
+    annotations: {
+        value: unknown
+    }[]
+}
 
 export const registerTagFixExtension = (plugin: PrettyPropertiesPlugin) => {
 
@@ -29,8 +38,10 @@ export const registerTagFixExtension = (plugin: PrettyPropertiesPlugin) => {
         }
 
         update(update: ViewUpdate) {
-            //@ts-ignore
-            if (update.docChanged || update.viewportChanged || update.transactions?.[0]?.annotations?.[0]?.value) {
+
+            let transaction = update.transactions?.[0] as TransectionExtended | undefined
+
+            if (update.docChanged || update.viewportChanged || transaction?.annotations?.[0]?.value) {
                 this.decorations = this.buildDecorations(update.view);
             }
         }
@@ -45,12 +56,12 @@ export const registerTagFixExtension = (plugin: PrettyPropertiesPlugin) => {
                 if (plugin.settings.enableColoredInlineTags) {
                     for (let { from, to } of view.visibleRanges) {
     
-                        let tagTextStart = 0
+                        let tagTextStart = 0;
                         
-                        syntaxTree(view.state).iterate({
+                        (syntaxTree as (state: EditorState) => Tree)(view.state).iterate({
                             from,
                             to,
-                            enter(node: any) {
+                            enter(node: SyntaxNode) {
                                 if (node.type.name.includes('hashtag-begin')) {
                                     tagTextStart = node.to
                                 }

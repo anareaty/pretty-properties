@@ -1,4 +1,4 @@
-import { SuggestModal, TFile, App, MarkdownRenderer, Editor } from "obsidian";
+import { SuggestModal, TFile, App, MarkdownRenderer, Editor, FrontMatterCache, Component } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { setNestedProperty } from "src/utils/propertyUtils";
 
@@ -10,6 +10,7 @@ export class LocalImageSuggestModal extends SuggestModal<string> {
     shape: string
     propName: string
     editor?: Editor
+    renderComponent: Component
     constructor(
         app: App, 
         plugin: PrettyPropertiesPlugin, 
@@ -25,6 +26,7 @@ export class LocalImageSuggestModal extends SuggestModal<string> {
       this.shape = shape
       this.propName = propName
       this.editor = editor
+      this.renderComponent = new Component()
     }
 
     getSuggestions(query:string): string[] {
@@ -32,17 +34,17 @@ export class LocalImageSuggestModal extends SuggestModal<string> {
             return val.toLowerCase().includes(query.toLowerCase())
         });
     }
-    async renderSuggestion(val: string, el: Element) {
+    renderSuggestion(val: string, el: Element) {
         let path = val
         let nameParts = val.split("/")
-        let name = nameParts[nameParts.length - 1].replace(/(.*)(\.[^\.]+)$/, "$1")
-        name = this.names[this.values.indexOf(val)]
+        let name = nameParts[nameParts.length - 1]?.replace(/(.*)(.[^.]+)$/, "$1") || ""
+        name = this.names[this.values.indexOf(val)] || ""
         let file = this.app.vault.getAbstractFileByPath(path)
         if (file instanceof TFile) {
             let link = this.app.fileManager.generateMarkdownLink(file, "")
             if (!link.startsWith("!")) link = "!" + link
             let image = createDiv()
-            await MarkdownRenderer.render(this.app, link, image, "", this.plugin)
+            void MarkdownRenderer.render(this.app, link, image, "", this.renderComponent)
             el.classList.add("image-suggestion-item")
             el.classList.add(this.shape)
             //image.append(name)
@@ -65,14 +67,14 @@ export class LocalImageSuggestModal extends SuggestModal<string> {
 
 
                 if (this.editor) {
-                    imageLink = this.app.fileManager.generateMarkdownLink(imageFile, "").replace(/^\!/, "")
+                    imageLink = this.app.fileManager.generateMarkdownLink(imageFile, "").replace(/^!/, "")
                     imageLink = "!" + imageLink
                     this.editor.replaceSelection(imageLink)
                     
                 } else {
 
                     if (this.plugin.settings.imageLinkFormat != "raw") {
-                        imageLink = this.app.fileManager.generateMarkdownLink(imageFile, "").replace(/^\!/, "")
+                        imageLink = this.app.fileManager.generateMarkdownLink(imageFile, "").replace(/^!/, "")
                         if (this.plugin.settings.imageLinkFormat == "embed") {
                             imageLink = "!" + imageLink
                         }
@@ -81,7 +83,7 @@ export class LocalImageSuggestModal extends SuggestModal<string> {
                         imageLink = imageLink.replace("[]", "[" + imageFile.basename + "]")
                     }
 
-                    this.app.fileManager.processFrontMatter(file, fm => {
+                    void this.app.fileManager.processFrontMatter(file, (fm: FrontMatterCache) => {
                         setNestedProperty(fm, this.propName, imageLink);
                     })
 

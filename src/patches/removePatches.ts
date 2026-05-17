@@ -1,13 +1,20 @@
 import PrettyPropertiesPlugin from "src/main"
 
-export const unPatchWidgets = async (plugin: PrettyPropertiesPlugin) => {
-  for (let p in plugin.patches) {
-    if (typeof plugin.patches[p] == "object") {
-      for (let w in plugin.patches[p]) {
-        plugin.patches[p][w]()
+export const unPatchWidgets = (plugin: PrettyPropertiesPlugin) => {
+
+  let patches = plugin.patches
+
+  for (let p in patches) {
+    let patch = patches[p]
+    if (typeof patch == "object") {
+      for (let w in patch) {
+        let widgetPatch = patch[w]
+        if (widgetPatch) {
+          widgetPatch()
+        }
       }
-    } else {
-      plugin.patches[p]()
+    } else if (patch) {
+      patch()
     }
   }  
 }

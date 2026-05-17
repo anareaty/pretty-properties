@@ -1,9 +1,10 @@
-import { Menu, MenuItem, setIcon } from "obsidian";
+import { HSL, Menu, MenuItem, setIcon } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { i18n } from "src/localization/localization";
 import { ColorPickerModal } from "src/modals/colorPickerModal";
 import { updateRelativeDateColors } from "src/utils/updates/updateStyles";
 import { updateAllProperties } from "src/utils/updates/updateElements";
+import { PillColorSettings } from "src/settings/settings";
 
 
 
@@ -26,62 +27,86 @@ export const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string
         "default"
     ];
 
+
+    let pillColorSettings: PillColorSettings | undefined
+
+    let savedColor: string | HSL | undefined
+
+    if (
+        colorList == "propertyPillColors" ||
+        colorList == "propertyLongtextColors" ||
+        colorList == "tagColors"
+    ) {
+        pillColorSettings = plugin.settings[colorList][pillVal]
+    }
+
+    else if (
+        colorList == "dateColors" && 
+        (pillVal == "future" || pillVal == "present" || pillVal == "past")
+    ) {
+        pillColorSettings = plugin.settings[colorList][pillVal]
+    }
+
+    if (pillColorSettings && (colorType == "pillColor" || colorType == "textColor")) {
+        savedColor = pillColorSettings[colorType]
+    }
+
     for (let color of colors) {
+
         menu.addItem((item: MenuItem) => {
+
+
             
             item.setIcon("square");
 
             if (color != "default" && color != "none" && color != "accent") {
-                //@ts-ignore
+                
                 item.iconEl.style =
                     "color: transparent; background-color: rgba(var(--color-" +
                     color +
                     "-rgb), 0.3);";
             } else if (color == "accent") {
-                //@ts-ignore
+                
                 item.iconEl.style =
                     "color: transparent; background-color: hsla(var(--interactive-accent-hsl), 0.3);";
             } else if (color == "none") {
-                //@ts-ignore
+                
                 item.iconEl.style = "opacity: 0.2;";
             }
 
-            item.setTitle(i18n.t(color)).onClick(() => {
-                
-                if (color == "default") {						
-                    //@ts-ignore
-                    if (pillVal) delete plugin.settings[colorList][pillVal]?.[colorType];
-                } else {
-                    
-                    //@ts-ignore
-                    if (pillVal) {
-                        //@ts-ignore
-                        if (!plugin.settings[colorList][pillVal]) {
-                            //@ts-ignore
-                          plugin.settings[colorList][pillVal] = {
-                            pillColor: "default",
-                            textColor: "default"
-                          }
+
+            
+
+
+            item.setTitle(i18n.t(color)).onClick(async() => {
+
+                if (colorType == "pillColor" || colorType == "textColor") {
+                    if (color == "default") {						
+                        delete pillColorSettings?.[colorType]
+                    } else {   
+                        if (!pillColorSettings) {
+                            pillColorSettings = {
+                                pillColor: "default",
+                                textColor: "default"
+                            }
                         }
-                        //@ts-ignore
-                        plugin.settings[colorList][pillVal][colorType] = color;
-                    }    
+                        pillColorSettings[colorType] = color;    
+                    }
                 }
 
-                plugin.saveSettings();
+                await plugin.saveSettings();
                 updateAllProperties(plugin)
-
 
                 if (colorList == "dateColors") {
                     updateRelativeDateColors(plugin)
                 }
             });
-            //@ts-ignore
-            item.setChecked(plugin.settings[colorList][pillVal]?.[colorType] == color)
+            
+            item.setChecked(savedColor == color)
 
             if (color == "default") {
-                //@ts-ignore
-                item.setChecked(plugin.settings[colorList][pillVal]?.[colorType] == color || !plugin.settings[colorList][pillVal]?.[colorType])
+                
+                item.setChecked(savedColor == color || !savedColor)
             }
         });
     }
@@ -89,13 +114,12 @@ export const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string
     menu.addItem((item: MenuItem) => {
         item.setTitle(i18n.t("CUSTOM_COLOR"))
         item.setIcon("square");
-        //@ts-ignore
+        
         item.iconEl.classList.add("menu-item-custom-color")
         item.onClick(() => {
             new ColorPickerModal(plugin.app, plugin, pillVal, colorList, colorType).open()
         })
-        //@ts-ignore
-            item.setChecked(plugin.settings[colorList][pillVal]?.[colorType]?.h !== undefined)
+            item.setChecked(savedColor != undefined && typeof savedColor != "string")
     })
 }
 
@@ -117,7 +141,7 @@ export const createColorMenu = (pillVal: string, colorList: string, colorType: s
             .setTitle(itemTitle)
             .setIcon(iconName)
             .setSection("pretty-properties");
-        //@ts-ignore
+        
         let sub = item.setSubmenu();
         setColorMenuItems(sub, pillVal, colorList, colorType, plugin);
     });
@@ -130,7 +154,7 @@ export const createColorMenu = (pillVal: string, colorList: string, colorType: s
 
 
 
-export const createColorButton = async (parent: HTMLElement, value: string, plugin: PrettyPropertiesPlugin) => {
+export const createColorButton = (parent: HTMLElement, value: string, plugin: PrettyPropertiesPlugin) => {
     if(plugin.settings.enableColoredProperties && plugin.settings.enableColorButton) {
         let isBase = parent.classList.contains("bases-table-cell")
 

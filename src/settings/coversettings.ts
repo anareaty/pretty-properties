@@ -96,7 +96,7 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
 				button.setIcon("plus").onClick(async () => {
                     if (newProperty && !plugin.settings.coverProperties.find(c => c.property == newProperty)) {
                         plugin.settings.coverProperties.push({ property: newProperty, format: "" });
-                        plugin.saveSettings()
+                        await plugin.saveSettings()
                         settingTab.display();
                     }
 

@@ -4,7 +4,7 @@ import { getNestedProperty } from "../propertyUtils";
 import { querySelectorsWithIframes } from "../querySelectorsHelper";
 
 
-export const updateProgress = async (propertyEl: HTMLElement, plugin: PrettyPropertiesPlugin, sourcePath?: string) => {
+export const updateProgress = (propertyEl: HTMLElement, plugin: PrettyPropertiesPlugin, sourcePath?: string) => {
 
     
 
@@ -41,7 +41,7 @@ export const updateProgress = async (propertyEl: HTMLElement, plugin: PrettyProp
 
         }
 
-        if (maxVal) {  
+        if (maxVal && typeof maxVal == "number") {  
 
          
             let value = 0
@@ -56,7 +56,7 @@ export const updateProgress = async (propertyEl: HTMLElement, plugin: PrettyProp
             let percent = Math.round((value * 100) / maxVal) + " %";
             let progress
 
-            if (existingProgressWrapper instanceof HTMLElement) {
+            if (existingProgressWrapper?.instanceOf(HTMLElement)) {
                 let existingProgressValue = existingProgressWrapper.getAttribute("data-progress-percent")
                 if (existingProgressValue == percent) {
                     return
@@ -88,7 +88,7 @@ export const updateProgress = async (propertyEl: HTMLElement, plugin: PrettyProp
                 progressWrapper.append(progress);
                 let propertyKeyEl = propertyEl.querySelector(".metadata-property-key");
 
-                if (propertyKeyEl instanceof HTMLElement) {
+                if (propertyKeyEl?.instanceOf(HTMLElement)) {
                     propertyKeyEl.after(progressWrapper);
                 }
             }
@@ -107,20 +107,22 @@ export const updateProgress = async (propertyEl: HTMLElement, plugin: PrettyProp
 
 
 
-export const updateAllProgressElsOnMaxChange = async (file: TFile, cache: CachedMetadata, plugin: PrettyPropertiesPlugin) => {
+export const updateAllProgressElsOnMaxChange = (file: TFile, cache: CachedMetadata, plugin: PrettyPropertiesPlugin) => {
     for (let prop in plugin.settings.progressProperties) {
-        let maxProperty = plugin.settings.progressProperties[prop].maxProperty
-        let maxVal = getNestedProperty(cache.frontmatter, maxProperty)
-        if (maxVal !== undefined) {
-            let numbers = querySelectorsWithIframes("input.metadata-input-number")
-            for (let input of numbers) {
-                if (input instanceof HTMLElement) {
-                    let num = input.closest(".metadata-property")
-                    let sourcePath = num?.getAttribute("data-source-path") || ""
-                    if (num instanceof HTMLElement) {
-                        updateProgress(num, plugin, sourcePath)
-                        input.onchange = () => {
-                            if (num instanceof HTMLElement) updateProgress(num, plugin, sourcePath)
+        let maxProperty = plugin.settings.progressProperties[prop]?.maxProperty
+        if (maxProperty) {
+            let maxVal = getNestedProperty(cache.frontmatter, maxProperty)
+            if (maxVal !== undefined) {
+                let numbers = querySelectorsWithIframes("input.metadata-input-number")
+                for (let input of numbers) {
+                    if (input?.instanceOf(HTMLElement)) {
+                        let num = input.closest(".metadata-property")
+                        let sourcePath = num?.getAttribute("data-source-path") || ""
+                        if (num?.instanceOf(HTMLElement)) {
+                            updateProgress(num, plugin, sourcePath)
+                            input.onchange = () => {
+                                if (num?.instanceOf(HTMLElement)) updateProgress(num, plugin, sourcePath)
+                            }
                         }
                     }
                 }

@@ -3,7 +3,7 @@ import { getPropertyType } from "./propertyUtils"
 import { getTextLightness } from "./updates/updatePills";
 
 declare global {
-    interface Window { PrettyPropertiesApi: any; }
+    interface Window { PrettyPropertiesApi: API; }
 }
 window.PrettyPropertiesApi = window.PrettyPropertiesApi || {}
 

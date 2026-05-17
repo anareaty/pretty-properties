@@ -5,12 +5,22 @@ import {
 	loadPdfJs,
 	normalizePath,
 	Component, setIcon,
-	Menu
+	Menu,
+	MarkdownPreviewView,
+	TFile
 } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { getNestedProperty } from "../propertyUtils";
 import { hookUpLinks } from "../internalLinksUtils";
-import {handleCoverMenu} from "../../menus/coverMenu";
+import { EmbedMarkdownComponent, WidgetEditorView } from "@obsidian-typings/obsidian-public-latest";
+
+
+
+interface EmbedMarkdownComponentExtended extends EmbedMarkdownComponent {
+    containerEl: HTMLElement,
+    previewMode: MarkdownPreviewView,
+	file: TFile
+}
 
 enum CoverType {
 	Pdf,
@@ -19,9 +29,9 @@ enum CoverType {
 	Markdown,
 }
 
-const pdfRegex = /^(\!)?(?:\[\[(.+\.pdf)\]\]|\[([^\]]*)\]\((.+\.pdf)\))$/;
-const urlRegex = /^(?:http[s]?:\/\/.)?(?:www\.)?[-a-zA-Z0-9@%._\+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)$/i;
-const localFileRegex = /^(file:\/\/\/\/.)[-a-zA-Z0-9@%._\+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)$/i;
+const pdfRegex = /^(!)?(?:\[\[(.+\.pdf)\]\]|\[([^\]]*)\]\((.+\.pdf)\))$/;
+const urlRegex = /^(?:http[s]?:\/\/.)?(?:www\.)?[-a-zA-Z0-9@%._+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_+.~#?&//=]*)$/i;
+const localFileRegex = /^(file:\/\/\/\/.)[-a-zA-Z0-9@%._+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_+.~#?&//=]*)$/i;
 const wikiLinkRegex = /^\[\[(.+?)\]\]$/;
 
 export const renderCover = async (
@@ -29,6 +39,7 @@ export const renderCover = async (
 	contentEl: HTMLElement,
 	frontmatter: FrontMatterCache,
 	sourcePath: string,
+	
 	plugin: PrettyPropertiesPlugin
 ) => {
 
@@ -42,7 +53,7 @@ export const renderCover = async (
 
 
 
-	if (!(mdContainer instanceof HTMLElement))
+	if (!(mdContainer?.instanceOf(HTMLElement)))
 		return;
 
 	let coverDiv: HTMLDivElement | undefined;
@@ -83,13 +94,13 @@ export const renderCover = async (
 				let renderValue = coverVal;
 
 				if (coverType === CoverType.Url)
-					coverVal = coverVal.replace(/(https:\/\/www\.youtube\.com\/watch\?v\=)(.*)/, "https://img.youtube.com/vi/$2/maxresdefault.jpg")
+					coverVal = coverVal.replace(/(https:\/\/www\.youtube.com\/watch\?v=)(.*)/, "https://img.youtube.com/vi/$2/maxresdefault.jpg")
 					renderValue = `![](${coverVal})`;
 				if (coverType === CoverType.Wikilink)
 					renderValue = `!${coverVal}`;
 
 				const coverTemp = createDiv();
-				await MarkdownRenderer.render(plugin.app, renderValue, coverTemp, sourcePath, plugin);
+				await MarkdownRenderer.render(plugin.app, renderValue, coverTemp, sourcePath, component);
 
 				hookUpLinks(plugin.app, component, coverTemp, sourcePath);
 
@@ -199,14 +210,14 @@ function applyCoverCssClasses(
 	coverDiv: HTMLElement,
 	plugin: PrettyPropertiesPlugin
 ) {
-	const coverShapeVal = frontmatter?.cover_shape
+	const coverShapeVal = frontmatter?.cover_shape as string | null
 
 	if (coverShapeVal)
 		coverDiv.classList.add(coverShapeVal);
 	else
 		coverDiv.classList.add("initial");
 
-	let coverPositionVal = frontmatter?.cover_position
+	let coverPositionVal = frontmatter?.cover_position as string | null
 
 	if (coverPositionVal)
 		coverDiv.classList.add(coverPositionVal);
@@ -235,7 +246,8 @@ export const renderPdfCover = async (relativePath: string, sourcePath: string, p
     //@ts-ignore
     let pdfjsLib = window.pdfjsLib
     if (!pdfjsLib) {
-        pdfjsLib = await loadPdfJs()
+        await loadPdfJs()
+		pdfjsLib = window.pdfjsLib
     }
     let canvas
     let pdf
@@ -244,6 +256,7 @@ export const renderPdfCover = async (relativePath: string, sourcePath: string, p
     try {
         pdf = await pdfjsLib.getDocument(path)?.promise
     } catch(err) {
+		console.error(err)
         return
     }
 
@@ -257,10 +270,13 @@ export const renderPdfCover = async (relativePath: string, sourcePath: string, p
             let context = canvas.getContext('2d')
             canvas.width = viewport.width
             canvas.height = viewport.height
-            await firstPage.render({
-                canvasContext: context,
-                viewport: viewport
-            });
+			if (context) {
+				firstPage.render({
+					canvasContext: context,
+					viewport: viewport
+            	});
+			}
+            
             let pdfContainer = createDiv()
             pdfContainer.classList.add("pp-pdf-cover-container")
             pdfContainer.append(canvas)
@@ -301,10 +317,11 @@ function addCoverMenuButton(
 }
 
 
-export const updateCoverForView = async (
-    view: MarkdownView,
+export const updateCoverForView = (
+    view: MarkdownView | WidgetEditorView | EmbedMarkdownComponentExtended,
     plugin: PrettyPropertiesPlugin
 ) => {
+
 
 
 
@@ -314,20 +331,18 @@ export const updateCoverForView = async (
   if (file) {
     let cache = plugin.app.metadataCache.getFileCache(file);
     let frontmatter = cache?.frontmatter;
-    let contentEl = view.contentEl;
+    let contentEl = view.containerEl;
 
-	if (!contentEl) {
-		contentEl = view.containerEl
-	}
 
 	
 
 
     let sourcePath = view.file?.path || ""
     if (frontmatter) {
-      renderCover(view, contentEl, frontmatter, sourcePath, plugin)
+      void renderCover(view, contentEl, frontmatter, sourcePath, plugin)
     }
   }
+
 }
 
 

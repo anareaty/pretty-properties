@@ -1,35 +1,53 @@
-import { TFile } from "obsidian";
+import { FrontMatterCache, TFile } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 
-/**
- * Gets a nested property from an object using dot notation.
- * @param obj The object to get the property from.
- * @param path The path to the property using dot notation (e.g., 'obsidian.icon').
- * @returns The value at the specified path, or undefined if not found.
- */
-export const getNestedProperty = (obj: any, path: string): any => {
+
+
+export const getNestedProperty = (obj: FrontMatterCache, path: string): string | string[] | number | boolean | null | undefined => {
     if (!obj || !path) {
         return undefined;
     }
+    let val: unknown
+
+
     // Split the path by dots and traverse the object
     const keys = path.split('.');
     let result = obj;
-    for (const key of keys) {
-        if (result === null || result === undefined) {
-            return undefined;
-        }
-        result = result[key];
+
+    const isStringsArray = (arr: unknown) => {
+        return Array.isArray(arr) && arr.every(i => typeof i === "string")
     }
-    return result;
+    
+    for (let i = 0; i < keys.length; i++) {
+        let key = keys[i]
+        if (key) {
+            if (result === null || result === undefined) {
+                return undefined;
+            }
+
+            result = result[key] as FrontMatterCache
+
+            if (i == keys.length - 1) {
+                val = result as unknown
+            } 
+        }   
+    }
+
+    if (
+        val == null ||
+        val == undefined ||
+        typeof val == "string" || 
+        typeof val == "number" || 
+        typeof val == "boolean" ||
+        isStringsArray(val) 
+    ) {
+        return val
+    }
+    return undefined;
 };
 
-/**
- * Sets a nested property in an object using dot notation.
- * @param obj The object to set the property in.
- * @param path The path to the property using dot notation (e.g., 'obsidian.icon').
- * @param value The value to set.
- */
-export const setNestedProperty = (obj: any, path: string, value: any): void => {
+
+export const setNestedProperty = (obj: FrontMatterCache, path: string, value: string | string[] | number | boolean | null | undefined): void => {
     if (!obj || !path) {
         return;
     }
@@ -39,15 +57,21 @@ export const setNestedProperty = (obj: any, path: string, value: any): void => {
     // Navigate to the parent of the target property
     for (let i = 0; i < keys.length - 1; i++) {
         const key = keys[i];
-        // Create intermediate objects if they don't exist
-        if (current[key] === null || current[key] === undefined || typeof current[key] !== 'object') {
-            current[key] = {};
+        if (key) {
+            // Create intermediate objects if they don't exist
+            if (current[key] === null || current[key] === undefined || typeof current[key] !== 'object') {
+                current[key] = {};
+            }
+            current = current[key] as FrontMatterCache;
         }
-        current = current[key];
     }
     
     // Set the final property
-    current[keys[keys.length - 1]] = value;
+    let lastKey = keys[keys.length - 1] 
+    if (lastKey) {
+        current[lastKey] = value;
+    }
+    
 };
 
 /**
@@ -56,7 +80,7 @@ export const setNestedProperty = (obj: any, path: string, value: any): void => {
  * @param path The path to the property using dot notation (e.g., 'obsidian.icon').
  * @returns true if the property was deleted, false otherwise.
  */
-export const deleteNestedProperty = (obj: any, path: string): boolean => {
+export const deleteNestedProperty = (obj: FrontMatterCache, path: string): boolean => {
     if (!obj || !path) {
         return false;
     }
@@ -66,25 +90,28 @@ export const deleteNestedProperty = (obj: any, path: string): boolean => {
     // Navigate to the parent of the target property
     for (let i = 0; i < keys.length - 1; i++) {
         const key = keys[i];
-        if (current[key] === null || current[key] === undefined) {
-            return false;
+        if (key) {
+            if (current[key] === null || current[key] === undefined) {
+                return false;
+            }
+            current = current[key] as FrontMatterCache;
         }
-        current = current[key];
+        
     }
     
     // Delete the final property
     const lastKey = keys[keys.length - 1];
-    if (lastKey in current) {
+    if (lastKey && lastKey in current) {
         delete current[lastKey];
         return true;
     }
     return false;
 };
 
-export const removeProperty = async (propName: string, plugin: PrettyPropertiesPlugin) => {
+export const removeProperty = (propName: string, plugin: PrettyPropertiesPlugin) => {
     let file = plugin.app.workspace.getActiveFile();
     if (file instanceof TFile) {
-        plugin.app.fileManager.processFrontMatter(file, (fm) => {
+        void plugin.app.fileManager.processFrontMatter(file, (fm: FrontMatterCache) => {
             if (getNestedProperty(fm, propName)) {
                 deleteNestedProperty(fm, propName);
             }
@@ -93,12 +120,14 @@ export const removeProperty = async (propName: string, plugin: PrettyPropertiesP
 }
 
 export const getCurrentProperty = (propName: string, plugin: PrettyPropertiesPlugin) => {
-    let prop: any;
+    let prop: string | string[] | number | boolean | null | undefined
     let file = plugin.app.workspace.getActiveFile();
     if (file instanceof TFile) {
         let cache = plugin.app.metadataCache.getFileCache(file);
         let frontmatter = cache?.frontmatter;
-        prop = getNestedProperty(frontmatter, propName);
+        if (frontmatter) {
+            prop = getNestedProperty(frontmatter, propName);
+        }
     }
     return prop;
 }
@@ -121,7 +150,7 @@ export const getPropertyValue = (e: MouseEvent, plugin: PrettyPropertiesPlugin) 
             targetEl.closest(".metadata-input-text");
         let checkboxEl = targetEl.closest(".metadata-input-checkbox");
 
-        if (valueTextEl instanceof HTMLElement) {
+        if (valueTextEl?.instanceOf(HTMLElement)) {
             text = valueTextEl.innerText;
         } else if (valueInputEl?.instanceOf(HTMLInputElement)) {
             text = valueInputEl.value;
@@ -131,7 +160,10 @@ export const getPropertyValue = (e: MouseEvent, plugin: PrettyPropertiesPlugin) 
             let propEl = targetEl.closest(".metadata-property");
             let prop = propEl!.getAttribute("data-property-key");
             if (currentFile instanceof TFile && prop) {
-                text = getNestedProperty(plugin.app.metadataCache.getFileCache(currentFile)?.frontmatter, prop);
+                let frontmatter = plugin.app.metadataCache.getFileCache(currentFile)?.frontmatter
+                if (frontmatter) {
+                    text = getNestedProperty(frontmatter, prop);
+                }
             }
         }
     }
@@ -140,14 +172,28 @@ export const getPropertyValue = (e: MouseEvent, plugin: PrettyPropertiesPlugin) 
 
 
 export const getPropertyType = (propName: string, plugin: PrettyPropertiesPlugin) => {
-    //@ts-ignore
     let propertyTypeObject = plugin.app.metadataTypeManager.getPropertyInfo(propName.toLowerCase());
     let propertyType;
     if (propertyTypeObject) {
-        propertyType = propertyTypeObject.widget || propertyTypeObject.type;
+
+        propertyType = propertyTypeObject.widget
+
+        // Old versions of Obsidian used property "type" instead of "widget"
+        if (!propertyType) {
+            let propertyTypeObjectOldVersion = propertyTypeObject as unknown
+            if (propertyTypeObjectOldVersion && 
+                typeof propertyTypeObjectOldVersion == "object" && 
+                "type" in propertyTypeObjectOldVersion) 
+            {
+                propertyType = propertyTypeObjectOldVersion.type;
+            }
+        }
     }
     return propertyType
 }
+
+
+
 
 
 

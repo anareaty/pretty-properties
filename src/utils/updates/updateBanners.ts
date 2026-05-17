@@ -1,4 +1,4 @@
-import { MarkdownRenderer, MarkdownView, FrontMatterCache } from "obsidian";
+import { MarkdownRenderer, MarkdownView, FrontMatterCache, Component } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { getNestedProperty } from "../propertyUtils";
 
@@ -7,9 +7,10 @@ export const renderBanner = async (
   contentEl: HTMLElement, 
   frontmatter: FrontMatterCache,
   sourcePath: string,
+  component: Component,
   plugin: PrettyPropertiesPlugin) => {
 
-    contentEl.classList.add("has-banner")
+    contentEl.classList.remove("has-banner")
 
     let bannerVal = getNestedProperty(frontmatter, plugin.settings.bannerProperty);
 
@@ -21,7 +22,7 @@ export const renderBanner = async (
     }
     
     if (bannerVal && typeof bannerVal != "string") {
-        bannerVal = null
+        bannerVal = ""
     }
 
     
@@ -31,6 +32,7 @@ export const renderBanner = async (
 
     let positionVal = getNestedProperty(frontmatter, plugin.settings.bannerPositionProperty)
     if (!positionVal) positionVal = 50
+    let positionString = positionVal.toString()
 
     let bannerContainerPreview = contentEl.querySelector(".markdown-reading-view > .markdown-preview-view");
     let bannerContainerSource = contentEl.querySelector(".cm-scroller");
@@ -55,45 +57,48 @@ export const renderBanner = async (
 
     if (bannerVal == oldBannerValue) {
       let oldPositionValue = oldBannerDivSource?.getAttribute("data-position") || ""
-      if (positionVal?.toString() != oldPositionValue) {
+
+      
+      if (positionString != oldPositionValue) {
         let imageSource = oldBannerDivSource?.querySelector("img")
         let imagePreview = oldBannerDivPreview?.querySelector("img")
-        let styles = {"object-position": "center " + positionVal + "%"}
+        let styles = {"object-position": "center " + positionString + "%"}
         imageSource?.setCssStyles(styles)
         imagePreview?.setCssStyles(styles)
-        oldBannerDivSource?.setAttribute("data-position", positionVal.toString())
-        oldBannerDivPreview?.setAttribute("data-position", positionVal.toString())
+        oldBannerDivSource?.setAttribute("data-position", positionString)
+        oldBannerDivPreview?.setAttribute("data-position", positionString)
       }
       return
     }
 
     let bannerDiv = createDiv();
     bannerDiv.setAttribute("data-value", bannerVal)
-    bannerDiv.setAttribute("data-position", positionVal.toString())
+    bannerDiv.setAttribute("data-position", positionString)
 
     bannerDiv.classList.add("banner-image");
 
-    if (bannerVal) {
+    if (bannerVal && typeof bannerVal == "string") {
         if (bannerVal.startsWith("http")) bannerVal = "![](" + bannerVal + ")";
         if (bannerVal.startsWith("[") && !bannerVal.startsWith("!")) bannerVal = "!" + bannerVal;
         if (!bannerVal.startsWith("![")) bannerVal = "![[" + bannerVal + "]]"
 
         let bannerTemp = createDiv();
 
-        MarkdownRenderer.render(
+        await MarkdownRenderer.render(
             plugin.app,
             bannerVal,
             bannerTemp,
             sourcePath,
-            plugin
+            component
         );
         let image = bannerTemp.querySelector("img");
         if (image) {
             if (positionVal) {
-                image.setAttribute("style", "object-position: center " + positionVal + "%;")
+                image.setAttribute("style", "object-position: center " + positionString + "%;")
             }
 
             bannerDiv.append(image);
+            contentEl.classList.remove("has-banner")
         }
     }
 
@@ -121,7 +126,7 @@ export const renderBanner = async (
 }
 
 
-export const updateBannerForView = async (
+export const updateBannerForView = (
     view: MarkdownView,
     plugin: PrettyPropertiesPlugin
 ) => {
@@ -133,7 +138,7 @@ export const updateBannerForView = async (
     let contentEl = view.contentEl;
     let sourcePath = view.file?.path || ""
     if (frontmatter) {
-      renderBanner(contentEl, frontmatter, sourcePath, plugin)
+      void renderBanner(contentEl, frontmatter, sourcePath, view, plugin)
     }
   }
 }

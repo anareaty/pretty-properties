@@ -3,7 +3,7 @@ import { setPillStyles } from "src/utils/updates/updatePills";
 
 
 export const registerTagPostProcessor = (plugin: PrettyPropertiesPlugin) => {
-    plugin.registerMarkdownPostProcessor((el, ctx) => {
+    plugin.registerMarkdownPostProcessor((el, _ctx) => {
         processTagsInPreviewElement(el, plugin)
     });
 }
@@ -14,7 +14,7 @@ export const processTagsInPreviewElement = (el: HTMLElement, plugin: PrettyPrope
         const tags = el.findAll("a.tag")
 
         for (let tag of tags) {
-            if (tag instanceof HTMLElement) {
+            if (tag?.instanceOf(HTMLElement)) {
                 let value = tag.innerText.replace("#", "")
                 setPillStyles(tag, "data-tag-value", value, "tag", plugin)
             }

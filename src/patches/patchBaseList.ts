@@ -2,23 +2,44 @@ import PrettyPropertiesPlugin from "src/main";
 import { updateDateInput, updateDateTimeInput } from "src/utils/updates/updateDates";
 import { updateCardLongtext, updateValueListElement } from "src/utils/updates/updatePills";
 import { around, dedupe } from "monkey-around";
+import { BasesPluginInstance } from "@obsidian-typings/obsidian-public-latest";
+import { BasesEntry, BasesView, BasesViewRegistration } from "obsidian";
+
+interface Bases extends BasesPluginInstance {
+    registrations: {list: BasesViewRegistration}
+}
+
+type ListCell = {
+    propertyId: string,
+    el: HTMLElement
+}
+
+
+interface ListBasesView extends BasesView {
+    updateVirtualDisplay: () => void
+    rowsMap: {
+        get: (entry: BasesEntry) => {cells: ListCell[]}
+    }
+}
+
 
 
 export const patchBaseList = (plugin: PrettyPropertiesPlugin) => {
-    //@ts-ignore
-	let bases = plugin.app.internalPlugins.getEnabledPluginById("bases")
+    let bases = plugin.app.internalPlugins.getEnabledPluginById("bases") as Bases
 
     if (bases && bases.registrations.list) {
 
 
         plugin.patches.uninstallPPBaseListPatch = around(bases.registrations.list, {
-            factory(oldFactory: any) {
-              return dedupe("pp-patch-base-list-around-key", oldFactory, (...args: any[]) => {
-                let view = oldFactory && oldFactory.apply(this, args)
+            factory(oldFactory) {
+              return dedupe("pp-patch-base-list-around-key", oldFactory, (...args) => {
+                let view = oldFactory && oldFactory.apply(this, args) as ListBasesView
 
                 view.updateVirtualDisplay = new Proxy(view.updateVirtualDisplay, {
-                    apply(updateVirtualDisplay, thisArg2, args2) {
-                        let update = updateVirtualDisplay.call(thisArg2, ...args2)
+                    apply(updateVirtualDisplay, thisArg2) {
+
+                      
+                        let update = updateVirtualDisplay.call(thisArg2)
                         processBaseListProperties(view, plugin)
                         return update
                     }
@@ -41,11 +62,12 @@ export const patchBaseList = (plugin: PrettyPropertiesPlugin) => {
 
 
 
-export const processBaseListProperties = (view: any, plugin: PrettyPropertiesPlugin) => {
+export const processBaseListProperties = (view: ListBasesView, plugin: PrettyPropertiesPlugin) => {
     let data = view.data?.data
     if (data) {
         for (let entry of data) {
             let row = view.rowsMap.get(entry)
+           
             if (row) {
                 for (let cell of row.cells) {
                     processBaseListProperty(cell, plugin)
@@ -56,14 +78,17 @@ export const processBaseListProperties = (view: any, plugin: PrettyPropertiesPlu
 }
 
 
-const processBaseListProperty = (property: any, plugin: PrettyPropertiesPlugin) => {
+const processBaseListProperty = (property: ListCell, plugin: PrettyPropertiesPlugin) => {
     
     let prop = property.propertyId
 
     if (prop == "note.tags" || prop == "file.tags" || prop.startsWith("formula.")) {
         let elements = property.el.querySelectorAll("a.tag")
         for (let el of elements) {
-            updateValueListElement(el, "data-tag-value", "tag", plugin)
+            if (el?.instanceOf(HTMLElement)) {
+                updateValueListElement(el, "data-tag-value", "tag", plugin)
+            }
+            
         }
     }
 
@@ -80,7 +105,10 @@ const processBaseListProperty = (property: any, plugin: PrettyPropertiesPlugin) 
             
             let elements = property.el.querySelectorAll(".value-list-element")
             for (let el of elements) {
-                updateValueListElement(el, "data-property-pill-value", "multiselect-pill", plugin)
+                if (el?.instanceOf(HTMLElement)) {
+                    updateValueListElement(el, "data-property-pill-value", "multiselect-pill", plugin)
+                }
+                
             }
                 
         } 
@@ -94,14 +122,14 @@ const processBaseListProperty = (property: any, plugin: PrettyPropertiesPlugin) 
 
         else if (type == "date") {
             let input = property.el.querySelector("input");
-            if (input.instanceOf(HTMLInputElement)) {
+            if (input?.instanceOf(HTMLInputElement)) {
                 updateDateInput(input, plugin)
             }
         }
 
         else if (type == "datetime") {
             let input = property.el.querySelector("input");
-            if (input.instanceOf(HTMLInputElement)) {
+            if (input?.instanceOf(HTMLInputElement)) {
                 updateDateTimeInput(input, plugin)
             }
         }
