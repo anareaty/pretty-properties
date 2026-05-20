@@ -33,7 +33,7 @@
 
 
 
-.workspace-split.mod-root .view-content.has-banner {
+.workspace-split.mod-root .view-content.has-banner:has(.banner-image:not(:empty)) {
   background-color: transparent;
 }
 
