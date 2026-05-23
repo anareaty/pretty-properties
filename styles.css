@@ -651,7 +651,6 @@ body {
 
 .pp-banner .image-resize-container img {
   width: 100% !important;
-  
 }
 
 
@@ -1200,7 +1199,6 @@ a.tag.transparent-color {
 .
 
 ,
- 
 */
 {
   background-color: var(--tag-background-hover);
@@ -1242,14 +1240,14 @@ body:not(.show-hidden-properties).hidden-props-in-prop-tab .workspace-leaf-conte
 body:not(.show-hidden-properties) .hover-popover .metadata-property.pp-property-hidden:not(:focus, :focus-within),
 
 /* Hide empty properties when the settings set to hide all empty properties */
-.hide-all-empty-properties:not(.show-hidden-properties) .markdown-source-view .metadata-property.is-empty:not(:focus, :focus-within), 
-.hide-all-empty-properties:not(.show-hidden-properties) .markdown-preview-view .metadata-property.is-empty:not(:focus, :focus-within), 
+.hide-all-empty-properties:not(.show-hidden-properties) .markdown-source-view .metadata-property.is-empty:not(:focus, :focus-within),
+.hide-all-empty-properties:not(.show-hidden-properties) .markdown-preview-view .metadata-property.is-empty:not(:focus, :focus-within),
 .hide-all-empty-properties:not(.show-hidden-properties).hidden-props-in-prop-tab .workspace-leaf-content[data-type='file-properties'] .metadata-property.is-empty:not(:focus, :focus-within), 
 .hide-all-empty-properties:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty:not(:focus, :focus-within),
 
 /* Hide empty properties when marked as hide when empty */
-body:not(.show-hidden-properties) .markdown-source-view .metadata-property.is-empty.pp-property-hidden-when-empty:not(:focus, :focus-within), 
-body:not(.show-hidden-properties) .markdown-preview-view .metadata-property.is-empty.pp-property-hidden-when-empty:not(:focus, :focus-within), 
+body:not(.show-hidden-properties) .markdown-source-view .metadata-property.is-empty.pp-property-hidden-when-empty:not(:focus, :focus-within),
+body:not(.show-hidden-properties) .markdown-preview-view .metadata-property.is-empty.pp-property-hidden-when-empty:not(:focus, :focus-within),
 body:not(.show-hidden-properties).hidden-props-in-prop-tab .workspace-leaf-content[data-type='file-properties'] .metadata-property.is-empty.pp-property-hidden-when-empty:not(:focus, :focus-within), 
 body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-property-hidden-when-empty:not(:focus, :focus-within),
 
@@ -1767,7 +1765,7 @@ button.longtext-color-button:hover {
   font-family: var(--inline-title-font);
   letter-spacing: -0.015em;
   
-  
+
 }
 
 .title-icon-wrapper .pp-icon-image {
@@ -1805,6 +1803,55 @@ button.longtext-color-button:hover {
   height: 100%;
 }
 
+
+/* Hide properties title */
+
+.hide-properties-title .metadata-properties-heading:not(:focus) .metadata-properties-title {
+  font-size: 0;
+}
+
+.hide-properties-title .metadata-properties-heading {
+  display: block;
+  padding: 0;
+  margin-bottom: 0;
+}
+
+.hide-properties-title .metadata-container.is-collapsed {
+  margin-block-end: 0;
+  padding: 0;
+}
+
+.hide-properties-title .metadata-properties-heading.is-collapsed .collapse-indicator {
+    top:-1em;
+
+}
+
+.metadata-properties-heading .collapse-indicator {
+    inset-inline-start: -21px;
+}
+
+/* Need to make inset smaller so collapse indicator is visible on canvas nodes */
+
+.hide-properties-title .markdown-embed-content .metadata-properties-heading .collapse-indicator,
+.hide-properties-title .mod-inside-iframe .metadata-properties-heading .collapse-indicator {
+    inset-inline-start: -16px;
+}
+
+/* Hide metadata add button */
+
+.hide-metadata-add-button .markdown-source-view .metadata-content:not(:focus-within) .metadata-add-button,
+.hide-metadata-add-button .markdown-preview-view .metadata-content:not(:focus-within) .metadata-add-button {
+  display: none;
+
+}
+
+/* Fix for Minimal theme */
+
+[data-theme="Minimal"] .markdown-source-view.mod-cm6.is-readable-line-width .cm-sizer>.title-wrapper {
+    max-width: var(--max-width);
+    width: var(--line-width);
+    margin-inline: var(--content-margin)!important;
+}
 
 
 .pp-format-wrapper {

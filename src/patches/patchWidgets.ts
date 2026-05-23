@@ -239,7 +239,7 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
     console.error("Can not update metadata widgets")
     console.error(e)
   }
-  
+
 }
 
 
