@@ -2,16 +2,17 @@
 import tsparser from "@typescript-eslint/parser";
 import { defineConfig } from "eslint/config";
 import obsidianmd from "eslint-plugin-obsidianmd";
+import css from "@eslint/css";
 import globals from 'globals';
 
 export default defineConfig([
-  ...obsidianmd.configs.recommended,
+  //...obsidianmd.configs.recommended,
   {
     files: ["**/*.ts"],
     languageOptions: {
         globals: {
             ...globals.browser,
-            ...globals.node
+            ...globals.node,
         },
         parser: tsparser,
         parserOptions: { project: "./tsconfig.json" },
@@ -19,12 +20,26 @@ export default defineConfig([
 
     // You can add your own configuration to override or add rules
     rules: {
+      ...obsidianmd.configs.recommended.rules,
       // example: turn off a rule from the recommended set
       //"obsidianmd/sample-names": "off",
       // example: add a rule not in the recommended set and set its severity
       //"obsidianmd/prefer-file-manager-trash": "error",
       "no-undef": "off",
       "@typescript-eslint/unbound-method": "off"
+    },
+  },
+  {
+    files: ["**/*.css"],
+    plugins: {
+      css,
+    },
+    language: "css/css",
+    rules: {
+      "css/no-empty-blocks": "warn",
+      "css/no-duplicate-imports": "warn",
+      "css/no-important": "warn",
+      "css/use-baseline": ["warn"]
     },
   },
   {

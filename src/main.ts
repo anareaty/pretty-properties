@@ -123,14 +123,13 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 		const registerWindowEvents = (win: Window) => {
 
-			//@ts-ignore
     		let plugins = this.app.plugins
 			
 
 			this.registerDomEvent(win, "click", (e: MouseEvent) => {
 
 
-				//@ts-ignore
+				
 				let searchPlugin = this.app.internalPlugins.getEnabledPluginById("global-search") as GlobalSearchPluginInstanceExtended | null
 
 				
@@ -163,8 +162,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 					if (
 						targetEl.closest(".pp-icon") || 
-						targetEl.closest(".banner-image") || 
-						targetEl.closest(".metadata-side-image")
+						targetEl.closest(".pp-banner") || 
+						targetEl.closest(".pp-cover")
 					) {
 						e.preventDefault();
 						if (!imageMenuExist) {

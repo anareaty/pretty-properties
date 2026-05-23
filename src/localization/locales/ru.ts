@@ -199,5 +199,7 @@ export default {
   DO_NOT_RENDER_MARKDOWN: "Не отображать как Markdown",
   COLORED_PROPERTIES: "Цвета",
   HIDDEN_PROPERTIES: "Скрытые свойства",
-  PROPERTY_FORMATTINGS: "Форматы свойств"
+  PROPERTY_FORMATTINGS: "Форматы свойств",
+  COVER_SHAPE_PROPERTY: "Свойство для формы обложки",
+  COVER_POSITION_PROPERTY: "Свойство для положения обложки",
 };

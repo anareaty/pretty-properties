@@ -1,15 +1,18 @@
 import { MarkdownView, FrontMatterCache, getIcon, MarkdownRenderer, Component } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { getNestedProperty } from "../propertyUtils";
+import { renderImageFromValue } from "../imageUtils";
 
 
 
-export const renderIcon = (
+export const renderIcon = async (
   contentEl: HTMLElement, 
   frontmatter: FrontMatterCache,
   sourcePath: string,
   component: Component,
   plugin: PrettyPropertiesPlugin) => {
+
+    contentEl.classList.remove("has-icon")
 
     let preview = contentEl.querySelector(".markdown-reading-view > .markdown-preview-view");
     let source = contentEl.querySelector(".cm-scroller");
@@ -39,7 +42,7 @@ export const renderIcon = (
 
     if (iconVal && plugin.settings.enableIcon) {
         if (iconVal == oldIconValue) return
-        let image = getIconImage(iconVal, sourcePath, component, plugin)
+        let image = await getIconImage(iconVal, sourcePath, component, plugin)
 
      
 
@@ -116,6 +119,8 @@ export const renderIcon = (
             iconDiv.classList.add("icon-wrapper");
 
             if (image) {
+
+                contentEl.classList.add("has-icon")
                 
                 let iconOuter = iconDiv.createDiv({
                     cls: "icon-outer",
@@ -123,10 +128,13 @@ export const renderIcon = (
                 let iconSizer = iconOuter.createDiv({
                     cls: "icon-sizer",
                 });
+
+                
                 let iconImage = iconSizer.createDiv({
-                    cls: "icon-image",
+                    cls: "pp-icon",
                 });
                 iconImage.append(image);
+                
             }
 
             let iconDivClone = iconDiv.cloneNode(true) as HTMLElement
@@ -180,7 +188,7 @@ export const getIconValue = (frontmatter: FrontMatterCache, plugin: PrettyProper
 
 
 
-export const getIconImage = (iconVal: string, sourcePath: string, component: Component, plugin: PrettyPropertiesPlugin) => {
+export const getIconImage = async (iconVal: string, sourcePath: string, component: Component, plugin: PrettyPropertiesPlugin) => {
     if (!iconVal) return
     let image:
         | HTMLDivElement
@@ -190,19 +198,13 @@ export const getIconImage = (iconVal: string, sourcePath: string, component: Com
 
     if (!image) {
         let iconLink = iconVal;
-        if (iconLink.startsWith("http"))
-            iconLink = "![](" + iconLink + ")";
-        if (iconLink.startsWith("[") && !iconLink.startsWith("!")) iconLink = "!" + iconLink;
-        if (!iconLink.startsWith("![")) iconLink = "![[" + iconLink + "]]"
-        let iconTemp = createDiv();
-        void MarkdownRenderer.render(
-            plugin.app,
-            iconLink,
-            iconTemp,
-            sourcePath,
-            component
-        );
-        image = iconTemp.querySelector("img");
+        let imageEl = await renderImageFromValue(iconLink, "icon", sourcePath, component, plugin)
+
+        console.log(imageEl)
+
+        if (imageEl) {
+            return imageEl
+        }
     }
 
     if (!image) {
@@ -210,7 +212,8 @@ export const getIconImage = (iconVal: string, sourcePath: string, component: Com
         image.classList.add("pp-text-icon");
         image.append(iconVal);
     }
-    image.classList.add("pp-icon");
+
+    image.classList.add("pp-icon-image");
 
     return image
 }
@@ -250,7 +253,7 @@ export const updateAllIcons = (plugin: PrettyPropertiesPlugin) => {
 
 
 
-export const renderTitleIcon = (view: MarkdownView, plugin: PrettyPropertiesPlugin) => {
+export const renderTitleIcon = async (view: MarkdownView, plugin: PrettyPropertiesPlugin) => {
   if (plugin.settings.enableIcon && plugin.settings.iconInTitle) {
 
     let currentMode = view.getMode()
@@ -260,7 +263,7 @@ export const renderTitleIcon = (view: MarkdownView, plugin: PrettyPropertiesPlug
         //@ts-expect-error, not typed
         containerEl = (view.previewMode.renderer as {header: {el: HTMLElement}}).header.el
     } else {
-        //@ts-expect-error, not typed
+       
         containerEl = (view.editMode as {editorEl: HTMLElement}).editorEl
     }
     
@@ -289,7 +292,8 @@ export const renderTitleIcon = (view: MarkdownView, plugin: PrettyPropertiesPlug
         if (frontmatter) {
           iconVal = getIconValue(frontmatter, plugin)
           if (iconVal) {
-            iconImage = getIconImage(iconVal, sourcePath, view, plugin)
+            iconImage = await getIconImage(iconVal, sourcePath, view, plugin)
+            
           }
           
           

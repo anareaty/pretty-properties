@@ -4,6 +4,7 @@ import { updateCardLongtext, updateValueListElement } from "src/utils/updates/up
 import { around, dedupe } from "monkey-around";
 import { BasesPluginInstance } from "@obsidian-typings/obsidian-public-latest";
 import { BasesEntry, BasesView, BasesViewRegistration } from "obsidian";
+import { getPropertyType } from "src/utils/propertyUtils";
 
 interface Bases extends BasesPluginInstance {
     registrations: {list: BasesViewRegistration}
@@ -14,8 +15,7 @@ type ListCell = {
     el: HTMLElement
 }
 
-
-interface ListBasesView extends BasesView {
+export interface ListBasesView extends BasesView {
     updateVirtualDisplay: () => void
     rowsMap: {
         get: (entry: BasesEntry) => {cells: ListCell[]}
@@ -28,8 +28,6 @@ export const patchBaseList = (plugin: PrettyPropertiesPlugin) => {
     let bases = plugin.app.internalPlugins.getEnabledPluginById("bases") as Bases
 
     if (bases && bases.registrations.list) {
-
-
         plugin.patches.uninstallPPBaseListPatch = around(bases.registrations.list, {
             factory(oldFactory) {
               return dedupe("pp-patch-base-list-around-key", oldFactory, (...args) => {
@@ -37,28 +35,17 @@ export const patchBaseList = (plugin: PrettyPropertiesPlugin) => {
 
                 view.updateVirtualDisplay = new Proxy(view.updateVirtualDisplay, {
                     apply(updateVirtualDisplay, thisArg2) {
-
-                      
                         let update = updateVirtualDisplay.call(thisArg2)
                         processBaseListProperties(view, plugin)
                         return update
                     }
                 })
-
                 return view
               })
             }
         })
-
-
-
-
-
     }
-    
 }
-
-
 
 
 
@@ -78,8 +65,8 @@ export const processBaseListProperties = (view: ListBasesView, plugin: PrettyPro
 }
 
 
+
 const processBaseListProperty = (property: ListCell, plugin: PrettyPropertiesPlugin) => {
-    
     let prop = property.propertyId
 
     if (prop == "note.tags" || prop == "file.tags" || prop.startsWith("formula.")) {
@@ -88,38 +75,27 @@ const processBaseListProperty = (property: ListCell, plugin: PrettyPropertiesPlu
             if (el?.instanceOf(HTMLElement)) {
                 updateValueListElement(el, "data-tag-value", "tag", plugin)
             }
-            
         }
     }
 
-
     else if (prop.startsWith("note.")) {
         let propName = prop.replace("note.", "")
-        //@ts-ignore
-        let type = plugin.app.metadataTypeManager.getPropertyInfo(propName)?.widget
+        let type = getPropertyType(propName, plugin)
 
         if (type == "multitext" || type == "aliases") {
-
-           
-
-            
             let elements = property.el.querySelectorAll(".value-list-element")
             for (let el of elements) {
                 if (el?.instanceOf(HTMLElement)) {
                     updateValueListElement(el, "data-property-pill-value", "multiselect-pill", plugin)
                 }
-                
             }
-                
         } 
-        
        
         else if (type == "text") {
             let el = property.el
             updateCardLongtext(el, plugin);
         } 
  
-
         else if (type == "date") {
             let input = property.el.querySelector("input");
             if (input?.instanceOf(HTMLInputElement)) {
@@ -133,12 +109,5 @@ const processBaseListProperty = (property: ListCell, plugin: PrettyPropertiesPlu
                 updateDateTimeInput(input, plugin)
             }
         }
-
-        
-
-        
-
-        
     }
-    
 }

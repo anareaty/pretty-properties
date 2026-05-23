@@ -17,7 +17,6 @@ export class LocalizationService {
   }
 
   t(key: string): string {
-
     let localeObj = locales[this.currentLocale] || locales['en']
     const translation = localeObj![key] || key;
     return translation;

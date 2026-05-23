@@ -10,25 +10,22 @@ interface Bases extends BasesPluginInstance {
     registrations: {cards: BasesViewRegistration}
 }
 
-
 type CardProp = {
     prop: string,
     lineEl: HTMLElement
 }
 
-interface CardsBasesView extends BasesView {
+export interface CardsBasesView extends BasesView {
     updateVirtualDisplay: () => void
     items: {
         props: CardProp[]
     }[]
-    
 }
 
 export const patchBaseCards = (plugin: PrettyPropertiesPlugin) => {
     let bases = plugin.app.internalPlugins.getEnabledPluginById("bases") as Bases
 
     if (bases) {
-
         plugin.patches.uninstallPPBaseCardsPatch = around(bases.registrations.cards, {
             factory(oldFactory) {
               return dedupe("pp-patch-base-cards-around-key", oldFactory, (...args) => {
@@ -45,10 +42,8 @@ export const patchBaseCards = (plugin: PrettyPropertiesPlugin) => {
               })
             }
         })
-
     }
 }
-
 
 
 
@@ -70,13 +65,11 @@ const processBaseCardProperty = (property: CardProp, plugin: PrettyPropertiesPlu
             if (el?.instanceOf(HTMLElement)) {
                 updateValueListElement(el, "data-tag-value", "tag", plugin)
             }
-            
         }
     }
 
     else if (prop.startsWith("note.")) {
         let propName = prop.replace("note.", "")
-        //@ts-ignore
         let type = plugin.app.metadataTypeManager.getPropertyInfo(propName)?.widget
 
         if (type == "multitext" || type == "aliases") {
@@ -85,20 +78,13 @@ const processBaseCardProperty = (property: CardProp, plugin: PrettyPropertiesPlu
                 if (el?.instanceOf(HTMLElement)) {
                     updateValueListElement(el, "data-property-pill-value", "multiselect-pill", plugin)
                 }
-                
             }
         } 
         
-
         else if (type == "text") {
             let el = property.lineEl
             updateCardLongtext(el, plugin);
-
-            
-
-
         } 
-
 
         else if (type == "date") {
             let input = property.lineEl.querySelector("input");
@@ -113,11 +99,5 @@ const processBaseCardProperty = (property: CardProp, plugin: PrettyPropertiesPlu
                 updateDateTimeInput(input, plugin)
             }
         }
-
-        
-
-        
     } 
-
-
 }

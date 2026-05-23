@@ -14,18 +14,14 @@ interface ReadViewRendererExtended extends ReadViewRenderer {
   onRendered: (f: simpleFunc) => void
 }
 
-
 export const patchMarkdownView = (plugin: PrettyPropertiesPlugin) => {
 
   plugin.patches.uninstallPPMarkdownPatch = around(MarkdownView.prototype, {
 
-
-
-
     onLoadFile(old) {
       return dedupe("pp-patch-markdown-around-key", old, async function(this: MarkdownView, ...args) {
 
-        let view = this;
+        const getView = (() => this).bind(this)
 
         const onRendered = (this.previewMode.renderer as ReadViewRendererExtended).onRendered;
 
@@ -37,6 +33,7 @@ export const patchMarkdownView = (plugin: PrettyPropertiesPlugin) => {
 
 
             try {
+              let view = getView()
               renderTitleIcon(view, plugin)
             } catch {
               console.error("Can not render title icon in preview mode")
@@ -52,6 +49,7 @@ export const patchMarkdownView = (plugin: PrettyPropertiesPlugin) => {
             let result = old2.call(thisArg2) 
 
             try {
+              let view = getView()
               renderTitleIcon(view, plugin)
             } catch {
               console.error("Can not render title icon in edit mode")
@@ -68,6 +66,7 @@ export const patchMarkdownView = (plugin: PrettyPropertiesPlugin) => {
             let result = old2.call(thisArg2, ...args2)
 
             try {
+              let view = getView()
               updateCoverForView(view, plugin)  
             } catch {
               console.error("Can not update cover for markdown view")
@@ -94,7 +93,7 @@ export const patchMarkdownView = (plugin: PrettyPropertiesPlugin) => {
 
 
         try {
-          renderTitleIcon(view, plugin)
+          renderTitleIcon(this, plugin)
         } catch {
           console.error("Can not render title icon on file load")
         }

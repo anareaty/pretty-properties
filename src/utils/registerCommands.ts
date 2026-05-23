@@ -64,6 +64,7 @@ export function registerCommands(plugin: PrettyPropertiesPlugin) {
                 if (banner) {
                     if (!checking) {
                         removeProperty(plugin.settings.bannerProperty, plugin);
+                        removeProperty(plugin.settings.bannerPositionProperty, plugin);
                     }
                     return true;
                 }
@@ -147,10 +148,9 @@ export function registerCommands(plugin: PrettyPropertiesPlugin) {
                 currentCoverProp
             ) {
                 if (!checking) {
-                    removeProperty(plugin.settings.coverProperties[0]?.property, plugin);
-					for (let coverProperty of plugin.settings.coverProperties) {
-						removeProperty(coverProperty.property, plugin);
-					}
+					removeProperty(currentCoverProp, plugin);
+                    removeProperty(plugin.settings.coverPositionProperty, plugin);
+                    removeProperty(plugin.settings.coverShapeProperty, plugin);
                 }
                 return true;
             }

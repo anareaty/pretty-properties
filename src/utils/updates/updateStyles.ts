@@ -269,7 +269,6 @@ export const updateHideMetadataAddButton = (plugin: PrettyPropertiesPlugin) => {
 
 
 export const updateTheme = (plugin: PrettyPropertiesPlugin) => {
-  //@ts-ignore
   let theme = (plugin.app.customCss as {theme: string} | undefined)?.theme
   if (theme) {
     document.body.setAttr('data-theme', theme);

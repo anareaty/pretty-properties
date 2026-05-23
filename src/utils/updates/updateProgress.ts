@@ -37,7 +37,11 @@ export const updateProgress = (propertyEl: HTMLElement, plugin: PrettyProperties
             }
 
             let cache = plugin.app.metadataCache.getCache(sourcePath)
-            maxVal = getNestedProperty(cache?.frontmatter, maxProperty)
+            let frontmatter = cache?.frontmatter
+            if (frontmatter && maxProperty) {
+                maxVal = getNestedProperty(frontmatter, maxProperty)
+            }
+            
 
         }
 
@@ -111,7 +115,13 @@ export const updateAllProgressElsOnMaxChange = (file: TFile, cache: CachedMetada
     for (let prop in plugin.settings.progressProperties) {
         let maxProperty = plugin.settings.progressProperties[prop]?.maxProperty
         if (maxProperty) {
-            let maxVal = getNestedProperty(cache.frontmatter, maxProperty)
+
+            let maxVal: string | number | boolean | string[] | null | undefined
+            let frontmatter = cache?.frontmatter
+            if (frontmatter && maxProperty) {
+                maxVal = getNestedProperty(frontmatter, maxProperty)
+            }
+
             if (maxVal !== undefined) {
                 let numbers = querySelectorsWithIframes("input.metadata-input-number")
                 for (let input of numbers) {

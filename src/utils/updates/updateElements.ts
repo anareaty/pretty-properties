@@ -10,40 +10,24 @@ import { updateAllMetadataContainers } from "./updateHiddenProperties";
 import { querySelectorsWithIframes } from "../querySelectorsHelper";
 import { processTagsInPreviewElement } from "src/extensions/tagPostProcessor";
 import { updateWidgets } from "src/patches/patchWidgets";
-import { processBaseCardProperties } from "src/patches/patchBaseCards";
-import { processBaseListProperties } from "src/patches/patchBaseList";
-import { processBaseTableCellTags } from "src/patches/patchBaseTable";
+import { CardsBasesView, processBaseCardProperties } from "src/patches/patchBaseCards";
+import { ListBasesView, processBaseListProperties } from "src/patches/patchBaseList";
+import { processBaseTableCellTags, TableBasesView } from "src/patches/patchBaseTable";
 import { AliasesPropertyWidgetComponent, 
     BasesView as BasesLeafView, 
     CanvasView, 
     DatePropertyWidgetComponentBase,  
+    EmbeddedEditorView,  
     MetadataEditor, 
-    MultitextPropertyWidgetComponent, 
-    PropertyWidgetComponentBase, 
+    MultitextPropertyWidgetComponent,  
     TagsPropertyWidgetComponent, 
     TextPropertyWidgetComponent 
 } from "@obsidian-typings/obsidian-public-latest";
+import { updateTags } from "src/extensions/tagFixExtension";
 
-
-interface TableBasesView extends BasesView {
-    updateVirtualDisplay: () => void
-    rows: {
-        cells: {
-            prop: string,
-            el: HTMLElement,
-            renderer: {
-                propertyEditor: PropertyWidgetComponentBase,
-                inferredType: {type: string},
-                entry: {file: {path: string}},
-                el: HTMLElement,
-                val: string
-            }
-        }[]
-    }[],
-}
 
 interface Popover extends HoverPopover {
-    embed: {file: TFile}
+    embed: EmbeddedEditorView
 }
 
 
@@ -58,8 +42,7 @@ export const updateAllProperties = (plugin:PrettyPropertiesPlugin) => {
         let view = leaf.view
 
         if (view instanceof MarkdownView) {
-            
-            //@ts-ignore
+
             view.metadataEditor?.rendered?.forEach(p => {
                 p.renderProperty(p.entry, !0)
             })
@@ -73,12 +56,21 @@ export const updateAllProperties = (plugin:PrettyPropertiesPlugin) => {
 
             if (state.mode == "source") {
                 const editorView = view.editor.cm
+
+                //@ts-expect-error
                 editorView.dispatch({
-                    userEvent: "updatePillColors"
+                    effects: [updateTags.of(null)]
                 })
+
+                
+
+                
+
+                
             }
         }
     }
+
 
 
     
@@ -99,9 +91,23 @@ export const updateAllProperties = (plugin:PrettyPropertiesPlugin) => {
 
                 if (nodeView.editor) {
                     const editorView = nodeView.editor.cm
+
+
+
+
+
+                   
+                    //@ts-expect-error
                     editorView.dispatch({
-                        userEvent: "updatePillColors"
+                        effects: [updateTags.of(null)]
                     })
+
+
+
+
+
+
+                    
                 }
             }
         })
@@ -157,8 +163,8 @@ export const updateAllProperties = (plugin:PrettyPropertiesPlugin) => {
 
                             
 
-                            let args = [cell.renderer.el, value, ctx]
-                            updateWidgets(type, propertyEditor, args, plugin)
+                        
+                            updateWidgets(type, propertyEditor, [cell.renderer.el, value, ctx], plugin)
 
 
 
@@ -172,11 +178,13 @@ export const updateAllProperties = (plugin:PrettyPropertiesPlugin) => {
             }
 
             else if (baseView.type == "cards") {
-                processBaseCardProperties(baseView, plugin)
+                let cardsBaseView = baseView as unknown as CardsBasesView
+                processBaseCardProperties(cardsBaseView, plugin)
             }
 
             else if (baseView.type == "list") {
-                processBaseListProperties(baseView, plugin)
+                let listBaseView = baseView as unknown as ListBasesView
+                processBaseListProperties(listBaseView, plugin)
             }
         }
 
@@ -196,11 +204,13 @@ export const updateAllProperties = (plugin:PrettyPropertiesPlugin) => {
 
 
 export const updateEmptyProperties = (plugin: PrettyPropertiesPlugin) => {
+    /*
     let propertyEls = querySelectorsWithIframes(".metadata-property")
     for (let propertyEl of propertyEls) {
         let emptyLongtext = propertyEl.querySelector(".metadata-input-longtext:empty")
     }
     //??????????????????????
+    */
 }
 
 
@@ -226,8 +236,8 @@ export const updateImagesInPopover = (popover: HoverPopover, plugin: PrettyPrope
             if (frontmatter && getNestedProperty(frontmatter, plugin.settings.bannerProperty)  && plugin.settings.enableBanner && plugin.settings.enableBannersInPopover) {
                 void renderBanner(contentEl, frontmatter, sourcePath, popover, plugin);
             } else {
-                let oldBannerDivSource = contentEl?.querySelector(".cm-scroller .banner-image");
-                let oldBannerDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .banner-image");
+                let oldBannerDivSource = contentEl?.querySelector(".cm-scroller .pp-banner");
+                let oldBannerDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .pp-banner");
                 oldBannerDivSource?.remove();
                 oldBannerDivPreview?.remove();
                 contentEl.classList.remove("has-banner")
@@ -252,7 +262,7 @@ export const updateImagesInPopover = (popover: HoverPopover, plugin: PrettyPrope
                 
                 void renderCover(popover, contentEl, frontmatter, sourcePath, plugin);
             } else {    
-                let oldCoverDiv = contentEl?.querySelector(".metadata-side-image");
+                let oldCoverDiv = contentEl?.querySelector(".pp-cover");
                 oldCoverDiv?.remove();
             }
             if (frontmatter && getNestedProperty(frontmatter, plugin.settings.iconProperty)  && plugin.settings.enableIcon && plugin.settings.enableIconsInPopover) {
@@ -262,6 +272,7 @@ export const updateImagesInPopover = (popover: HoverPopover, plugin: PrettyPrope
                 let oldIconDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .icon-wrapper");
                 oldIconDivSource?.remove();
                 oldIconDivPreview?.remove();
+                contentEl.classList.remove("has-icon")
                 let titleIconWrappers = contentEl?.querySelectorAll(".title-icon-wrapper")
                 for (let titleIconWrapper of titleIconWrappers) {
                     titleIconWrapper.remove()
@@ -293,10 +304,11 @@ export const updateImagesForView = (view: MarkdownView, plugin: PrettyProperties
         if (frontmatter && getNestedProperty(frontmatter, plugin.settings.bannerProperty)  && plugin.settings.enableBanner) {
             void renderBanner(contentEl, frontmatter, sourcePath, view, plugin);
         } else {
-            let oldBannerDivSource = contentEl?.querySelector(".cm-scroller .banner-image");
-            let oldBannerDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .banner-image");
+            let oldBannerDivSource = contentEl?.querySelector(".cm-scroller .pp-banner");
+            let oldBannerDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .pp-banner");
             oldBannerDivSource?.remove();
             oldBannerDivPreview?.remove();
+            contentEl.classList.remove("has-banner")
         }
     
         let hasCover = false
@@ -318,7 +330,7 @@ export const updateImagesForView = (view: MarkdownView, plugin: PrettyProperties
         if (frontmatter && hasCover  && plugin.settings.enableCover) {
             void renderCover(view, contentEl, frontmatter, sourcePath, plugin);
         } else {    
-            let oldCoverDiv = contentEl?.querySelector(".metadata-side-image");
+            let oldCoverDiv = contentEl?.querySelector(".pp-cover");
             oldCoverDiv?.remove();
         }
         if (frontmatter && getNestedProperty(frontmatter, plugin.settings.iconProperty)  && plugin.settings.enableIcon) {
@@ -329,6 +341,7 @@ export const updateImagesForView = (view: MarkdownView, plugin: PrettyProperties
             let oldIconDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .icon-wrapper");
             oldIconDivSource?.remove();
             oldIconDivPreview?.remove();
+            contentEl.classList.remove("has-icon")
             let titleIconWrappers = contentEl?.querySelectorAll(".title-icon-wrapper")
             for (let titleIconWrapper of titleIconWrappers) {
                 titleIconWrapper.remove()
@@ -360,10 +373,11 @@ export const updateImagesOnCacheChanged = (file: TFile, cache: CachedMetadata, p
         if (frontmatter && getNestedProperty(frontmatter, plugin.settings.bannerProperty)  && plugin.settings.enableBanner) {
           void renderBanner(contentEl, frontmatter, sourcePath, view, plugin);
         } else {
-            let oldBannerDivSource = contentEl?.querySelector(".cm-scroller .banner-image");
-            let oldBannerDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .banner-image");
+            let oldBannerDivSource = contentEl?.querySelector(".cm-scroller .pp-banner");
+            let oldBannerDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .pp-banner");
             oldBannerDivSource?.remove();
             oldBannerDivPreview?.remove();
+            contentEl.classList.remove("has-banner")
         }
 
         let hasCover = false
@@ -385,7 +399,7 @@ export const updateImagesOnCacheChanged = (file: TFile, cache: CachedMetadata, p
         if (frontmatter && hasCover && plugin.settings.enableCover) {
           void renderCover(view, contentEl, frontmatter, sourcePath, plugin);
         } else {
-          let oldCoverDiv = contentEl?.querySelector(".metadata-side-image");
+          let oldCoverDiv = contentEl?.querySelector(".pp-cover");
           oldCoverDiv?.remove();
         }
         if (frontmatter && getNestedProperty(frontmatter, plugin.settings.iconProperty)  && plugin.settings.enableIcon) {
@@ -396,6 +410,7 @@ export const updateImagesOnCacheChanged = (file: TFile, cache: CachedMetadata, p
             let oldIconDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .icon-wrapper");
             oldIconDivSource?.remove();
             oldIconDivPreview?.remove();
+            contentEl.classList.remove("has-icon")
             let titleIconWrappers = contentEl?.querySelectorAll(".title-icon-wrapper")
             for (let titleIconWrapper of titleIconWrappers) {
                 titleIconWrapper.remove()

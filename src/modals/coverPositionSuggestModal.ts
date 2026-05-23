@@ -1,14 +1,18 @@
 import { SuggestModal, TFile, App, FrontMatterCache } from "obsidian";
 import { i18n } from "src/localization/localization";
+import PrettyPropertiesPlugin from "src/main";
+import { setNestedProperty } from "src/utils/propertyUtils";
 
 
 export class CoverPositionSuggestModal extends SuggestModal<string> {
     positions: Record<string, string>
     file: TFile
+    plugin: PrettyPropertiesPlugin
 
-    constructor(app: App, file: TFile) {
-        super(app)
+    constructor(plugin: PrettyPropertiesPlugin, file: TFile) {
+        super(plugin.app)
         this.file = file
+        this.plugin = plugin
         this.positions = {
             "left": i18n.t("LEFT"),
             "right": i18n.t("RIGHT"),
@@ -30,7 +34,7 @@ export class CoverPositionSuggestModal extends SuggestModal<string> {
     onChooseSuggestion(key: string) {
         if (key && this.file instanceof TFile) {
             void this.app.fileManager.processFrontMatter(this.file, (fm: FrontMatterCache) => {
-                fm.cover_position = key
+                setNestedProperty(fm, this.plugin.settings.coverPositionProperty, key);
             });
         }
     }

@@ -40,7 +40,6 @@ export class EmojiSuggestModal extends SuggestModal<string> {
                         setNestedProperty(fm, this.propName, emoji);
                     });
                 }
-                
             }
         }
     }

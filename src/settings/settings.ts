@@ -16,8 +16,8 @@ import { showFormatSettingsTab } from './formatSettings';
 
 
 export interface PillColorSettings {
-	pillColor: HSL | string | undefined,
-	textColor: HSL | string | undefined
+	pillColor?: HSL | string | undefined,
+	textColor?: HSL | string | undefined
 }
 export interface PPPluginSettings {
     hiddenProperties: string[];
@@ -32,6 +32,8 @@ export interface PPPluginSettings {
     coverProperty?: string;//deprecated
 	extraCoverProperties?: string[];//deprecated
 	coverProperties: Array<{ property: string; format: string }>;
+	coverShapeProperty: string;
+	coverPositionProperty: string;
     bannerHeight: number;
     bannerHeightMobile: number;
 	bannerHeightPopover: number;
@@ -131,6 +133,8 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
     bannerProperty: "banner",
 	iconProperty: "icon",
 	coverProperties: [{ property: "cover", format: "" }],
+	coverShapeProperty: "cover_shape",
+	coverPositionProperty: "cover_position",
     bannerHeight: 150,
     bannerHeightMobile: 100,
 	bannerHeightPopover: 100,

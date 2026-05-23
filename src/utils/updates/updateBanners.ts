@@ -1,6 +1,7 @@
-import { MarkdownRenderer, MarkdownView, FrontMatterCache, Component } from "obsidian";
+import { MarkdownView, FrontMatterCache, Component } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { getNestedProperty } from "../propertyUtils";
+import { renderImageFromValue } from "../imageUtils";
 
 
 export const renderBanner = async (
@@ -12,23 +13,18 @@ export const renderBanner = async (
 
     contentEl.classList.remove("has-banner")
 
-    let bannerVal = getNestedProperty(frontmatter, plugin.settings.bannerProperty);
+    let bannerVal = ""
+    let bannerValInitial = getNestedProperty(frontmatter, plugin.settings.bannerProperty);
 
-    
     // Fix wrong property types
 
-    if (Array.isArray(bannerVal)) {
-        bannerVal = bannerVal[0]
+    if (Array.isArray(bannerValInitial) && typeof bannerValInitial[0] == "string") {
+        bannerVal = bannerValInitial[0]
     }
     
-    if (bannerVal && typeof bannerVal != "string") {
-        bannerVal = ""
+    if (bannerValInitial && typeof bannerValInitial == "string") {
+        bannerVal = bannerValInitial
     }
-
-    
-
-    
-
 
     let positionVal = getNestedProperty(frontmatter, plugin.settings.bannerPositionProperty)
     if (!positionVal) positionVal = 50
@@ -38,14 +34,12 @@ export const renderBanner = async (
     let bannerContainerSource = contentEl.querySelector(".cm-scroller");
 
 
-    
-
     if (contentEl.classList.contains("hover-popover")) {
       bannerContainerPreview = contentEl.querySelector(".markdown-preview-view.markdown-rendered.node-insert-event");
     }
     
-    let oldBannerDivSource = bannerContainerSource?.querySelector(".banner-image");
-    let oldBannerDivPreview = bannerContainerPreview?.querySelector(".banner-image");
+    let oldBannerDivSource = bannerContainerSource?.querySelector(".pp-banner");
+    let oldBannerDivPreview = bannerContainerPreview?.querySelector(".pp-banner");
 
     if (!plugin.settings.enableBanner) {
       oldBannerDivSource?.remove();
@@ -55,10 +49,12 @@ export const renderBanner = async (
 
     let oldBannerValue = oldBannerDivSource?.getAttribute("data-value") || ""
 
+    let bannerDiv: HTMLElement | undefined
+    let bannerDivClone: HTMLElement | undefined
+
     if (bannerVal == oldBannerValue) {
       let oldPositionValue = oldBannerDivSource?.getAttribute("data-position") || ""
 
-      
       if (positionString != oldPositionValue) {
         let imageSource = oldBannerDivSource?.querySelector("img")
         let imagePreview = oldBannerDivPreview?.querySelector("img")
@@ -71,59 +67,49 @@ export const renderBanner = async (
       return
     }
 
-    let bannerDiv = createDiv();
-    bannerDiv.setAttribute("data-value", bannerVal)
-    bannerDiv.setAttribute("data-position", positionString)
-
-    bannerDiv.classList.add("banner-image");
-
+  
     if (bannerVal && typeof bannerVal == "string") {
-        if (bannerVal.startsWith("http")) bannerVal = "![](" + bannerVal + ")";
-        if (bannerVal.startsWith("[") && !bannerVal.startsWith("!")) bannerVal = "!" + bannerVal;
-        if (!bannerVal.startsWith("![")) bannerVal = "![[" + bannerVal + "]]"
 
-        let bannerTemp = createDiv();
-
-        await MarkdownRenderer.render(
-            plugin.app,
-            bannerVal,
-            bannerTemp,
-            sourcePath,
-            component
-        );
-        let image = bannerTemp.querySelector("img");
-        if (image) {
-            if (positionVal) {
-                image.setAttribute("style", "object-position: center " + positionString + "%;")
-            }
-
-            bannerDiv.append(image);
-            contentEl.classList.remove("has-banner")
-        }
-    }
-
-    let bannerDivClone = bannerDiv.cloneNode(true) as HTMLElement
-
-    if (oldBannerDivSource) {
-        if (oldBannerDivSource.outerHTML != bannerDiv.outerHTML) {
-            oldBannerDivSource.remove();
-            bannerContainerSource?.prepend(bannerDiv);
-        }
-    } else {
-        bannerContainerSource?.prepend(bannerDiv);
+      bannerDiv = await renderImageFromValue(bannerVal, "banner", sourcePath, component, plugin)
+      
+      if (bannerDiv) {
+        contentEl.classList.add("has-banner")
+        bannerDiv.setAttribute("data-position", positionString)
+        bannerDiv.setCssProps({
+          "--banner-position": "center " + positionString + "%"
+        })
+        bannerDivClone = bannerDiv.cloneNode(true) as HTMLElement
+      }
     }
 
     
 
+    if (oldBannerDivSource) {
+      if (!bannerDiv) {
+        oldBannerDivSource.remove();
+      } else if (oldBannerDivSource.outerHTML != bannerDiv.outerHTML) {
+          oldBannerDivSource.remove();
+          bannerContainerSource?.prepend(bannerDiv);
+      }
+    } else if (bannerDiv) {
+        bannerContainerSource?.prepend(bannerDiv);
+    }
+
+    
     if (oldBannerDivPreview) {
-        if (oldBannerDivPreview.outerHTML != bannerDivClone.outerHTML) {
-            oldBannerDivPreview.remove();
-            bannerContainerPreview?.prepend(bannerDivClone);
-        }
-    } else {
+      if (!bannerDivClone) {
+        oldBannerDivPreview.remove();
+      } else if (oldBannerDivPreview.outerHTML != bannerDivClone.outerHTML) {
+          oldBannerDivPreview.remove();
+          bannerContainerPreview?.prepend(bannerDivClone);
+      }
+    } else if (bannerDivClone) {
         bannerContainerPreview?.prepend(bannerDivClone);
     }
 }
+
+
+
 
 
 export const updateBannerForView = (
@@ -142,6 +128,8 @@ export const updateBannerForView = (
     }
   }
 }
+
+
 
 
 export const updateAllBanners = (plugin: PrettyPropertiesPlugin) => {

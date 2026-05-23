@@ -148,7 +148,14 @@ const showFormatSettings = (settingTab: PPSettingTab) => {
         let propertyFormatSetting = new Setting(formatSettingsEl)
 
 
-		const entry = plugin.settings.propertyFormats[property]
+		let entry = plugin.settings.propertyFormats[property]
+
+        if (!entry) {
+            entry = {
+                format: "",
+                textFormat: ""
+            }
+        }
 
         propertyFormatSetting
 		.setName(property)
@@ -162,21 +169,25 @@ const showFormatSettings = (settingTab: PPSettingTab) => {
 
 
 		.addTextArea((text) => {
-			enhanceFormatTextArea(plugin, text, entry.format, async (value) => {
-				
-				plugin.settings.propertyFormats[property].format = value;
-				await plugin.saveSettings();
-				updateAllProperties(plugin);
-			});
+
+            
+            enhanceFormatTextArea(plugin, text, entry.format, async (value) => {
+            
+                entry.format = value;
+                await plugin.saveSettings();
+                updateAllProperties(plugin);
+            });
+            
+			
 		})
 		.addDropdown(drop => drop
 			.addOptions({
 				"raw": i18n.t("TEXT"),
 				"markdown": i18n.t("MARKDOWN")
 			})
-			.setValue(plugin.settings.propertyFormats[property].textFormat || "raw")
+			.setValue(entry.textFormat || "raw")
 			.onChange(async (value) => {
-				plugin.settings.propertyFormats[property].textFormat = value || "raw"
+				entry.textFormat = value || "raw"
 				await plugin.saveSettings();
 				updateAllProperties(plugin);
 			})

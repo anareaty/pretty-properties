@@ -28,9 +28,9 @@ export const handleCoverMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => {
                             plugin.settings.coversFolder,
                             "cover"
                         ).open();
-                    
                     };
             }))
+
             .addItem((item: MenuItem) => item
                 .setTitle(i18n.t("SELECT_COVER_SHAPE"))
                 .setIcon("lucide-shapes")
@@ -38,6 +38,7 @@ export const handleCoverMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => {
                 .onClick(async () => {
                     selectCoverShape(plugin);
             }))
+
             .addItem((item: MenuItem) => item
                 .setTitle(i18n.t("SELECT_COVER_POSITION"))
                 .setIcon("layout-grid")
@@ -45,15 +46,19 @@ export const handleCoverMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => {
                 .onClick(async () => {
                     selectCoverPosition(plugin);
             }))
+
             .addItem((item: MenuItem) => item
                 .setTitle(i18n.t("REMOVE_COVER"))
                 .setIcon("image-off")
                 .setSection("pretty-properties")
                 .onClick(async () => {
                     if (propName) removeProperty(propName, plugin);
+                    removeProperty(plugin.settings.coverPositionProperty, plugin);
+                    removeProperty(plugin.settings.coverShapeProperty, plugin);
             }))
 
             if (plugin.settings.hiddenProperties.find(p => p == propName)) {
+
                 menu.addItem((item: MenuItem) => item
                 .setTitle(i18n.t("UNHIDE_COVER_PROPERTY"))
                 .setIcon('lucide-eye')
@@ -63,7 +68,9 @@ export const handleCoverMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => {
                     await plugin.saveSettings()
                     updateHiddenProperties(plugin)			
                 }))
+
             } else {
+                
                 menu.addItem((item: MenuItem) => item
                 .setTitle(i18n.t("HIDE_COVER_PROPERTY"))
                 .setIcon("lucide-eye-off")

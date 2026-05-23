@@ -1,6 +1,6 @@
 //@ts-ignore
 import { syntaxTree } from '@codemirror/language';
-import { EditorState, RangeSetBuilder, Transaction } from '@codemirror/state';
+import { EditorState, RangeSetBuilder, StateEffect } from '@codemirror/state';
 import {
 Decoration,
 DecorationSet,
@@ -20,11 +20,9 @@ interface Tree extends LezerTree {
     iterate: (item: { from: number; to: number; enter(node: SyntaxNode): void; }) => void
 }
 
-interface TransectionExtended extends Transaction {
-    annotations: {
-        value: unknown
-    }[]
-}
+
+
+export const updateTags = StateEffect.define()
 
 export const registerTagFixExtension = (plugin: PrettyPropertiesPlugin) => {
 
@@ -38,10 +36,11 @@ export const registerTagFixExtension = (plugin: PrettyPropertiesPlugin) => {
         }
 
         update(update: ViewUpdate) {
+            const updateEvent = update.transactions.some(tr => {
+                return tr.effects.some(e => e.is(updateTags))
+            })
 
-            let transaction = update.transactions?.[0] as TransectionExtended | undefined
-
-            if (update.docChanged || update.viewportChanged || transaction?.annotations?.[0]?.value) {
+            if (update.docChanged || update.viewportChanged || updateEvent) {
                 this.decorations = this.buildDecorations(update.view);
             }
         }

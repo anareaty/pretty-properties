@@ -14,12 +14,10 @@ export const patchHoverPopover = (plugin: PrettyPropertiesPlugin) => {
     load(old) {
       return dedupe("pp-patch-popover-show-around-key", old, function(this: Popover, ...args) {
 
+        const getPopover = (() => this).bind(this)
         let embed = this.embed
 
-       
-
         if (embed) {
-          let popover = this
 
           if (embed.containerEl?.classList.contains("markdown-embed")) {
             updateImagesInPopover(this, plugin)
@@ -27,6 +25,7 @@ export const patchHoverPopover = (plugin: PrettyPropertiesPlugin) => {
             if (embed.previewMode) {
               embed.previewMode.onRenderComplete = new Proxy(embed.previewMode.onRenderComplete, {
                 apply(old2, thisArg2) {
+                  let popover = getPopover()
                   updateImagesInPopover(popover, plugin)
                   return old2.call(thisArg2)
                 }
@@ -37,6 +36,7 @@ export const patchHoverPopover = (plugin: PrettyPropertiesPlugin) => {
               embed.showEditor = new Proxy(embed.showEditor, {
                 apply(old2, thisArg2, args2: {x: number, y: number}[]) {
                   let result = old2.call(thisArg2, ...args2)
+                  let popover = getPopover()
                   updateImagesInPopover(popover, plugin)
                   return result
                 }

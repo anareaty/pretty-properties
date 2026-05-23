@@ -6,7 +6,6 @@ import { selectLocalImage } from "src/utils/imageUtils";
 
 
 export class ImageSuggestModal extends SuggestModal<string> {
-
     plugin: PrettyPropertiesPlugin
     options: Record<string, string>
     propName: string 

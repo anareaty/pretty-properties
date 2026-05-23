@@ -26,8 +26,7 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                         );
                     await plugin.saveSettings();
                     updateHiddenProperties(plugin);
-                })
-            );
+                }));
 
         } else {
 
@@ -43,14 +42,11 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                         );
                     await plugin.saveSettings();
                     updateHiddenProperties(plugin);
-                })
-            );
+                }));
         }
 
-
-
-
         if (plugin.settings.hiddenWhenEmptyProperties.find((p) => p == propName)) {
+
             menu.addItem((item: MenuItem) =>
                 item
                 .setTitle(i18n.t("NOT_HIDE_WHEN_EMPTY"))
@@ -63,9 +59,10 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                         );
                     await plugin.saveSettings();
                     updateHiddenProperties(plugin);
-                })
-            );
+                }));
+
         } else {
+
             menu.addItem((item: MenuItem) =>
                 item
                 .setTitle(i18n.t("HIDE_WHEN_EMPTY"))
@@ -78,8 +75,7 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                         );
                     await plugin.saveSettings();
                     updateHiddenProperties(plugin);
-                })
-            );
+                }));
         }
 
 

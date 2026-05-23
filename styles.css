@@ -15,7 +15,7 @@ body {
 }
 
 
-.banner-image:not(:empty) {
+.pp-banner:not(:empty) {
     position: absolute;
     width: 100%;
     top: 0;
@@ -24,7 +24,7 @@ body {
     z-index: -1;
 }
 
-.has-banner .markdown-preview-view .banner-image {
+.has-banner .markdown-preview-view .pp-banner {
     z-index: 1;
 }
 
@@ -43,7 +43,7 @@ body {
   background-color: transparent;
 }
 
-.banner-image img {
+.pp-banner img {
     width: 100% !important;
     max-width: 100% !important;
     height: var(--banner-height);
@@ -55,7 +55,9 @@ body {
 }
 
 
-
+.pp-banner-image {
+  object-position: var(--banner-position);
+}
 
 
 
@@ -110,8 +112,8 @@ body {
 
 
 
-.has-banner > .markdown-source-view > .cm-editor > .cm-scroller .icon-image,
-.has-banner > .markdown-reading-view > .markdown-preview-view .icon-image {
+.has-banner > .markdown-source-view > .cm-editor > .cm-scroller .pp-icon,
+.has-banner > .markdown-reading-view > .markdown-preview-view .pp-icon {
   margin-top: var(--pp-icon-top-margin);
 }
 
@@ -215,7 +217,7 @@ body {
 }
 
 
-.icon-image {
+.pp-icon {
   position: absolute;
   z-index: 99;
   width: var(--pp-icon-size);
@@ -234,26 +236,26 @@ body {
 
 
 
-.icon-image img,
-.icon-image svg,
-.icon-image .pp-text-icon {
+.pp-icon img,
+.pp-icon svg,
+.pp-icon .pp-text-icon {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
 
 
-.theme-light .icon-image img,
-.theme-light .icon-image svg,
-.theme-light .icon-image .pp-text-icon,
-.theme-light .title-icon-wrapper .pp-icon {
+.theme-light .pp-icon img,
+.theme-light .pp-icon svg,
+.theme-light .pp-icon .pp-text-icon,
+.theme-light .title-icon-wrapper .pp-icon-image {
   color: var(--pp-icon-color-light);
 }
 
-.theme-dark .icon-image img,
-.theme-dark .icon-image svg,
-.theme-dark .icon-image .pp-text-icon,
-.theme-dark .title-icon-wrapper .pp-icon {
+.theme-dark .pp-icon img,
+.theme-dark .pp-icon svg,
+.theme-dark .pp-icon .pp-text-icon,
+.theme-dark .title-icon-wrapper .pp-icon-image {
   color: var(--pp-icon-color-dark);
 }
 
@@ -265,7 +267,7 @@ body {
 
 
 
-.icon-image .pp-text-icon {
+.pp-icon .pp-text-icon {
   font-size: 80cqw;
   white-space: nowrap;
 
@@ -286,7 +288,7 @@ body {
 }
 
 @container (width >= 600px) {
-  .metadata-container:has(.metadata-side-image:not(.top, .bottom) .pp-cover-image) {
+  .metadata-container:has(.pp-cover:not(.top, .bottom) .pp-cover-image) {
     --metadata-display-editing: grid;
     --metadata-display-reading: grid;
     grid-column-gap: 22px;
@@ -295,7 +297,7 @@ body {
 }
 
 
-.canvas-node-content .metadata-container:has(.metadata-side-image:not(.top, .bottom) .pp-cover-image) {
+.canvas-node-content .metadata-container:has(.pp-cover:not(.top, .bottom) .pp-cover-image) {
     --metadata-display-editing: grid;
     --metadata-display-reading: grid;
     grid-column-gap: 10px;
@@ -304,14 +306,14 @@ body {
 
 
 
-.metadata-container:has(.metadata-side-image.bottom .pp-cover-image) {
+.metadata-container:has(.pp-cover.bottom .pp-cover-image) {
   --metadata-display-editing: flex;
   --metadata-display-reading: flex;
   flex-direction: column;
 }
 
 
-.metadata-side-image.bottom {
+.pp-cover.bottom {
   order: 1;
 }
 
@@ -320,12 +322,12 @@ body {
 
 
 
-.metadata-side-image {
+.pp-cover {
     grid-row: 1/3;
 }
 
-.metadata-side-image.mode-image,
-.metadata-side-image.mode-pdf {
+.pp-cover.mode-image,
+.pp-cover.mode-pdf {
     text-align: center;
 }
 
@@ -334,32 +336,32 @@ body {
 
 
 
-.metadata-container:has(.metadata-side-image.initial) {
+.metadata-container:has(.pp-cover.initial) {
   --cover-column-width: var(--cover-width-initial);
 }
 
-.metadata-container:has(.metadata-side-image.initial-2) {
+.metadata-container:has(.pp-cover.initial-2) {
   --cover-column-width: var(--cover-width-initial-2);
 }
 
-.metadata-container:has(.metadata-side-image.initial-3) {
+.metadata-container:has(.pp-cover.initial-3) {
   --cover-column-width: var(--cover-width-initial-3);
 }
 
-.metadata-container:has(.metadata-side-image.vertical-cover, .metadata-side-image.vertical-contain) {
+.metadata-container:has(.pp-cover.vertical-cover, .pp-cover.vertical-contain) {
   --cover-column-width: var(--cover-width-vertical);
 }
 
-.metadata-container:has(.metadata-side-image.horizontal-cover, .metadata-side-image.horizontal-contain) {
+.metadata-container:has(.pp-cover.horizontal-cover, .pp-cover.horizontal-contain) {
   --cover-column-width: var(--cover-width-horizontal);
 }
 
-.metadata-container:has(.metadata-side-image.square) {
+.metadata-container:has(.pp-cover.square) {
   --cover-column-width: var(--cover-width-square);
 }
 
 
-.metadata-container:has(.metadata-side-image.circle) {
+.metadata-container:has(.pp-cover.circle) {
   --cover-column-width: var(--cover-width-circle);
 }
 
@@ -367,35 +369,35 @@ body {
 
 
 
-.metadata-container:has(.metadata-side-image.left) {
+.metadata-container:has(.pp-cover.left) {
   grid-template-columns: var(--cover-column-width) auto;
 }
 
-.metadata-container:has(.metadata-side-image.right) {
+.metadata-container:has(.pp-cover.right) {
   grid-template-columns: auto var(--cover-column-width);
 }
 
-.hover-popover .metadata-container:has(.metadata-side-image.left) {
+.hover-popover .metadata-container:has(.pp-cover.left) {
   grid-template-columns: min(var(--cover-column-width), var(--cover-max-width-popover)) auto;
 }
 
-.hover-popover  .metadata-container:has(.metadata-side-image.right) {
+.hover-popover  .metadata-container:has(.pp-cover.right) {
   grid-template-columns: auto min(var(--cover-column-width), var(--cover-max-width-popover));
 }
 
 
 
-.canvas-node-content .metadata-container:has(.metadata-side-image.left) {
+.canvas-node-content .metadata-container:has(.pp-cover.left) {
   grid-template-columns: min(var(--cover-column-width), var(--cover-max-width-canvas)) auto;
 }
 
-.canvas-node-content .metadata-container:has(.metadata-side-image.right) {
+.canvas-node-content .metadata-container:has(.pp-cover.right) {
   grid-template-columns: auto min(var(--cover-column-width), var(--cover-max-width-canvas));
 }
 
 
 
-.metadata-side-image.right {
+.pp-cover.right {
   grid-column: 2;
 }
 
@@ -403,20 +405,20 @@ body {
 
 
 /*
-.metadata-side-image:not(.top, .bottom) .pp-cover-image {
+.pp-cover:not(.top, .bottom) .pp-cover-image {
   max-height: var(--cover-max-height);
 }
 
-.metadata-side-image.top .pp-cover-image,
-.metadata-side-image.bottom .pp-cover-image {
+.pp-cover.top .pp-cover-image,
+.pp-cover.bottom .pp-cover-image {
   max-height: var(--cover-max-height-top-bottom);
 }
 */
 
 
-.metadata-side-image.initial .pp-cover-image,
-.metadata-side-image.initial-2 .pp-cover-image,
-.metadata-side-image.initial-3 .pp-cover-image {
+.pp-cover.initial .pp-cover-image,
+.pp-cover.initial-2 .pp-cover-image,
+.pp-cover.initial-3 .pp-cover-image {
   object-fit: cover;
 }
 
@@ -425,29 +427,29 @@ body {
  
 @container (width < 600px) {
 
-  .is-mobile .metadata-side-image .pp-cover-image:not(.canvas-cover-image) {
+  .is-mobile .pp-cover:not(.pp-canvas-cover) .pp-cover-image {
     width: var(--cover-column-width) !important;
   }
   
-  .metadata-side-image .pp-cover-image:not(.canvas-cover-image) {
+  .pp-cover:not(.pp-canvas-cover) .pp-cover-image {
     height: 200px !important;
 	  width: auto !important;
     margin: auto;
   }
 
-  .metadata-side-image.vertical-cover .pp-cover-image:not(.canvas-cover-image),
-  .metadata-side-image.vertical-contain .pp-cover-image:not(.canvas-cover-image) {
+  .pp-cover.vertical-cover:not(.pp-canvas-cover) .pp-cover-image,
+  .pp-cover.vertical-contain:not(.pp-canvas-cover) .pp-cover-image {
     aspect-ratio: auto !important;
     max-width: 150px !important;
   }
 
-  .metadata-side-image.horizontal-cover .pp-cover-image:not(.canvas-cover-image),
-  .metadata-side-image.horizontal-contain .pp-cover-image:not(.canvas-cover-image) {
+  .pp-cover.horizontal-cover:not(.pp-canvas-cover) .pp-cover-image,
+  .pp-cover.horizontal-contain:not(.pp-canvas-cover) .pp-cover-image {
     width: 100% !important;
   }
 
-  .metadata-side-image.square .pp-cover-image:not(.canvas-cover-image),
-  .metadata-side-image.circle .pp-cover-image:not(.canvas-cover-image) {
+  .pp-cover.square:not(.pp-canvas-cover) .pp-cover-image,
+  .pp-cover.circle:not(.pp-canvas-cover) .pp-cover-image {
     width: 200px !important;
   }
 
@@ -466,42 +468,42 @@ body {
 
 
 
-.metadata-side-image.vertical-cover .pp-cover-image,
-.metadata-side-image.vertical-contain .pp-cover-image {
+.pp-cover.vertical-cover .pp-cover-image,
+.pp-cover.vertical-contain .pp-cover-image {
   aspect-ratio: 0.63;
   object-position: top;
 }
 
-.metadata-side-image.vertical-contain .pp-cover-image {
+.pp-cover.vertical-contain .pp-cover-image {
   object-fit: contain;
 }
 
-.metadata-side-image.vertical-cover .pp-cover-image {
+.pp-cover.vertical-cover .pp-cover-image {
   object-fit: cover;
 }
 
 
-.metadata-side-image.horizontal-cover .pp-cover-image,
-.metadata-side-image.horizontal-contain .pp-cover-image {
+.pp-cover.horizontal-cover .pp-cover-image,
+.pp-cover.horizontal-contain .pp-cover-image {
   aspect-ratio: 4/3;
 }
 
-.metadata-side-image.horizontal-contain .pp-cover-image {
+.pp-cover.horizontal-contain .pp-cover-image {
   object-fit: contain;
 }
 
-.metadata-side-image.horizontal-cover .pp-cover-image {
+.pp-cover.horizontal-cover .pp-cover-image {
   object-fit: cover;
 }
 
 
 
-.metadata-side-image.square .pp-cover-image {
+.pp-cover.square .pp-cover-image {
   aspect-ratio: 1;
   object-fit: cover;
 }
 
-.metadata-side-image.circle .pp-cover-image {
+.pp-cover.circle .pp-cover-image {
   aspect-ratio: 1;
   object-fit: cover;
   border-radius: 50% !important;
@@ -509,7 +511,7 @@ body {
 
 
 
-.metadata-side-image > .pp-cover-image {
+.pp-cover > .pp-cover-image {
   width: 100%;
 }
 
@@ -524,10 +526,10 @@ body {
 
 
 /*Квадратная и круглая*/
-.metadata-side-image.top.square > .pp-cover-image,
-.metadata-side-image.bottom.square > .pp-cover-image,
-.metadata-side-image.top.circle > .pp-cover-image,
-.metadata-side-image.bottom.circle > .pp-cover-image {
+.pp-cover.top.square > .pp-cover-image,
+.pp-cover.bottom.square > .pp-cover-image,
+.pp-cover.top.circle > .pp-cover-image,
+.pp-cover.bottom.circle > .pp-cover-image {
     width: min(var(--cover-max-height-top-bottom), var(--cover-column-width));
 }
 
@@ -535,34 +537,34 @@ body {
 
 /*Оригинал*/
 
-.metadata-side-image.initial.top .pp-cover-image,
-.metadata-side-image.initial-2.top .pp-cover-image,
-.metadata-side-image.initial-3.top .pp-cover-image,
-.metadata-side-image.initial.bottom .pp-cover-image,
-.metadata-side-image.initial-2.bottom .pp-cover-image,
-.metadata-side-image.initial-3.bottom .pp-cover-image {
+.pp-cover.initial.top .pp-cover-image,
+.pp-cover.initial-2.top .pp-cover-image,
+.pp-cover.initial-3.top .pp-cover-image,
+.pp-cover.initial.bottom .pp-cover-image,
+.pp-cover.initial-2.bottom .pp-cover-image,
+.pp-cover.initial-3.bottom .pp-cover-image {
   max-width: var(--cover-column-width);
   width: auto;
 }
 
 /*Вертикальная*/
-.metadata-side-image.vertical-cover.top .pp-cover-image,
-.metadata-side-image.vertical-contain.top .pp-cover-image,
-.metadata-side-image.vertical-cover.bottom .pp-cover-image,
-.metadata-side-image.vertical-contain.bottom .pp-cover-image {
+.pp-cover.vertical-cover.top .pp-cover-image,
+.pp-cover.vertical-contain.top .pp-cover-image,
+.pp-cover.vertical-cover.bottom .pp-cover-image,
+.pp-cover.vertical-contain.bottom .pp-cover-image {
   max-width: var(--cover-width-vertical);
 }
 
-.metadata-side-image.vertical-cover.top .pp-cover-image,
-.metadata-side-image.vertical-cover.bottom .pp-cover-image {
+.pp-cover.vertical-cover.top .pp-cover-image,
+.pp-cover.vertical-cover.bottom .pp-cover-image {
   width: auto;
 }
 
 /*Горизонтальная*/
-.metadata-side-image.horizontal-cover.top .pp-cover-image,
-.metadata-side-image.horizontal-contain.top .pp-cover-image,
-.metadata-side-image.horizontal-cover.bottom .pp-cover-image,
-.metadata-side-image.horizontal-contain.bottom .pp-cover-image {
+.pp-cover.horizontal-cover.top .pp-cover-image,
+.pp-cover.horizontal-contain.top .pp-cover-image,
+.pp-cover.horizontal-cover.bottom .pp-cover-image,
+.pp-cover.horizontal-contain.bottom .pp-cover-image {
   width: 100%;
   aspect-ratio: unset;
 }
@@ -586,7 +588,7 @@ body {
 	cursor: pointer !important;
 }
 
-.metadata-side-image:hover .pp-cover-menu-button {
+.pp-cover:hover .pp-cover-menu-button {
   opacity: 0.75 !important;
 }
 
@@ -635,19 +637,19 @@ body {
 
 
 
-.hide-cover-collapsed .metadata-container.is-collapsed .metadata-side-image {
+.hide-cover-collapsed .metadata-container.is-collapsed .pp-cover {
 	display: none;
 }
 
 
 
 
-.banner-image .image-resize-container {
+.pp-banner .image-resize-container {
   width: 100% !important;
 
 }
 
-.banner-image .image-resize-container img {
+.pp-banner .image-resize-container img {
   width: 100% !important;
   
 }
@@ -1252,15 +1254,15 @@ body:not(.show-hidden-properties).hidden-props-in-prop-tab .workspace-leaf-conte
 body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-property-hidden-when-empty:not(:focus, :focus-within),
 
 /* Hide metadata block when all properties are hidden */
-.hide-metadata-if-props-empty-editing:not(.show-hidden-properties) .markdown-source-view .metadata-container.pp-mc-hidden:not(:focus-within, :has(.metadata-side-image)),
-.hide-metadata-if-props-empty-editing.hide-all-empty-properties:not(.show-hidden-properties) .markdown-source-view .metadata-container.pp-mc-empty-hidden:not(:focus-within, :has(.metadata-side-image)),
-.hide-metadata-if-props-empty-reading:not(.show-hidden-properties) .markdown-preview-view .metadata-container.pp-mc-hidden:not(:focus-within, :has(.metadata-side-image)),
-.hide-metadata-if-props-empty-reading.hide-all-empty-properties:not(.show-hidden-properties) .markdown-preview-view .metadata-container.pp-mc-empty-hidden:not(:focus-within, :has(.metadata-side-image)),
+.hide-metadata-if-props-empty-editing:not(.show-hidden-properties) .markdown-source-view .metadata-container.pp-mc-hidden:not(:focus-within, :has(.pp-cover)),
+.hide-metadata-if-props-empty-editing.hide-all-empty-properties:not(.show-hidden-properties) .markdown-source-view .metadata-container.pp-mc-empty-hidden:not(:focus-within, :has(.pp-cover)),
+.hide-metadata-if-props-empty-reading:not(.show-hidden-properties) .markdown-preview-view .metadata-container.pp-mc-hidden:not(:focus-within, :has(.pp-cover)),
+.hide-metadata-if-props-empty-reading.hide-all-empty-properties:not(.show-hidden-properties) .markdown-preview-view .metadata-container.pp-mc-empty-hidden:not(:focus-within, :has(.pp-cover)),
 /* Manage hiding metadata when it has the cover image */
-.hide-metadata-if-props-empty-editing:not(.show-hidden-properties) .markdown-source-view .metadata-container.pp-mc-hidden:has(.metadata-side-image) :is(.metadata-properties-heading, .metadata-content):not(:focus, :focus-within),
-.hide-metadata-if-props-empty-editing.hide-all-empty-properties:not(.show-hidden-properties) .markdown-source-view .metadata-container.pp-mc-empty-hidden:has(.metadata-side-image) :is(.metadata-properties-heading, .metadata-content):not(:focus, :focus-within),
-.hide-metadata-if-props-empty-reading:not(.show-hidden-properties) .markdown-preview-view .metadata-container.pp-mc-hidden:has(.metadata-side-image) :is(.metadata-properties-heading, .metadata-content):not(:focus, :focus-within),
-.hide-metadata-if-props-empty-reading.hide-all-empty-properties:not(.show-hidden-properties) .markdown-preview-view .metadata-container.pp-mc-empty-hidden:has(.metadata-side-image) :is(.metadata-properties-heading, .metadata-content):not(:focus, :focus-within)
+.hide-metadata-if-props-empty-editing:not(.show-hidden-properties) .markdown-source-view .metadata-container.pp-mc-hidden:has(.pp-cover) :is(.metadata-properties-heading, .metadata-content):not(:focus, :focus-within),
+.hide-metadata-if-props-empty-editing.hide-all-empty-properties:not(.show-hidden-properties) .markdown-source-view .metadata-container.pp-mc-empty-hidden:has(.pp-cover) :is(.metadata-properties-heading, .metadata-content):not(:focus, :focus-within),
+.hide-metadata-if-props-empty-reading:not(.show-hidden-properties) .markdown-preview-view .metadata-container.pp-mc-hidden:has(.pp-cover) :is(.metadata-properties-heading, .metadata-content):not(:focus, :focus-within),
+.hide-metadata-if-props-empty-reading.hide-all-empty-properties:not(.show-hidden-properties) .markdown-preview-view .metadata-container.pp-mc-empty-hidden:has(.pp-cover) :is(.metadata-properties-heading, .metadata-content):not(:focus, :focus-within)
 {
   position: absolute;
   width: 1px;
@@ -1768,7 +1770,7 @@ button.longtext-color-button:hover {
   
 }
 
-.title-icon-wrapper .pp-icon {
+.title-icon-wrapper .pp-icon-image {
   height: var(--pp-title-icon-size);
   --icon-size: var(--pp-title-icon-size);
   
@@ -1776,7 +1778,7 @@ button.longtext-color-button:hover {
   
 }
 
-.pp-icon {
+.pp-icon-image {
   image-rendering: auto !important;
   cursor: auto;
 }

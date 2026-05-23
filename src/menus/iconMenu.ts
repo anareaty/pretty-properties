@@ -16,6 +16,7 @@ export const handleIconMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => {
         .onClick(async () => {
             new IconSuggestModal(plugin.app, plugin).open();
         }))
+
     .addItem((item: MenuItem) => item
         .setTitle(i18n.t("REMOVE_ICON"))
         .setIcon("image-off")
@@ -25,6 +26,7 @@ export const handleIconMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => {
         }))
 
     if (plugin.settings.hiddenProperties.find(p => p == propName)) {
+
         menu.addItem((item: MenuItem) => item
         .setTitle(i18n.t("UNHIDE_ICON_PROPERTY"))
         .setIcon("lucide-eye")
@@ -35,7 +37,9 @@ export const handleIconMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => {
             await plugin.saveSettings();
             updateHiddenProperties(plugin);
         }))
+
     } else {
+        
         menu.addItem((item: MenuItem) => item
         .setTitle(i18n.t("HIDE_ICON_PROPERTY"))
         .setIcon("lucide-eye-off")

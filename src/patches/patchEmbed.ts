@@ -6,7 +6,6 @@ import { EmbedMarkdownComponent, ReadViewRenderer } from "@obsidian-typings/obsi
 import { TFile } from "obsidian";
 
 
-
 interface ReadViewRendererExtended extends ReadViewRenderer {
   onRender: () => void
 }
@@ -18,9 +17,10 @@ interface EmbedMarkdownComponentExtended extends EmbedMarkdownComponent {
 	file: TFile
 }
 
+
+
 export const patchEmbed = (plugin: PrettyPropertiesPlugin) => {
-    
-    //@ts-ignore
+
     plugin.patches.uninstallPPEmbedPatch = around(plugin.app.embedRegistry.embedByExtension, {
         md(old) {
             return dedupe("pp-patch-embed-around-key", old, (...args) => {
@@ -29,19 +29,12 @@ export const patchEmbed = (plugin: PrettyPropertiesPlugin) => {
                     if (view.containerEl.classList.contains("canvas-node-content")) {
                         (view.previewMode.renderer as ReadViewRendererExtended).onRender = new Proxy((view.previewMode.renderer as ReadViewRendererExtended).onRender, {
                             apply(onRender, thisArg2) {
-
                                 let result = onRender.call(thisArg2)
-                                
                                 updateCoverForView(view, plugin)  
-                               
                                 return result
                             }
                         })
                     }
-               
-                
-                
-
                 return view
             })
         }

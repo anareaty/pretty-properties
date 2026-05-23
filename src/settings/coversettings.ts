@@ -107,11 +107,12 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
 
 		for (let i = 0; i < plugin.settings.coverProperties.length; i++) {
 			const cover = plugin.settings.coverProperties[i];
+            if (!cover) continue
 			new Setting(coverSettingsEl)
 				.setName(cover.property)
 				.addTextArea((text) => {
 					enhanceFormatTextArea(plugin, text, cover.format, async (value) => {
-						plugin.settings.coverProperties[i].format = value;
+						cover.format = value;
 						await plugin.saveSettings();
 						updateAllCovers(plugin);
 					});
@@ -125,7 +126,13 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
 							if (i === 0)
 								return;
 							const covers = plugin.settings.coverProperties;
-							[covers[i - 1], covers[i]] = [covers[i], covers[i - 1]];
+
+                            let c1 = covers[i];
+                            let c2 = covers[i - 1];
+
+                            if (c1 && c2) {
+                                [covers[i - 1], covers[i]] = [c1, c2];
+                            }
 
 							await plugin.saveSettings();
 							updateAllCovers(plugin);
@@ -141,7 +148,15 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
 							if (i === plugin.settings.coverProperties.length - 1)
 								return;
 							const covers = plugin.settings.coverProperties;
-							[covers[i + 1], covers[i]] = [covers[i], covers[i + 1]];
+
+
+                            let c1 = covers[i];
+                            let c2 = covers[i + 1];
+
+                            if (c1 && c2) {
+                                [covers[i + 1], covers[i]] = [c1, c2];
+                            }
+							
 
 							await plugin.saveSettings();
 							updateAllCovers(plugin);
@@ -158,6 +173,35 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
 					}),
 				);
 		}
+
+
+
+        let coverShapePlaceholder = "cover_shape"
+        new Setting(containerEl)
+            .setName(i18n.t("COVER_SHAPE_PROPERTY"))
+            .addText(text => text
+                .setPlaceholder(coverShapePlaceholder)
+                .setValue(plugin.settings.coverShapeProperty)
+                .onChange(async (value) => {
+                    plugin.settings.coverShapeProperty = value;
+                    await plugin.saveSettings();
+                    updateAllCovers(plugin);
+            }));
+
+
+
+        let coverPositionPlaceholder = "cover_position"
+        new Setting(containerEl)
+            .setName(i18n.t("COVER_POSITION_PROPERTY"))
+            .addText(text => text
+                .setPlaceholder(coverPositionPlaceholder)
+                .setValue(plugin.settings.coverPositionProperty)
+                .onChange(async (value) => {
+                    plugin.settings.coverPositionProperty = value;
+                    await plugin.saveSettings();
+                    updateAllCovers(plugin);
+            }));
+
 
 
 

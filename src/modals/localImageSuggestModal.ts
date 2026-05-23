@@ -1,4 +1,4 @@
-import { SuggestModal, TFile, App, MarkdownRenderer, Editor, FrontMatterCache, Component } from "obsidian";
+import { SuggestModal, TFile, App, MarkdownRenderer, Editor, FrontMatterCache, Component, setTooltip } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { setNestedProperty } from "src/utils/propertyUtils";
 
@@ -47,8 +47,15 @@ export class LocalImageSuggestModal extends SuggestModal<string> {
             void MarkdownRenderer.render(this.app, link, image, "", this.renderComponent)
             el.classList.add("image-suggestion-item")
             el.classList.add(this.shape)
-            //image.append(name)
+
+            if (this.shape == "banner") {
+                image.append(name)
+            } else {
+                setTooltip(image, name, {delay: 100})
+            }
+
             el.append(image)
+            
         } else {
             el.append(name)
         }
@@ -62,17 +69,12 @@ export class LocalImageSuggestModal extends SuggestModal<string> {
             if (imageFile instanceof TFile && file instanceof TFile) {
                 let imageLink = imagePath
 
-
-
-
-
                 if (this.editor) {
                     imageLink = this.app.fileManager.generateMarkdownLink(imageFile, "").replace(/^!/, "")
                     imageLink = "!" + imageLink
                     this.editor.replaceSelection(imageLink)
                     
                 } else {
-
                     if (this.plugin.settings.imageLinkFormat != "raw") {
                         imageLink = this.app.fileManager.generateMarkdownLink(imageFile, "").replace(/^!/, "")
                         if (this.plugin.settings.imageLinkFormat == "embed") {
@@ -86,9 +88,7 @@ export class LocalImageSuggestModal extends SuggestModal<string> {
                     void this.app.fileManager.processFrontMatter(file, (fm: FrontMatterCache) => {
                         setNestedProperty(fm, this.propName, imageLink);
                     })
-
-                }
-                
+                } 
             }
         }
     } 

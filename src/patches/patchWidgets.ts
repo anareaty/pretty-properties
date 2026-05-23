@@ -6,7 +6,7 @@ import { updateProgress } from "src/utils/updates/updateProgress"
 import { around, dedupe } from "monkey-around";
 import { updateAllMetadataContainers } from "src/utils/updates/updateHiddenProperties";
 import { getPropertyFormatObj, updatePropertyFormatting } from "src/utils/updates/updatePropertyFormattings";
-import { AliasesPropertyWidgetComponent, MultitextPropertyWidgetComponent, PropertyWidgetComponentBase, TagsPropertyWidgetComponent } from "@obsidian-typings/obsidian-public-latest";
+import { AliasesPropertyWidgetComponent, MultitextPropertyWidgetComponent, PropertyWidgetComponentBase, TagsPropertyWidgetComponent, TypeInfo } from "@obsidian-typings/obsidian-public-latest";
 
 
 type WidgetArgs = [
@@ -15,6 +15,11 @@ type WidgetArgs = [
     key: string;
     sourcePath: string;
 }]
+
+
+interface MetadataTypeManagerOld {
+  getTypeInfo: (obj: {key: string, value: unknown}) => TypeInfo
+}
 
 export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBase, args: WidgetArgs, plugin: PrettyPropertiesPlugin) => {
 
@@ -239,7 +244,6 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
 
 
 export const patchPropertyWidgets = (plugin: PrettyPropertiesPlugin) => {
-  //@ts-ignore
   let metadataTypeManager = plugin.app.metadataTypeManager
   let widgets = metadataTypeManager.registeredTypeWidgets
 
@@ -247,7 +251,10 @@ export const patchPropertyWidgets = (plugin: PrettyPropertiesPlugin) => {
   if (metadataTypeManager.getWidget) {
     unknownWidget = metadataTypeManager.getWidget(" ");
   } else {
-    unknownWidget = metadataTypeManager.getTypeInfo({key: " ", value: "unknown"}).inferred
+
+    let metadataTypeManagerOldVersion = metadataTypeManager as unknown as MetadataTypeManagerOld
+    unknownWidget = metadataTypeManagerOldVersion.getTypeInfo({key: " ", value: "unknown"}).inferred
+
   }
   widgets.unknown = unknownWidget;
 

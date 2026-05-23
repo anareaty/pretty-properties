@@ -59,7 +59,7 @@ export const patchMenu = (plugin: PrettyPropertiesPlugin) => {
 
 
             // Banner menu
-            let banner = target.closest(".banner-image")
+            let banner = target.closest(".pp-banner")
             if (banner?.instanceOf(HTMLElement)) {
                 handleBannerMenu(this, plugin);
                 return old && old.apply(this, [e])
@@ -67,7 +67,7 @@ export const patchMenu = (plugin: PrettyPropertiesPlugin) => {
 
 
             //Cover menu
-            let cover = target.closest(".metadata-side-image")
+            let cover = target.closest(".pp-cover")
             if (cover?.instanceOf(HTMLElement)) {
                 handleCoverMenu(this, plugin);
                 return old && old.apply(this, [e])

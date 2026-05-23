@@ -1,4 +1,4 @@
-import { TFile } from "obsidian";
+import { Component, ImageValue, loadPdfJs, MarkdownRenderer, Menu, normalizePath, setIcon, TFile } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { getNestedProperty } from "./propertyUtils";
 import { LocalImageSuggestModal } from "src/modals/localImageSuggestModal";
@@ -6,6 +6,12 @@ import { BannerPositionModal } from "src/modals/bannerPositionModal";
 import { CoverShapeSuggestModal } from "src/modals/coverShapeSuggestModal";
 import { CoverPositionSuggestModal } from "src/modals/coverPositionSuggestModal";
 import { ImageSuggestModal } from "src/modals/imageSuggestModal";
+
+const pdfRegex = /^(!)?(?:\[\[(.+\.pdf)\]\]|\[([^\]]*)\]\((.+\.pdf)\))$/;
+const urlRegex = /^(?:http[s]?:\/\/.)?(?:www\.)?[-a-zA-Z0-9@%._+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_+.~#?&//=]*)$/i;
+const localFileRegex = /^(file:\/\/\/\/.)[-a-zA-Z0-9@%._+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_+.~#?&//=]*)$/i;
+const wikiLinkRegex = /^\[\[.+?\]\]$/;
+
 
 
 export const selectLocalImage = (propName: string, folder: string, shape: string, plugin: PrettyPropertiesPlugin) => {
@@ -63,7 +69,7 @@ export const selectBannerPosition = (plugin: PrettyPropertiesPlugin) => {
 export const selectCoverShape = (plugin: PrettyPropertiesPlugin) => {
     let file = plugin.app.workspace.getActiveFile();
     if (file instanceof TFile) {
-        new CoverShapeSuggestModal(plugin.app, file).open();
+        new CoverShapeSuggestModal(plugin, file).open();
     }
 }
 
@@ -72,7 +78,7 @@ export const selectCoverShape = (plugin: PrettyPropertiesPlugin) => {
 export const selectCoverPosition = (plugin: PrettyPropertiesPlugin) => {
     let file = plugin.app.workspace.getActiveFile();
     if (file instanceof TFile) {
-        new CoverPositionSuggestModal(plugin.app, file).open();
+        new CoverPositionSuggestModal(plugin, file).open();
     }
 }
 
@@ -89,7 +95,7 @@ export const getCurrentCoverProperty = (plugin: PrettyPropertiesPlugin) => {
 			.filter((p) => p);
 
         for (let prop of props) {
-            if (getNestedProperty(frontmatter, prop) !== undefined) {
+            if (frontmatter && getNestedProperty(frontmatter, prop) !== undefined) {
                 propName = prop;
                 break;
             }
@@ -115,4 +121,182 @@ export const selectCoverImage = (plugin: PrettyPropertiesPlugin) => {
             ).open();
         }
     }
+}
+
+
+
+
+
+
+
+export const renderImageFromValue = async (
+	value: string,  
+    type: string,
+	sourcePath: string, 
+	component: Component, 
+	plugin: PrettyPropertiesPlugin
+) => {
+
+    let imageMode = "mode-markdown"
+
+
+	if(type == "cover" && pdfRegex.test(value)) {
+		const relativePath = extractPdfPath(value);
+		if (relativePath) {
+			const pdfCover = await renderPdfCover(relativePath, sourcePath, plugin);
+			if (pdfCover) {
+                pdfCover.setAttribute("data-property", value)
+                return createImageWrapper(pdfCover, value, "mode-pdf", type)
+            }
+		}
+	} 
+	
+	else if (urlRegex.test(value) || localFileRegex.test(value)) {
+		value = value.replace(/^(https:\/\/www\.youtube.com\/watch\?v=)(.*)/, "https://img.youtube.com/vi/$2/maxresdefault.jpg")
+		value = `![](${value})`;
+	} 
+	
+	else if (wikiLinkRegex.test(value)) {
+		value = `!${value}`;
+	} 
+	
+	const imageTemp = createDiv();
+	await MarkdownRenderer.render(plugin.app, value, imageTemp, sourcePath, component);
+
+    const img = imageTemp.querySelector("img");
+	if (img instanceof HTMLImageElement) {
+		img.classList.add("pp-image-img");
+		return createImageWrapper(img, value, "mode-image", type)
+	}
+
+    if (type == "banner") return
+
+    const svg = imageTemp.querySelector("svg");
+	if (svg instanceof SVGElement) {
+		svg.classList.add("pp-image-svg");
+		return createImageWrapper(svg as any as HTMLElement, value, "mode-image", type)
+	}
+
+    if (type == "icon") return
+
+    const iframe = imageTemp.querySelector("iframe");
+	if (iframe instanceof HTMLIFrameElement) {
+		imageTemp.classList.add("pp-image-iframe");
+        addIframeMenuButton(imageTemp);
+		return createImageWrapper(imageTemp, value, "mode-iframe", type)
+	}
+
+    imageTemp.classList.add("pp-image-markdown");
+	return createImageWrapper(imageTemp, value, "mode-markdown", type)
+}
+
+
+
+
+
+
+const createImageWrapper = (imageItem: HTMLElement, value: string, imageMode: string, type: string) => {
+
+    imageItem.setAttribute("data-property", value)
+    imageItem.classList.add("pp-" + type + "-image");
+
+    if (type == "icon") return imageItem
+
+    let imageDiv = createDiv();
+    imageDiv.appendChild(imageItem);
+    imageDiv.classList.add("pp-" + type);
+    imageDiv.classList.add(imageMode)
+    imageDiv.setAttribute("data-value", value)
+
+    return imageDiv
+}
+
+
+
+
+
+
+
+
+
+
+
+const extractPdfPath = (valueStr: string): string | null => {
+    const pdfMatch = valueStr.match(pdfRegex);
+    if (pdfMatch?.[2])// wiki-style: [[file.pdf]] / ![[file.pdf]]
+        return pdfMatch[2];
+    else if (pdfMatch?.[4])// markdown-style: [text](file.pdf) / ![text](file.pdf)
+        return pdfMatch[4].replaceAll("%20", " ");
+    return null;
+}
+
+
+
+const renderPdfCover = async (relativePath: string, sourcePath: string, plugin: PrettyPropertiesPlugin) => {
+
+    let pdfPath = plugin.app.metadataCache.getFirstLinkpathDest(relativePath, sourcePath)?.path || ""
+    if (!pdfPath) return
+
+    let pdfjsLib = window.pdfjsLib
+    if (!pdfjsLib) {
+        await loadPdfJs()
+		pdfjsLib = window.pdfjsLib
+    }
+    let canvas
+    let pdf
+    let path = plugin.app.vault.adapter.getResourcePath(normalizePath(pdfPath))
+
+    try {
+        pdf = await pdfjsLib.getDocument(path)?.promise
+    } catch(err) {
+		console.error(err)
+        return
+    }
+
+    if (pdf) {
+        let firstPage = await pdf.getPage(1)
+        if (firstPage) {
+            let viewport = firstPage.getViewport({scale: 1});
+            canvas = createEl("canvas")
+            canvas.classList.add("pp-pdf-cover-canvas")
+            canvas.classList.add("pp-cover-image")
+            let context = canvas.getContext('2d')
+            canvas.width = viewport.width
+            canvas.height = viewport.height
+			if (context) {
+				firstPage.render({
+					canvasContext: context,
+					viewport: viewport
+            	});
+			}
+
+            let pdfContainer = createDiv()
+            pdfContainer.classList.add("pp-pdf-cover-container")
+            pdfContainer.append(canvas)
+            return pdfContainer
+        }
+    }
+    return
+}
+
+
+
+
+const addIframeMenuButton = (
+    coverItem: HTMLElement
+) => {
+    coverItem.classList.add("pp-cover-has-iframe");
+
+    const menuButton = createEl("button");
+    menuButton.classList.add("pp-cover-menu-button", "edit-block-button");
+    setIcon(menuButton, "code-2");
+
+    menuButton.onclick = (e: PointerEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        let menu = new Menu();
+        menu.showAtMouseEvent(e)
+    };
+
+    coverItem.appendChild(menuButton);
 }

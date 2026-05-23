@@ -36,7 +36,7 @@ export class API {
             return "transparent"
         } else if (colorSetting == "default") {
             return ""
-        } else if (colorSetting.h !== undefined) {
+        } else if (colorSetting && typeof colorSetting != "string") {
             return "hsl(" + colorSetting.h + " ," + colorSetting.s + "% ," + colorSetting.l + "%)"
         }
         return ""
@@ -48,14 +48,14 @@ export class API {
             return "rgba(var(--color-" + colorSetting + "-rgb), 1)"
         } else if (colorSetting == "none") {
             return "transparent"
-        } else if (colorSetting != "default") {
+        } else if (colorSetting && typeof colorSetting != "string") {
 
             return "hsl(" + colorSetting.h + " ," + colorSetting.s + "% ," + colorSetting.l + "%)"
         } else {
             let bgColorSetting = this.getPropertyBackgroundColorSetting(propName, propValue)
             if (typeof bgColorSetting == "string" && colors.find(c => c == bgColorSetting)) {
                 return "rgba(var(--color-" + bgColorSetting + "-rgb), 1)"
-            } else if (bgColorSetting.h !== undefined) {
+            } else if (bgColorSetting && typeof bgColorSetting != "string") {
                 let textLightness = getTextLightness(bgColorSetting)
                 return "hsl(" + bgColorSetting.h + " ," + bgColorSetting.s + "% ," + textLightness + "%)"
             } 
@@ -72,6 +72,7 @@ export class API {
         } else if (propType == "tags") {
             return this.plugin.settings.tagColors?.[propValue]?.pillColor || "default"
         }
+        return "default"
     }
 
     getPropertyTextColorSetting (propName: string, propValue: string) {
@@ -83,6 +84,7 @@ export class API {
         } else if (propType == "tags") {
             return this.plugin.settings.tagColors?.[propValue]?.textColor || "default"
         }
+        return "default"
     }
 
     setPPColorStyles (el: HTMLElement, propName: string, propValue: string) {

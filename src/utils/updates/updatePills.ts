@@ -365,7 +365,7 @@ export const updateCardLongtext = (pill: HTMLElement, plugin: PrettyPropertiesPl
 		let parent = pill.parentElement
 		//let prop = parent?.getAttribute("data-property") || ""
 		//prop = prop.replace(/^note\./, "")
-		//@ts-ignore
+		////@ts-ignore
 		//let properties = plugin.app.metadataTypeManager.getAllProperties()
 		//let type = properties[prop]?.widget || properties[prop]?.type;
 		//if (type != "text") return

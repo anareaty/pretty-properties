@@ -25,8 +25,6 @@ export class ColorPickerModal extends Modal {
 
         new Setting(contentEl)
         .addColorPicker(color => {
-
-            
             let pillColorSettings: PillColorSettings | undefined
 
             if (
@@ -52,14 +50,10 @@ export class ColorPickerModal extends Modal {
                 }
             }
             
-
             color.onChange(async (value) => {
-
-                
                 let hsl = color.getValueHsl()
             
                 if (!pillColorSettings) {
-                 
                     pillColorSettings = {
                       pillColor: "default",
                       textColor: "default"
@@ -70,11 +64,7 @@ export class ColorPickerModal extends Modal {
                     pillColorSettings[this.colorType] = hsl
                 }
 
-
-         
-                
                 await this.plugin.saveSettings()
-
 
                 updateAllProperties(this.plugin)
                 if (this.colorList == "dateColors") {

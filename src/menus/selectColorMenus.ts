@@ -27,9 +27,7 @@ export const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string
         "default"
     ];
 
-
     let pillColorSettings: PillColorSettings | undefined
-
     let savedColor: string | HSL | undefined
 
     if (
@@ -54,32 +52,20 @@ export const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string
     for (let color of colors) {
 
         menu.addItem((item: MenuItem) => {
-
-
-            
             item.setIcon("square");
-
             if (color != "default" && color != "none" && color != "accent") {
-                
                 item.iconEl.style =
                     "color: transparent; background-color: rgba(var(--color-" +
                     color +
                     "-rgb), 0.3);";
             } else if (color == "accent") {
-                
                 item.iconEl.style =
                     "color: transparent; background-color: hsla(var(--interactive-accent-hsl), 0.3);";
             } else if (color == "none") {
-                
                 item.iconEl.style = "opacity: 0.2;";
             }
 
-
-            
-
-
             item.setTitle(i18n.t(color)).onClick(async() => {
-
                 if (colorType == "pillColor" || colorType == "textColor") {
                     if (color == "default") {						
                         delete pillColorSettings?.[colorType]
@@ -105,7 +91,6 @@ export const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string
             item.setChecked(savedColor == color)
 
             if (color == "default") {
-                
                 item.setChecked(savedColor == color || !savedColor)
             }
         });
@@ -114,7 +99,6 @@ export const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string
     menu.addItem((item: MenuItem) => {
         item.setTitle(i18n.t("CUSTOM_COLOR"))
         item.setIcon("square");
-        
         item.iconEl.classList.add("menu-item-custom-color")
         item.onClick(() => {
             new ColorPickerModal(plugin.app, plugin, pillVal, colorList, colorType).open()
@@ -146,8 +130,6 @@ export const createColorMenu = (pillVal: string, colorList: string, colorType: s
         setColorMenuItems(sub, pillVal, colorList, colorType, plugin);
     });
 };
-
-
 
 
 

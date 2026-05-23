@@ -11,7 +11,15 @@ export class BannerPositionModal extends Modal {
     constructor(app: App, plugin: PrettyPropertiesPlugin, file: TFile, bannerPositionProperty: string) {
         super(app)
         let cache = plugin.app.metadataCache.getFileCache(file);
-        this.position = getNestedProperty(cache?.frontmatter, bannerPositionProperty) || 50
+        let frontmatter = cache?.frontmatter
+        this.position = 50
+        if (frontmatter) {
+            let positionVal = getNestedProperty(frontmatter, bannerPositionProperty)
+            if (typeof positionVal == "number") {
+                this.position = positionVal
+            }
+        }
+        
         this.file = file
         this.bannerPositionProperty = bannerPositionProperty
     }

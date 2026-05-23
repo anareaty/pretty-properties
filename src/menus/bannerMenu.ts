@@ -27,6 +27,7 @@ export const handleBannerMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => 
                 "banner"
             ).open();
     }))
+
     .addItem((item: MenuItem) => item
         .setTitle(i18n.t("SELECT_BANNER_POSITION"))
         .setIcon("sliders-horizontal")
@@ -34,14 +35,15 @@ export const handleBannerMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => 
         .onClick(async () => {
             selectBannerPosition(plugin)
     }))
+
     .addItem((item: MenuItem) => item
         .setTitle(i18n.t("REMOVE_BANNER"))
         .setIcon("image-off")
         .setSection("pretty-properties")
         .onClick(async () => {
             removeProperty(plugin.settings.bannerProperty, plugin);
+            removeProperty(plugin.settings.bannerPositionProperty, plugin);
     }))
-
 
     if (plugin.settings.hiddenProperties.find(p => p == propName)) {
         menu.addItem((item: MenuItem) => item
@@ -54,7 +56,9 @@ export const handleBannerMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => 
                 await plugin.saveSettings();
                 updateHiddenProperties(plugin);
         }))
+
     } else {
+        
         menu.addItem((item: MenuItem) => item
             .setTitle(i18n.t("HIDE_BANNER_PROPERTY"))
             .setIcon("lucide-eye-off")
