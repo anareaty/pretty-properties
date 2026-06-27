@@ -73,7 +73,7 @@ export interface PPPluginSettings {
 	iconBackground: boolean;
 	bannerPositionProperty: string;
 	addPillPadding: string;
-	addBaseTagColor: boolean;
+	//addBaseTagColor: boolean;
 	enableColorButtonInBases:boolean;
 	customDateFormat: string;
   	customDateTimeFormat: string;
@@ -174,7 +174,7 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	iconBackground: false,
 	bannerPositionProperty: "banner_position",
 	addPillPadding: "all",
-	addBaseTagColor: true,
+	//addBaseTagColor: true,
 	enableColorButtonInBases: false,
 	customDateFormat: "",
     customDateTimeFormat: "",

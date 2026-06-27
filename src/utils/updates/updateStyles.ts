@@ -253,10 +253,6 @@ export const updateAutoHideProps = (plugin: PrettyPropertiesPlugin) => {
 }
 
 
-export const updateBaseTagsStyle = (plugin: PrettyPropertiesPlugin) => {
-  document.body.classList.toggle("base-tags-style", plugin.settings.addBaseTagColor)
-}
-
 
 export const updateHidePropTitle = (plugin: PrettyPropertiesPlugin) => {
   document.body.classList.toggle("hide-properties-title", plugin.settings.hidePropTitle)
@@ -275,4 +271,11 @@ export const updateTheme = (plugin: PrettyPropertiesPlugin) => {
   } else {
     document.body.removeAttribute('data-theme');
   }
+}
+
+
+
+
+export const updateColoredTagsStyle = (plugin: PrettyPropertiesPlugin) => {
+  document.body.classList.toggle("colored-tags", plugin.settings.enableColoredInlineTags)
 }

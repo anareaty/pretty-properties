@@ -1,6 +1,6 @@
 import PrettyPropertiesPlugin from "src/main";
 import { createColorButton } from "src/menus/selectColorMenus";
-import { finishRenderMath, HSL, renderMath } from "obsidian"
+import { HSL } from "obsidian"
 import { hideMetadataContainerIfAllPropertiesHidden } from "./updateHiddenProperties";
 import { querySelectorsWithIframesForContainer } from "../querySelectorsHelper";
 import { getPropertyFormatObj, updatePropertyFormatting } from "./updatePropertyFormattings";
@@ -152,6 +152,11 @@ export const setPillStyles = (
 	if (styles.colorClass || styles.textColorClass) {
 		pill.setCssProps(styles.styleProps)
 	} 
+
+
+	if (pill.classList.contains("value-list-element")) {
+		pill.classList.add("pp-value-list-element")
+	}
 }
 
 
@@ -258,89 +263,34 @@ export const updateLongtext = (pill: HTMLElement, plugin: PrettyPropertiesPlugin
 			propName = propName.replace(/^note./, "")
 		}
 
-		let propertyFormatObj = getPropertyFormatObj(propName, plugin)
+		let propertyFormatObj = getPropertyFormatObj(propName, text, plugin)
 
 
-
-		let existingMathWrapper = propEl?.querySelector(".math-wrapper")
-		let match
-
-
-		
-
-		if (plugin.settings.enableMath) {
-			match = text?.match(/^(\$\$)(.+)(\$\$)$/)
-			if (!match) {
-				match = text?.match(/^(\$)(.+)(\$)$/)
-			}
-		}
-
-		if (match && !propertyFormatObj.format) {
-			//render math
-
-			let existingValue = existingMathWrapper?.getAttribute("data-math") || ""
-			if (existingValue == text) { return }
-			let formula = match[2]
-			let symbols = match[1]
-			existingMathWrapper?.remove()
-			let display = false
-
-			if (symbols == "$$") {
-				display = true
-			}
-			
-			if (symbols && formula) {
-
-				let math = renderMath(formula, display)
-				void finishRenderMath()
-
-				if (math) {
-					propEl?.classList.add("has-math")
-					let mathWrapper = createDiv()
-					mathWrapper.classList.add("math-wrapper")
-					mathWrapper.setAttribute("data-math", text)
-					mathWrapper.append(math)
-
-					if (isBase) {
-						propEl?.prepend(mathWrapper)
-						mathWrapper.onclick = () => {
-							pill.focus()
-						}
-					} else {
-						let mathKeyEl = propEl?.querySelector(".metadata-property-key");
-						mathKeyEl?.after(mathWrapper);
-					}
-				}
-			}
-			
-
-
-		} else {
-			
-			existingMathWrapper?.remove()
-			
-			propEl?.classList.remove("has-math")
-            
-
-			if (plugin.settings.enableColoredProperties) {
-				if (text) {
-					text = text.slice(0, 200).trim()
-				}
-
-				
-				setPillStyles(pill, "data-property-longtext-value", text, "longtext", plugin)
-				if (parent) {
-					updateColorButton(parent, text, isBase, plugin)
-				}
-				
-			}
-		}
-
-		
-
+		let overlayElement
 		if (grandParent) {
-			updatePropertyFormatting(grandParent, propName, text, "text", propertyFormatObj.format, propertyFormatObj.textFormat, plugin)
+
+			overlayElement = updatePropertyFormatting(grandParent, propName, text, "text", propertyFormatObj.format, propertyFormatObj.textFormat, plugin)
 		}
+
+		if (plugin.settings.enableColoredProperties) {
+			if (text) {
+				text = text.slice(0, 200).trim()
+			}
+
+			setPillStyles(pill, "data-property-longtext-value", text, "longtext", plugin)
+
+			if (overlayElement) {
+				setPillStyles(overlayElement, "data-property-longtext-value", text, "longtext", plugin)
+			}
+
+			if (parent) {
+				updateColorButton(parent, text, isBase, plugin)
+			}
+		}
+
+		
+
+		
 		
 
 
@@ -362,63 +312,22 @@ export const updateLongtext = (pill: HTMLElement, plugin: PrettyPropertiesPlugin
 export const updateCardLongtext = (pill: HTMLElement, plugin: PrettyPropertiesPlugin) => {
 
 	if (plugin.settings.enableColoredProperties || plugin.settings.enableMath) {
-		let parent = pill.parentElement
-		//let prop = parent?.getAttribute("data-property") || ""
-		//prop = prop.replace(/^note\./, "")
-		////@ts-ignore
-		//let properties = plugin.app.metadataTypeManager.getAllProperties()
-		//let type = properties[prop]?.widget || properties[prop]?.type;
-		//if (type != "text") return
-		
 		let text = pill.innerText
 
-		let propEl = parent
-		let existingMathWrapper = propEl?.querySelector(".math-wrapper")
-		let match
-
+		/*
 		if (plugin.settings.enableMath) {
-			match = text?.match(/^(\$\$)(.+)(\$\$)$/)
+			let match = text?.match(/^(\$\$)(.+)(\$\$)$/)
 			if (!match) {
 				match = text?.match(/^(\$)(.+)(\$)$/)
 			}
 		}
+		*/
 
-		if (match) {
-			//render math
-			let existingValue = existingMathWrapper?.getAttribute("data-math") || ""
-			if (existingValue == text) { return }
-			let formula = match[2]
-			//let symbols = match[1]
-			existingMathWrapper?.remove()
-			let display = false	
-			
-			if (formula) {
-				let math = renderMath(formula, display)
-				void finishRenderMath()
-
-				if (math) {
-					propEl?.classList.add("has-math")
-					let mathWrapper = createDiv()
-					mathWrapper.classList.add("math-wrapper")
-					mathWrapper.setAttribute("data-math", text)
-					mathWrapper.append(math)
-					propEl?.append(mathWrapper)
-				}
+		if (plugin.settings.enableColoredProperties) {
+			if (text) {
+				text = text.slice(0, 200).trim()
 			}
-			
-
-
-		} else {
-			
-			existingMathWrapper?.remove()
-            propEl?.classList.remove("has-math")
-
-			if (plugin.settings.enableColoredProperties) {
-				if (text) {
-					text = text.slice(0, 200).trim()
-				}
-				setPillStyles(pill, "data-property-longtext-value", text, "longtext", plugin)
-			}
+			setPillStyles(pill, "data-property-longtext-value", text, "longtext", plugin)
 		}
 
 	}

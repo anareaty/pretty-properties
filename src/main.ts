@@ -22,7 +22,7 @@ import { getPropertyValue } from "./utils/propertyUtils";
 import { registerTagFixExtension } from "./extensions/tagFixExtension";
 import { updatePillPaddings } from "./utils/updates/updateStyles";
 import { registerTagPostProcessor } from "./extensions/tagPostProcessor";
-import { updateHiddenPropertiesInPropTab, updateBaseTagsStyle } from "./utils/updates/updateStyles";
+import { updateHiddenPropertiesInPropTab } from "./utils/updates/updateStyles";
 import { patchPropertyWidgets } from "./patches/patchWidgets";
 import { patchTagView } from "./patches/patchTagView";
 import { patchMarkdownView } from "./patches/patchMarkdownView";
@@ -88,7 +88,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		updateAutoHideProps(this)
 		updateHidePropTitle(this)
 		updateHideMetadataAddButton(this)
-		updateBaseTagsStyle(this)
+		//updateBaseTagsStyle(this)
 		
 		updateTheme(this)
 

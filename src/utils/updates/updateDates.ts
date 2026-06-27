@@ -25,7 +25,7 @@ export const updateDateInput = (input: HTMLInputElement, plugin: PrettyPropertie
 
 	if (!propName) return
 
-	let propertyFormatObj = getPropertyFormatObj(propName, plugin)
+	let propertyFormatObj = getPropertyFormatObj(propName, value, plugin)
 
 
 

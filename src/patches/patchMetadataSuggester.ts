@@ -31,6 +31,9 @@ export const patchMetadataSuggester = (plugin: PrettyPropertiesPlugin) => {
 
                 if (type) {
                   for (let suggestEl of elements) {
+
+
+                    
                     let text = suggestEl.innerText
 
                     if (type == "tags") {

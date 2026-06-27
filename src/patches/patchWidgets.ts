@@ -131,7 +131,7 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
         let input = el.querySelector("input");
 
         if (input) {
-          let propertyFormatObj = getPropertyFormatObj(propName, plugin)
+          let propertyFormatObj = getPropertyFormatObj(propName, input.value, plugin)
           updatePropertyFormatting(parent, propName, input.value, type, propertyFormatObj.format, propertyFormatObj.textFormat, plugin)
 
           if (input.value === "") {

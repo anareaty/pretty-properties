@@ -7,6 +7,8 @@ import { showColoredTagsSettings } from './coloredTagsSettings';
 import { showColoredTextSettings } from './coloredTextSettings';
 import { updateTagPaneTagsAll } from 'src/utils/updates/updatePills';
 import { setColorMenuItems } from 'src/menus/selectColorMenus';
+import { updateColoredTagsStyle } from 'src/utils/updates/updateStyles';
+
 
 
 
@@ -34,6 +36,7 @@ export const showColorSettings = (settingTab: PPSettingTab) => {
         .onChange(async (value) => {
             plugin.settings.enableColoredInlineTags = value
             await plugin.saveSettings()
+            updateColoredTagsStyle(plugin)
             updateAllProperties(plugin)
         })
     });

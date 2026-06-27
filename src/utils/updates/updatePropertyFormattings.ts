@@ -57,9 +57,12 @@ export const updatePropertyFormatting = (
     propValueEl.before(overlayElement)
 
     let formattedValue = computeFormattedValue(plugin, propName, propertyFormat, value)
+
     setOverlayContent(formattedValue, propertyTextFormat, overlayElement, el, plugin)
 
     el.classList.add("has-property-formatting")
+
+    return overlayElement
 }
 
 
@@ -72,6 +75,11 @@ export const computeFormattedValue = (
     currentValue: string | null 
 ): string =>  {
     const rawText = currentValue || ""
+
+    if (propertyFormat == "{{propertyValue}}") {
+        return rawText;
+    }
+
     try {
         return plugin.formatter.format(propertyName, rawText, propertyFormat);
     } catch {
@@ -113,15 +121,29 @@ const getCurrentPropertyElValue = (propValueEl: HTMLElement, type: string) => {
 
 
 
-export const getPropertyFormatObj = (propName: string, plugin: PrettyPropertiesPlugin) => {
+export const getPropertyFormatObj = (propName: string, text: string, plugin: PrettyPropertiesPlugin) => {
     let propertyFormatObj = plugin.settings.propertyFormats[propName]
     let propertyFormat = propertyFormatObj?.format
     let propertyTextFormat = propertyFormatObj?.textFormat || "raw"
+
+    // Always render as markdown if text is formatted as MathJax
+    if (plugin.settings.enableMath) {
+        let match = text?.match(/^(\$\$)(.+)(\$\$)$/)
+        if (!match) {
+            match = text?.match(/^(\$)(.+)(\$)$/)
+        }
+
+        if (match) {
+            propertyTextFormat = "markdown"
+        }
+    }
 
     // We need to create overlay even for empty format if property is set to render as Markdown
     if (!propertyFormat && propertyTextFormat == "markdown") {
       propertyFormat = "{{propertyValue}}"
     }
+
+    
 
     return {
         format: propertyFormat,

@@ -258,12 +258,14 @@ export const updateImagesInPopover = (popover: HoverPopover, plugin: PrettyPrope
 
             
 
-            if (frontmatter && hasCover  && plugin.settings.enableCover && plugin.settings.enableCoversInPopover) {
+            if (frontmatter && hasCover && plugin.settings.enableCover && plugin.settings.enableCoversInPopover) {
                 
                 void renderCover(popover, contentEl, frontmatter, sourcePath, plugin);
             } else {    
                 let oldCoverDiv = contentEl?.querySelector(".pp-cover");
                 oldCoverDiv?.remove();
+                const mdContainer = contentEl.querySelector(".metadata-container");
+                mdContainer?.classList.remove("has-cover")
             }
             if (frontmatter && getNestedProperty(frontmatter, plugin.settings.iconProperty)  && plugin.settings.enableIcon && plugin.settings.enableIconsInPopover) {
                 renderIcon(contentEl, frontmatter, sourcePath, popover, plugin);
@@ -332,6 +334,8 @@ export const updateImagesForView = (view: MarkdownView, plugin: PrettyProperties
         } else {    
             let oldCoverDiv = contentEl?.querySelector(".pp-cover");
             oldCoverDiv?.remove();
+            const mdContainer = contentEl.querySelector(".metadata-container");
+            mdContainer?.classList.remove("has-cover")
         }
         if (frontmatter && getNestedProperty(frontmatter, plugin.settings.iconProperty)  && plugin.settings.enableIcon) {
             renderIcon(contentEl, frontmatter, sourcePath, view, plugin);
@@ -401,6 +405,8 @@ export const updateImagesOnCacheChanged = (file: TFile, cache: CachedMetadata, p
         } else {
           let oldCoverDiv = contentEl?.querySelector(".pp-cover");
           oldCoverDiv?.remove();
+          const mdContainer = contentEl.querySelector(".metadata-container");
+          mdContainer?.classList.remove("has-cover")
         }
         if (frontmatter && getNestedProperty(frontmatter, plugin.settings.iconProperty)  && plugin.settings.enableIcon) {
           renderIcon(contentEl, frontmatter, sourcePath, view, plugin);

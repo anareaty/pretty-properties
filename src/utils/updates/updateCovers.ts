@@ -29,8 +29,12 @@ export const renderCover = async (
 ) => {
 
 	const mdContainer = contentEl.querySelector(".metadata-container");
+	
 	if (!(mdContainer?.instanceOf(HTMLElement))) return;
-	let coverDiv: HTMLDivElement | undefined;
+
+	mdContainer.classList.remove("has-cover")
+
+	let coverDiv: HTMLElement | undefined;
 
 	if (plugin.settings.enableCover) {
 		let coverVal = ""
@@ -61,7 +65,7 @@ export const renderCover = async (
 			if (contentEl.classList.contains("canvas-node-content")) {
 				coverDiv.classList.add("pp-canvas-cover")
 			}
-			applyCoverCssClasses(frontmatter, coverDiv, plugin);
+			applyCoverCssClasses(frontmatter, coverDiv, mdContainer, plugin);
 		}
 	}
 
@@ -77,7 +81,15 @@ export const renderCover = async (
 		}
 	} else {
 		if (oldCoverDiv) oldCoverDiv.remove();
+		
 	}
+
+
+
+
+
+
+	
 };
 
 
@@ -88,22 +100,63 @@ export const renderCover = async (
 const  applyCoverCssClasses = (
 	frontmatter: FrontMatterCache,
 	coverDiv: HTMLElement,
+	mdContainer: HTMLElement,
 	plugin: PrettyPropertiesPlugin
 ) => {
+
+	mdContainer.classList.add("has-cover")
+
+	let oldClasses = [
+		"left", 
+		"right", 
+		"top", 
+		"bottom",
+		"initial",
+		"initial-2",
+		"initial-3",
+		"vertical-cover",
+		"vertical-contain",
+		"horizontal-cover",
+		"horizontal-contain",
+		"square",
+		"circle"
+	]
+
+	for (let cls of oldClasses) {
+		mdContainer.classList.remove(cls)
+	}
+
+
 	let coverShapeVal = getNestedProperty(frontmatter, plugin.settings.coverShapeProperty)
 
-	if (coverShapeVal && typeof coverShapeVal == "string")
+	if (coverShapeVal && typeof coverShapeVal == "string") {
 		coverDiv.classList.add(coverShapeVal);
-	else
+		mdContainer.classList.add(coverShapeVal);
+	}
+		
+	else {
 		coverDiv.classList.add("initial");
+		mdContainer.classList.add("initial");
+	}
+		
 
 	let coverPositionVal = getNestedProperty(frontmatter, plugin.settings.coverPositionProperty)
 
-	if (coverPositionVal && typeof coverPositionVal == "string")
+	if (coverPositionVal && typeof coverPositionVal == "string") {
 		coverDiv.classList.add(coverPositionVal);
-	else
+		mdContainer.classList.add(coverPositionVal);
+	}
+		
+	else {
 		coverDiv.classList.add(plugin.settings.coverPosition)
+		mdContainer.classList.add(plugin.settings.coverPosition)
+	}
+		
 }
+
+
+
+
 
 
 
