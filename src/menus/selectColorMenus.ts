@@ -30,6 +30,9 @@ export const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string
     let pillColorSettings: PillColorSettings | undefined
     let savedColor: string | HSL | undefined
 
+
+
+    
     if (
         colorList == "propertyPillColors" ||
         colorList == "propertyLongtextColors" ||
@@ -44,6 +47,11 @@ export const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string
     ) {
         pillColorSettings = plugin.settings[colorList][pillVal]
     }
+
+
+
+
+
 
     if (pillColorSettings && (colorType == "pillColor" || colorType == "textColor")) {
         savedColor = pillColorSettings[colorType]
@@ -70,13 +78,31 @@ export const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string
                     if (color == "default") {						
                         delete pillColorSettings?.[colorType]
                     } else {   
+
                         if (!pillColorSettings) {
                             pillColorSettings = {
                                 pillColor: "default",
                                 textColor: "default"
                             }
                         }
-                        pillColorSettings[colorType] = color;    
+                        pillColorSettings[colorType] = color;  
+                        
+                        if (
+                            colorList == "propertyPillColors" ||
+                            colorList == "propertyLongtextColors" ||
+                            colorList == "tagColors"
+                        ) {
+                            plugin.settings[colorList][pillVal] = pillColorSettings
+                        }
+
+                        else if (
+                            colorList == "dateColors" && 
+                            (pillVal == "future" || pillVal == "present" || pillVal == "past")
+                        ) {
+                            plugin.settings[colorList][pillVal] = pillColorSettings
+                        }
+
+                        
                     }
                 }
 

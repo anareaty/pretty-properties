@@ -11,6 +11,7 @@ import { handleIconMenu } from "src/menus/iconMenu";
 
 
 
+
 export const patchMenu = (plugin: PrettyPropertiesPlugin) => {
   plugin.patches.uninstallPPMenuPatch = around(Menu.prototype, {
     showAtMouseEvent(old) {
@@ -21,6 +22,9 @@ export const patchMenu = (plugin: PrettyPropertiesPlugin) => {
         let target = e.target
         
         if (target instanceof Element) {
+
+
+    
 
 
             // Tag menu
@@ -86,7 +90,37 @@ export const patchMenu = (plugin: PrettyPropertiesPlugin) => {
       })
     }
   })
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

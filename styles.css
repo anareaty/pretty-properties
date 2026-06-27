@@ -1149,10 +1149,27 @@ height: 100% !important;
 
 
 
+.bases-table-cell, .metadata-container {
+  --tag-padding-y: 0;
+}
 
 
 
 
+.metadata-property-value[data-property-type="tags"] .multi-select-pill {
+    line-height: unset;
+}
+
+.value-list-container {
+    display: inline-flex;
+    vertical-align: top;
+    flex-wrap: wrap;
+    gap: var(--size-2-3) 0;
+}
+
+.value-list-gap {
+  width: 6px;
+}
 
 
 
@@ -1503,7 +1520,8 @@ body {
 
 .metadata-input-longtext.colored:not(:hover, :focus),
 .bases-cards-line.colored,
-.bases-rendered-value.colored {
+.bases-rendered-value.colored, 
+.suggestion-item.colored {
   background-color: var(--pp-bg);
   color: var(--pp-color)
 }
@@ -1912,3 +1930,23 @@ button.bare-button {
   box-shadow: none;
   background-color: transparent;
 }
+
+
+.multi-suggest-item {
+  border-radius: var(--tag-radius);
+}
+
+
+
+.multi-suggest-item,
+.longtext-suggest-item {
+  padding: 3px var(--tag-padding-x) !important;
+  margin: 4px 0;
+  width: fit-content;
+}
+
+.metadata-multi-suggestion,
+.metadata-longtext-suggestion {
+  padding: 2px 6px
+}
+

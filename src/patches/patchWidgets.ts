@@ -60,9 +60,8 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
 
 
 
-
-
     if (type == "tags") {
+
       let renderedTyped = rendered as TagsPropertyWidgetComponent
       let elements = renderedTyped?.multiselect.elements
       if (elements.length == 0) {
@@ -72,6 +71,9 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
       }
 
       for (let element of elements) {
+
+        
+        
         updateTagPill(element, plugin)
       }
     }
@@ -267,9 +269,14 @@ export const patchPropertyWidgets = (plugin: PrettyPropertiesPlugin) => {
       if (!widget) continue
 
 
+      
+
+
       plugin.patches.uninstallWidgetPatch[type] = around(widget, {
 
         render(oldRender) {
+
+          
 
 
 
@@ -277,15 +284,17 @@ export const patchPropertyWidgets = (plugin: PrettyPropertiesPlugin) => {
 
             let rendered = oldRender && oldRender.apply(this, args)
 
+          
+
             let widgetArgs = args as WidgetArgs
 
             updateWidgets(type, rendered, widgetArgs, plugin)
 
-            if (rendered.type == "multitext") {
+
+            if (type == "multitext" || type == "tags" || type == "aliases") {
               let multiRendered = rendered as MultitextPropertyWidgetComponent
 
               let renderValues = multiRendered.multiselect.renderValues
-
                 multiRendered.multiselect.renderValues = new Proxy(renderValues, {
                   apply(renderValues, thisArg2) {
                     renderValues.call(thisArg2)
@@ -293,6 +302,15 @@ export const patchPropertyWidgets = (plugin: PrettyPropertiesPlugin) => {
                     return undefined
                   }
                 })
+
+
+
+                
+                
+                  
+
+
+
             }
 
             

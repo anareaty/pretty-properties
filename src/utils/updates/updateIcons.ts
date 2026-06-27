@@ -200,7 +200,7 @@ export const getIconImage = async (iconVal: string, sourcePath: string, componen
         let iconLink = iconVal;
         let imageEl = await renderImageFromValue(iconLink, "icon", sourcePath, component, plugin)
 
-        console.log(imageEl)
+        
 
         if (imageEl) {
             return imageEl

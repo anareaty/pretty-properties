@@ -38,6 +38,7 @@ import { patchMenu } from "./patches/patchMenu";
 import { reloadAllTabs } from "./utils/reload";
 import { patchEmbed } from "./patches/patchEmbed";
 import { GlobalSearchPluginInstance } from "@obsidian-typings/obsidian-public-latest";
+import { patchMetadataSuggester } from "./patches/patchMetadataSuggester";
 
 type Patch = () => void
 type PatchList = Record<string, Patch>
@@ -71,6 +72,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		patchBaseCards(this)
 		patchBaseList(this)
 		patchMenu(this)
+		patchMetadataSuggester(this)
 
 
 		
