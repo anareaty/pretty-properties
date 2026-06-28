@@ -2,7 +2,7 @@ import {i18n} from "../localization/localization";
 import {TextAreaComponent} from "obsidian";
 import PrettyPropertiesPlugin from "../main";
 import { registerPropertyFormatter } from "./propertyFormatter";
-import { updateLongTexts } from "./updates/updatePills";
+import { updateLongTexts } from "../updates/updatePills";
 
 export function enhanceFormatTextArea(
 	plugin: PrettyPropertiesPlugin,
@@ -37,7 +37,6 @@ export function enhanceFormatTextArea(
 		} else {
 			textareaEl.removeClass("pp-format-invalid");
 			errorEl.textContent = "";
-			
 		}
 	};
 

@@ -1,8 +1,8 @@
 import { Menu, MenuItem } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { i18n } from "src/localization/localization";
-import { updateHiddenProperties } from "src/utils/updates/updateHiddenProperties";
-import { updateAllProperties } from "src/utils/updates/updateElements";
+import { updateHiddenProperties } from "src/updates/updateHiddenProperties";
+import { updateAllProperties } from "src/updates/updateElements";
 import { getPropertyType } from "src/utils/propertyUtils";
 
 

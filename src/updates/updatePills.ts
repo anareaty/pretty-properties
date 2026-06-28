@@ -2,7 +2,7 @@ import PrettyPropertiesPlugin from "src/main";
 import { createColorButton } from "src/menus/selectColorMenus";
 import { HSL } from "obsidian"
 import { hideMetadataContainerIfAllPropertiesHidden } from "./updateHiddenProperties";
-import { querySelectorsWithIframesForContainer } from "../querySelectorsHelper";
+import { querySelectorsWithIframesForContainer } from "../utils/querySelectorsHelper";
 import { getPropertyFormatObj, updatePropertyFormatting } from "./updatePropertyFormattings";
 
 

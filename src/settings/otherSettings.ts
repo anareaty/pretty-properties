@@ -1,9 +1,9 @@
 import { Setting, Notice, Platform, Modal } from 'obsidian';
 import { i18n } from 'src/localization/localization';
 import { DEFAULT_SETTINGS, PPSettingTab } from 'src/settings/settings';
-import { updateAutoHideProps, updateBannerStyles, updateCoverStyles, updateHiddenEmptyProperties, updateHiddenMetadataContainer, updateHiddenPropertiesInPropTab, updateHideMetadataAddButton, updateHidePropTitle, updateIconStyles, updatePillPaddings, updateRelativeDateColors } from 'src/utils/updates/updateStyles';
-import { updateAllProperties } from 'src/utils/updates/updateElements';
-import { updateLongTexts } from 'src/utils/updates/updatePills';
+import { updateAutoHideProps, updateBannerStyles, updateCoverStyles, updateHiddenEmptyProperties, updateHiddenMetadataContainer, updateHiddenPropertiesInPropTab, updateHideMetadataAddButton, updateHidePropTitle, updateIconStyles, updatePillPaddings, updateRelativeDateColors } from 'src/updates/updateStyles';
+import { updateAllProperties } from 'src/updates/updateElements';
+import { updateLongTexts } from 'src/updates/updatePills';
 
 
 

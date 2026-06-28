@@ -1,5 +1,5 @@
 import PrettyPropertiesPlugin from "src/main"
-import { updateImagesInPopover } from "src/utils/updates/updateElements"
+import { updateImagesInPopover } from "src/updates/updateElements"
 import { around, dedupe } from "monkey-around";
 import { HoverPopover } from "obsidian";
 import { EmbeddedEditorView } from "@obsidian-typings/obsidian-public-latest";

@@ -1,5 +1,5 @@
 import PrettyPropertiesPlugin from "src/main"
-import { updateTagPaneTags } from "src/utils/updates/updatePills"
+import { updateTagPaneTags } from "src/updates/updatePills"
 import { around, dedupe } from "monkey-around";
 import { TagView } from "@obsidian-typings/obsidian-public-latest";
 

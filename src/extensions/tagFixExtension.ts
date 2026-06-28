@@ -13,7 +13,7 @@ ViewUpdate
 import { LezerTree, SyntaxNode } from '@obsidian-typings/obsidian-public-latest';
 import { editorLivePreviewField } from 'obsidian';
 import PrettyPropertiesPlugin from 'src/main';
-import { generateInlineStyles } from 'src/utils/updates/updatePills';
+import { generateInlineStyles } from 'src/updates/updatePills';
 
 
 interface Tree extends LezerTree {

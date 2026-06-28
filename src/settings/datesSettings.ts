@@ -2,7 +2,7 @@ import { Setting, Menu, moment  } from 'obsidian';
 import { i18n } from 'src/localization/localization';
 import { PPSettingTab } from 'src/settings/settings';
 import { setColorMenuItems } from 'src/menus/selectColorMenus';
-import { updateAllProperties } from 'src/utils/updates/updateElements';
+import { updateAllProperties } from 'src/updates/updateElements';
 
 
 

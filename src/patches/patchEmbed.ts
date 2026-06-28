@@ -1,6 +1,6 @@
 import PrettyPropertiesPlugin from "src/main"
 import { around, dedupe } from "monkey-around";
-import { updateCoverForView } from "src/utils/updates/updateCovers";
+import { updateCoverForView } from "src/updates/updateCovers";
 import { MarkdownPreviewView } from "obsidian";
 import { EmbedMarkdownComponent, ReadViewRenderer } from "@obsidian-typings/obsidian-public-latest";
 import { TFile } from "obsidian";

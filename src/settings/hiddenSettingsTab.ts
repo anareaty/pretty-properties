@@ -8,7 +8,7 @@ import {
     updateHiddenPropertiesInPropTab, 
     updateHideMetadataAddButton, 
     updateHidePropTitle 
-} from 'src/utils/updates/updateStyles';
+} from 'src/updates/updateStyles';
 import { showHiddenEmptySettings, showHiddenSettings } from './hiddenSettings';
 
 

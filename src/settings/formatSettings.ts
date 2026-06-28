@@ -1,6 +1,6 @@
 import { Setting } from 'obsidian';
 import { i18n } from 'src/localization/localization';
-import { updateAllProperties } from 'src/utils/updates/updateElements';
+import { updateAllProperties } from 'src/updates/updateElements';
 import { PPSettingTab } from 'src/settings/settings';
 import {PropertyNameSuggest} from "../utils/propertyNameSuggester";
 import {enhanceFormatTextArea} from "../utils/settingsHelper";

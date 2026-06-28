@@ -1,7 +1,7 @@
 import { Setting, TextComponent } from 'obsidian';
 import { i18n } from 'src/localization/localization';
 import { PPSettingTab } from 'src/settings/settings';
-import { updateHiddenProperties } from 'src/utils/updates/updateHiddenProperties';
+import { updateHiddenProperties } from 'src/updates/updateHiddenProperties';
 
 
 export const showHiddenSettings = (settingTab: PPSettingTab) => {

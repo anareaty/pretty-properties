@@ -1,5 +1,5 @@
 import PrettyPropertiesPlugin from "src/main"
-import { setPillStyles } from "src/utils/updates/updatePills";
+import { setPillStyles } from "src/updates/updatePills";
 
 
 export const registerTagPostProcessor = (plugin: PrettyPropertiesPlugin) => {

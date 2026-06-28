@@ -1,7 +1,7 @@
 import { CachedMetadata, setTooltip, TFile } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
-import { getNestedProperty } from "../propertyUtils";
-import { querySelectorsWithIframes } from "../querySelectorsHelper";
+import { getNestedProperty } from "../utils/propertyUtils";
+import { querySelectorsWithIframes } from "../utils/querySelectorsHelper";
 
 
 export const updateProgress = (propertyEl: HTMLElement, plugin: PrettyPropertiesPlugin, sourcePath?: string) => {

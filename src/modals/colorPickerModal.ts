@@ -1,8 +1,8 @@
 import { Modal, App, Setting } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { PillColorSettings } from "src/settings/settings";
-import { updateAllProperties } from "src/utils/updates/updateElements";
-import { updateRelativeDateColors } from "src/utils/updates/updateStyles";
+import { updateAllProperties } from "src/updates/updateElements";
+import { updateRelativeDateColors } from "src/updates/updateStyles";
 
 
 export class ColorPickerModal extends Modal {

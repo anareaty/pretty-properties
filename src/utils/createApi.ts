@@ -1,6 +1,6 @@
 import PrettyPropertiesPlugin from "src/main"
 import { getPropertyType } from "./propertyUtils"
-import { getTextLightness } from "./updates/updatePills";
+import { getTextLightness } from "../updates/updatePills";
 
 declare global {
     interface Window { PrettyPropertiesApi: API; }

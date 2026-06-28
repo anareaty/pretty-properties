@@ -50,7 +50,6 @@ import vi from 'dayjs/locale/vi'
 import zh from 'dayjs/locale/zh'
 import zhTW from 'dayjs/locale/zh-tw'
 
-
 import * as hb from "src/utils/handlebars_moment.cjs"
 
 //@ts-expect-error, no typings
@@ -92,68 +91,53 @@ export class PropertyFormatter {
 	}
 
 	private registerCustomHelpers() {
-
-
-
-		
-		
-		
-		
-
 		let locale: string
 		if (getLanguage) locale = getLanguage();
 		else locale = window.localStorage.language as string
-
 
 		if (locale && locales[locale]) {
 			dayjs.locale(locale)
 		}
 
-
 		dayjs.extend(durationPlugin);
 		dayjs.extend(relativeTimePlugin);
 		dayjs.extend(utcPlugin);
 
-		this.handlebars.registerHelper("durationHumanized", (time: number, unit: DurationUnitType | undefined, withSuffixOrOptions?: boolean | Handlebars.HelperOptions) => {
+		this.handlebars.registerHelper("durationHumanized", (
+			time: number, 
+			unit: DurationUnitType | undefined, 
+			withSuffixOrOptions?: boolean | Handlebars.HelperOptions
+		) => {
 			const withSuffix = typeof withSuffixOrOptions === "boolean" ? withSuffixOrOptions : false;
 			return dayjs.duration(time, unit).humanize(withSuffix);
 		});
-		this.handlebars.registerHelper("durationFormatted", (time: number, unit: DurationUnitType | undefined, formatOrOptions?: string | Handlebars.HelperOptions) => {
+
+		this.handlebars.registerHelper("durationFormatted", (
+			time: number, 
+			unit: DurationUnitType | undefined, 
+			formatOrOptions?: string | Handlebars.HelperOptions
+		) => {
 			const format = typeof formatOrOptions === "string" ? formatOrOptions : "HH:mm:ss";
 			return dayjs.duration(time, unit).format(format);
 		});
 
-		this.handlebars.registerHelper(
-			"durationAbbreviated",
-			(time: number, unit: DurationUnitType | undefined) => {
-				const duration = dayjs.duration(time, unit);
-
-				const parts: string[] = [];
-				if (duration.years() > 0) parts.push(`${duration.years()}y`);
-				if (duration.months() > 0) parts.push(`${duration.months()}mo`);
-				if (duration.weeks() > 0) parts.push(`${duration.weeks()}w`);
-				if (duration.days() > 0) parts.push(`${duration.days()}d`);
-				if (duration.hours() > 0) parts.push(`${duration.hours()}h`);
-				if (duration.minutes() > 0) parts.push(`${duration.minutes()}m`);
-				if (duration.seconds() > 0) parts.push(`${duration.seconds()}s`);
-				if (duration.milliseconds() > 0 || parts.length === 0) parts.push(`${duration.milliseconds()}ms`);
-
-				return parts.join(" ");
-			}
-		);
-
-
-
-
-
-
-
-
+		this.handlebars.registerHelper("durationAbbreviated", (
+			time: number, 
+			unit: DurationUnitType | undefined
+		) => {
+			const duration = dayjs.duration(time, unit);
+			const parts: string[] = [];
+			if (duration.years() > 0) parts.push(`${duration.years()}y`);
+			if (duration.months() > 0) parts.push(`${duration.months()}mo`);
+			if (duration.weeks() > 0) parts.push(`${duration.weeks()}w`);
+			if (duration.days() > 0) parts.push(`${duration.days()}d`);
+			if (duration.hours() > 0) parts.push(`${duration.hours()}h`);
+			if (duration.minutes() > 0) parts.push(`${duration.minutes()}m`);
+			if (duration.seconds() > 0) parts.push(`${duration.seconds()}s`);
+			if (duration.milliseconds() > 0 || parts.length === 0) parts.push(`${duration.milliseconds()}ms`);
+			return parts.join(" ");
+		});
 	}
-
-
-
-
 
 
 	format(
@@ -161,9 +145,7 @@ export class PropertyFormatter {
 		propertyValue: unknown,
 		formatTemplate: string
 	): string {
-
 		const compiled = this.getOrCompile(formatTemplate);
-
 		return compiled({propertyName, propertyValue});
 	}
 
@@ -172,21 +154,10 @@ export class PropertyFormatter {
 	}
 
 	private getOrCompile(formatTemplate: string): Handlebars.TemplateDelegate {
-		
 		const cached = this.compiledCache.get(formatTemplate);
-		
-		if (cached)
-			return cached;
-
-		
+		if (cached) return cached;
 		const compiled = this.handlebars.compile(formatTemplate, {noEscape: false});
-
-		
 		this.compiledCache.set(formatTemplate, compiled);
-
-		
-
-		
 		return compiled;
 	}
 

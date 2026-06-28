@@ -1,7 +1,7 @@
 import { MarkdownView, FrontMatterCache, Component } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
-import { getNestedProperty } from "../propertyUtils";
-import { renderImageFromValue } from "../imageUtils";
+import { getNestedProperty } from "../utils/propertyUtils";
+import { renderImageFromValue } from "../utils/imageUtils";
 
 
 export const renderBanner = async (

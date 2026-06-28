@@ -1135,12 +1135,14 @@ button.pp-settings-tab:not(.pp-settings-tab-selected):hover {
     line-height: unset;
 }
 
-.value-list-container {
+
+.bases-table-container.mod-multiline .value-list-container {
     display: inline-flex;
-    vertical-align: top;
+    align-self: flex-start;
     flex-wrap: wrap;
     gap: var(--size-2-3) 0;
 }
+
 
 .value-list-gap {
   width: 6px;

@@ -1,10 +1,10 @@
 import PrettyPropertiesPlugin from "src/main"
-import { updateImagesForView } from "src/utils/updates/updateElements"
+import { updateImagesForView } from "src/updates/updateElements"
 import { around, dedupe } from "monkey-around";
 import { MarkdownView } from "obsidian";
-import { renderTitleIcon } from "src/utils/updates/updateIcons";
-import { updateAllMetadataContainers } from "src/utils/updates/updateHiddenProperties";
-import { updateCoverForView } from "src/utils/updates/updateCovers";
+import { renderTitleIcon } from "src/updates/updateIcons";
+import { updateAllMetadataContainers } from "src/updates/updateHiddenProperties";
+import { updateCoverForView } from "src/updates/updateCovers";
 import { ReadViewRenderer } from "@obsidian-typings/obsidian-public-latest";
 
 

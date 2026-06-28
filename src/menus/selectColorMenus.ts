@@ -2,8 +2,8 @@ import { HSL, Menu, MenuItem, setIcon } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { i18n } from "src/localization/localization";
 import { ColorPickerModal } from "src/modals/colorPickerModal";
-import { updateRelativeDateColors } from "src/utils/updates/updateStyles";
-import { updateAllProperties } from "src/utils/updates/updateElements";
+import { updateRelativeDateColors } from "src/updates/updateStyles";
+import { updateAllProperties } from "src/updates/updateElements";
 import { PillColorSettings } from "src/settings/settings";
 
 

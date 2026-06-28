@@ -1,6 +1,6 @@
 import PrettyPropertiesPlugin from "src/main";
-import { updateDateInput, updateDateTimeInput } from "src/utils/updates/updateDates";
-import { updateCardLongtext, updateValueListElement } from "src/utils/updates/updatePills";
+import { updateDateInput, updateDateTimeInput } from "src/updates/updateDates";
+import { updateCardLongtext, updateValueListElement } from "src/updates/updatePills";
 import { around, dedupe } from "monkey-around";
 import { BasesPluginInstance } from "@obsidian-typings/obsidian-public-latest";
 import { BasesEntry, BasesView, BasesViewRegistration } from "obsidian";

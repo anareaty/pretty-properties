@@ -3,9 +3,9 @@ import { i18n } from 'src/localization/localization';
 import { 
 	updateBannerStyles,  
 	updateIconStyles
-} from 'src/utils/updates/updateStyles';
+} from 'src/updates/updateStyles';
 import { PPSettingTab } from 'src/settings/settings';
-import { updateAllBanners } from 'src/utils/updates/updateBanners';
+import { updateAllBanners } from 'src/updates/updateBanners';
 
 
 

@@ -1,11 +1,11 @@
 
 import PrettyPropertiesPlugin from "src/main"
-import { updateLongtext, updateMultiselectPill, updateTagPill } from "src/utils/updates/updatePills"
-import { updateDateInput, updateDateTimeInput } from "src/utils/updates/updateDates"
-import { updateProgress } from "src/utils/updates/updateProgress"
+import { updateLongtext, updateMultiselectPill, updateTagPill } from "src/updates/updatePills"
+import { updateDateInput, updateDateTimeInput } from "src/updates/updateDates"
+import { updateProgress } from "src/updates/updateProgress"
 import { around, dedupe } from "monkey-around";
-import { updateAllMetadataContainers } from "src/utils/updates/updateHiddenProperties";
-import { getPropertyFormatObj, updatePropertyFormatting } from "src/utils/updates/updatePropertyFormattings";
+import { updateAllMetadataContainers } from "src/updates/updateHiddenProperties";
+import { getPropertyFormatObj, updatePropertyFormatting } from "src/updates/updatePropertyFormattings";
 import { AliasesPropertyWidgetComponent, MultitextPropertyWidgetComponent, PropertyWidgetComponentBase, TagsPropertyWidgetComponent, TypeInfo } from "@obsidian-typings/obsidian-public-latest";
 
 

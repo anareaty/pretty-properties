@@ -5,9 +5,9 @@ import { renderCover, updateCoverForView } from "./updateCovers";
 import { renderIcon, updateIconForView } from "./updateIcons";
 import { updateSettingPills, updateTagPaneTagsAll } from "./updatePills";
 import { renderBanner, updateBannerForView } from "./updateBanners";
-import { getNestedProperty } from "../propertyUtils";
+import { getNestedProperty } from "../utils/propertyUtils";
 import { updateAllMetadataContainers } from "./updateHiddenProperties";
-import { querySelectorsWithIframes } from "../querySelectorsHelper";
+import { querySelectorsWithIframes } from "../utils/querySelectorsHelper";
 import { processTagsInPreviewElement } from "src/extensions/tagPostProcessor";
 import { updateWidgets } from "src/patches/patchWidgets";
 import { CardsBasesView, processBaseCardProperties } from "src/patches/patchBaseCards";
@@ -24,6 +24,7 @@ import { AliasesPropertyWidgetComponent,
     TextPropertyWidgetComponent 
 } from "@obsidian-typings/obsidian-public-latest";
 import { updateTags } from "src/extensions/tagFixExtension";
+import { updateColoredTagsStyle } from "./updateStyles";
 
 
 interface Popover extends HoverPopover {
@@ -196,6 +197,7 @@ export const updateAllProperties = (plugin:PrettyPropertiesPlugin) => {
     }
 
     updateTagPaneTagsAll(plugin)
+    
     updateSettingPills(plugin)
     updateAllMetadataContainers(plugin)
 }

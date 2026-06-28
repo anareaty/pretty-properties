@@ -5,6 +5,7 @@ import {
 import { 
 	updateAutoHideProps,
 	updateBannerStyles, 
+	updateColoredTagsStyle, 
 	updateCoverStyles, 
 	updateHiddenEmptyProperties, 
 	updateHiddenMetadataContainer, 
@@ -13,21 +14,21 @@ import {
 	updateIconStyles,
 	updateRelativeDateColors,
 	updateTheme,
-} from "./utils/updates/updateStyles";
+} from "./updates/updateStyles";
 import { i18n } from "./localization/localization";
 import { PPSettingTab, PPPluginSettings, DEFAULT_SETTINGS } from "./settings/settings";
 import { registerCommands } from "./utils/registerCommands";
-import { updateEmptyProperties, updateImagesOnCacheChanged } from "./utils/updates/updateElements";
+import { updateEmptyProperties, updateImagesOnCacheChanged } from "./updates/updateElements";
 import { getPropertyValue } from "./utils/propertyUtils";
 import { registerTagFixExtension } from "./extensions/tagFixExtension";
-import { updatePillPaddings } from "./utils/updates/updateStyles";
+import { updatePillPaddings } from "./updates/updateStyles";
 import { registerTagPostProcessor } from "./extensions/tagPostProcessor";
-import { updateHiddenPropertiesInPropTab } from "./utils/updates/updateStyles";
+import { updateHiddenPropertiesInPropTab } from "./updates/updateStyles";
 import { patchPropertyWidgets } from "./patches/patchWidgets";
 import { patchTagView } from "./patches/patchTagView";
 import { patchMarkdownView } from "./patches/patchMarkdownView";
 import { patchBaseCards } from "./patches/patchBaseCards";
-import { updateAllProgressElsOnMaxChange } from "./utils/updates/updateProgress";
+import { updateAllProgressElsOnMaxChange } from "./updates/updateProgress";
 import { patchBaseList } from "./patches/patchBaseList";
 import { patchBaseTable } from "./patches/patchBaseTable";
 import { unPatchWidgets } from "./patches/removePatches";
@@ -88,6 +89,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		updateAutoHideProps(this)
 		updateHidePropTitle(this)
 		updateHideMetadataAddButton(this)
+		updateColoredTagsStyle(this)
 		//updateBaseTagsStyle(this)
 		
 		updateTheme(this)

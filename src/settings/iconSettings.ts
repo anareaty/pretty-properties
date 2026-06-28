@@ -2,9 +2,9 @@ import { Setting } from 'obsidian';
 import { i18n } from 'src/localization/localization';
 import {   
 	updateIconStyles
-} from 'src/utils/updates/updateStyles';
+} from 'src/updates/updateStyles';
 import { PPSettingTab } from 'src/settings/settings';
-import { updateAllIcons } from 'src/utils/updates/updateIcons';
+import { updateAllIcons } from 'src/updates/updateIcons';
 
 
 

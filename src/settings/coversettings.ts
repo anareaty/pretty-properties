@@ -2,9 +2,9 @@ import { Setting } from 'obsidian';
 import { i18n } from 'src/localization/localization';
 import {   
     updateCoverStyles
-} from 'src/utils/updates/updateStyles';
+} from 'src/updates/updateStyles';
 import { PPSettingTab } from 'src/settings/settings';
-import { updateAllCovers } from 'src/utils/updates/updateCovers';
+import { updateAllCovers } from 'src/updates/updateCovers';
 import {PropertyNameSuggest} from "../utils/propertyNameSuggester";
 import {enhanceFormatTextArea} from "../utils/settingsHelper";
 

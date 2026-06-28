@@ -1,13 +1,13 @@
 import { Menu, Setting, moment } from 'obsidian';
 import { i18n } from 'src/localization/localization';
-import { updateAllProperties } from 'src/utils/updates/updateElements';
+import { updateAllProperties } from 'src/updates/updateElements';
 import { PPSettingTab } from 'src/settings/settings';
 import { showColoredListSettings } from './coloredListSettings';
 import { showColoredTagsSettings } from './coloredTagsSettings';
 import { showColoredTextSettings } from './coloredTextSettings';
-import { updateTagPaneTagsAll } from 'src/utils/updates/updatePills';
+import { updateTagPaneTagsAll } from 'src/updates/updatePills';
 import { setColorMenuItems } from 'src/menus/selectColorMenus';
-import { updateColoredTagsStyle } from 'src/utils/updates/updateStyles';
+import { updateColoredTagsStyle } from 'src/updates/updateStyles';
 
 
 

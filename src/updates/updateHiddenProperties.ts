@@ -1,5 +1,5 @@
 import PrettyPropertiesPlugin from "src/main";
-import { querySelectorsWithIframes, querySelectorsWithIframesForContainer } from "../querySelectorsHelper";
+import { querySelectorsWithIframes, querySelectorsWithIframesForContainer } from "../utils/querySelectorsHelper";
 
 
 export const updateHiddenProperty = (propEl: HTMLElement, plugin: PrettyPropertiesPlugin) => {
