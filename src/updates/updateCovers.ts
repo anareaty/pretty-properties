@@ -19,7 +19,6 @@ interface EmbedMarkdownComponentExtended extends EmbedMarkdownComponent {
 
 
 
-
 export const renderCover = async (
 	component: Component,
 	contentEl: HTMLElement,
@@ -28,11 +27,19 @@ export const renderCover = async (
 	plugin: PrettyPropertiesPlugin
 ) => {
 
-	const mdContainer = contentEl.querySelector(".metadata-container");
 	
-	if (!(mdContainer?.instanceOf(HTMLElement))) return;
 
-	mdContainer.classList.remove("has-cover")
+	const mdContainer = contentEl.querySelector(".metadata-container");
+
+	//console.log(mdContainer)
+
+
+	if (!(mdContainer?.instanceOf(HTMLElement))) return;
+	//mdContainer.classList.remove("has-cover")
+
+	//console.log("test")
+
+	//console.log(mdContainer.innerHTML)
 
 	let coverDiv: HTMLElement | undefined;
 
@@ -55,6 +62,8 @@ export const renderCover = async (
 				break
 			}
 		}
+
+		//console.log(coverVal)
 
 		if (coverVal) {
 			coverDiv = await renderImageFromValue(coverVal, "cover", sourcePath, component, plugin)
@@ -122,12 +131,17 @@ const  applyCoverCssClasses = (
 		"circle"
 	]
 
+
 	for (let cls of oldClasses) {
 		mdContainer.classList.remove(cls)
 	}
 
+	
+
 
 	let coverShapeVal = getNestedProperty(frontmatter, plugin.settings.coverShapeProperty)
+	
+
 
 	if (coverShapeVal && typeof coverShapeVal == "string") {
 		coverDiv.classList.add(coverShapeVal);
@@ -138,7 +152,7 @@ const  applyCoverCssClasses = (
 		coverDiv.classList.add("initial");
 		mdContainer.classList.add("initial");
 	}
-		
+
 
 	let coverPositionVal = getNestedProperty(frontmatter, plugin.settings.coverPositionProperty)
 
@@ -151,6 +165,9 @@ const  applyCoverCssClasses = (
 		coverDiv.classList.add(plugin.settings.coverPosition)
 		mdContainer.classList.add(plugin.settings.coverPosition)
 	}
+
+
+	
 		
 }
 
@@ -169,6 +186,8 @@ export const updateCoverForView = (
     view: MarkdownView | WidgetEditorView | EmbedMarkdownComponentExtended,
     plugin: PrettyPropertiesPlugin
 ) => {
+
+  //console.log("update cover for view")
 
   let file = view.file
   if (file) {

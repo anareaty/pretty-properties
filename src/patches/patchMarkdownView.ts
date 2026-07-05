@@ -23,6 +23,13 @@ export const patchMarkdownView = (plugin: PrettyPropertiesPlugin) => {
 
         const getView = (() => this).bind(this)
 
+
+
+
+
+
+        /*
+
         const onRendered = (this.previewMode.renderer as ReadViewRendererExtended).onRendered;
 
         (this.previewMode.renderer as ReadViewRendererExtended).onRendered = new Proxy(onRendered, {
@@ -35,6 +42,8 @@ export const patchMarkdownView = (plugin: PrettyPropertiesPlugin) => {
             try {
               let view = getView()
               renderTitleIcon(view, plugin)
+
+
             } catch {
               console.error("Can not render title icon in preview mode")
             }
@@ -42,6 +51,47 @@ export const patchMarkdownView = (plugin: PrettyPropertiesPlugin) => {
             return result
           }
         })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        this.previewMode.onRenderComplete = new Proxy(this.previewMode.onRenderComplete, {
+          async apply(old2, thisArg2) {
+
+            let result = old2.call(thisArg2) 
+
+
+
+            try {
+              let view = getView()
+              updateCoverForView(view, plugin) 
+
+
+            } catch {
+              console.error("Can not render title icon in preview mode")
+            }
+            
+            return result
+          }
+        })
+
+
+
+
+
+
+
           
         this.editMode.show = new Proxy(this.editMode.show, {
           apply(old2, thisArg2) {
@@ -59,6 +109,13 @@ export const patchMarkdownView = (plugin: PrettyPropertiesPlugin) => {
           }
         })
 
+
+        console.log(this)
+
+        
+
+
+
         this.loadFrontmatter = new Proxy(this.loadFrontmatter, {
           apply(old2, thisArg2, args2: string[]) {
 
@@ -67,7 +124,10 @@ export const patchMarkdownView = (plugin: PrettyPropertiesPlugin) => {
 
             try {
               let view = getView()
+              //console.log("update md")
               updateCoverForView(view, plugin)  
+
+
             } catch {
               console.error("Can not update cover for markdown view")
             }
@@ -77,6 +137,10 @@ export const patchMarkdownView = (plugin: PrettyPropertiesPlugin) => {
             } catch {
               console.error("Can not update metadata containers on loading frontmatter")
             }
+
+
+
+            
             
             
             return result
@@ -84,7 +148,39 @@ export const patchMarkdownView = (plugin: PrettyPropertiesPlugin) => {
         })
 
 
+
+
+
+
+
+
+
+
+        this.onload = new Proxy(this.onload, {
+          apply(old2, thisArg2, args2: string[]) {
+            let result = old2.call(thisArg2, ...args2)
+            try {
+              let view = getView()
+              updateCoverForView(view, plugin)  
+            } catch {
+              console.error("Can not update cover for markdown view")
+            }
+            return result
+          }
+        })
+
+
+
+
+
+
+
+
+
+
+
         try {
+          //console.log("update images")
           updateImagesForView(this, plugin);
         } catch {
           console.error("Can not update images for file view")
@@ -104,6 +200,62 @@ export const patchMarkdownView = (plugin: PrettyPropertiesPlugin) => {
         } catch {
           console.error("Can not update metadata containers on file load")
         }
+
+
+
+
+        */
+
+
+        //console.log(this.previewMode)
+
+
+
+        this.previewMode.onRenderComplete = new Proxy(this.previewMode.onRenderComplete, {
+          async apply(old2, thisArg2) {
+
+            let result = old2.call(thisArg2) 
+
+            let view = getView()
+            updateImagesForView(view, plugin)
+            //renderTitleIcon(view, plugin)
+
+            return result
+          }
+        })
+
+
+
+
+
+        this.editMode.show = new Proxy(this.editMode.show, {
+          apply(old2, thisArg2) {
+
+            let result = old2.call(thisArg2) 
+
+            let view = getView()
+            renderTitleIcon(view, plugin)
+            
+            return result
+          }
+        })
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        //updateImagesForView(this, plugin)
+
         
         return old && old.apply(this, args)
       })

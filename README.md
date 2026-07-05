@@ -168,6 +168,65 @@ Converts a duration into a natural-sounding string.
 - `withSuffix` **{Boolean}**: Optional. Will add "in " at the front or " ago" at the end.
 - `returns` **{String}**
 
+
+
+## Supported helpers
+
+### Just Handlebars Helpers
+
+| Helper                                                                                   | Description                                           |
+| ---------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| [eq](https://www.npmjs.com/package/just-handlebars-helpers#eq)                           | Strict equality `===`                                 |
+| [eqw](https://www.npmjs.com/package/just-handlebars-helpers#eqw)                         | Equality `==`                                         |
+| [neq](https://www.npmjs.com/package/just-handlebars-helpers#neq)                         | Strict inequality `!==`                               |
+| [neqw](https://www.npmjs.com/package/just-handlebars-helpers#neqw)                       | Inequality `!=`                                       |
+| [lt](https://www.npmjs.com/package/just-handlebars-helpers#lt)                           | Less than `<`                                         |
+| [lte](https://www.npmjs.com/package/just-handlebars-helpers#lte)                         | Less than or equal `<=`                               |
+| [gt](https://www.npmjs.com/package/just-handlebars-helpers#gt)                           | Greater than `>`                                      |
+| [gte](https://www.npmjs.com/package/just-handlebars-helpers#gte)                         | Greater than or equal `>=`                            |
+| [not](https://www.npmjs.com/package/just-handlebars-helpers#not)                         | Not `!`                                               |
+| [ifx](https://www.npmjs.com/package/just-handlebars-helpers#ifx)                         | Imitates conditional operator `?:`                    |
+| [empty](https://www.npmjs.com/package/just-handlebars-helpers#empty)                     | Check if an array is empty                            |
+| [count](https://www.npmjs.com/package/just-handlebars-helpers#count)                     | Length of an array                                    |
+| [and](https://www.npmjs.com/package/just-handlebars-helpers#and)                         | Logical AND operation                                 |
+| [or](https://www.npmjs.com/package/just-handlebars-helpers#or)                           | Logical OR operation                                  |
+| [coalesce](https://www.npmjs.com/package/just-handlebars-helpers#coalesce)               | Returns first non-falsy value from list of parameters |
+| [includes](https://www.npmjs.com/package/just-handlebars-helpers#includes)               | Check for a value inside an array                     |
+| [excerpt](https://www.npmjs.com/package/just-handlebars-helpers#excerpt)                 | Extract a sub-string from a string                    |
+| [sanitize](https://www.npmjs.com/package/just-handlebars-helpers#sanitize)               | Sanitize a string to url friendly dash/kebab case     |
+| [newLineToBr](https://www.npmjs.com/package/just-handlebars-helpers#newlinetobr)         | Replace new line with line breaks `<br>` of a string  |
+| [capitalizeEach](https://www.npmjs.com/package/just-handlebars-helpers#capitalizeeach)   | Capitalize the first letter of each word in a string  |
+| [capitalizeFirst](https://www.npmjs.com/package/just-handlebars-helpers#capitalizefirst) | Capitalize the first letter of a string               |
+| [sprintf](https://www.npmjs.com/package/just-handlebars-helpers#sprintf)                 | String produced according to the formatting format    |
+| [lowercase](https://www.npmjs.com/package/just-handlebars-helpers#lowercase)             | String to lowercase                                   |
+| [uppercase](https://www.npmjs.com/package/just-handlebars-helpers#uppercase)             | String to uppercase                                   |
+| [first](https://www.npmjs.com/package/just-handlebars-helpers#first)                     | First element of an array                             |
+| [last](https://www.npmjs.com/package/just-handlebars-helpers#last)                       | Last element of an array                              |
+| [concat](https://www.npmjs.com/package/just-handlebars-helpers#concat)                   | Concatenate two or more strings                       |
+| [join](https://www.npmjs.com/package/just-handlebars-helpers#join)                       | Join elements of an array using a delimeter           |
+| [sum](https://www.npmjs.com/package/just-handlebars-helpers#sum)                         | Sum of two numbers                                    |
+| [difference](https://www.npmjs.com/package/just-handlebars-helpers#difference)           | Difference of two numbers                             |
+| [multiplication](https://www.npmjs.com/package/just-handlebars-helpers#multiplication)   | Multiplication of two numbers                         |
+| [division](https://www.npmjs.com/package/just-handlebars-helpers#division)               | Division of two numbers                               |
+| [remainder](https://www.npmjs.com/package/just-handlebars-helpers#remainder)             | Remainder of two numbers                              |
+| [ceil](https://www.npmjs.com/package/just-handlebars-helpers#ceil)                       | Round a number upward to its nearest integer          |
+| [floor](https://www.npmjs.com/package/just-handlebars-helpers#floor)                     | Round a number downward to its nearest integer        |
+| [abs](https://www.npmjs.com/package/just-handlebars-helpers#abs)                         | Find the absolute value of a number                   |
+| [formatDate](https://www.npmjs.com/package/just-handlebars-helpers#formatdate)           | Format date to specified format                       |
+| [showIf](https://www.npmjs.com/package/just-handlebars-helpers#showif)                   | Show HTML element if expression is true               |
+| [hideIf](https://www.npmjs.com/package/just-handlebars-helpers#hideif)                   | Hide HTML element if expression is true               |
+| [selectedIf](https://www.npmjs.com/package/just-handlebars-helpers#selectedif)           | Select `<option>` if expression is true               |
+| [checkedIf](https://www.npmjs.com/package/just-handlebars-helpers#checkedif)             | Check the `<input>` checkbox if expression is true    |
+| [options](https://www.npmjs.com/package/just-handlebars-helpers#options)                 | Generate `<option>` list for `<select>`               |
+| [formatCurrency](https://www.npmjs.com/package/just-handlebars-helpers#formatcurrency)   | Format currency value according to country            |
+
+### Additional helpers
+
+
+
+
+
+
 ## Example Templates
 Reverse the order of a property:
 ````

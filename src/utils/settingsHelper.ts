@@ -1,8 +1,8 @@
 import {i18n} from "../localization/localization";
-import {TextAreaComponent} from "obsidian";
+import {Platform, TextAreaComponent} from "obsidian";
 import PrettyPropertiesPlugin from "../main";
-import { registerPropertyFormatter } from "./propertyFormatter";
 import { updateLongTexts } from "../updates/updatePills";
+import { registerPropertyFormatter } from "./propertyFormatter";
 
 export function enhanceFormatTextArea(
 	plugin: PrettyPropertiesPlugin,
@@ -43,10 +43,7 @@ export function enhanceFormatTextArea(
 	applyValidationState(initialValue);
 
 	text.onChange(async (value: string) => {
-		if (value) {
-			registerPropertyFormatter(plugin, true)
-			
-		}
+		registerPropertyFormatter(plugin, true)
 		await onValidChange(value);
 		applyValidationState(value);
 		updateLongTexts(document.body, plugin)

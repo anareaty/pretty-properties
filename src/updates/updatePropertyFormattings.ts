@@ -48,16 +48,13 @@ export const updatePropertyFormatting = (
 
     if (!propertyFormat) return
 
-
-    
-
     let overlayElement = createSpan()
     overlayElement.classList.add("pp-formatted-value-overlay")
     overlayElement.classList.add(type + "-overlay")
     propValueEl.before(overlayElement)
 
-    let formattedValue = computeFormattedValue(plugin, propName, propertyFormat, value)
-
+    let formattedValue = value || ""
+    formattedValue = computeFormattedValue(plugin, propName, propertyFormat, value)
     setOverlayContent(formattedValue, propertyTextFormat, overlayElement, el, plugin)
 
     el.classList.add("has-property-formatting")

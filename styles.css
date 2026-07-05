@@ -1643,14 +1643,21 @@ button.longtext-color-button:hover {
 
 
 
-.title-wrapper {
-  margin-block-end: var(--inline-title-margin-bottom);
+.title-wrapper:not(:empty) {
+  margin-block-end: calc(var(--inline-title-size) * 0.5);
   cursor: text;
 }
+
+.title-wrapper:not(:has(.inline-title)) {
+  display: none;
+}
+
+
 
 .title-wrapper .inline-title {
   display: inline;
   vertical-align: middle;
+
 }
 
 .title-icon-wrapper {
@@ -1673,7 +1680,7 @@ button.longtext-color-button:hover {
   
 }
 
-.pp-icon-image {
+.pp-icon-image, .markdown-preview-view img.pp-icon-image {
   image-rendering: auto;
   cursor: auto;
 }

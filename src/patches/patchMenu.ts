@@ -79,7 +79,10 @@ export const patchMenu = (plugin: PrettyPropertiesPlugin) => {
 
 
             //Icon menu
-            let icon = target.closest(".pp-icon")
+
+           
+            let icon = target.closest(".pp-icon, .title-icon-wrapper")
+
             if (icon instanceof Element) {
                 handleIconMenu(this, plugin);
                 return old && old.apply(this, [e])

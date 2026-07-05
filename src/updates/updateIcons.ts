@@ -12,7 +12,9 @@ export const renderIcon = async (
   component: Component,
   plugin: PrettyPropertiesPlugin) => {
 
-    contentEl.classList.remove("has-icon")
+    //console.log("render icon")
+
+    //contentEl.classList.remove("has-icon")
 
     let preview = contentEl.querySelector(".markdown-reading-view > .markdown-preview-view");
     let source = contentEl.querySelector(".cm-scroller");
@@ -36,23 +38,34 @@ export const renderIcon = async (
 
     if (!iconVal && !oldIconValue) return
 
+    //console.log("test")
+
     
 
 
 
     if (iconVal && plugin.settings.enableIcon) {
-        if (iconVal == oldIconValue) return
+
+        //console.log("test 2")
+
+        //if (iconVal == oldIconValue) return
         let image = await getIconImage(iconVal, sourcePath, component, plugin)
 
      
+        //console.log("test 3")
 
         if (plugin.settings.iconInTitle) {
+
+            //console.log("render icon in title")
+
 
          
             oldIconDivSource?.remove()
             oldIconDivPreview?.remove()
             let wrappedTitle = contentEl.querySelector(".title-wrapper .inline-title")
             let inlineTitle = contentEl.querySelector(".inline-title")
+
+           
             let parent = inlineTitle?.parentElement
 
             if (wrappedTitle) {
@@ -65,6 +78,7 @@ export const renderIcon = async (
                 let titleIconWrapper = parent?.querySelector(".title-icon-wrapper");
                 let titleWrapper = contentEl.querySelector(".title-wrapper")
 
+                
 
                 if (image) {
                     if (titleIconWrapper) {
@@ -78,19 +92,24 @@ export const renderIcon = async (
                         titleIconWrapper.append(image)
                     }
                 }
-                
+
                 if (titleWrapper) {
                     titleWrapper.remove()
                 }
+                
+                
 
                 titleWrapper = createDiv()
                 titleWrapper.classList.add("title-wrapper")
-                parent?.prepend(titleWrapper)
+                
+                
                 titleWrapper.append(inlineTitle)
 
                 if (titleWrapper && titleIconWrapper) {
                     titleWrapper.prepend(titleIconWrapper)
                 }
+
+                parent?.prepend(titleWrapper)
 
                 if (titleWrapper?.instanceOf(HTMLElement)) {
                     titleWrapper.onclick = (e) => {
@@ -103,6 +122,9 @@ export const renderIcon = async (
                             }
                     }
                 }
+
+
+                //console.log(titleWrapper.innerHTML)
 
                 
             }

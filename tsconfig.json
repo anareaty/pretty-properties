@@ -27,11 +27,12 @@
 			"dom.iterable"
 		],
 		"types": [
-            "@obsidian-typings/obsidian-public-latest"
+            "@obsidian-typings/obsidian-public-latest",
+			"node"
         ]
 	},
 	"include": [
-		"src/**/*.ts",
+		"src/**/*.ts", "declarations.d.ts",
 		
 	]
 }

@@ -11,7 +11,7 @@ export const renderBanner = async (
   component: Component,
   plugin: PrettyPropertiesPlugin) => {
 
-    contentEl.classList.remove("has-banner")
+    //contentEl.classList.remove("has-banner")
 
     let bannerVal = ""
     let bannerValInitial = getNestedProperty(frontmatter, plugin.settings.bannerProperty);

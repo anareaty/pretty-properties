@@ -40,6 +40,7 @@ import { reloadAllTabs } from "./utils/reload";
 import { patchEmbed } from "./patches/patchEmbed";
 import { GlobalSearchPluginInstance } from "@obsidian-typings/obsidian-public-latest";
 import { patchMetadataSuggester } from "./patches/patchMetadataSuggester";
+import { Platform } from "obsidian";
 
 type Patch = () => void
 type PatchList = Record<string, Patch>
@@ -61,8 +62,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		createApi(this)
 		i18n.setLocale();
 		this.patches = {}
-		registerPropertyFormatter(this)
 
+		registerPropertyFormatter(this)
 
 		patchPropertyWidgets(this)
 		patchTagView(this)
@@ -166,8 +167,11 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 					if (
 						targetEl.closest(".pp-icon") || 
+						targetEl.closest(".title-icon-wrapper") ||
 						targetEl.closest(".pp-banner") || 
 						targetEl.closest(".pp-cover")
+
+						
 					) {
 						e.preventDefault();
 						if (!imageMenuExist) {
