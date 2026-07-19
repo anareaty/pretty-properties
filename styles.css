@@ -24,8 +24,8 @@ body {
     z-index: -1;
 }
 
-.has-banner .markdown-preview-view .pp-banner {
-    z-index: 1;
+.has-banner .markdown-preview-view {
+    isolation: isolate;
 }
 
 .has-banner .markdown-preview-sizer {
