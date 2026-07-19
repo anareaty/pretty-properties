@@ -29,7 +29,6 @@ body {
 }
 
 .has-banner .markdown-preview-sizer {
-  position: relative;
   z-index: 2;
 }
 
