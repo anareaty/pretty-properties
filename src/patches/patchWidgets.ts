@@ -170,7 +170,7 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
 
       if (longText?.instanceOf(HTMLElement)) {
 
-        // Prototype fix for wikilink values ("[[...]]") not being saved.
+        // Fix for wikilink values ("[[...]]") not being saved.
         //
         // 1) Don't run value post-processing / overlay creation while the user is
         //    actively editing this field. When typing "[[" Obsidian re-renders the
