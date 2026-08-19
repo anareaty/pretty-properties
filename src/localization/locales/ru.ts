@@ -202,4 +202,13 @@ export default {
   PROPERTY_FORMATTINGS: "Форматы свойств",
   COVER_SHAPE_PROPERTY: "Свойство для формы обложки",
   COVER_POSITION_PROPERTY: "Свойство для положения обложки",
-};
+  SUGGESTION_FILTERS: "Фильтры автодополнения",
+  SUGGESTION_FILTERS_DESC: "Ограничьте, какие заметки предлагаются в автодополнении свойства. Правила работают по папкам.",
+  ENABLE_SUGGESTION_FILTERS: "Включить фильтры автодополнения",
+  ADD_SUGGESTION_FILTER: "Добавить фильтр",
+  SUGGESTION_FILTER_FOLDER_RULE: "Папка — папка, включение/исключение и учёт подпапок",
+  SUGGESTION_FILTER_FOLDER_PLACEHOLDER: "Путь к папке",
+  SUGGESTION_FILTER_INCLUDE: "Включить",
+  SUGGESTION_FILTER_EXCLUDE: "Исключить",
+  SUGGESTION_FILTER_SUBFOLDERS: "Включая подпапки",
+}

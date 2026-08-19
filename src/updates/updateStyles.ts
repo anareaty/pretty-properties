@@ -210,7 +210,7 @@ export const updateRelativeDateColors = (plugin: PrettyPropertiesPlugin) => {
 
   }
   document.body.setCssProps(relativeDatesProps);
-  document.body.classList.add(coloredDatesClass)
+  document.body.classList.toggle("colored-dates", coloredDatesClass != "")
 }
 
 

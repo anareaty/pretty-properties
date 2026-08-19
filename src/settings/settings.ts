@@ -10,6 +10,7 @@ import { showOtherSettings } from './otherSettings';
 import { showColorSettings } from './colorSettings';
 import { showHiddenSettingsTab } from './hiddenSettingsTab';
 import { showFormatSettingsTab } from './formatSettings';
+import { showSuggestionFilterSettings } from './suggestionFilterSettings';
 
 
 
@@ -19,6 +20,16 @@ export interface PillColorSettings {
 	pillColor?: HSL | string | undefined,
 	textColor?: HSL | string | undefined
 }
+export type SuggestionFilterMatch = "folder"
+
+export interface SuggestionFilterRule {
+	property: string,
+	match: SuggestionFilterMatch,
+	value: string,
+	mode: "include" | "exclude",
+	includeSubfolders: boolean
+}
+
 export interface PPPluginSettings {
     hiddenProperties: string[];
     propertyPillColors: Record<string, PillColorSettings>;
@@ -116,6 +127,8 @@ export interface PPPluginSettings {
 	hideCoverCollapsed: boolean,
 	hidePropTitle: boolean,
 	hideAddPropertyButton: boolean,
+	enableSuggestionFilters: boolean,
+	suggestionFilters: SuggestionFilterRule[],
 }
 
 
@@ -227,6 +240,8 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	hideCoverCollapsed: false,
 	hidePropTitle: false,
 	hideAddPropertyButton: false,
+	enableSuggestionFilters: true,
+	suggestionFilters: [],
 
 }
 
@@ -243,7 +258,7 @@ export class PPSettingTab extends PluginSettingTab {
 		const {containerEl} = this;
 		containerEl.empty();
 
-		let tabNames = ["BANNERS", "ICONS", "COVERS", "COLORED_PROPERTIES", "HIDDEN_PROPERTIES", "PROPERTY_FORMATTINGS", "OTHER"]
+		let tabNames = ["BANNERS", "ICONS", "COVERS", "COLORED_PROPERTIES", "HIDDEN_PROPERTIES", "PROPERTY_FORMATTINGS", "SUGGESTION_FILTERS", "OTHER"]
 		let tabsEl = containerEl.createDiv({cls: "pp-settings-tabs"})
 		for (let tabName of tabNames) {
 			let button = tabsEl.createEl("button", {cls: "pp-settings-tab"})
@@ -290,6 +305,11 @@ export class PPSettingTab extends PluginSettingTab {
 
 		
 
+
+
+		else if (this.plugin.settings.settingsTab == "SUGGESTION_FILTERS") {
+			showSuggestionFilterSettings(this)
+		}
 
 
 		else if (this.plugin.settings.settingsTab == "DATES") {
