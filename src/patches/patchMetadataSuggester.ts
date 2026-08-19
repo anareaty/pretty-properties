@@ -2,6 +2,7 @@ import PrettyPropertiesPlugin from "src/main"
 import { around, dedupe } from "monkey-around";
 import { PopoverSuggest } from "obsidian";
 import { setPillStyles } from "src/updates/updatePills";
+import { filterSuggestionValues, getRulesForProperty } from "src/utils/suggestionFilter";
 
 
 
@@ -25,6 +26,27 @@ export const patchMetadataSuggester = (plugin: PrettyPropertiesPlugin) => {
         let textInputEl = this.textInputEl
 
         if (textInputEl instanceof HTMLElement) {
+
+            let propertyEl = textInputEl.closest(".metadata-property")
+            let propertyKey = propertyEl?.getAttribute("data-property-key")
+
+            if (propertyKey && getRulesForProperty(plugin, propertyKey).length) {
+                let values = this.suggestions?.values
+
+                if (Array.isArray(values) && typeof this.suggestions?.setSuggestions == "function") {
+                    let filtered = filterSuggestionValues(plugin, propertyKey, values)
+
+                    if (filtered.length != values.length) {
+                        this.suggestions.setSuggestions(filtered)
+
+                        // Nothing survived the filter, so there is no popover worth opening.
+                        if (!filtered.length) return
+
+                        elements = this.suggestions.suggestions
+                    }
+                }
+            }
+
             let metadataEl = textInputEl.closest(".metadata-property-value")
             if (metadataEl instanceof HTMLElement) {
                 let type = metadataEl.getAttribute("data-property-type")

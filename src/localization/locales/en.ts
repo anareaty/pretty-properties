@@ -191,4 +191,13 @@ export default {
   HIDDEN_PROPERTIES: "Hidden properties",
   COVER_SHAPE_PROPERTY: "Cover shape property",
   COVER_POSITION_PROPERTY: "Cover position property",
-};
+  SUGGESTION_FILTERS: "Autocomplete filters",
+  SUGGESTION_FILTERS_DESC: "Restrict which notes a property offers in its autocomplete. Rules match on folder, so they apply to suggestions that resolve to a note; suggestions that are not links are hidden by include rules.",
+  ENABLE_SUGGESTION_FILTERS: "Enable autocomplete filters",
+  ADD_SUGGESTION_FILTER: "Add autocomplete filter",
+  SUGGESTION_FILTER_FOLDER_RULE: "Folder — folder, include/exclude, and whether subfolders count",
+  SUGGESTION_FILTER_FOLDER_PLACEHOLDER: "Folder path",
+  SUGGESTION_FILTER_INCLUDE: "Include",
+  SUGGESTION_FILTER_EXCLUDE: "Exclude",
+  SUGGESTION_FILTER_SUBFOLDERS: "Include subfolders",
+}
