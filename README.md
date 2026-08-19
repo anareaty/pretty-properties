@@ -128,6 +128,16 @@ If you Ctrl+click on any property value, the plugin will open search for this va
 
 ![base](images/image_search.png)
 
+### Autocomplete filters
+
+By default Obsidian suggests every value a property has ever had anywhere in the vault. This setting lets you narrow that down per property.
+
+Add a rule in the "Autocomplete filters" tab, pick a property and a folder, and choose whether that folder should be included (only suggest notes from it) or excluded (suggest everything else). Subfolders can be counted or ignored per rule.
+
+For example, a rule for the `areas` property pointing at the `Areas` folder in "include" mode means typing in `areas:` only ever suggests your area notes, instead of every note in the vault.
+
+Rules match on the note a suggestion points to, so they apply to link values. Several rules can target the same property: "include" rules widen the allowed set, while "exclude" rules are always subtracted.
+
 ## Bases support 
 
 Most of the properties functional, including colored properties, custom date formats and math rendering also work in bases.
