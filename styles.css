@@ -21,14 +21,11 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    z-index: -1;
-}
-
-.has-banner .markdown-preview-view .pp-banner {
     z-index: 1;
 }
 
-.has-banner .markdown-preview-sizer {
+.pp-banner:not(:empty) ~ .cm-sizer,
+.pp-banner:not(:empty) ~ .markdown-preview-sizer {
   position: relative;
   z-index: 2;
 }
@@ -38,10 +35,6 @@ body {
 
 
 
-
-.workspace-split.mod-root .view-content.has-banner {
-  background-color: transparent;
-}
 
 .pp-banner img {
     width: 100%;
