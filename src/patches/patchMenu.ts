@@ -132,7 +132,7 @@ export const patchMenu = (plugin: PrettyPropertiesPlugin) => {
 
 const handleTagMenu = (menu: Menu, tag: Element | null, plugin: PrettyPropertiesPlugin) => {
 
-    if (plugin.settings.enableColoredInlineTags) {
+    if (plugin.settings.enableColoredProperties) {
         if (tag && tag.classList.contains("cm-hashtag-begin") && tag.classList.contains("cm-hashtag-inner")) {
             tag = tag.parentElement?.nextElementSibling?.firstElementChild || null
         }

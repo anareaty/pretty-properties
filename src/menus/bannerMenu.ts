@@ -13,6 +13,7 @@ import { ImageSuggestModal } from "src/modals/imageSuggestModal";
 export const handleBannerMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => {
 
     let propName = plugin.settings.bannerProperty;
+    let positionPropName = plugin.settings.bannerPositionProperty;
 
     menu.addItem((item: MenuItem) => item
         .setTitle(i18n.t("SELECT_BANNER_IMAGE"))
@@ -45,29 +46,56 @@ export const handleBannerMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => 
             removeProperty(plugin.settings.bannerPositionProperty, plugin);
     }))
 
-    if (plugin.settings.hiddenProperties.find(p => p == propName)) {
+
+
+
+    let bannerPropHidden = plugin.settings.hiddenProperties.find(p => p == propName)
+    let bannerPositionPropHidden = plugin.settings.hiddenProperties.find(p => p == positionPropName)
+
+    if (bannerPropHidden || bannerPositionPropHidden) {
         menu.addItem((item: MenuItem) => item
             .setTitle(i18n.t("UNHIDE_BANNER_PROPERTY"))
             .setIcon("lucide-eye")
             .setSection("pretty-properties")
             .onClick(async () => {
-                if (propName)
+                if (propName && bannerPropHidden) {
                     plugin.settings.hiddenProperties.remove(propName);
+                }
+                if (positionPropName && bannerPositionPropHidden) {
+                    plugin.settings.hiddenProperties.remove(positionPropName);
+                }
+                    
                 await plugin.saveSettings();
                 updateHiddenProperties(plugin);
+                plugin.settingTab?.update()
         }))
+    }
 
-    } else {
-        
+
+    if (!bannerPropHidden || !bannerPositionPropHidden) {
         menu.addItem((item: MenuItem) => item
             .setTitle(i18n.t("HIDE_BANNER_PROPERTY"))
             .setIcon("lucide-eye-off")
             .setSection("pretty-properties")
             .onClick(async () => {
-                if (propName)
+
+                if (propName && !bannerPropHidden) {
                     plugin.settings.hiddenProperties.push(propName);
+                }
+                if (positionPropName && !bannerPositionPropHidden) {
+                    plugin.settings.hiddenProperties.push(positionPropName);
+                }
+
+
                 await plugin.saveSettings();
                 updateHiddenProperties(plugin);
+                plugin.settingTab?.update()
         }))
     }
+
+   
+
+
+
+
 }

@@ -138,7 +138,14 @@ export const updateRelativeDateColors = (plugin: PrettyPropertiesPlugin) => {
  
   if (colors.find((c) => c == futureColor) && typeof futureColor == "string") {
     futureBgColor = "rgba(var(--color-" + futureColor + "-rgb), 0.2)"
+    futureTextColor = "rgb(var(--color-" + futureColor + "-rgb))"
     coloredDatesClass = "colored-dates"
+
+  } else if (futureColor == "accent") {
+    futureBgColor = "hsla(var(--interactive-accent-hsl), 0.15)"
+    futureTextColor = "var(--text-accent)"
+    coloredDatesClass = "colored-dates"
+
   } else if (futureColor && typeof futureColor != "string") {
       let textLightness = getTextLightness(futureColor);
       let hslString = futureColor.h + " ," + futureColor.s + "% ," + futureColor.l + "%";
@@ -150,7 +157,14 @@ export const updateRelativeDateColors = (plugin: PrettyPropertiesPlugin) => {
 
   if (colors.find((c) => c == presentColor) && typeof presentColor == "string") {
     presentBgColor = "rgba(var(--color-" + presentColor + "-rgb), 0.2)"
+    presentTextColor = "rgb(var(--color-" + presentColor + "-rgb))"
     coloredDatesClass = "colored-dates"
+
+  } else if (presentColor == "accent") {
+    presentBgColor = "hsla(var(--interactive-accent-hsl), 0.15)"
+    presentTextColor = "var(--text-accent)"
+    coloredDatesClass = "colored-dates"
+
   } else if (presentColor && typeof presentColor != "string") {
     let textLightness = getTextLightness(presentColor);
     let hslString = presentColor.h + " ," + presentColor.s + "% ," + presentColor.l + "%";
@@ -162,7 +176,14 @@ export const updateRelativeDateColors = (plugin: PrettyPropertiesPlugin) => {
 
   if (colors.find((c) => c == pastColor) && typeof pastColor == "string") {
     pastBgColor = "rgba(var(--color-" + pastColor + "-rgb), 0.2)"
+    pastTextColor = "rgb(var(--color-" + pastColor + "-rgb))"
     coloredDatesClass = "colored-dates"
+
+    } else if (pastColor == "accent") {
+    pastBgColor = "hsla(var(--interactive-accent-hsl), 0.15)"
+    pastTextColor = "var(--text-accent)"
+    coloredDatesClass = "colored-dates"
+
   } else if (pastColor && typeof pastColor != "string") {
     let textLightness = getTextLightness(pastColor);
     let hslString = pastColor.h + " ," + pastColor.s + "% ," + pastColor.l + "%";
@@ -210,7 +231,11 @@ export const updateRelativeDateColors = (plugin: PrettyPropertiesPlugin) => {
 
   }
   document.body.setCssProps(relativeDatesProps);
-  document.body.classList.add(coloredDatesClass)
+
+  if (coloredDatesClass) {
+    document.body.classList.add(coloredDatesClass)
+  }
+  
 }
 
 
@@ -277,5 +302,5 @@ export const updateTheme = (plugin: PrettyPropertiesPlugin) => {
 
 
 export const updateColoredTagsStyle = (plugin: PrettyPropertiesPlugin) => {
-  document.body.classList.toggle("colored-tags", plugin.settings.enableColoredInlineTags)
+  document.body.classList.toggle("colored-tags", plugin.settings.enableColoredProperties)
 }

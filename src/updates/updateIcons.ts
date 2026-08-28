@@ -1,7 +1,7 @@
 import { MarkdownView, FrontMatterCache, getIcon, MarkdownRenderer, Component } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { getNestedProperty } from "../utils/propertyUtils";
-import { renderImageFromValue } from "../utils/imageUtils";
+import { getImageValue, renderImageFromValue } from "../utils/imageUtils";
 
 
 
@@ -12,7 +12,7 @@ export const renderIcon = async (
   component: Component,
   plugin: PrettyPropertiesPlugin) => {
 
-    //console.log("render icon")
+
 
     //contentEl.classList.remove("has-icon")
 
@@ -23,8 +23,30 @@ export const renderIcon = async (
       preview = contentEl.querySelector(".markdown-preview-view.markdown-rendered.node-insert-event");
     }
 
-    let oldIconDivSource = source?.querySelector(".icon-wrapper");
-    let oldIconDivPreview = preview?.querySelector(".icon-wrapper");
+
+
+    let oldIconDivSource: Element | undefined
+    let oldIconDivSources = source?.querySelectorAll(".icon-wrapper");
+    if (oldIconDivSources) {
+      oldIconDivSources.forEach((div, i) => {
+        if (i == 0) oldIconDivSource = div
+        else div.remove()
+      })
+    } 
+
+    let oldIconDivPreview: Element | undefined
+    let oldIconDivPreviews = preview?.querySelectorAll(".icon-wrapper");
+    if (oldIconDivPreviews) {
+      oldIconDivPreviews.forEach((div, i) => {
+        if (i == 0) oldIconDivPreview = div
+        else div.remove()
+      })
+    } 
+
+
+
+
+
     let titleIconWrapper = contentEl?.querySelector(".title-icon-wrapper");
 
     let iconVal = getIconValue(frontmatter, plugin)
@@ -38,30 +60,23 @@ export const renderIcon = async (
 
     if (!iconVal && !oldIconValue) return
 
-    //console.log("test")
+    if (iconVal == oldIconValue) {
+        if (plugin.settings.iconInTitle && titleIconWrapper) return
+        if (!plugin.settings.iconInTitle && oldIconDivSource) return
+    }
 
-    
+
 
 
 
     if (iconVal && plugin.settings.enableIcon) {
-
-        //console.log("test 2")
-
-        //if (iconVal == oldIconValue) return
         let image = await getIconImage(iconVal, sourcePath, component, plugin)
-
-     
-        //console.log("test 3")
 
         if (plugin.settings.iconInTitle) {
 
-            //console.log("render icon in title")
-
-
-         
             oldIconDivSource?.remove()
             oldIconDivPreview?.remove()
+            contentEl.classList.remove("has-icon")
             let wrappedTitle = contentEl.querySelector(".title-wrapper .inline-title")
             let inlineTitle = contentEl.querySelector(".inline-title")
 
@@ -124,7 +139,7 @@ export const renderIcon = async (
                 }
 
 
-                //console.log(titleWrapper.innerHTML)
+        
 
                 
             }
@@ -183,6 +198,7 @@ export const renderIcon = async (
 
         oldIconDivSource?.remove()
         oldIconDivPreview?.remove()
+        contentEl.classList.remove("has-icon")
         let titleIconWrappers = contentEl.querySelectorAll(".title-icon-wrapper")
         for (let titleIconWrapper of titleIconWrappers) {
             titleIconWrapper.remove()
@@ -219,6 +235,7 @@ export const getIconImage = async (iconVal: string, sourcePath: string, componen
         | null = getIcon(iconVal);
 
     if (!image) {
+        iconVal = getImageValue(iconVal)
         let iconLink = iconVal;
         let imageEl = await renderImageFromValue(iconLink, "icon", sourcePath, component, plugin)
 

@@ -26,6 +26,7 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                         );
                     await plugin.saveSettings();
                     updateHiddenProperties(plugin);
+                    plugin.settingTab?.update()
                 }));
 
         } else {
@@ -42,6 +43,7 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                         );
                     await plugin.saveSettings();
                     updateHiddenProperties(plugin);
+                    plugin.settingTab?.update()
                 }));
         }
 
@@ -59,6 +61,7 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                         );
                     await plugin.saveSettings();
                     updateHiddenProperties(plugin);
+                    plugin.settingTab?.update()
                 }));
 
         } else {
@@ -75,6 +78,7 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                         );
                     await plugin.saveSettings();
                     updateHiddenProperties(plugin);
+                    plugin.settingTab?.update()
                 }));
         }
 
@@ -94,18 +98,23 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
 
             let propertyFormatObj = plugin.settings.propertyFormats[propName]
 
+
             
 
-            if (propertyFormatObj && propertyFormatObj.textFormat == "markdown") {
+            
+            let markdownProperties = plugin.settings.markdownProperties
+
+            if (markdownProperties.find(p => p == propName)) {
                 menu.addItem((item: MenuItem) =>
                     item
                     .setTitle(i18n.t("DO_NOT_RENDER_MARKDOWN"))
                     .setIcon("code-2")
                     .setSection("pretty-properties")
                     .onClick(async () => {
-                        propertyFormatObj.textFormat = "raw"
+                        plugin.settings.markdownProperties = markdownProperties.filter(p => p != propName)
                         await plugin.saveSettings();
                         updateAllProperties(plugin);
+                        plugin.settingTab?.update()
                     })  
                 );
             } else if (propertyType == "text" || (propertyFormatObj && propertyFormatObj.format)) {
@@ -115,17 +124,10 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                     .setIcon("book-open")
                     .setSection("pretty-properties")
                     .onClick(async () => {
-                        if (propertyFormatObj) {
-                            propertyFormatObj.textFormat = "markdown"
-                        } else {
-                            plugin.settings.propertyFormats[propName] = {
-                                format: "",
-                                textFormat: "markdown"
-                            }
-                        }
-
+                        plugin.settings.markdownProperties.push(propName)
                         await plugin.saveSettings();
                         updateAllProperties(plugin);
+                        plugin.settingTab?.update()
                     })  
                 );
             }

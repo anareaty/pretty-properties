@@ -4,14 +4,20 @@ import { i18n } from "src/localization/localization";
 import { ColorPickerModal } from "src/modals/colorPickerModal";
 import { updateRelativeDateColors } from "src/updates/updateStyles";
 import { updateAllProperties } from "src/updates/updateElements";
-import { PillColorSettings } from "src/settings/settings";
+import { PillColorSettings, PPSettingTab } from "src/settings/settings";
 
 
 
 
 
 
-export const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string, colorType: string, plugin: PrettyPropertiesPlugin) => {
+export const setColorMenuItems = (
+    menu: Menu, 
+    pillVal: string, 
+    colorList: "propertyPillColors" | "propertyLongtextColors" | "tagColors" | "dateColors", 
+    colorType: string, 
+    plugin: PrettyPropertiesPlugin,
+) => {
 
     let colors = [
         "red",
@@ -67,13 +73,15 @@ export const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string
                     color +
                     "-rgb), 0.3);";
             } else if (color == "accent") {
+              
                 item.iconEl.style =
                     "color: transparent; background-color: hsla(var(--interactive-accent-hsl), 0.3);";
             } else if (color == "none") {
                 item.iconEl.style = "opacity: 0.2;";
             }
 
-            item.setTitle(i18n.t(color)).onClick(async() => {
+            item.setTitle(i18n.t(color))
+            .onClick(async() => {
                 if (colorType == "pillColor" || colorType == "textColor") {
                     if (color == "default") {						
                         delete pillColorSettings?.[colorType]
@@ -108,6 +116,7 @@ export const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string
 
                 await plugin.saveSettings();
                 updateAllProperties(plugin)
+                plugin.settingTab?.update()
 
                 if (colorList == "dateColors") {
                     updateRelativeDateColors(plugin)
@@ -135,7 +144,7 @@ export const setColorMenuItems = (menu: Menu, pillVal: string, colorList: string
 
 
 
-export const createColorMenu = (pillVal: string, colorList: string, colorType: string, plugin: PrettyPropertiesPlugin, menu: Menu) => {
+export const createColorMenu = (pillVal: string, colorList: "propertyPillColors" | "propertyLongtextColors" | "tagColors" | "dateColors", colorType: string, plugin: PrettyPropertiesPlugin, menu: Menu) => {
     let itemTitle = i18n.t("SELECT_COLOR")
     let iconName = "paintbrush"
   
@@ -163,10 +172,9 @@ export const createColorMenu = (pillVal: string, colorList: string, colorType: s
 
 
 export const createColorButton = (parent: HTMLElement, value: string, plugin: PrettyPropertiesPlugin) => {
-    if(plugin.settings.enableColoredProperties && plugin.settings.enableColorButton) {
-        let isBase = parent.classList.contains("bases-table-cell")
+    if(plugin.settings.enableColoredProperties) {
 
-        if (value && (!isBase || plugin.settings.enableColorButtonInBases)) {
+        if (value) {
             let colorButton = createEl("button")
             setIcon(colorButton, "palette")
             colorButton.classList.add("longtext-color-button")

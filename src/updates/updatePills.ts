@@ -208,11 +208,8 @@ export const updateTagPill = (pill: HTMLElement, plugin: PrettyPropertiesPlugin)
 export const updateTag = (tag: HTMLElement, plugin: PrettyPropertiesPlugin) => {
 
 	let value = tag.innerText.replace("#", "")
-	let parent = tag.parentElement
-	let isBase = parent?.classList.contains("value-list-element")
 
-	if ((!isBase && plugin.settings.enableColoredInlineTags) || 
-	(isBase && plugin.settings.enableColoredProperties)) {
+	if (plugin.settings.enableColoredProperties) {
 		setPillStyles(tag, "data-tag-value", value, "tag", plugin)
 	}
 }
@@ -224,7 +221,7 @@ export const updateTag = (tag: HTMLElement, plugin: PrettyPropertiesPlugin) => {
 
 
 const updateColorButton = (parent: HTMLElement, value:string, isBase: boolean | undefined, plugin:PrettyPropertiesPlugin) => {
-	if (!isBase || plugin.settings.enableColorButtonInBases) {
+	if (plugin.settings.enableColoredProperties) {
 		if (parent) {
 			createColorButton(parent, value, plugin)
 		}
@@ -302,7 +299,7 @@ export const updateLongtext = (pill: HTMLElement, plugin: PrettyPropertiesPlugin
 	
 	let metadataContainer = pill.closest(".metadata-container")
 	if (metadataContainer?.instanceOf(HTMLElement)) {
-		hideMetadataContainerIfAllPropertiesHidden(metadataContainer)
+		hideMetadataContainerIfAllPropertiesHidden(metadataContainer, plugin)
 	}
 	
 	
@@ -431,7 +428,7 @@ export const updateTagPaneTags = (container: HTMLElement, plugin: PrettyProperti
     for (let tag of tags) {
 		if (tag?.instanceOf(HTMLElement)) {
 			let value = tag.innerText
-			if (!plugin.settings.enableColoredTagsInTagPane) {
+			if (!plugin.settings.enableColoredProperties) {
 				value = ""
 			}
 			

@@ -155,6 +155,9 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
       
     }
 
+
+    
+
     if (type == "text") {
 
 
@@ -226,6 +229,9 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
       }
     }
 
+
+    
+
     
 
     if (plugin.settings.hiddenProperties.find(p => p.toLowerCase() == propName.toLowerCase())) {
@@ -272,17 +278,22 @@ export const patchPropertyWidgets = (plugin: PrettyPropertiesPlugin) => {
       
 
 
+      
+
+
       plugin.patches.uninstallWidgetPatch[type] = around(widget, {
 
         render(oldRender) {
 
-          
 
 
 
           return dedupe("pp-patch-widgets-around-key", oldRender, (...args) => {
 
             let rendered = oldRender && oldRender.apply(this, args)
+
+
+            
 
           
 

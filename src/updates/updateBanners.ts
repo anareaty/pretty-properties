@@ -1,7 +1,7 @@
 import { MarkdownView, FrontMatterCache, Component } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { getNestedProperty } from "../utils/propertyUtils";
-import { renderImageFromValue } from "../utils/imageUtils";
+import { getImageValue, renderImageFromValue } from "../utils/imageUtils";
 
 
 export const renderBanner = async (
@@ -10,6 +10,10 @@ export const renderBanner = async (
   sourcePath: string,
   component: Component,
   plugin: PrettyPropertiesPlugin) => {
+
+
+
+
 
     //contentEl.classList.remove("has-banner")
 
@@ -26,6 +30,8 @@ export const renderBanner = async (
         bannerVal = bannerValInitial
     }
 
+    bannerVal = getImageValue(bannerVal)
+
     let positionVal = getNestedProperty(frontmatter, plugin.settings.bannerPositionProperty)
     if (!positionVal) positionVal = 50
     let positionString = positionVal.toString()
@@ -34,23 +40,47 @@ export const renderBanner = async (
     let bannerContainerSource = contentEl.querySelector(".cm-scroller");
 
 
+    
+
+
     if (contentEl.classList.contains("hover-popover")) {
       bannerContainerPreview = contentEl.querySelector(".markdown-preview-view.markdown-rendered.node-insert-event");
     }
     
-    let oldBannerDivSource = bannerContainerSource?.querySelector(".pp-banner");
-    let oldBannerDivPreview = bannerContainerPreview?.querySelector(".pp-banner");
+    let oldBannerDivSource: Element | undefined
+    let oldBannerDivSources = bannerContainerSource?.querySelectorAll(".pp-banner");
+    if (oldBannerDivSources) {
+      oldBannerDivSources.forEach((div, i) => {
+        if (i == 0) oldBannerDivSource = div
+        else div.remove()
+      })
+    } 
+
+    let oldBannerDivPreview: Element | undefined
+    let oldBannerDivPreviews = bannerContainerPreview?.querySelectorAll(".pp-banner");
+    if (oldBannerDivPreviews) {
+      oldBannerDivPreviews.forEach((div, i) => {
+        if (i == 0) oldBannerDivPreview = div
+        else div.remove()
+      })
+    } 
+
+    
 
     if (!plugin.settings.enableBanner) {
       oldBannerDivSource?.remove();
       oldBannerDivPreview?.remove();
+      contentEl.classList.remove("has-banner")
       return
     }
 
-    let oldBannerValue = oldBannerDivSource?.getAttribute("data-value") || ""
+    
 
     let bannerDiv: HTMLElement | undefined
     let bannerDivClone: HTMLElement | undefined
+
+
+    let oldBannerValue = oldBannerDivSource?.getAttribute("data-value") || ""
 
     if (bannerVal == oldBannerValue) {
       let oldPositionValue = oldBannerDivSource?.getAttribute("data-position") || ""
@@ -87,6 +117,7 @@ export const renderBanner = async (
     if (oldBannerDivSource) {
       if (!bannerDiv) {
         oldBannerDivSource.remove();
+        contentEl.classList.remove("has-banner")
       } else if (oldBannerDivSource.outerHTML != bannerDiv.outerHTML) {
           oldBannerDivSource.remove();
           bannerContainerSource?.prepend(bannerDiv);
@@ -99,6 +130,7 @@ export const renderBanner = async (
     if (oldBannerDivPreview) {
       if (!bannerDivClone) {
         oldBannerDivPreview.remove();
+        contentEl.classList.remove("has-banner")
       } else if (oldBannerDivPreview.outerHTML != bannerDivClone.outerHTML) {
           oldBannerDivPreview.remove();
           bannerContainerPreview?.prepend(bannerDivClone);

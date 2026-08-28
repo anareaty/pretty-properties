@@ -1,6 +1,6 @@
 import { Modal, App, Setting } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
-import { PillColorSettings } from "src/settings/settings";
+import { PillColorSettings, PPSettingTab } from "src/settings/settings";
 import { updateAllProperties } from "src/updates/updateElements";
 import { updateRelativeDateColors } from "src/updates/updateStyles";
 
@@ -8,15 +8,25 @@ import { updateRelativeDateColors } from "src/updates/updateStyles";
 export class ColorPickerModal extends Modal {
     plugin: PrettyPropertiesPlugin
     propVal: string
-    colorList: string
+    colorList: "propertyPillColors" | "propertyLongtextColors" | "tagColors" | "dateColors"
     colorType: string
+    settingsTab?: PPSettingTab
 
-    constructor(app: App, plugin: PrettyPropertiesPlugin, propVal: string, colorList: string, colorType: string) {
+    constructor(
+        app: App, 
+        plugin: PrettyPropertiesPlugin, 
+        propVal: string, 
+        colorList: "propertyPillColors" | "propertyLongtextColors" | "tagColors" | "dateColors", 
+        colorType: string,
+        settingsTab?: PPSettingTab
+    
+    ) {
         super(app);
         this.propVal = propVal
         this.plugin = plugin
         this.colorList = colorList
         this.colorType = colorType
+        this.settingsTab = settingsTab
     }
     
     onOpen() {
@@ -64,7 +74,13 @@ export class ColorPickerModal extends Modal {
                     pillColorSettings[this.colorType] = hsl
                 }
 
+                this.plugin.settings[this.colorList][this.propVal] = pillColorSettings
+
+
                 await this.plugin.saveSettings()
+
+        
+                this.plugin.settingTab?.update()
 
                 updateAllProperties(this.plugin)
                 if (this.colorList == "dateColors") {

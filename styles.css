@@ -24,12 +24,11 @@ body {
     z-index: -1;
 }
 
-.has-banner .markdown-preview-view .pp-banner {
-    z-index: 1;
+.has-banner .markdown-preview-view {
+    isolation: isolate;
 }
 
 .has-banner .markdown-preview-sizer {
-  position: relative;
   z-index: 2;
 }
 
@@ -73,10 +72,14 @@ body {
 
 
 .has-banner > .markdown-source-view > .cm-editor > .cm-scroller > .cm-sizer,
-.has-banner > .markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer {
+.has-banner > .markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer,
+.popover.has-banner > .markdown-embed > .markdown-embed-content > .markdown-source-view > .cm-editor > .cm-scroller > .cm-sizer,
+.popover.has-banner > .markdown-embed > .markdown-embed-content > .markdown-preview-view > .markdown-preview-sizer {
   --pp-banner-top-spacing-phone: calc(var(--banner-height) + var(--banner-margin) - var(--view-top-spacing-markdown));
   --pp-banner-top-spacing: calc(var(--banner-height) + var(--banner-margin));
   margin-top: var(--pp-banner-top-spacing);
+
+
 }
 
 
@@ -89,15 +92,22 @@ body {
 
 
 .has-icon > .markdown-source-view > .cm-editor > .cm-scroller > .cm-sizer,
-.has-icon > .markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer {
+.has-icon > .markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer,
+.popover.has-icon > .markdown-embed > .markdown-embed-content > .markdown-source-view > .cm-editor > .cm-scroller > .cm-sizer,
+.popover.has-icon > .markdown-embed > .markdown-embed-content > .markdown-preview-view > .markdown-preview-sizer
+
+{
   margin-top: calc(var(--pp-icon-size) + var(--pp-icon-top-margin-wb) + var(--pp-icon-gap));
+
 }
 
 
 
 
 .has-banner.has-icon > .markdown-source-view > .cm-editor > .cm-scroller > .cm-sizer,
-.has-banner.has-icon > .markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer {
+.has-banner.has-icon > .markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer,
+.popover.has-icon.has-banner > .markdown-embed > .markdown-embed-content > .markdown-source-view > .cm-editor > .cm-scroller > .cm-sizer,
+.popover.has-icon.has-banner > .markdown-embed > .markdown-embed-content > .markdown-preview-view > .markdown-preview-sizer {
   --pp-banner-icon-top-spacing-phone: calc(var(--banner-height) + var(--pp-banner-icon-gap) - var(--view-top-spacing-markdown));
   --pp-banner-icon-top-spacing: calc(var(--banner-height) + var(--pp-banner-icon-gap));
   margin-top: var(--pp-banner-icon-top-spacing);
@@ -1041,13 +1051,26 @@ body {
   color: var(--color-pink)
 }
 
+.setting-group .setting-item.pp-settings-tabs {
+  padding: 10px 5px;
 
+}
 
 .pp-settings-tabs {
   border-bottom: 1px solid var(--background-modifier-border);
   overflow-x: scroll;
   white-space: nowrap;
   margin-bottom: 16px;
+  padding: 0;
+
+}
+
+.pp-settings-tabs .setting-item-control {
+  justify-content: center;
+}
+
+.pp-settings-tabs  .setting-item-info {
+  display: none;
 }
 
 button.pp-settings-tab {
@@ -1132,7 +1155,7 @@ button.pp-settings-tab:not(.pp-settings-tab-selected):hover {
 
 
 .metadata-property-value[data-property-type="tags"] .multi-select-pill {
-    line-height: unset;
+    line-height: normal;
 }
 
 
@@ -1208,6 +1231,15 @@ a.tag.transparent-color {
 /* Hide properties */
 /* We need to use more complex styles instead of just 'display: none' so the property can be revealed when selected by keyboard navigation. */
 
+
+
+/* When shown show more faded then non hidden.*/
+.pp-property-hidden,
+.is-empty.pp-property-hidden-when-empty {
+  opacity: 0.5
+}
+
+
 /* Hide properties marked as hidden */
 body:not(.show-hidden-properties) .markdown-source-view .metadata-property.pp-property-hidden:not(:focus, :focus-within),
 body:not(.show-hidden-properties) .markdown-preview-view .metadata-property.pp-property-hidden:not(:focus, :focus-within),
@@ -1228,14 +1260,14 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 
 /* Hide metadata block when all properties are hidden */
 .hide-metadata-if-props-empty-editing:not(.show-hidden-properties) .markdown-source-view .metadata-container.pp-mc-hidden:not(:focus-within, .has-cover),
-.hide-metadata-if-props-empty-editing.hide-all-empty-properties:not(.show-hidden-properties) .markdown-source-view .metadata-container.pp-mc-empty-hidden:not(:focus-within, .has-cover),
 .hide-metadata-if-props-empty-reading:not(.show-hidden-properties) .markdown-preview-view .metadata-container.pp-mc-hidden:not(:focus-within, .has-cover),
-.hide-metadata-if-props-empty-reading.hide-all-empty-properties:not(.show-hidden-properties) .markdown-preview-view .metadata-container.pp-mc-empty-hidden:not(:focus-within, .has-cover),
 /* Manage hiding metadata when it has the cover image */
 .hide-metadata-if-props-empty-editing:not(.show-hidden-properties) .markdown-source-view .metadata-container.pp-mc-hidden.has-cover :is(.metadata-properties-heading, .metadata-content):not(:focus, :focus-within),
-.hide-metadata-if-props-empty-editing.hide-all-empty-properties:not(.show-hidden-properties) .markdown-source-view .metadata-container.pp-mc-empty-hidden.has-cover :is(.metadata-properties-heading, .metadata-content):not(:focus, :focus-within),
 .hide-metadata-if-props-empty-reading:not(.show-hidden-properties) .markdown-preview-view .metadata-container.pp-mc-hidden.has-cover :is(.metadata-properties-heading, .metadata-content):not(:focus, :focus-within),
-.hide-metadata-if-props-empty-reading.hide-all-empty-properties:not(.show-hidden-properties) .markdown-preview-view .metadata-container.pp-mc-empty-hidden.has-cover :is(.metadata-properties-heading, .metadata-content):not(:focus, :focus-within)
+
+.hide-metadata-add-button .markdown-source-view .metadata-content:not(:focus-within) .metadata-add-button,
+.hide-metadata-add-button .markdown-preview-view .metadata-content:not(:focus-within) .metadata-add-button
+
 {
   position: absolute;
   width: 1px;
@@ -1256,7 +1288,8 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 
 
 .has-property-formatting:not(:focus-within) .metadata-input-longtext,
-.has-property-formatting:not(:focus-within) .metadata-input-number {
+.has-property-formatting:not(:focus-within) .metadata-input-number,
+.has-property-formatting:not(:focus-within) .metadata-link {
   font-size: 0;
 }
 
@@ -1306,6 +1339,7 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 }
 
 
+.multi-select-pill.colored,
 .metadata-property-value .multi-select-pill.colored,
 .metadata-property-value[data-property-type="tags"] .multi-select-pill.colored,
 .value-list-element.colored {
@@ -1743,11 +1777,7 @@ button.longtext-color-button:hover {
 
 /* Hide metadata add button */
 
-.hide-metadata-add-button .markdown-source-view .metadata-content:not(:focus-within) .metadata-add-button,
-.hide-metadata-add-button .markdown-preview-view .metadata-content:not(:focus-within) .metadata-add-button {
-  display: none;
 
-}
 
 /* Fix for Minimal theme */
 
@@ -1789,8 +1819,6 @@ button.longtext-color-button:hover {
 }
 
 .pp-formatted-value-overlay.text-overlay {
-
-
   margin: var(--input-padding);
 }
 
@@ -1844,4 +1872,17 @@ button.bare-button {
 
 .pp-formatted-value-overlay {
   border-radius: 4px;
+}
+
+
+button.cover-has-format {
+  color: var(--text-accent)
+}
+
+
+
+.pp-settings-list-container {
+  border: 1px solid var(--text-accent);
+  border-radius: 4px;
+  padding: 8px;
 }
