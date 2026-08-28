@@ -1,6 +1,7 @@
 import PrettyPropertiesPlugin from "src/main";
 import { querySelectorsWithIframes, querySelectorsWithIframesForContainer } from "../utils/querySelectorsHelper";
 import { MetadataEditor } from "@obsidian-typings/obsidian-public-latest";
+import { MarkdownView } from "obsidian";
 
 
 
@@ -131,15 +132,18 @@ export const updateHiddenProperties = (plugin: PrettyPropertiesPlugin) => {
     let leaves = plugin.app.workspace.getLeavesOfType("markdown");
     for (let leaf of leaves) {
         let view = leaf.view
-        let container = view.containerEl;
-        updateHiddenPropertiesForContainer(container, plugin)
+        if (view instanceof MarkdownView) {
+            updateMetadataEditor(view.metadataEditor, plugin)
+        }
     }
 
     let propLeaves = plugin.app.workspace.getLeavesOfType("file-properties");
     for (let leaf of propLeaves) {
         let view = leaf.view
-        let container = view.containerEl;
-        updateHiddenPropertiesForContainer(container, plugin)
+        if ("metadataEditor" in view) {
+            let metadataEditor = view.metadataEditor as MetadataEditor
+            updateMetadataEditor(metadataEditor, plugin)
+        }
     }
 }
 
