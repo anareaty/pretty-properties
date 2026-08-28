@@ -16,6 +16,10 @@ type WidgetArgs = [
     sourcePath: string;
 }]
 
+// Tracks text widgets we've already attached our blur-refresh listener to, so
+// re-renders (which may reuse the same DOM element) don't accumulate duplicates.
+const longtextBlurWired = new WeakSet<HTMLElement>();
+
 
 interface MetadataTypeManagerOld {
   getTypeInfo: (obj: {key: string, value: unknown}) => TypeInfo
@@ -168,15 +172,37 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
       parent?.setAttribute("data-source-path", sourcePath)
 
       if (longText?.instanceOf(HTMLElement)) {
-        updateLongtext(longText, plugin, propName);
-        longText.onblur = () => {
+
+        // Fix for wikilink values ("[[...]]") not being saved.
+        //
+        // 1) Don't run value post-processing / overlay creation while the user is
+        //    actively editing this field. When typing "[[" Obsidian re-renders the
+        //    text widget (it internally converts the input into a link element), and
+        //    our restyle/overlay logic running mid-edit can tear down the DOM and
+        //    drop the in-progress input, leaving the old committed value in the file.
+        const isEditing = longText.matches(":focus") || longText.contains(document.activeElement);
+        if (!isEditing) {
           updateLongtext(longText, plugin, propName);
-          let link = el.querySelector(".metadata-link");
-          if (link) {
-            parent?.classList.remove("is-empty")
-            updateAllMetadataContainers(plugin)
-          }
-        };
+        }
+
+        // 2) Register the blur refresh with addEventListener instead of overwriting
+        //    the `onblur` property. Plain text is committed by Obsidian on `input`,
+        //    but a wikilink value is only finalized/committed on blur (after the link
+        //    suggester resolves it). Overwriting `onblur` here clobbered Obsidian's
+        //    own blur handler, so wikilink edits were never committed. addEventListener
+        //    keeps both handlers. Guard with a WeakSet so repeated renders of the same
+        //    element don't add duplicate listeners.
+        if (!longtextBlurWired.has(longText)) {
+          longtextBlurWired.add(longText);
+          longText.addEventListener("blur", () => {
+            updateLongtext(longText, plugin, propName);
+            let link = el.querySelector(".metadata-link");
+            if (link) {
+              parent?.classList.remove("is-empty")
+              updateAllMetadataContainers(plugin)
+            }
+          });
+        }
       } else if (link) {
         parent?.classList.remove("is-empty")
         updateAllMetadataContainers(plugin)
