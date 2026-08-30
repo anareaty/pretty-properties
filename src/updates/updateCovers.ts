@@ -27,11 +27,24 @@ export const renderCover = async (
 	plugin: PrettyPropertiesPlugin
 ) => {
 
+	//console.log("render cover")
+
 	const mdContainer = contentEl.querySelector(".metadata-container");
+
+	//console.log(contentEl)
 
 	if (!(mdContainer?.instanceOf(HTMLElement))) return;
 
-	const oldCoverDiv = mdContainer.querySelector(".pp-cover");
+	let oldCoverDiv: Element | undefined
+	let oldCoverDivs = mdContainer.querySelectorAll(".pp-cover");
+
+	if (oldCoverDivs) {
+      oldCoverDivs.forEach((div, i) => {
+        if (i == 0) oldCoverDiv = div
+        else div.remove()
+      })
+    } 
+
 
 	if (!plugin.settings.enableCover) {
 		oldCoverDiv?.remove();
@@ -67,6 +80,19 @@ export const renderCover = async (
 	
 	if (coverDiv) {
 		applyCoverCssClasses(frontmatter, coverDiv, mdContainer, contentEl, plugin);
+
+
+		/* Remove all old covers again, because sometimes we get extra ones when the view is opened more then once */
+
+		oldCoverDivs = mdContainer.querySelectorAll(".pp-cover");
+
+		if (oldCoverDivs) {
+			oldCoverDivs.forEach((div, i) => {
+				if (i == 0) oldCoverDiv = div
+				else div.remove()
+			})
+		} 
+
 		if (oldCoverDiv) {
 			if (coverDiv.outerHTML != oldCoverDiv.outerHTML) {
 				oldCoverDiv.remove();
@@ -96,8 +122,11 @@ const  applyCoverCssClasses = (
 	mdContainer.classList.add("has-cover")
 	coverDiv.classList.add("pp-cover");
 
+
 	if (contentEl.classList.contains("canvas-node-content")) {
-		coverDiv.classList.add("pp-canvas-cover")
+		mdContainer.classList.add("in-canvas")
+	} else if (contentEl.classList.contains("hover-popover")) {
+		mdContainer.classList.add("in-popover")
 	}
 
 	let oldClasses = [
@@ -180,13 +209,15 @@ export const updateCoverForView = (
 
 
 export const updateAllCovers = (plugin: PrettyPropertiesPlugin) => {
+
   let leaves = plugin.app.workspace.getLeavesOfType("markdown");
   for (let leaf of leaves) {
     let view = leaf.view
     if (view instanceof MarkdownView) {
         updateCoverForView(view, plugin);
-    }
+    } 
   }
+
 }
 
 

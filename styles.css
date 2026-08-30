@@ -306,7 +306,7 @@ body.is-mobile .pp-cover {
   --cover-max-height-top-bottom: var(--cover-max-height-mobile);
 }
 
-.pp-canvas-cover.pp-cover {
+.in-canvas .pp-cover {
   --cover-max-height-top-bottom: var(--cover-max-height-top-bottom-canvas);
 }
 
@@ -330,15 +330,15 @@ body.is-mobile .pp-cover {
   grid-template-columns: auto var(--cover-column-width);
 }
 
-.canvas-node-content .metadata-container.has-cover {
+.metadata-container.has-cover.in-canvas {
   --pp-cover-gap: 10px;
 }
 
-.canvas-node-content .metadata-container.has-cover.left {
+.metadata-container.has-cover.left.in-canvas {
   grid-template-columns: min(var(--cover-column-width), var(--cover-max-width-canvas)) auto;
 }
 
-.canvas-node-content .metadata-container.has-cover.right {
+.metadata-container.has-cover.right.in-canvas {
   grid-template-columns: auto min(var(--cover-column-width), var(--cover-max-width-canvas));
 }
 
@@ -557,47 +557,47 @@ body.is-mobile .pp-cover {
 
 @container (width < 600px) {
 
-  .metadata-container.has-cover.left,
-  .metadata-container.has-cover.right {
+  .metadata-container:not(.in-canvas, .in-popover).has-cover.left,
+  .metadata-container:not(.in-canvas, .in-popover).has-cover.right {
     grid-template-columns: auto;
   }
 
-  .pp-cover.left,
-  .pp-cover.right {
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.left,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.right {
     max-height: var(--cover-max-height-top-bottom);
     margin-bottom: var(--pp-cover-gap);
   }
 
-  .pp-cover.initial.left .pp-cover-image,
-  .pp-cover.initial-2.left .pp-cover-image,
-  .pp-cover.initial-3.left .pp-cover-image,
-  .pp-cover.initial.right .pp-cover-image,
-  .pp-cover.initial-2.right .pp-cover-image,
-  .pp-cover.initial-3.right .pp-cover-image {
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.initial.left .pp-cover-image,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.initial-2.left .pp-cover-image,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.initial-3.left .pp-cover-image,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.initial.right .pp-cover-image,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.initial-2.right .pp-cover-image,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.initial-3.right .pp-cover-image {
     max-width: var(--cover-column-width);
     object-fit: contain;
   }
 
-  .pp-cover.vertical-cover.left .pp-cover-image,
-  .pp-cover.vertical-contain.left .pp-cover-image,
-  .pp-cover.vertical-cover.right .pp-cover-image,
-  .pp-cover.vertical-contain.right .pp-cover-image {
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.vertical-cover.left .pp-cover-image,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.vertical-contain.left .pp-cover-image,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.vertical-cover.right .pp-cover-image,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.vertical-contain.right .pp-cover-image {
     max-width: min(calc(var(--cover-max-height-top-bottom) * 0.63), var(--cover-width-vertical));
   }
 
-  .pp-cover.horizontal-cover.left .pp-cover-image,
-  .pp-cover.horizontal-contain.left .pp-cover-image,
-  .pp-cover.horizontal-cover.right .pp-cover-image,
-  .pp-cover.horizontal-contain.right .pp-cover-image {
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.horizontal-cover.left .pp-cover-image,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.horizontal-contain.left .pp-cover-image,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.horizontal-cover.right .pp-cover-image,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.horizontal-contain.right .pp-cover-image {
     width: 100%;
     aspect-ratio: unset;
     max-height: min(75cqw, var(--cover-max-height-top-bottom));
   }
 
-  .pp-cover.left.square > .pp-cover-image,
-  .pp-cover.right.square > .pp-cover-image,
-  .pp-cover.left.circle > .pp-cover-image,
-  .pp-cover.right.circle > .pp-cover-image {
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.left.square > .pp-cover-image,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.right.square > .pp-cover-image,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.left.circle > .pp-cover-image,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.right.circle > .pp-cover-image {
       width: min(var(--cover-max-height-top-bottom), var(--cover-column-width));
   }
 
