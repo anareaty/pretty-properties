@@ -86,6 +86,8 @@ export const updateCoverStyles = (plugin: PrettyPropertiesPlugin) => {
     "--cover-width-vertical": plugin.settings.coverVerticalWidth + "px",
     "--cover-max-height": plugin.settings.coverMaxHeight + "px",
     "--cover-max-height-top-bottom": plugin.settings.coverMaxHeightTopBottom + "px",
+    "--cover-max-height-top-bottom-canvas": plugin.settings.coverMaxHeightTopBottomCanvas + "px",
+    "--cover-max-height-mobile": plugin.settings.coverMaxHeightMobile + "px",
     "--cover-width-initial": plugin.settings.coverDefaultWidth1 + "px",
     "--cover-width-initial-2": plugin.settings.coverDefaultWidth2 + "px",
     "--cover-width-initial-3": plugin.settings.coverDefaultWidth3 + "px",

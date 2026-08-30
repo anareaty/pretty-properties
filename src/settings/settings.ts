@@ -44,6 +44,8 @@ export interface PPPluginSettings {
 	coverDefaultWidth3: number;
 	coverMaxHeight: number;
 	coverMaxHeightTopBottom: number;
+	coverMaxHeightMobile: number;
+	coverMaxHeightTopBottomCanvas: number;
     coverVerticalWidth: number;
     coverHorizontalWidth: number;
     coverSquareWidth: number;
@@ -139,6 +141,8 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	coverDefaultWidth3: 300,
 	coverMaxHeight: 500,
 	coverMaxHeightTopBottom: 400,
+	coverMaxHeightMobile: 200,
+	coverMaxHeightTopBottomCanvas: 200,
     coverVerticalWidth: 200,
     coverHorizontalWidth: 300,
     coverSquareWidth: 250,

@@ -183,16 +183,50 @@ export const getCoverSettingsDefinitions = (tab: PPSettingTab) => {
             visible: visible,
             render: (setting: Setting) => {
                 setting.addText(text => {
-            text.inputEl.type = "number"
-            text.setValue(plugin.settings.coverMaxHeightTopBottom.toString())
-            .setPlaceholder('400')
-            .onChange(async (value) => {
-                if (!value) value = "0"
-                plugin.settings.coverMaxHeightTopBottom = Number(value);
-                await plugin.saveSettings();
-                updateCoverStyles(plugin);
-            })
-        });
+                    text.inputEl.type = "number"
+                    text.setValue(plugin.settings.coverMaxHeightTopBottom.toString())
+                    .setPlaceholder('400')
+                    .onChange(async (value) => {
+                        if (!value) value = "0"
+                        plugin.settings.coverMaxHeightTopBottom = Number(value);
+                        await plugin.saveSettings();
+                        updateCoverStyles(plugin);
+                    })
+                });
+
+            }
+        }, {
+            name: i18n.t("COVER_MAX_HEIGHT_MOBILE"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+                    text.inputEl.type = "number"
+                    text.setValue(plugin.settings.coverMaxHeightMobile.toString())
+                    .setPlaceholder('200')
+                    .onChange(async (value) => {
+                        if (!value) value = "0"
+                        plugin.settings.coverMaxHeightMobile = Number(value);
+                        await plugin.saveSettings();
+                        updateCoverStyles(plugin);
+                    })
+                });
+
+            }
+        }, {
+            name: i18n.t("COVER_MAX_HEIGHT_TOP_BOTTOM_CANVAS"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+                    text.inputEl.type = "number"
+                    text.setValue(plugin.settings.coverMaxHeightTopBottomCanvas.toString())
+                    .setPlaceholder('200')
+                    .onChange(async (value) => {
+                        if (!value) value = "0"
+                        plugin.settings.coverMaxHeightTopBottomCanvas = Number(value);
+                        await plugin.saveSettings();
+                        updateCoverStyles(plugin);
+                    })
+                });
 
             }
         }, {
