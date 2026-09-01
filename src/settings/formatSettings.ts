@@ -4,7 +4,178 @@ import { updateAllProperties } from 'src/updates/updateElements';
 import { PPSettingTab } from 'src/settings/settings';
 import {PropertyNameSuggest} from "../utils/propertyNameSuggester";
 import {enhanceFormatTextArea} from "../utils/settingsHelper";
+import { AddPropertyModal, FormatTemplateModal } from 'src/modals/settingItemModals';
 
+
+
+
+
+export const getFormatSettingsDefinitions = (tab: PPSettingTab) => {
+    let plugin = tab.plugin
+    let datePlaceholder = "DD.MM.YYYY"
+    let dateTimePlaceholder = "DD.MM.YYYY HH:mm"
+
+    let propertyFormatsKeys = Object.keys(plugin.settings.propertyFormats)
+
+    return [
+        
+        {
+            type: "group",
+          
+            items: [
+                {
+                    name: i18n.t("ENABLE_CUSTOM_DATE_FORMAT"),
+                    render: (setting: Setting) => {
+                        setting.addToggle(toggle => toggle
+                            .setValue(plugin.settings.enableCustomDateFormat)
+                            .onChange(async (value) => {
+                                plugin.settings.enableCustomDateFormat = value
+                                await plugin.saveSettings();
+                                tab.update()
+                                updateAllProperties(plugin);
+                            }));
+                    }
+                }, {
+                    name: i18n.t("ENABLE_CUSTOM_DATE_FORMAT_IN_BASES"),
+                    visible: plugin.settings.enableCustomDateFormat,
+                    render: (setting: Setting) => {
+                        setting.addToggle(toggle => toggle
+                            .setValue(plugin.settings.enableCustomDateFormatInBases)
+                            .onChange(async (value) => {
+                                plugin.settings.enableCustomDateFormatInBases = value
+                                await plugin.saveSettings();
+                                tab.update()
+                                updateAllProperties(plugin);
+                        }));
+                    }
+                }, {
+                    name: i18n.t("CUSTOM_DATE_FORMAT"),
+                    visible: plugin.settings.enableCustomDateFormat,
+                    render: (setting: Setting) => {
+                        setting.addText(text => text
+                            .setPlaceholder(datePlaceholder)
+                            .setValue(plugin.settings.customDateFormat)
+                            .onChange(async (value) => {
+                                plugin.settings.customDateFormat = value;
+                                await plugin.saveSettings();
+                                updateAllProperties(plugin);
+                            }));
+                    }
+                }, {
+                    name: i18n.t("CUSTOM_DATETIME_FORMAT"),
+                    visible: plugin.settings.enableCustomDateFormat,
+                    render: (setting: Setting) => {
+                        setting.addText(text => text
+                            .setPlaceholder(dateTimePlaceholder)
+                            .setValue(plugin.settings.customDateTimeFormat)
+                            .onChange(async (value) => {
+                                plugin.settings.customDateTimeFormat = value;
+                                await plugin.saveSettings();
+                                updateAllProperties(plugin);
+                            }));
+                    }
+                }
+            ]
+        },
+
+        
+       {
+            type: "page",
+            name: i18n.t("SHOW_EXTRA_PROPERTY_FORMATTINGS"),
+            description: i18n.t("PROPERTY_FORMAT_DESC"),
+            items: [
+                {
+                    type: "list",
+                    heading: i18n.t("EXTRA_FORMATTINGS"),
+                    
+                    addItem: {
+                        name: i18n.t("ADD_PROPERTY_FORMAT"),
+                        action: () => {
+                            new AddPropertyModal(["text", "number", "date", "datetime"], plugin, async (newProperty) => {
+                                if (newProperty && !plugin.settings.propertyFormats[newProperty]) {
+                                    plugin.settings.propertyFormats[newProperty] = {
+                                        format: ""
+                                    }
+                                    await plugin.saveSettings()
+                                    tab.update()
+                                }
+                            }).open()
+                        }
+                    },
+                    onDelete: async (idx: number) => {
+                        let key = propertyFormatsKeys[idx] || ""
+                        delete plugin.settings.propertyFormats[key]
+                        await plugin.saveSettings();
+                        updateAllProperties(plugin);
+                        tab.update();
+                    },
+                    items: propertyFormatsKeys.map(key => ({
+                        name: key,
+                        searchable: false,
+                        render: (setting: Setting) => {
+
+                            let property = plugin.settings.propertyFormats[key]!
+
+
+                            setting.addButton(btn => {
+                                let format = property.format || ""
+                                if (format) {
+                                    btn.setClass("cover-has-format")
+                                }
+                                
+                                btn
+                                .setIcon("code-square")
+                                .setTooltip(i18n.t("SET_PROPERTY_FORMAT"))
+                                .onClick(() => {
+                                    new FormatTemplateModal(plugin, "PROPERTY_FORMAT_TEMPLATE", format, async (newFormat) => {
+                                        property.format = newFormat
+                                        await plugin.saveSettings();
+                                        updateAllProperties(plugin);
+                                        tab.update()
+                                    }).open()
+                                })
+                            })
+                        }
+                    }))
+                }
+            ]
+       },
+        {
+            type: "page",
+            name: i18n.t("SHOW_MARKDOWN_PROPERTIES_LIST"),
+            items: [
+                {
+                    type: "list",
+                    heading: i18n.t("MARKDOWN_PROPERTIES"),
+                    addItem: {
+                        name: i18n.t("ADD_MARKDOWN_PROPERTY"),
+                        action: () => {
+                            new AddPropertyModal(["text", "number", "date", "datetime"], plugin, async (newProperty) => {
+                                if (newProperty && !plugin.settings.markdownProperties.find(p => p == newProperty)) {
+                                    plugin.settings.markdownProperties.push(newProperty)
+                                    await plugin.saveSettings()
+                                    updateAllProperties(plugin);
+                                    tab.update()
+                                }
+                            }).open()
+                        }
+                    },
+                    onDelete: async (idx: number) => {
+                        plugin.settings.markdownProperties.splice(idx, 1);
+                        await plugin.saveSettings();
+                        updateAllProperties(plugin);
+                        tab.update();
+                    },
+                    items: plugin.settings.markdownProperties.map(property => ({
+                        name: property,
+                        searchable: false
+                    }))
+                    
+                }
+            ]
+        }
+    ]
+}
 
 
 
@@ -28,8 +199,8 @@ export const showFormatSettingsTab = (settingTab: PPSettingTab) => {
             updateAllProperties(plugin);
         }));
 
-    let datePlaceholder = "DD.MM.YYYY"
-    let dateTimePlaceholder = "DD.MM.YYYY HH:mm"
+    let datePlaceholder = "DD-MM-YYYY"
+    let dateTimePlaceholder = "DD-MM-YYYY HH:mm"
     
     if (plugin.settings.enableCustomDateFormat) {
         new Setting(containerEl)
@@ -136,10 +307,7 @@ const showFormatSettings = (settingTab: PPSettingTab) => {
 
     let formatSettingsWrapper = containerEl.createDiv()
 
-    formatSettingsWrapper.setCssProps({
-        border: "1px solid var(--text-accent)",
-        "border-radius": "4px"
-    })
+    formatSettingsWrapper.classList.add("pp-settings-list-container")
 
     let formatSettingsEl = formatSettingsWrapper.createDiv()
 
@@ -152,8 +320,7 @@ const showFormatSettings = (settingTab: PPSettingTab) => {
 
         if (!entry) {
             entry = {
-                format: "",
-                textFormat: ""
+                format: ""
             }
         }
 
@@ -169,31 +336,14 @@ const showFormatSettings = (settingTab: PPSettingTab) => {
 
 
 		.addTextArea((text) => {
-
-            
             enhanceFormatTextArea(plugin, text, entry.format, async (value) => {
-            
                 entry.format = value;
                 await plugin.saveSettings();
                 updateAllProperties(plugin);
             });
-            
-			
 		})
-		.addDropdown(drop => drop
-			.addOptions({
-				"raw": i18n.t("TEXT"),
-				"markdown": i18n.t("MARKDOWN")
-			})
-			.setValue(entry.textFormat || "raw")
-			.onChange(async (value) => {
-				entry.textFormat = value || "raw"
-				await plugin.saveSettings();
-				updateAllProperties(plugin);
-			})
-		)
 
-        
+
 
         .addButton(btn => btn
             .setIcon("x")
@@ -242,8 +392,7 @@ const showFormatSettings = (settingTab: PPSettingTab) => {
 				newProperty = newProperty.trim()
                 if (newProperty && !plugin.settings.propertyFormats[newProperty]) {
                     plugin.settings.propertyFormats[newProperty] = {
-						format: "",
-						textFormat: "raw"
+						format: ""
 					}
                     await plugin.saveSettings()
                     settingTab.display();

@@ -66,10 +66,14 @@ body {
 
 
 .has-banner > .markdown-source-view > .cm-editor > .cm-scroller > .cm-sizer,
-.has-banner > .markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer {
+.has-banner > .markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer,
+.popover.has-banner > .markdown-embed > .markdown-embed-content > .markdown-source-view > .cm-editor > .cm-scroller > .cm-sizer,
+.popover.has-banner > .markdown-embed > .markdown-embed-content > .markdown-preview-view > .markdown-preview-sizer {
   --pp-banner-top-spacing-phone: calc(var(--banner-height) + var(--banner-margin) - var(--view-top-spacing-markdown));
   --pp-banner-top-spacing: calc(var(--banner-height) + var(--banner-margin));
   margin-top: var(--pp-banner-top-spacing);
+
+
 }
 
 
@@ -82,15 +86,22 @@ body {
 
 
 .has-icon > .markdown-source-view > .cm-editor > .cm-scroller > .cm-sizer,
-.has-icon > .markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer {
+.has-icon > .markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer,
+.popover.has-icon > .markdown-embed > .markdown-embed-content > .markdown-source-view > .cm-editor > .cm-scroller > .cm-sizer,
+.popover.has-icon > .markdown-embed > .markdown-embed-content > .markdown-preview-view > .markdown-preview-sizer
+
+{
   margin-top: calc(var(--pp-icon-size) + var(--pp-icon-top-margin-wb) + var(--pp-icon-gap));
+
 }
 
 
 
 
 .has-banner.has-icon > .markdown-source-view > .cm-editor > .cm-scroller > .cm-sizer,
-.has-banner.has-icon > .markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer {
+.has-banner.has-icon > .markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer,
+.popover.has-icon.has-banner > .markdown-embed > .markdown-embed-content > .markdown-source-view > .cm-editor > .cm-scroller > .cm-sizer,
+.popover.has-icon.has-banner > .markdown-embed > .markdown-embed-content > .markdown-preview-view > .markdown-preview-sizer {
   --pp-banner-icon-top-spacing-phone: calc(var(--banner-height) + var(--pp-banner-icon-gap) - var(--view-top-spacing-markdown));
   --pp-banner-icon-top-spacing: calc(var(--banner-height) + var(--pp-banner-icon-gap));
   margin-top: var(--pp-banner-icon-top-spacing);
@@ -266,6 +277,16 @@ body {
 
 }
 
+.markdown-source-view .cm-sizer,
+.mod-header {
+  container-type: inline-size;
+}
+
+
+
+
+
+
 
 
 
@@ -274,60 +295,110 @@ body {
 
 
 /* SIDE IMAGES*/
-  
-.markdown-source-view .cm-sizer,
-.mod-header {
-  container-type: inline-size;
+
+body.is-mobile .pp-cover {
+  --cover-max-height-top-bottom: var(--cover-max-height-mobile);
 }
 
-@container (width >= 600px) {
-  .metadata-container.has-cover:not(.top, .bottom) {
-    --metadata-display-editing: grid;
-    --metadata-display-reading: grid;
-    grid-column-gap: 22px;
-    grid-template-rows: auto 1fr;
-  }
+.in-canvas .pp-cover {
+  --cover-max-height-top-bottom: var(--cover-max-height-top-bottom-canvas);
 }
 
-
-.canvas-node-content .metadata-container.has-cover:not(.top, .bottom) {
-    --metadata-display-editing: grid;
-    --metadata-display-reading: grid;
-    grid-column-gap: 10px;
-    grid-template-rows: auto 1fr;
+.metadata-content {
+  min-width: 0;
 }
 
-
-
-.metadata-container.has-cover.bottom {
-  --metadata-display-editing: flex;
-  --metadata-display-reading: flex;
-  flex-direction: column;
+.metadata-container.has-cover {
+  --metadata-display-editing: grid;
+  --metadata-display-reading: grid;
+  --pp-cover-gap: 22px;
+  grid-column-gap: var(--pp-cover-gap);
+  grid-template-rows: auto 1fr;
 }
 
+.metadata-container.has-cover.left {
+  grid-template-columns: var(--cover-column-width) auto;
+}
+
+.metadata-container.has-cover.right {
+  grid-template-columns: auto var(--cover-column-width);
+}
+
+.metadata-container.has-cover.in-canvas {
+  --pp-cover-gap: 10px;
+}
+
+.metadata-container.has-cover.left.in-canvas {
+  grid-template-columns: min(var(--cover-column-width), var(--cover-max-width-canvas)) auto;
+}
+
+.metadata-container.has-cover.right.in-canvas {
+  grid-template-columns: auto min(var(--cover-column-width), var(--cover-max-width-canvas));
+}
+
+.hover-popover .metadata-container.has-cover.left {
+  grid-template-columns: min(var(--cover-column-width), var(--cover-max-width-popover)) auto;
+}
+
+.hover-popover  .metadata-container.has-cover.right {
+  grid-template-columns: auto min(var(--cover-column-width), var(--cover-max-width-popover));
+}
 
 .pp-cover.bottom {
-  order: 1;
+  grid-row: 3;
+}
+
+.pp-cover.right {
+  grid-column: 2;
+}
+
+.pp-cover.top {
+  margin-bottom: var(--pp-cover-gap)
+}
+
+.pp-cover.bottom {
+  margin-top: var(--pp-cover-gap)
 }
 
 
 
+.pp-cover.left,
+.pp-cover.right {
+  grid-row: 1/3;
+  max-height: var(--cover-max-height);
+}
+
+.pp-cover.top,
+.pp-cover.bottom {
+  max-height: var(--cover-max-height-top-bottom);
+}
 
 
+.pp-cover-image {
+  width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+}
 
-.pp-cover {
-    grid-row: 1/3;
+.pp-cover.left .pp-cover-image,
+.pp-cover.right .pp-cover-image {
+  width: 100%;
 }
 
 .pp-cover.mode-image,
 .pp-cover.mode-pdf {
-    text-align: center;
+  text-align: center;
+  font-size: 0;
+}
+
+.hide-cover-collapsed .metadata-container.is-collapsed .pp-cover {
+	display: none;
 }
 
 
 
 
-
+/* Initial shape */
 
 .metadata-container.has-cover.initial {
   --cover-column-width: var(--cover-width-initial);
@@ -341,127 +412,25 @@ body {
   --cover-column-width: var(--cover-width-initial-3);
 }
 
+.pp-cover.initial.top .pp-cover-image,
+.pp-cover.initial-2.top .pp-cover-image,
+.pp-cover.initial-3.top .pp-cover-image,
+.pp-cover.initial.bottom .pp-cover-image,
+.pp-cover.initial-2.bottom .pp-cover-image,
+.pp-cover.initial-3.bottom .pp-cover-image {
+  max-width: var(--cover-column-width);
+  object-fit: contain;
+}
+
+
+
+
+/* Vertical */
+
 .metadata-container.has-cover.vertical-cover, 
 .metadata-container.has-cover.vertical-contain {
   --cover-column-width: var(--cover-width-vertical);
 }
-
-.metadata-container.has-cover.horizontal-cover, 
-.metadata-container.has-cover.horizontal-contain {
-  --cover-column-width: var(--cover-width-horizontal);
-}
-
-.metadata-container.has-cover.square {
-  --cover-column-width: var(--cover-width-square);
-}
-
-
-.metadata-container.has-cover.circle {
-  --cover-column-width: var(--cover-width-circle);
-}
-
-
-
-
-
-.metadata-container.has-cover.left {
-  grid-template-columns: var(--cover-column-width) auto;
-}
-
-.metadata-container.has-cover.right {
-  grid-template-columns: auto var(--cover-column-width);
-}
-
-.hover-popover .metadata-container.has-cover.left {
-  grid-template-columns: min(var(--cover-column-width), var(--cover-max-width-popover)) auto;
-}
-
-.hover-popover  .metadata-container.has-cover.right {
-  grid-template-columns: auto min(var(--cover-column-width), var(--cover-max-width-popover));
-}
-
-
-
-.canvas-node-content .metadata-container.has-cover.left {
-  grid-template-columns: min(var(--cover-column-width), var(--cover-max-width-canvas)) auto;
-}
-
-.canvas-node-content .metadata-container.has-cover.right {
-  grid-template-columns: auto min(var(--cover-column-width), var(--cover-max-width-canvas));
-}
-
-
-
-.pp-cover.right {
-  grid-column: 2;
-}
-
-
-
-
-/*
-.pp-cover:not(.top, .bottom) .pp-cover-image {
-  max-height: var(--cover-max-height);
-}
-
-.pp-cover.top .pp-cover-image,
-.pp-cover.bottom .pp-cover-image {
-  max-height: var(--cover-max-height-top-bottom);
-}
-*/
-
-
-.pp-cover.initial .pp-cover-image,
-.pp-cover.initial-2 .pp-cover-image,
-.pp-cover.initial-3 .pp-cover-image {
-  object-fit: cover;
-}
-
-
-
- 
-@container (width < 600px) {
-
-  .is-mobile .pp-cover:not(.pp-canvas-cover) .pp-cover-image {
-    width: var(--cover-column-width);
-  }
-  
-  .pp-cover:not(.pp-canvas-cover) .pp-cover-image {
-    height: 200px;
-	  width: auto;
-    margin: auto;
-  }
-
-  .pp-cover.vertical-cover:not(.pp-canvas-cover) .pp-cover-image,
-  .pp-cover.vertical-contain:not(.pp-canvas-cover) .pp-cover-image {
-    aspect-ratio: auto;
-    max-width: 150px;
-  }
-
-  .pp-cover.horizontal-cover:not(.pp-canvas-cover) .pp-cover-image,
-  .pp-cover.horizontal-contain:not(.pp-canvas-cover) .pp-cover-image {
-    width: 100%;
-  }
-
-  .pp-cover.square:not(.pp-canvas-cover) .pp-cover-image,
-  .pp-cover.circle:not(.pp-canvas-cover) .pp-cover-image {
-    width: 200px;
-  }
-
-  
-}
-
-
-
-
-
-
-
-
-
-
-
-
 
 .pp-cover.vertical-cover .pp-cover-image,
 .pp-cover.vertical-contain .pp-cover-image {
@@ -473,10 +442,24 @@ body {
   object-fit: contain;
 }
 
-.pp-cover.vertical-cover .pp-cover-image {
-  object-fit: cover;
+
+
+
+.pp-cover.vertical-cover.top .pp-cover-image,
+.pp-cover.vertical-contain.top .pp-cover-image,
+.pp-cover.vertical-cover.bottom .pp-cover-image,
+.pp-cover.vertical-contain.bottom .pp-cover-image {
+  max-width: min(calc(var(--cover-max-height-top-bottom) * 0.63), var(--cover-width-vertical));
 }
 
+
+
+/* Horizontal */
+
+.metadata-container.has-cover.horizontal-cover, 
+.metadata-container.has-cover.horizontal-contain {
+  --cover-column-width: var(--cover-width-horizontal);
+}
 
 .pp-cover.horizontal-cover .pp-cover-image,
 .pp-cover.horizontal-contain .pp-cover-image {
@@ -487,40 +470,37 @@ body {
   object-fit: contain;
 }
 
-.pp-cover.horizontal-cover .pp-cover-image {
-  object-fit: cover;
+.pp-cover.horizontal-cover.top .pp-cover-image,
+.pp-cover.horizontal-contain.top .pp-cover-image,
+.pp-cover.horizontal-cover.bottom .pp-cover-image,
+.pp-cover.horizontal-contain.bottom .pp-cover-image {
+  width: 100%;
+  aspect-ratio: unset;
+  max-height: min(75cqw, var(--cover-max-height-top-bottom));
 }
 
 
 
-.pp-cover.square .pp-cover-image {
+
+/* Square and circle */
+
+.metadata-container.has-cover.square {
+  --cover-column-width: var(--cover-width-square);
+}
+
+.metadata-container.has-cover.circle {
+  --cover-column-width: var(--cover-width-circle);
+}
+
+.pp-cover.square .pp-cover-image,
+.pp-cover.circle .pp-cover-image {
   aspect-ratio: 1;
-  object-fit: cover;
 }
 
 .pp-cover.circle .pp-cover-image {
-  aspect-ratio: 1;
-  object-fit: cover;
   border-radius: 50%;
 }
 
-
-
-.pp-cover > .pp-cover-image {
-  width: 100%;
-}
-
-.metadata-content {
-  min-width: 0;
-}
-
-
-
-
-
-
-
-/*Квадратная и круглая*/
 .pp-cover.top.square > .pp-cover-image,
 .pp-cover.bottom.square > .pp-cover-image,
 .pp-cover.top.circle > .pp-cover-image,
@@ -530,47 +510,13 @@ body {
 
 
 
-/*Оригинал*/
-
-.pp-cover.initial.top .pp-cover-image,
-.pp-cover.initial-2.top .pp-cover-image,
-.pp-cover.initial-3.top .pp-cover-image,
-.pp-cover.initial.bottom .pp-cover-image,
-.pp-cover.initial-2.bottom .pp-cover-image,
-.pp-cover.initial-3.bottom .pp-cover-image {
-  max-width: var(--cover-column-width);
-  width: auto;
-}
-
-/*Вертикальная*/
-.pp-cover.vertical-cover.top .pp-cover-image,
-.pp-cover.vertical-contain.top .pp-cover-image,
-.pp-cover.vertical-cover.bottom .pp-cover-image,
-.pp-cover.vertical-contain.bottom .pp-cover-image {
-  max-width: var(--cover-width-vertical);
-}
-
-.pp-cover.vertical-cover.top .pp-cover-image,
-.pp-cover.vertical-cover.bottom .pp-cover-image {
-  width: auto;
-}
-
-/*Горизонтальная*/
-.pp-cover.horizontal-cover.top .pp-cover-image,
-.pp-cover.horizontal-contain.top .pp-cover-image,
-.pp-cover.horizontal-cover.bottom .pp-cover-image,
-.pp-cover.horizontal-contain.bottom .pp-cover-image {
-  width: 100%;
-  aspect-ratio: unset;
-}
 
 
+/* Iframe cover */
 
 .pp-cover-has-iframe {
 	position: relative;
 }
-
-
 
 .pp-cover-menu-button {
   padding: var(--size-2-2) var(--size-2-3);
@@ -596,6 +542,61 @@ body {
 	color: var(--text-normal);
 	opacity: 1;
 }
+
+
+
+
+/* Narrow container */
+
+
+@container (width < 600px) {
+
+  .metadata-container:not(.in-canvas, .in-popover).has-cover.left,
+  .metadata-container:not(.in-canvas, .in-popover).has-cover.right {
+    grid-template-columns: auto;
+  }
+
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.left,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.right {
+    max-height: var(--cover-max-height-top-bottom);
+    margin-bottom: var(--pp-cover-gap);
+  }
+
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.initial.left .pp-cover-image,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.initial-2.left .pp-cover-image,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.initial-3.left .pp-cover-image,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.initial.right .pp-cover-image,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.initial-2.right .pp-cover-image,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.initial-3.right .pp-cover-image {
+    max-width: var(--cover-column-width);
+    object-fit: contain;
+  }
+
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.vertical-cover.left .pp-cover-image,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.vertical-contain.left .pp-cover-image,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.vertical-cover.right .pp-cover-image,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.vertical-contain.right .pp-cover-image {
+    max-width: min(calc(var(--cover-max-height-top-bottom) * 0.63), var(--cover-width-vertical));
+  }
+
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.horizontal-cover.left .pp-cover-image,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.horizontal-contain.left .pp-cover-image,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.horizontal-cover.right .pp-cover-image,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.horizontal-contain.right .pp-cover-image {
+    width: 100%;
+    aspect-ratio: unset;
+    max-height: min(75cqw, var(--cover-max-height-top-bottom));
+  }
+
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.left.square > .pp-cover-image,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.right.square > .pp-cover-image,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.left.circle > .pp-cover-image,
+  .metadata-container:not(.in-canvas, .in-popover) .pp-cover.right.circle > .pp-cover-image {
+      width: min(var(--cover-max-height-top-bottom), var(--cover-column-width));
+  }
+
+}
+  
 
 
 
@@ -639,9 +640,7 @@ body {
 
 
 
-.hide-cover-collapsed .metadata-container.is-collapsed .pp-cover {
-	display: none;
-}
+
 
 
 
@@ -1034,13 +1033,26 @@ body {
   color: var(--color-pink)
 }
 
+.setting-group .setting-item.pp-settings-tabs {
+  padding: 10px 5px;
 
+}
 
 .pp-settings-tabs {
   border-bottom: 1px solid var(--background-modifier-border);
   overflow-x: scroll;
   white-space: nowrap;
   margin-bottom: 16px;
+  padding: 0;
+
+}
+
+.pp-settings-tabs .setting-item-control {
+  justify-content: center;
+}
+
+.pp-settings-tabs  .setting-item-info {
+  display: none;
 }
 
 button.pp-settings-tab {
@@ -1125,7 +1137,7 @@ button.pp-settings-tab:not(.pp-settings-tab-selected):hover {
 
 
 .metadata-property-value[data-property-type="tags"] .multi-select-pill {
-    line-height: unset;
+    line-height: normal;
 }
 
 
@@ -1201,6 +1213,15 @@ a.tag.transparent-color {
 /* Hide properties */
 /* We need to use more complex styles instead of just 'display: none' so the property can be revealed when selected by keyboard navigation. */
 
+
+
+/* When shown show more faded then non hidden.*/
+.pp-property-hidden,
+.is-empty.pp-property-hidden-when-empty {
+  opacity: 0.5
+}
+
+
 /* Hide properties marked as hidden */
 body:not(.show-hidden-properties) .markdown-source-view .metadata-property.pp-property-hidden:not(:focus, :focus-within),
 body:not(.show-hidden-properties) .markdown-preview-view .metadata-property.pp-property-hidden:not(:focus, :focus-within),
@@ -1221,14 +1242,14 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 
 /* Hide metadata block when all properties are hidden */
 .hide-metadata-if-props-empty-editing:not(.show-hidden-properties) .markdown-source-view .metadata-container.pp-mc-hidden:not(:focus-within, .has-cover),
-.hide-metadata-if-props-empty-editing.hide-all-empty-properties:not(.show-hidden-properties) .markdown-source-view .metadata-container.pp-mc-empty-hidden:not(:focus-within, .has-cover),
 .hide-metadata-if-props-empty-reading:not(.show-hidden-properties) .markdown-preview-view .metadata-container.pp-mc-hidden:not(:focus-within, .has-cover),
-.hide-metadata-if-props-empty-reading.hide-all-empty-properties:not(.show-hidden-properties) .markdown-preview-view .metadata-container.pp-mc-empty-hidden:not(:focus-within, .has-cover),
 /* Manage hiding metadata when it has the cover image */
 .hide-metadata-if-props-empty-editing:not(.show-hidden-properties) .markdown-source-view .metadata-container.pp-mc-hidden.has-cover :is(.metadata-properties-heading, .metadata-content):not(:focus, :focus-within),
-.hide-metadata-if-props-empty-editing.hide-all-empty-properties:not(.show-hidden-properties) .markdown-source-view .metadata-container.pp-mc-empty-hidden.has-cover :is(.metadata-properties-heading, .metadata-content):not(:focus, :focus-within),
 .hide-metadata-if-props-empty-reading:not(.show-hidden-properties) .markdown-preview-view .metadata-container.pp-mc-hidden.has-cover :is(.metadata-properties-heading, .metadata-content):not(:focus, :focus-within),
-.hide-metadata-if-props-empty-reading.hide-all-empty-properties:not(.show-hidden-properties) .markdown-preview-view .metadata-container.pp-mc-empty-hidden.has-cover :is(.metadata-properties-heading, .metadata-content):not(:focus, :focus-within)
+
+.hide-metadata-add-button .markdown-source-view .metadata-content:not(:focus-within) .metadata-add-button,
+.hide-metadata-add-button .markdown-preview-view .metadata-content:not(:focus-within) .metadata-add-button
+
 {
   position: absolute;
   width: 1px;
@@ -1249,7 +1270,8 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 
 
 .has-property-formatting:not(:focus-within) .metadata-input-longtext,
-.has-property-formatting:not(:focus-within) .metadata-input-number {
+.has-property-formatting:not(:focus-within) .metadata-input-number,
+.has-property-formatting:not(:focus-within) .metadata-link {
   font-size: 0;
 }
 
@@ -1299,6 +1321,7 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 }
 
 
+.multi-select-pill.colored,
 .metadata-property-value .multi-select-pill.colored,
 .metadata-property-value[data-property-type="tags"] .multi-select-pill.colored,
 .value-list-element.colored {
@@ -1462,14 +1485,28 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 
 
 
-.metadata-input-longtext,
+.metadata-input-longtext:not(:hover),
 .bases-cards-line[data-property-longtext-value] {
+
+
+
   border-radius: 4px;
+
+
+  
   display: block;
-  /*margin: var(--longtext-margin);*/
-  /*padding: 0px var(--pill-padding-x);*/
-  max-width: fit-content;
+  max-width: fit-content !important;
 }
+
+
+
+
+
+
+
+
+
+
 
 .bases-rendered-value[data-property-longtext-value]{
   border-radius: 4px;
@@ -1736,11 +1773,7 @@ button.longtext-color-button:hover {
 
 /* Hide metadata add button */
 
-.hide-metadata-add-button .markdown-source-view .metadata-content:not(:focus-within) .metadata-add-button,
-.hide-metadata-add-button .markdown-preview-view .metadata-content:not(:focus-within) .metadata-add-button {
-  display: none;
 
-}
 
 /* Fix for Minimal theme */
 
@@ -1782,8 +1815,6 @@ button.longtext-color-button:hover {
 }
 
 .pp-formatted-value-overlay.text-overlay {
-
-
   margin: var(--input-padding);
 }
 
@@ -1837,4 +1868,17 @@ button.bare-button {
 
 .pp-formatted-value-overlay {
   border-radius: 4px;
+}
+
+
+button.cover-has-format {
+  color: var(--text-accent)
+}
+
+
+
+.pp-settings-list-container {
+  border: 1px solid var(--text-accent);
+  border-radius: 4px;
+  padding: 8px;
 }

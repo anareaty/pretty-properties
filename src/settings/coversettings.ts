@@ -8,6 +8,404 @@ import { updateAllCovers } from 'src/updates/updateCovers';
 import {PropertyNameSuggest} from "../utils/propertyNameSuggester";
 import {enhanceFormatTextArea} from "../utils/settingsHelper";
 
+import { AddPropertyModal, FormatTemplateModal } from 'src/modals/settingItemModals';
+
+
+
+
+
+
+
+
+export const getCoverSettingsDefinitions = (tab: PPSettingTab) => {
+    let plugin = tab.plugin
+    let visible = plugin.settings.enableCover
+    let coverShapePlaceholder = "cover_shape"
+    let coverPositionPlaceholder = "cover_position"
+
+    return [
+        {
+            name: i18n.t("ENABLE_COVER"),
+            render: (setting: Setting) => {
+                setting.addToggle(toggle => toggle
+            .setValue(plugin.settings.enableCover)
+            .onChange(async (value) => {
+                plugin.settings.enableCover = value
+                await plugin.saveSettings();
+                tab.update()
+                updateAllCovers(plugin)
+                updateCoverStyles(plugin)
+            }));
+            }
+        }, 
+
+        {
+            type: "list",
+            heading: i18n.t("COVER_PROPERTIES"),
+            visible: visible,
+            addItem: {
+                name: i18n.t("ADD_COVER_PROPERTY"),
+                action: () => {
+                    
+                    new AddPropertyModal(["text"], plugin, async (newProperty) => {
+                        if (newProperty && !plugin.settings.coverProperties.find(c => c.property == newProperty)) {
+                        plugin.settings.coverProperties.push({ property: newProperty, format: "" });
+                        await plugin.saveSettings()
+                        tab.update()
+
+                    }
+                    }).open()
+                }
+            },
+            onDelete: async (idx: number) => {
+                plugin.settings.coverProperties.splice(idx, 1);
+                await plugin.saveSettings();
+                tab.update();
+            },
+            items: plugin.settings.coverProperties.map(cover => ({
+                name: cover.property,
+                searchable: false,
+                render: (setting: Setting) => {
+                    setting.addButton(btn => {
+                        if (cover.format) {
+                            btn.setClass("cover-has-format")
+                        }
+                        
+                        btn
+                        .setIcon("code-square")
+                        .setTooltip(i18n.t("SET_COVER_TEMPLATE"))
+                        .onClick(() => {
+
+                            new FormatTemplateModal(plugin, "PROPERTY_FORMAT_TEMPLATE", cover.format, async (newFormat) => {
+                                cover.format = newFormat
+                                await plugin.saveSettings();
+                                updateAllCovers(plugin);
+                                tab.update()
+                            }).open()
+                        })
+                    })
+                }
+            }))
+        }, {
+            name: i18n.t("COVERS_FOLDER"),
+            visible: visible,
+            control: {
+                type: "folder",
+                key: "coversFolder"
+            }
+        }, {
+            name: i18n.t("COVER_SHAPE_PROPERTY"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => text
+                .setPlaceholder(coverShapePlaceholder)
+                .setValue(plugin.settings.coverShapeProperty)
+                .onChange(async (value) => {
+                    plugin.settings.coverShapeProperty = value;
+                    await plugin.saveSettings();
+                    updateAllCovers(plugin);
+            }));
+
+            }
+        }, {
+            name: i18n.t("COVER_POSITION_PROPERTY"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => text
+                .setPlaceholder(coverPositionPlaceholder)
+                .setValue(plugin.settings.coverPositionProperty)
+                .onChange(async (value) => {
+                    plugin.settings.coverPositionProperty = value;
+                    await plugin.saveSettings();
+                    updateAllCovers(plugin);
+            }));
+
+            }
+        }, {
+            name: i18n.t("SHOW_COVERS_IN_PAGE_PREVIEWS"),
+            visible: visible,
+            control: {
+                type: "toggle",
+                key: "enableCoversInPopover"
+            }
+        }, {
+            name: i18n.t("HIDE_COVER_COLLAPSED"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addToggle(toggle => toggle
+                .setValue(plugin.settings.hideCoverCollapsed)
+                .onChange(async (value) => {
+                    plugin.settings.hideCoverCollapsed = value
+                    await plugin.saveSettings();
+                    updateCoverStyles(plugin);
+                }));
+
+            }
+        }, {
+            name: i18n.t("COVER_POSITION"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addDropdown(dropdown => dropdown
+            .addOptions({
+                "left": i18n.t("LEFT"),
+                "right": i18n.t("RIGHT"),
+                "top": i18n.t("TOP"),
+                "bottom": i18n.t("BOTTOM")
+            })
+            .setValue(plugin.settings.coverPosition)
+            .onChange(async (value) => {
+                plugin.settings.coverPosition = value
+                await plugin.saveSettings();
+                updateAllCovers(plugin)
+            })
+        )
+
+            }
+        }, {
+            name: i18n.t("COVER_MAX_HEIGHT"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverMaxHeight.toString())
+            .setPlaceholder('500')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverMaxHeight = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+            }
+        }, {
+            name: i18n.t("COVER_MAX_HEIGHT_TOP_BOTTOM"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+                    text.inputEl.type = "number"
+                    text.setValue(plugin.settings.coverMaxHeightTopBottom.toString())
+                    .setPlaceholder('400')
+                    .onChange(async (value) => {
+                        if (!value) value = "0"
+                        plugin.settings.coverMaxHeightTopBottom = Number(value);
+                        await plugin.saveSettings();
+                        updateCoverStyles(plugin);
+                    })
+                });
+
+            }
+        }, {
+            name: i18n.t("COVER_MAX_HEIGHT_MOBILE"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+                    text.inputEl.type = "number"
+                    text.setValue(plugin.settings.coverMaxHeightMobile.toString())
+                    .setPlaceholder('200')
+                    .onChange(async (value) => {
+                        if (!value) value = "0"
+                        plugin.settings.coverMaxHeightMobile = Number(value);
+                        await plugin.saveSettings();
+                        updateCoverStyles(plugin);
+                    })
+                });
+
+            }
+        }, {
+            name: i18n.t("COVER_MAX_HEIGHT_TOP_BOTTOM_CANVAS"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+                    text.inputEl.type = "number"
+                    text.setValue(plugin.settings.coverMaxHeightTopBottomCanvas.toString())
+                    .setPlaceholder('200')
+                    .onChange(async (value) => {
+                        if (!value) value = "0"
+                        plugin.settings.coverMaxHeightTopBottomCanvas = Number(value);
+                        await plugin.saveSettings();
+                        updateCoverStyles(plugin);
+                    })
+                });
+
+            }
+        }, {
+            name: i18n.t("DEFAULT_COVER_WIDTH"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverDefaultWidth1.toString())
+            .setPlaceholder('200')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverDefaultWidth1 = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+            }
+        }, {
+            name: i18n.t("DEFAULT_COVER_WIDTH_2"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverDefaultWidth2.toString())
+            .setPlaceholder('250')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverDefaultWidth2 = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+            }
+        }, {
+            name: i18n.t("DEFAULT_COVER_WIDTH_3"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverDefaultWidth3.toString())
+            .setPlaceholder('300')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverDefaultWidth3 = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+            }
+        }, {
+            name: i18n.t("VERTICAL_COVER_WIDTH"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverVerticalWidth.toString())
+            .setPlaceholder('200')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverVerticalWidth = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+            }
+        }, {
+            name: i18n.t("HORIZONTAL_COVER_WIDTH"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverHorizontalWidth.toString())
+            .setPlaceholder('300')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverHorizontalWidth = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+            }
+        }, {
+            name: i18n.t("SQUARE_COVER_WIDTH"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverSquareWidth.toString())
+            .setPlaceholder('250')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverSquareWidth = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+            }
+        }, {
+            name: i18n.t("CIRCLE_COVER_WIDTH"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverCircleWidth.toString())
+            .setPlaceholder('250')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverCircleWidth = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+            }
+        }, {
+            name: i18n.t("MAX_COVER_WIDTH_POPOVER"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverMaxWidthPopover.toString())
+            .setPlaceholder('150')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverMaxWidthPopover = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+            }
+        }, {
+            name: i18n.t("MAX_COVER_WIDTH_CANVAS"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverMaxWidthCanvas.toString())
+            .setPlaceholder('150')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverMaxWidthCanvas = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+            }
+        }
+    ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
 
 
 
@@ -47,10 +445,7 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
 
         let coverSettingsWrapper = containerEl.createDiv()
 
-        coverSettingsWrapper.setCssProps({
-            border: "1px solid var(--text-accent)",
-            "border-radius": "4px"
-        })
+        coverSettingsWrapper.classList.add("pp-settings-list-container")
 
         new Setting(coverSettingsWrapper)
         .setName(i18n.t("COVER_PROPERTIES"))

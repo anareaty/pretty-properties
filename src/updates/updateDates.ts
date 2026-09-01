@@ -126,7 +126,7 @@ export const updateDateInput = (input: HTMLInputElement, plugin: PrettyPropertie
 		
 		let metadataContainer = parent.closest(".metadata-container")
 		if (metadataContainer?.instanceOf(HTMLElement)) {
-			hideMetadataContainerIfAllPropertiesHidden(metadataContainer)
+			hideMetadataContainerIfAllPropertiesHidden(metadataContainer, plugin)
 		}
 		
 	}
@@ -192,7 +192,7 @@ export const updateDateTimeInput = (input: HTMLInputElement, plugin: PrettyPrope
 		
 		let metadataContainer = parent.closest(".metadata-container")
 		if (metadataContainer?.instanceOf(HTMLElement)) {
-			hideMetadataContainerIfAllPropertiesHidden(metadataContainer)
+			hideMetadataContainerIfAllPropertiesHidden(metadataContainer, plugin)
 		}
 		
 	}

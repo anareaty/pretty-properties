@@ -11,6 +11,8 @@ const pdfRegex = /^(!)?(?:\[\[(.+\.pdf)\]\]|\[([^\]]*)\]\((.+\.pdf)\))$/;
 const urlRegex = /^(?:http[s]?:\/\/.)?(?:www\.)?[-a-zA-Z0-9@%._+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_+.~#?&//=]*)$/i;
 const localFileRegex = /^(file:\/\/\/\/.)[-a-zA-Z0-9@%._+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_+.~#?&//=]*)$/i;
 const wikiLinkRegex = /^\[\[.+?\]\]$/;
+const base64Regex = /^data:image\/.*?;base64.*/i;
+
 
 
 
@@ -125,7 +127,16 @@ export const selectCoverImage = (plugin: PrettyPropertiesPlugin) => {
 
 
 
-
+export const getImageValue = (value: string) => {
+    if (pdfRegex.test(value)) return value
+    else if (urlRegex.test(value) || localFileRegex.test(value)) {
+        value = value.replace(/^(https:\/\/www\.youtube.com\/watch\?v=)(.*)/, "https://img.youtube.com/vi/$2/maxresdefault.jpg")
+		value = `![](${value})`
+    } else if (wikiLinkRegex.test(value)) {
+		value = `!${value}`;
+	} 
+    return value
+}
 
 
 
@@ -137,9 +148,6 @@ export const renderImageFromValue = async (
 	plugin: PrettyPropertiesPlugin
 ) => {
 
-    let imageMode = "mode-markdown"
-
-
 	if(type == "cover" && pdfRegex.test(value)) {
 		const relativePath = extractPdfPath(value);
 		if (relativePath) {
@@ -150,6 +158,11 @@ export const renderImageFromValue = async (
             }
 		}
 	} 
+    
+    else if (base64Regex.test(value)) {
+        const img = createEl("img", {cls: "pp-image-img", attr: {src: value}})
+        return createImageWrapper(img, value, "mode-image", type);
+    }
 	
 	else if (urlRegex.test(value) || localFileRegex.test(value)) {
 		value = value.replace(/^(https:\/\/www\.youtube.com\/watch\?v=)(.*)/, "https://img.youtube.com/vi/$2/maxresdefault.jpg")

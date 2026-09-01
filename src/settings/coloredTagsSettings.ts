@@ -11,11 +11,9 @@ export const showColoredTagsSettings = (settingTab: PPSettingTab) => {
 
     let colorSettingsWrapper = containerEl.createDiv()
 
-    colorSettingsWrapper.setCssProps({
-        border: "1px solid var(--text-accent)",
-        "border-radius": "4px"
-    })
+    colorSettingsWrapper.classList.add("pp-settings-list-container")
 
+    
     let colorSettingsEl = colorSettingsWrapper.createDiv()
 
     const addColorSetting = (property: string) => {

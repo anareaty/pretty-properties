@@ -7,6 +7,228 @@ import { updateLongTexts } from 'src/updates/updatePills';
 
 
 
+
+
+export const getOtherSettingsDefinitions = (tab: PPSettingTab) => {
+    let plugin = tab.plugin
+    return [
+        {
+            name: i18n.t("ADD_PADDINGS_TO_LIST_PROPERTIES"),
+            description: i18n.t("ADD_PADDINGS_DESC"),
+            render: (setting: Setting) => {
+                setting.addDropdown(drop => drop
+                    .addOptions({
+                        "all": i18n.t("ALL"),
+                        "none": i18n.t("NONE"),
+                        "colored": i18n.t("ONLY_COLORED"),
+                        "non-transparent": i18n.t("ONLY_NON_TRANSPARENT")
+                    })
+                    .setValue(plugin.settings.addPillPadding)
+                    .onChange(async(value) => {
+                        plugin.settings.addPillPadding = value
+                        await plugin.saveSettings()
+                        updatePillPaddings(plugin)
+                    })
+                )
+            }
+        },
+        {
+            name: i18n.t("IMAGE_LINK_FORMAT"),
+            description: i18n.t("IMAGE_LINK_FORMAT_DESC"),
+            render: (setting: Setting) => {
+                setting.addDropdown(drop => drop
+                    .addOptions({
+                        "link": i18n.t("LINK"),
+                        "embed": i18n.t("EMBED"),
+                        "raw": i18n.t("RAW_PATH")
+                    })
+                    .setValue(plugin.settings.imageLinkFormat)
+                    .onChange(async(value) => {
+                        plugin.settings.imageLinkFormat = value
+                        await plugin.saveSettings()
+                    })
+                )
+            }
+        },
+        {
+            name: i18n.t("ENABLE_MATH"),
+            render: (setting: Setting) => {
+                setting.addToggle(toggle => toggle
+                    .setValue(plugin.settings.enableMath)
+                    .onChange(async (value) => {
+                        plugin.settings.enableMath = value
+                        await plugin.saveSettings();
+                        updateLongTexts(document.body, plugin)			
+                    }));
+            }
+        },
+        {
+            name: i18n.t("EXPORT_OR_IMPORT_SETTINGS"),
+            render: (setting: Setting) => {
+                setting.addButton(button => {button
+                    .setButtonText(i18n.t("EXPORT"))
+                    .onClick(() => {
+                        let settingsText = JSON.stringify(plugin.settings, null, 2)
+                        let fileName = "pretty-properties-backup.json"
+                        let exportFileButtonName = i18n.t("DOWNLOAD_FILE")
+        
+                        if (Platform.isMobile && !navigator.share) {
+                            exportFileButtonName = i18n.t("SAVE_IN_VAULT_ROOT")
+                        }
+                        class SettingExportModal extends Modal {
+                            onOpen() {
+                                const {contentEl} = this
+                                let exportSetting = new Setting(contentEl)
+                                    .setName(i18n.t("EXPORT_OPTIONS"))
+                                    .addButton(btn => btn
+                                        .setButtonText(exportFileButtonName)
+                                        .onClick(async () => {
+                                            if (Platform.isDesktop) {
+                                                let exportLink = createEl("a")
+                                                exportLink.setAttrs({
+                                                        download: fileName,
+                                                        href: `data:application/json;charset=utf-8,${encodeURIComponent(settingsText)}`,
+                                                })
+                                                exportLink.click()
+                                                exportLink.remove()
+        
+                                            } else if (Platform.isMobile) {
+                                                if (navigator.share) {
+                                                    let file = new File([settingsText], fileName, {type: 'application/json'})
+                                                    await navigator.share({
+                                                        files: [file],
+                                                        title: "Pretty properties settings backup"
+                                                    })
+                                                } else {
+                                                    await plugin.app.vault.adapter.write(
+                                                        fileName,
+                                                        settingsText
+                                                    ).then();
+                                                    this.close()
+                                                    new Notice(i18n.t("SAVED_FILE") + " " + fileName)
+                                                }
+                                            }
+                                        })
+                                    )
+                                    .addButton(btn => btn
+                                        .setButtonText(i18n.t("COPY_SETTINGS_TO_CLIPBOARD"))
+                                        .onClick(async() => {
+                                            await navigator.clipboard.writeText(settingsText)
+                                            new Notice(i18n.t("SETTINGS_ARE_COPIED_TO_CLIPBOARD"))
+                                        })
+                                    )
+                                exportSetting.controlEl.classList.add("pp-export-setting")
+                            }
+                        }
+        
+                        new SettingExportModal(plugin.app).open()
+                    })
+                })
+                .addButton(button => {button
+                    .setButtonText(i18n.t("IMPORT"))
+                    .onClick(() => {
+                        let input = createEl('input');
+                        input.setAttrs({
+                                type: "file",
+                                accept: ".json"
+                        })
+                        
+                        input.onchange = (e) => { 
+                            let selectedFile = input.files?.[0]
+        
+                            if (selectedFile) {
+                                const reader = new FileReader();
+                                reader.readAsText(selectedFile,'UTF-8')
+                                reader.onload = async(readerEvent) => {
+                                    let importedJson
+                                    let content = readerEvent.target?.result
+                                    if (typeof content == "string") {
+                                        try {
+                                            importedJson = JSON.parse(content) as Record<string, string>
+                                        } catch(error) {
+                                            let errorString = i18n.t("INVALID_SETTING_IMPORT_FILE")
+                                            new Notice(errorString)
+                                            console.error(errorString)
+                                            console.error(error)
+                                        }
+                                    }
+        
+                                    if (importedJson) {
+                                        let newSettings = Object.assign(
+                                                {},
+                                                DEFAULT_SETTINGS
+                                            )
+                                        for (let setting in plugin.settings) {
+                                            
+                                            if (importedJson[setting]) {
+                                                //@ts-ignore
+                                                newSettings[setting] = importedJson[setting]
+                                            } 
+                                        }
+        
+                                        plugin.settings = newSettings
+                                        await plugin.saveSettings();
+                                        updateRelativeDateColors(plugin)
+                                        updateBannerStyles(plugin);
+                                        updateIconStyles(plugin);
+                                        updateCoverStyles(plugin);
+                                        updatePillPaddings(plugin)
+                                        updateHiddenPropertiesInPropTab(plugin)
+                                        updateHiddenEmptyProperties(plugin)
+                                        updateHiddenMetadataContainer(plugin)
+                                        updateAutoHideProps(plugin)
+                                        updateHidePropTitle(plugin)
+                                        updateHideMetadataAddButton(plugin)
+                                        //updateBaseTagsStyle(plugin)
+                                        updateAllProperties(plugin)
+                                    }
+                                }
+                            }
+                            input.remove()
+                        }
+                        input.click()
+                    })
+                })
+            }
+        },
+        {
+            name: i18n.t("CLEAR_SETTINGS"),
+            description: i18n.t("CLEAR_SETTINGS_DESCRIPTION"),
+            render: (setting: Setting) => {
+                setting.addButton(button => button
+                    .setButtonText(i18n.t("CLEAR"))
+                    .setClass("mod-warning")
+                    .onClick(async () => {
+                        plugin.settings = Object.assign({}, DEFAULT_SETTINGS);
+                        await plugin.saveSettings();
+                        updateRelativeDateColors(plugin)
+                        updateBannerStyles(plugin);
+                        updateIconStyles(plugin);
+                        updateCoverStyles(plugin);
+                        updatePillPaddings(plugin)
+                        updateHiddenPropertiesInPropTab(plugin)
+                        updateHiddenEmptyProperties(plugin)
+                        updateHiddenMetadataContainer(plugin)
+                        updateAutoHideProps(plugin)
+                        updateHidePropTitle(plugin)
+                        updateHideMetadataAddButton(plugin)
+                        //updateBaseTagsStyle(plugin)
+                        updateAllProperties(plugin)
+                        settingTab.display();
+                        new Notice(i18n.t("CLEAR_SETTINGS_NOTICE"))
+                    }))
+            }
+        }
+    ]
+}
+
+
+
+
+
+
+
+
 export const showOtherSettings = (settingTab: PPSettingTab) => {
     const {containerEl, plugin} = settingTab
 

@@ -9,6 +9,217 @@ import { updateAllBanners } from 'src/updates/updateBanners';
 
 
 
+
+
+
+
+export const getBannerSettingsDefinitions = (tab: PPSettingTab) => {
+    let plugin = tab.plugin
+    let bannerPlaceholder = 'banner'
+    let bannerPositionPlaceholder = 'banner_position'
+    let visible = plugin.settings.enableBanner
+
+    return [
+        
+        {
+            name: i18n.t("ENABLE_BANNER"),
+            render: (setting: Setting) => {
+                setting.addToggle(toggle => toggle
+                    .setValue(plugin.settings.enableBanner)
+                    .onChange(async (value) => {
+                        plugin.settings.enableBanner = value
+                        await plugin.saveSettings();
+                        tab.update()
+                        updateAllBanners(plugin);
+                        updateBannerStyles(plugin);
+                    }));
+            }
+            
+        },
+        {
+            name: i18n.t("BANNER_PROPERTY"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => text
+                    .setPlaceholder(bannerPlaceholder)
+                    .setValue(plugin.settings.bannerProperty)
+                    .onChange(async (value) => {
+                        plugin.settings.bannerProperty = value;
+                        await plugin.saveSettings();
+                        updateAllBanners(plugin);
+                    }))
+            }
+        }, {
+            name: i18n.t("BANNER_POSITION_PROPERTY"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => text
+                    .setPlaceholder(bannerPositionPlaceholder)
+                    .setValue(plugin.settings.bannerPositionProperty)
+                    .onChange(async (value) => {
+                        plugin.settings.bannerPositionProperty = value;
+                        await plugin.saveSettings();
+                        updateAllBanners(plugin);
+                    }));
+            }
+        }, {
+            name: i18n.t("BANNERS_FOLDER"),
+            visible: visible,
+            control: {
+                type: "folder",
+                key: "bannersFolder"
+            }
+        }, {
+            name: i18n.t("BANNER_FADING"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addToggle(toggle => toggle
+                    .setValue(plugin.settings.bannerFading)
+                    .onChange(async (value) => {
+                        plugin.settings.bannerFading = value
+                        await plugin.saveSettings();
+                        updateBannerStyles(plugin);
+                    }));
+            }
+        }, {
+            name: i18n.t("SHOW_BANNERS_IN_PAGE_PREVIEWS"),
+            visible: visible,
+            control: {
+                type: "toggle",
+                key: "enableBannersInPopover"
+            }
+        }, {
+            name: i18n.t("BANNER_HEIGHT"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+                    text.inputEl.type = "number"
+                    text.setValue(plugin.settings.bannerHeight.toString())
+                    .setPlaceholder('150')
+                    .onChange(async (value) => {
+                        if (!value) value = "0"
+                        plugin.settings.bannerHeight = Number(value);
+                        await plugin.saveSettings();
+                        updateBannerStyles(plugin);
+                    })
+                });
+            }
+        }, {
+            name: i18n.t("BANNER_HEIGHT_MOBILE"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+                    text.inputEl.type = "number"
+                    text.setValue(plugin.settings.bannerHeightMobile.toString())
+                    .setPlaceholder('100')
+                    .onChange(async (value) => {
+                        if (!value) value = "0"
+                        plugin.settings.bannerHeightMobile = Number(value);
+                        await plugin.saveSettings();
+                        updateBannerStyles(plugin);
+                    })
+                });
+            }
+        }, {
+            name: i18n.t("BANNER_HEIGHT_POPOVER"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+                    text.inputEl.type = "number"
+                    text.setValue(plugin.settings.bannerHeightPopover.toString())
+                    .setPlaceholder('100')
+                    .onChange(async (value) => {
+                        if (!value) value = "0"
+                        plugin.settings.bannerHeightPopover = Number(value);
+                        await plugin.saveSettings();
+                        updateBannerStyles(plugin);
+                    })
+                });
+            }
+        }, {
+            name: i18n.t("GAP_AFTER_BANNER"),
+            description: i18n.t("CAN_BE_POSITIVE_OR_NEGATIVE"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+                    text.inputEl.type = "number"
+                    text.setValue(plugin.settings.bannerMargin.toString())
+                    .setPlaceholder('-20')
+                    .onChange(async (value) => {
+                        if (!value) value = "0"
+                        plugin.settings.bannerMargin = Number(value);
+                        await plugin.saveSettings();
+                        updateBannerStyles(plugin);
+                    })
+                });
+            }
+        }, {
+            name: i18n.t("GAP_AFTER_BANNER_MOBILE"),
+            description: i18n.t("CAN_BE_POSITIVE_OR_NEGATIVE"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+                    text.inputEl.type = "number"
+                    text.setValue(plugin.settings.bannerMarginMobile.toString())
+                    .setPlaceholder('-20')
+                    .onChange(async (value) => {
+                        if (!value) value = "0"
+                        plugin.settings.bannerMarginMobile = Number(value);
+                        await plugin.saveSettings();
+                        updateBannerStyles(plugin);
+                    })
+                });
+            }
+        }, {
+            name: i18n.t("GAP_AFTER_BANNER_WITH_ICON"),
+            description: i18n.t("CAN_BE_POSITIVE_OR_NEGATIVE"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+                    text.inputEl.type = "number"
+                    text.setValue(plugin.settings.bannerIconGap.toString())
+                    .setPlaceholder('-20')
+                    .onChange(async (value) => {
+                        if (!value) value = "0"
+                        plugin.settings.bannerIconGap = Number(value);
+                        await plugin.saveSettings();
+                        updateIconStyles(plugin);
+                    })
+                });
+            }
+        }, {
+            name: i18n.t("GAP_AFTER_BANNER_WITH_ICON_MOBILE"),
+            description: i18n.t("CAN_BE_POSITIVE_OR_NEGATIVE"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+                    text.inputEl.type = "number"
+                    text.setValue(plugin.settings.bannerIconGapMobile.toString())
+                    .setPlaceholder('-20')
+                    .onChange(async (value) => {
+                        if (!value) value = "0"
+                        plugin.settings.bannerIconGapMobile = Number(value);
+                        await plugin.saveSettings();
+                        updateIconStyles(plugin);
+                    })
+                });
+            }
+        }
+
+
+
+
+
+  
+    ]
+}
+
+
+
+
+
+
+
 export const showBannerSettings = (settingTab: PPSettingTab) => {
     const {containerEl, plugin} = settingTab
 
@@ -186,3 +397,12 @@ export const showBannerSettings = (settingTab: PPSettingTab) => {
         });
     }
 }
+
+
+
+
+
+
+
+
+

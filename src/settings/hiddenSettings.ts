@@ -9,10 +9,7 @@ export const showHiddenSettings = (settingTab: PPSettingTab) => {
 
     let hiddenSettingsWrapper = containerEl.createDiv()
 
-    hiddenSettingsWrapper.setCssProps({
-        border: "1px solid var(--text-accent)",
-        "border-radius": "4px"
-    })
+    hiddenSettingsWrapper.classList.add("pp-settings-list-container")
 
     let hiddenSettingsEl = hiddenSettingsWrapper.createDiv()
     const addHiddenSetting = (property: string) => {
@@ -65,10 +62,7 @@ export const showHiddenEmptySettings = (settingTab: PPSettingTab) => {
 
     let hiddenSettingsWrapper = containerEl.createDiv()
 
-    hiddenSettingsWrapper.setCssProps({
-        border: "1px solid var(--text-accent)",
-        "border-radius": "4px"
-    })
+    hiddenSettingsWrapper.classList.add("pp-settings-list-container")
 
     let hiddenSettingsEl = hiddenSettingsWrapper.createDiv()
     const addHiddenSetting = (property: string) => {

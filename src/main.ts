@@ -54,6 +54,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 	patches: Record<string, PatchList | Patch>;
 	api: API;
 	formatter: PropertyFormatter;
+	settingTab: PPSettingTab
 
 
 	async onload() {
@@ -182,7 +183,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 					if (targetEl.closest(".tag-pane-tag") &&
-					this.settings.enableColoredTagsInTagPane) {
+					this.settings.enableColoredProperties) {
 						let tagPaneMenuExist = plugins.getPlugin("tag-wrangler")
 						if (!tagPaneMenuExist) {
 							let menu = new Menu();
@@ -256,5 +257,6 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+		
 	}
 }

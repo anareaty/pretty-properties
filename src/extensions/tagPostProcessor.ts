@@ -10,7 +10,7 @@ export const registerTagPostProcessor = (plugin: PrettyPropertiesPlugin) => {
 
 
 export const processTagsInPreviewElement = (el: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-    if (plugin.settings.enableColoredInlineTags) {
+    if (plugin.settings.enableColoredProperties) {
         const tags = el.findAll("a.tag")
 
         for (let tag of tags) {

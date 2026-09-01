@@ -36,6 +36,7 @@ export const handleIconMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => {
                 plugin.settings.hiddenProperties.remove(propName);
             await plugin.saveSettings();
             updateHiddenProperties(plugin);
+            plugin.settingTab?.update()
         }))
 
     } else {
@@ -49,6 +50,7 @@ export const handleIconMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => {
                 plugin.settings.hiddenProperties.push(propName);
             await plugin.saveSettings();
             updateHiddenProperties(plugin);
+            plugin.settingTab?.update()
         }))
     }
 }

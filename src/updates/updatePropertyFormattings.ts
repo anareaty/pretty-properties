@@ -121,7 +121,9 @@ const getCurrentPropertyElValue = (propValueEl: HTMLElement, type: string) => {
 export const getPropertyFormatObj = (propName: string, text: string, plugin: PrettyPropertiesPlugin) => {
     let propertyFormatObj = plugin.settings.propertyFormats[propName]
     let propertyFormat = propertyFormatObj?.format
-    let propertyTextFormat = propertyFormatObj?.textFormat || "raw"
+    let propertyTextFormat = "raw"
+    let isMD = plugin.settings.markdownProperties.find(p => p == propName)
+    if (isMD) propertyTextFormat = "markdown"
 
     // Always render as markdown if text is formatted as MathJax
     if (plugin.settings.enableMath) {

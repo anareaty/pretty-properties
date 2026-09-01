@@ -2,16 +2,14 @@ import { App, PluginSettingTab, HSL } from 'obsidian';
 import { i18n } from '../localization/localization';
 import PrettyPropertiesPlugin from "../main";
 
-import { showBannerSettings } from './bannerSettings';
-import { showIconSettings } from './iconSettings';
-import { showCoverSettings } from './coversettings';
+import { getBannerSettingsDefinitions, showBannerSettings } from './bannerSettings';
+import { getIconSettingsDefinitions, showIconSettings } from './iconSettings';
+import { getCoverSettingsDefinitions, showCoverSettings } from './coversettings';
 import { showDatesSettings } from './datesSettings';
-import { showOtherSettings } from './otherSettings';
-import { showColorSettings } from './colorSettings';
-import { showHiddenSettingsTab } from './hiddenSettingsTab';
-import { showFormatSettingsTab } from './formatSettings';
-
-
+import { getOtherSettingsDefinitions, showOtherSettings } from './otherSettings';
+import { getColorSettingsDefinitions, showColorSettings } from './colorSettings';
+import { getHiddenSettingsDefinitions, showHiddenSettingsTab } from './hiddenSettingsTab';
+import { getFormatSettingsDefinitions, showFormatSettingsTab } from './formatSettings';
 
 
 
@@ -21,6 +19,7 @@ export interface PillColorSettings {
 }
 export interface PPPluginSettings {
     hiddenProperties: string[];
+	markdownProperties: string[];
     propertyPillColors: Record<string, PillColorSettings>;
 	propertyLongtextColors: Record<string, PillColorSettings>;
 	tagColors: Record<string, PillColorSettings>; 
@@ -45,6 +44,8 @@ export interface PPPluginSettings {
 	coverDefaultWidth3: number;
 	coverMaxHeight: number;
 	coverMaxHeightTopBottom: number;
+	coverMaxHeightMobile: number;
+	coverMaxHeightTopBottomCanvas: number;
     coverVerticalWidth: number;
     coverHorizontalWidth: number;
     coverSquareWidth: number;
@@ -73,7 +74,6 @@ export interface PPPluginSettings {
 	iconBackground: boolean;
 	bannerPositionProperty: string;
 	addPillPadding: string;
-	//addBaseTagColor: boolean;
 	enableColorButtonInBases:boolean;
 	customDateFormat: string;
   	customDateTimeFormat: string;
@@ -81,9 +81,8 @@ export interface PPPluginSettings {
 	enableCustomDateFormatInBases: boolean;
 	enableRelativeDateColors: boolean;
 	settingsTab: string;
-	propertyFormats: Record<string, { format: string; textFormat: string }>;
+	propertyFormats: Record<string, { format: string }>;
 	enableColoredProperties: boolean;
-	enableColoredInlineTags: boolean;
 	nonLatinTagsSupport: boolean;
 	enableColorButton: boolean;
 	propertySearchKey: string;
@@ -91,15 +90,10 @@ export interface PPPluginSettings {
 	iconSizeMobile: number;
 	iconSizePopover: number;
 	hidePropertiesInPropTab: boolean;
-	enableColoredTagsInTagPane: boolean;
 	mathProperties: string[];
 	enableMath: boolean;
 	dataVersion: number;
-	dateColors: {
-		past: PillColorSettings,
-		present: PillColorSettings,
-		future: PillColorSettings
-	}
+	dateColors: Record<string, PillColorSettings>;
 	coverPosition: string;
 	enableBannersInPopover: boolean
 	enableIconsInPopover: boolean
@@ -124,6 +118,7 @@ export interface PPPluginSettings {
 
 export const DEFAULT_SETTINGS: PPPluginSettings = {
     hiddenProperties: [],
+	markdownProperties: [],
     propertyPillColors: {},
 	propertyLongtextColors: {},
 	tagColors: {},
@@ -146,6 +141,8 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	coverDefaultWidth3: 300,
 	coverMaxHeight: 500,
 	coverMaxHeightTopBottom: 400,
+	coverMaxHeightMobile: 200,
+	coverMaxHeightTopBottomCanvas: 200,
     coverVerticalWidth: 200,
     coverHorizontalWidth: 300,
     coverSquareWidth: 250,
@@ -184,16 +181,13 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	settingsTab: "BANNERS",
 	propertyFormats: {},
 	enableColoredProperties: true,
-	enableColoredInlineTags: false,
 	nonLatinTagsSupport: false,
 	enableColorButton: true,
 	propertySearchKey: "Ctrl",
-	
 	showTagColorSettings: false,
 	iconSizeMobile: 70,
 	iconSizePopover: 50,
 	hidePropertiesInPropTab: false,
-	enableColoredTagsInTagPane: false,
 	mathProperties: [],
 	enableMath: false,
 	dataVersion: 0,
@@ -239,11 +233,81 @@ export class PPSettingTab extends PluginSettingTab {
 		this.plugin = plugin;
 	}
 
+
+
+
+
+	getSettingDefinitions() {
+
+		let settingDefinitions = [
+			{
+				type: "page",
+				name: i18n.t("BANNERS"),
+				items: getBannerSettingsDefinitions(this)
+			},
+			{
+				type: "page",
+				name: i18n.t("ICONS"),
+				items: getIconSettingsDefinitions(this)
+			},
+			{
+				type: "page",
+				name: i18n.t("COVERS"),
+				items: getCoverSettingsDefinitions(this)
+			},
+			{
+				type: "page",
+				name: i18n.t("COLORED_PROPERTIES"),
+				items: getColorSettingsDefinitions(this)
+			},
+			{
+				type: "page",
+				name: i18n.t("HIDDEN_PROPERTIES"),
+				items: getHiddenSettingsDefinitions(this)
+			},
+			{
+				type: "page",
+				name: i18n.t("PROPERTY_FORMATTINGS"),
+				items: getFormatSettingsDefinitions(this)
+			},
+			{
+				type: "page",
+				name: i18n.t("OTHER"),
+				items: getOtherSettingsDefinitions(this)
+			}
+		]
+
+		
+		return settingDefinitions
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	display(): void {
 		const {containerEl} = this;
 		containerEl.empty();
 
-		let tabNames = ["BANNERS", "ICONS", "COVERS", "COLORED_PROPERTIES", "HIDDEN_PROPERTIES", "PROPERTY_FORMATTINGS", "OTHER"]
+		let tabNames = [
+			"BANNERS", 
+			"ICONS", 
+			"COVERS", 
+			"COLORED_PROPERTIES", 
+			"HIDDEN_PROPERTIES", 
+			"PROPERTY_FORMATTINGS", 
+			"OTHER"
+		]
 		let tabsEl = containerEl.createDiv({cls: "pp-settings-tabs"})
 		for (let tabName of tabNames) {
 			let button = tabsEl.createEl("button", {cls: "pp-settings-tab"})

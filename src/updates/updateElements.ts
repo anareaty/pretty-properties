@@ -399,9 +399,6 @@ export const updateImagesOnCacheChanged = (file: TFile, cache: CachedMetadata, p
 
 
 
-
-        
-
         if (frontmatter && hasCover && plugin.settings.enableCover) {
           void renderCover(view, contentEl, frontmatter, sourcePath, plugin);
         } else {
@@ -424,14 +421,14 @@ export const updateImagesOnCacheChanged = (file: TFile, cache: CachedMetadata, p
                 titleIconWrapper.remove()
             }
         }
-
-
-        
-
-
-
-
-
       }
     }
+
+
+
+
+
+
+
+
   }

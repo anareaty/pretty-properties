@@ -52,7 +52,7 @@ export const registerTagFixExtension = (plugin: PrettyPropertiesPlugin) => {
             if (!view.state.field(editorLivePreviewField)) {return builder.finish();}
 
             try {
-                if (plugin.settings.enableColoredInlineTags) {
+                if (plugin.settings.enableColoredProperties) {
                     for (let { from, to } of view.visibleRanges) {
     
                         let tagTextStart = 0;
