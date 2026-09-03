@@ -41,6 +41,7 @@ import { patchEmbed } from "./patches/patchEmbed";
 import { GlobalSearchPluginInstance } from "@obsidian-typings/obsidian-public-latest";
 import { patchMetadataSuggester } from "./patches/patchMetadataSuggester";
 import { Platform } from "obsidian";
+import { patchBaseKanban } from "./patches/patchBaseKanban";
 
 type Patch = () => void
 type PatchList = Record<string, Patch>
@@ -74,6 +75,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		patchBaseTable(this)
 		patchBaseCards(this)
 		patchBaseList(this)
+		patchBaseKanban(this)
 		patchMenu(this)
 		patchMetadataSuggester(this)
 
@@ -92,8 +94,6 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		updateHidePropTitle(this)
 		updateHideMetadataAddButton(this)
 		updateColoredTagsStyle(this)
-		//updateBaseTagsStyle(this)
-		
 		updateTheme(this)
 
 

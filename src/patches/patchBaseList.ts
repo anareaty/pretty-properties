@@ -26,25 +26,25 @@ export interface ListBasesView extends BasesView {
 
 export const patchBaseList = (plugin: PrettyPropertiesPlugin) => {
     let bases = plugin.app.internalPlugins.getEnabledPluginById("bases") as Bases
+    if (!bases || !bases.registrations.list) return
 
-    if (bases && bases.registrations.list) {
-        plugin.patches.uninstallPPBaseListPatch = around(bases.registrations.list, {
-            factory(oldFactory) {
-              return dedupe("pp-patch-base-list-around-key", oldFactory, (...args) => {
-                let view = oldFactory && oldFactory.apply(this, args) as ListBasesView
+    plugin.patches.uninstallPPBaseListPatch = around(bases.registrations.list, {
+        factory(oldFactory) {
+            return dedupe("pp-patch-base-list-around-key", oldFactory, (...args) => {
+            let view = oldFactory && oldFactory.apply(this, args) as ListBasesView
 
-                view.updateVirtualDisplay = new Proxy(view.updateVirtualDisplay, {
-                    apply(updateVirtualDisplay, thisArg2) {
-                        let update = updateVirtualDisplay.call(thisArg2)
-                        processBaseListProperties(view, plugin)
-                        return update
-                    }
-                })
-                return view
-              })
-            }
-        })
-    }
+            view.updateVirtualDisplay = new Proxy(view.updateVirtualDisplay, {
+                apply(updateVirtualDisplay, thisArg2) {
+                    let update = updateVirtualDisplay.call(thisArg2)
+                    processBaseListProperties(view, plugin)
+                    return update
+                }
+            })
+            return view
+            })
+        }
+    })
+    
 }
 
 

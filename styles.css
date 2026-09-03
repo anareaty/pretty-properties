@@ -788,7 +788,8 @@ body.is-mobile .pp-cover {
 
 
 
-.bases-cards-property .metadata-progress{
+.bases-cards-property .metadata-progress,
+.bases-kanban-card-property .metadata-progress{
   width: 100%;
 }
 
@@ -901,12 +902,15 @@ body.is-mobile .pp-cover {
 
 .bases-cards-line.has-custom-date input.metadata-input-text.mod-date,
 .bases-cards-line.has-custom-date input.metadata-input-text.mod-datetime,
+.bases-kanban-card-line.has-custom-date input.metadata-input-text.mod-date,
+.bases-kanban-card-line.has-custom-date input.metadata-input-text.mod-datetime,
 .bases-list-property .has-custom-date input.metadata-input-text.mod-date,
 .bases-list-property .has-custom-date input.metadata-input-text.mod-datetime {
   display: none;
 }
 
 .bases-cards-line .custom-date,
+.bases-kanban-card-line .custom-date,
 .bases-list-property .custom-date {
   font-size: 1em;
 }
@@ -945,11 +949,14 @@ body {
 
 .metadata-property-value[data-relative-date="past"] .custom-date,
 .bases-cards-line[data-relative-date="past"] .custom-date,
+.bases-kanban-card-line[data-relative-date="past"] .custom-date,
 .bases-list-property [data-relative-date="past"] .custom-date,
 .metadata-property-value:not(.has-custom-date)[data-relative-date="past"] input.mod-date,
 .metadata-property-value:not(.has-custom-date)[data-relative-date="past"] input.mod-datetime,
 .bases-cards-line[data-relative-date="past"] input.mod-date,
 .bases-cards-line[data-relative-date="past"] input.mod-datetime,
+.bases-kanban-card-line[data-relative-date="past"] input.mod-date,
+.bases-kanban-card-line[data-relative-date="past"] input.mod-datetime,
 .bases-rendered-value[data-relative-date="past"] input.mod-date,
 .bases-rendered-value[data-relative-date="past"] input.mod-datetime,
 .setting-custom-date-past {
@@ -963,11 +970,14 @@ body {
 
 .metadata-property-value[data-relative-date="present"] .custom-date,
 .bases-cards-line[data-relative-date="present"] .custom-date,
+.bases-kanban-card-line[data-relative-date="present"] .custom-date,
 .bases-list-property [data-relative-date="present"] .custom-date,
 .metadata-property-value:not(.has-custom-date)[data-relative-date="present"] input.mod-date,
 .metadata-property-value:not(.has-custom-date)[data-relative-date="present"] input.mod-datetime,
 .bases-cards-line[data-relative-date="present"] input.mod-date,
 .bases-cards-line[data-relative-date="present"] input.mod-datetime,
+.bases-kanban-card-line[data-relative-date="present"] input.mod-date,
+.bases-kanban-card-line[data-relative-date="present"] input.mod-datetime,
 .bases-rendered-value[data-relative-date="present"] input.mod-date,
 .bases-rendered-value[data-relative-date="present"] input.mod-datetime,
 .setting-custom-date-present {
@@ -980,11 +990,14 @@ body {
 
 .metadata-property-value[data-relative-date="future"] .custom-date,
 .bases-cards-line[data-relative-date="future"] .custom-date,
+.bases-kanban-card-line[data-relative-date="future"] .custom-date,
 .bases-list-property [data-relative-date="future"] .custom-date, 
 .metadata-property-value:not(.has-custom-date)[data-relative-date="future"] input.mod-date,
 .metadata-property-value:not(.has-custom-date)[data-relative-date="future"] input.mod-datetime,
 .bases-cards-line[data-relative-date="future"] input.mod-date,
 .bases-cards-line[data-relative-date="future"] input.mod-datetime,
+.bases-kanban-card-line[data-relative-date="future"] input.mod-date,
+.bases-kanban-card-line[data-relative-date="future"] input.mod-datetime,
 .bases-rendered-value[data-relative-date="future"] input.mod-date,
 .bases-rendered-value[data-relative-date="future"] input.mod-datetime,
 .setting-custom-date-future {
@@ -1130,7 +1143,8 @@ button.pp-settings-tab:not(.pp-settings-tab-selected):hover {
 
 
 .bases-table-cell a.tag,
-.bases-cards-line a.tag {
+.bases-cards-line a.tag,
+.bases-kanban-card-line a.tag {
   font-size: 1em;
 }
 
@@ -1429,12 +1443,14 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 }
 
 .bases-cards-line,
+.bases-kanban-card-line,
 .bases-list-item {
   --tag-padding-y: 0;
 }
 
 
 .bases-cards-line,
+.bases-kanban-card-line,
 .bases-list-property {
   --pill-padding-x: 0;
 }
@@ -1447,13 +1463,17 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 
 
 .bases-view .bases-cards-property[data-property*="note"] .pp-value-list-element,
+.bases-view .bases-kanban-card-property[data-property*="note"] .pp-value-list-element,
 .bases-view .bases-list-property [data-property-type="multitext"] .pp-value-list-element {
     padding: 0 var(--pill-padding-x);
 }
 
 .pp-pill-padding-all .bases-cards-line[data-property-longtext-value],
 .pp-pill-padding-colored .bases-cards-line.colored,
-.pp-pill-padding-non-transparent .bases-cards-line.colored {
+.pp-pill-padding-non-transparent .bases-cards-line.colored,
+.pp-pill-padding-all .bases-kanban-card-line[data-property-longtext-value],
+.pp-pill-padding-colored .bases-kanban-card-line.colored,
+.pp-pill-padding-non-transparent .bases-kanban-card-line.colored {
   margin: 0 8px;
 }
 
@@ -1465,6 +1485,7 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 
 
 .bases-view .bases-cards-property[data-property*="note"] .pp-value-list-element,
+.bases-view .bases-kanban-card-property[data-property*="note"] .pp-value-list-element,
 .bases-view .bases-list-property [data-property-type="multitext"] .pp-value-list-element {
     color: var(--pill-color);
     background-color: var(--pill-background);
@@ -1483,6 +1504,7 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 
 .metadata-input-longtext.colored:not(:hover, :focus),
 .bases-cards-line.colored,
+.bases-kanban-card-line.colored,
 .bases-rendered-value.colored, 
 .suggestion-item.colored,
 .pp-formatted-value-overlay.colored {
@@ -1494,7 +1516,8 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 
 
 .metadata-input-longtext:not(:hover),
-.bases-cards-line[data-property-longtext-value] {
+.bases-cards-line[data-property-longtext-value],
+.bases-kanban-card-line[data-property-longtext-value] {
 
 
 
@@ -1537,7 +1560,8 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 
 
 
-.bases-cards-line[data-property-longtext-value] {
+.bases-cards-line[data-property-longtext-value],
+.bases-kanban-card-line[data-property-longtext-value] {
   height: unset;
   margin-top: 0;
   margin-bottom: 0;

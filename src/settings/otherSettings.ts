@@ -179,7 +179,6 @@ export const getOtherSettingsDefinitions = (tab: PPSettingTab) => {
                                         updateAutoHideProps(plugin)
                                         updateHidePropTitle(plugin)
                                         updateHideMetadataAddButton(plugin)
-                                        //updateBaseTagsStyle(plugin)
                                         updateAllProperties(plugin)
                                     }
                                 }
@@ -212,7 +211,6 @@ export const getOtherSettingsDefinitions = (tab: PPSettingTab) => {
                         updateAutoHideProps(plugin)
                         updateHidePropTitle(plugin)
                         updateHideMetadataAddButton(plugin)
-                        //updateBaseTagsStyle(plugin)
                         updateAllProperties(plugin)
                         tab.update();
                         new Notice(i18n.t("CLEAR_SETTINGS_NOTICE"))
@@ -397,7 +395,6 @@ export const showOtherSettings = (settingTab: PPSettingTab) => {
                                 updateAutoHideProps(plugin)
                                 updateHidePropTitle(plugin)
                                 updateHideMetadataAddButton(plugin)
-                                //updateBaseTagsStyle(plugin)
                                 updateAllProperties(plugin)
                             }
                         }
@@ -432,7 +429,6 @@ export const showOtherSettings = (settingTab: PPSettingTab) => {
                 updateAutoHideProps(plugin)
                 updateHidePropTitle(plugin)
                 updateHideMetadataAddButton(plugin)
-                //updateBaseTagsStyle(plugin)
                 updateAllProperties(plugin)
                 settingTab.display();
                 new Notice(i18n.t("CLEAR_SETTINGS_NOTICE"))

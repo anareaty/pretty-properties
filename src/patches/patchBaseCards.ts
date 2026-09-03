@@ -24,25 +24,25 @@ export interface CardsBasesView extends BasesView {
 
 export const patchBaseCards = (plugin: PrettyPropertiesPlugin) => {
     let bases = plugin.app.internalPlugins.getEnabledPluginById("bases") as Bases
+    if (!bases) return
 
-    if (bases) {
-        plugin.patches.uninstallPPBaseCardsPatch = around(bases.registrations.cards, {
-            factory(oldFactory) {
-              return dedupe("pp-patch-base-cards-around-key", oldFactory, (...args) => {
-                let view = oldFactory && oldFactory.apply(this, args) as CardsBasesView
+    plugin.patches.uninstallPPBaseCardsPatch = around(bases.registrations.cards, {
+        factory(oldFactory) {
+            return dedupe("pp-patch-base-cards-around-key", oldFactory, (...args) => {
+            let view = oldFactory && oldFactory.apply(this, args) as CardsBasesView
 
-                view.updateVirtualDisplay = new Proxy(view.updateVirtualDisplay, {
-                    apply(updateVirtualDisplay, thisArg2) {
-                        let update = updateVirtualDisplay.call(thisArg2)
-                        processBaseCardProperties(view, plugin)
-                        return update
-                    }
-                })
-                return view
-              })
-            }
-        })
-    }
+            view.updateVirtualDisplay = new Proxy(view.updateVirtualDisplay, {
+                apply(updateVirtualDisplay, thisArg2) {
+                    let update = updateVirtualDisplay.call(thisArg2)
+                    processBaseCardProperties(view, plugin)
+                    return update
+                }
+            })
+            return view
+            })
+        }
+    })
+    
 }
 
 
@@ -56,7 +56,7 @@ export const processBaseCardProperties = (view: CardsBasesView, plugin: PrettyPr
 }
 
 
-const processBaseCardProperty = (property: CardProp, plugin: PrettyPropertiesPlugin) => {
+export const processBaseCardProperty = (property: CardProp, plugin: PrettyPropertiesPlugin) => {
     let prop = property.prop
 
     if (prop == "note.tags" || prop == "file.tags" || prop.startsWith("formula.")) {
