@@ -1,7 +1,5 @@
 
-body {
-  --pill-background: lightgray
-}
+
 
 
 /* BANNERS */
@@ -140,7 +138,8 @@ body {
   top: 5px;
   border-radius: 10px;
   container-type: unset;
-  width: calc(100% - var(--file-margins-x) * 2);
+  --margins-x: var(--file-margins-x, 32px);
+  width: calc(100% - var(--margins-x) * 2);
   left: 50%;
   transform: translate(-50%);
   background-color: var(--background-primary);
@@ -150,6 +149,8 @@ body {
   margin-bottom: 0;
   opacity: 1;
   transition: opacity 0.15s;
+  overflow: scroll;
+
 }
 
 
@@ -169,7 +170,6 @@ body {
 
 .autohide-props-with-banner .has-banner >  .is-readable-line-width  > .cm-editor > .cm-scroller .metadata-container .metadata-content,
 .autohide-props-with-banner .has-banner > .markdown-reading-view > .is-readable-line-width .metadata-container .metadata-content {
-  overflow: hidden;
   max-height: 500px;  
 }
 
@@ -941,6 +941,8 @@ body {
 
 
 
+
+
 .metadata-property-value[data-relative-date="past"] .custom-date,
 .bases-cards-line[data-relative-date="past"] .custom-date,
 .bases-list-property [data-relative-date="past"] .custom-date,
@@ -1367,7 +1369,7 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 /* Note metadata paddings */
 
 .metadata-input-longtext {
-  margin: var(--input-padding);
+  margin: 0 8px;
   padding: 0;
 }
 
@@ -1385,7 +1387,7 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 .pp-pill-padding-colored .metadata-input-longtext.colored,
 .pp-pill-padding-non-transparent .metadata-input-longtext.colored,
 
-.pp-pill-padding-all .pp-formatted-value-overlay.metadata-input-longtext,
+.pp-pill-padding-all .pp-formatted-value-overlay,
 .pp-pill-padding-colored .pp-formatted-value-overlay.colored,
 .pp-pill-padding-non-transparent .pp-formatted-value-overlay.colored {
   padding-left: var(--tag-padding-x);
@@ -1409,7 +1411,7 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
   .metadata-property-value:not(.has-custom-date) .metadata-input.mod-date,
 .colored-dates:is(.pp-pill-padding-all, .pp-pill-padding-colored, .pp-pill-padding-non-transparent) 
   .metadata-property-value:not(.has-custom-date) .metadata-input.mod-datetime {
-  margin: var(--input-padding);
+  margin: 0 8px;
 }
 
 
@@ -1452,7 +1454,7 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 .pp-pill-padding-all .bases-cards-line[data-property-longtext-value],
 .pp-pill-padding-colored .bases-cards-line.colored,
 .pp-pill-padding-non-transparent .bases-cards-line.colored {
-  margin: var(--input-padding);
+  margin: 0 8px;
 }
 
 
@@ -1537,7 +1539,6 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 
 .bases-cards-line[data-property-longtext-value] {
   height: unset;
-  /*padding: var(--input-padding);*/
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -1821,7 +1822,7 @@ button.longtext-color-button:hover {
 }
 
 .pp-formatted-value-overlay.text-overlay {
-  margin: var(--input-padding);
+  margin: auto 8px;
 }
 
 
@@ -1887,4 +1888,15 @@ button.cover-has-format {
   border: 1px solid var(--text-accent);
   border-radius: 4px;
   padding: 8px;
+}
+
+
+
+ .metadata-property .multi-select-container .multi-select-pill {
+  line-height: 1.4;
+}
+
+
+.multi-select-pill-content > span {
+  display: block;
 }

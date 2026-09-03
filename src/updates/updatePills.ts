@@ -243,17 +243,19 @@ export const updateLongtext = (pill: HTMLElement, plugin: PrettyPropertiesPlugin
 	}
 	
 
-	if (plugin.settings.enableColoredProperties || plugin.settings.enableMath) {
+	//if (plugin.settings.enableColoredProperties || plugin.settings.enableMath) {
 		
 		let isBase = parent?.classList.contains("bases-table-cell") 
 
 		let existingColorButton = parent?.querySelector(".longtext-color-button")
 		existingColorButton?.remove()
 
-		let text = pill.innerText
+		//let text = pill.innerText
 
 		let propEl = parent?.parentElement
-		let propName = propEl?.getAttribute("data-property-key") || ""
+		//let propName = propEl?.getAttribute("data-property-key") || ""
+
+		propName = propName || ""
 
 		if (isBase) {
 			propName = propEl?.getAttribute("data-property") || ""
@@ -267,6 +269,10 @@ export const updateLongtext = (pill: HTMLElement, plugin: PrettyPropertiesPlugin
 		if (grandParent) {
 
 			overlayElement = updatePropertyFormatting(grandParent, propName, text, "text", propertyFormatObj.format, propertyFormatObj.textFormat, plugin)
+
+			
+
+			
 		}
 
 		if (plugin.settings.enableColoredProperties) {
@@ -292,7 +298,7 @@ export const updateLongtext = (pill: HTMLElement, plugin: PrettyPropertiesPlugin
 
 
 
-	}
+	//}
 
 
 	
@@ -425,7 +431,13 @@ export const updateTagPaneTags = (container: HTMLElement, plugin: PrettyProperti
 
 
     let tags = container.querySelectorAll(".tag-pane-tag span.tree-item-inner-text")
+
+
+
     for (let tag of tags) {
+
+		
+
 		if (tag?.instanceOf(HTMLElement)) {
 			let value = tag.innerText
 			if (!plugin.settings.enableColoredProperties) {

@@ -82,6 +82,8 @@ export const setColorMenuItems = (
 
             item.setTitle(i18n.t(color))
             .onClick(async() => {
+
+
                 if (colorType == "pillColor" || colorType == "textColor") {
                     if (color == "default") {						
                         delete pillColorSettings?.[colorType]

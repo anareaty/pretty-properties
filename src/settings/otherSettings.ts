@@ -214,7 +214,7 @@ export const getOtherSettingsDefinitions = (tab: PPSettingTab) => {
                         updateHideMetadataAddButton(plugin)
                         //updateBaseTagsStyle(plugin)
                         updateAllProperties(plugin)
-                        settingTab.display();
+                        tab.update();
                         new Notice(i18n.t("CLEAR_SETTINGS_NOTICE"))
                     }))
             }

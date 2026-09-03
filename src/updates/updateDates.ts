@@ -6,7 +6,7 @@ import { computeFormattedValue, getPropertyFormatObj, setOverlayContent } from "
 
 export const updateDateInput = (input: HTMLInputElement, plugin: PrettyPropertiesPlugin) => {
 
-
+	
 	let value = input.value;
 	let parent = input.parentElement
 	let grandParent = parent?.parentElement
@@ -39,11 +39,12 @@ export const updateDateInput = (input: HTMLInputElement, plugin: PrettyPropertie
 		let isBase = parent.classList.contains("bases-table-cell")
 		let existingCustomDateElement = parent.querySelector(".custom-date")
 
+
 		if (plugin.settings.enableCustomDateFormat && 
 			(customDateFormat || propertyFormatObj.format) && 
 			(!isBase || plugin.settings.enableCustomDateFormatInBases)) {
 
-				
+			
 
 
 
@@ -102,8 +103,7 @@ export const updateDateInput = (input: HTMLInputElement, plugin: PrettyPropertie
 				parent.classList.remove("has-custom-date")
 			}
 
-		} else if (existingCustomDateElement) {
-			existingCustomDateElement.textContent = ""
+		} else {
 			parent.classList.remove("has-custom-date")
 		}
 
@@ -168,8 +168,7 @@ export const updateDateTimeInput = (input: HTMLInputElement, plugin: PrettyPrope
 				existingCustomDateElement.textContent = ""
 				parent.classList.remove("has-custom-date")
 			}
-		}  else if (existingCustomDateElement) {
-			existingCustomDateElement.textContent = ""
+		}  else {
 			parent.classList.remove("has-custom-date")
 		}
 

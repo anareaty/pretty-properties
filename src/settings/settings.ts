@@ -61,6 +61,7 @@ export interface PPPluginSettings {
 	showHiddenSettings: boolean;
 	showHiddenEmptySettings: boolean;
 	showExtraFormattings: boolean;
+	showMdProperties: boolean;
 	iconSize: number;
 	iconTopMargin: number;
 	iconTopMarginMobile: number;
@@ -157,6 +158,7 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	showHiddenSettings: false,
 	showHiddenEmptySettings: false,
 	showExtraFormattings: false,
+	showMdProperties: false,
 	iconsFolder: "",
 	iconSize: 70,
 	iconTopMargin: 70,

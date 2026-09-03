@@ -7,7 +7,7 @@ import {
 } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { getNestedProperty } from "../utils/propertyUtils";
-import { EmbedMarkdownComponent, WidgetEditorView } from "@obsidian-typings/obsidian-public-latest";
+import { CanvasView, EmbedMarkdownComponent, WidgetEditorView } from "@obsidian-typings/obsidian-public-latest";
 import { getImageValue, renderImageFromValue } from "../utils/imageUtils";
 
 
@@ -129,11 +129,14 @@ const  applyCoverCssClasses = (
 		mdContainer.classList.add("in-popover")
 	}
 
-	let oldClasses = [
+	let positionClasses = [
 		"left", 
 		"right", 
 		"top", 
-		"bottom",
+		"bottom"
+	]
+
+	let shapeClasses = [
 		"initial",
 		"initial-2",
 		"initial-3",
@@ -145,14 +148,17 @@ const  applyCoverCssClasses = (
 		"circle"
 	]
 
+	for (let cls of positionClasses) {
+		mdContainer.classList.remove(cls)
+	}
 
-	for (let cls of oldClasses) {
+	for (let cls of shapeClasses) {
 		mdContainer.classList.remove(cls)
 	}
 
 	let coverShapeVal = getNestedProperty(frontmatter, plugin.settings.coverShapeProperty)
 	
-	if (coverShapeVal && typeof coverShapeVal == "string") {
+	if (coverShapeVal && typeof coverShapeVal == "string" && shapeClasses.find(c => c == coverShapeVal)) {
 		coverDiv.classList.add(coverShapeVal);
 		mdContainer.classList.add(coverShapeVal);
 	}
@@ -164,7 +170,7 @@ const  applyCoverCssClasses = (
 
 	let coverPositionVal = getNestedProperty(frontmatter, plugin.settings.coverPositionProperty)
 
-	if (coverPositionVal && typeof coverPositionVal == "string") {
+	if (coverPositionVal && typeof coverPositionVal == "string" && positionClasses.find(c => c == coverPositionVal)) {
 		coverDiv.classList.add(coverPositionVal);
 		mdContainer.classList.add(coverPositionVal);
 	}
@@ -201,6 +207,10 @@ export const updateCoverForView = (
     let sourcePath = view.file?.path || ""
     if (frontmatter) {
       void renderCover(view, contentEl, frontmatter, sourcePath, plugin)
+
+	  if ("editMode" in view && view.editMode) {
+        void renderCover(view.editMode, view.editMode.containerEl, frontmatter, sourcePath, plugin);
+      }
     }
   }
 
@@ -210,13 +220,29 @@ export const updateCoverForView = (
 
 export const updateAllCovers = (plugin: PrettyPropertiesPlugin) => {
 
-  let leaves = plugin.app.workspace.getLeavesOfType("markdown");
-  for (let leaf of leaves) {
-    let view = leaf.view
-    if (view instanceof MarkdownView) {
-        updateCoverForView(view, plugin);
-    } 
-  }
+	let mdLeaves = plugin.app.workspace.getLeavesOfType("markdown");
+		for (let leaf of mdLeaves) {
+		let view = leaf.view
+		if (view instanceof MarkdownView) {
+			updateCoverForView(view, plugin);
+		} 
+	}
+
+
+	let canvasLeaves = plugin.app.workspace.getLeavesOfType("canvas");
+	for (let leaf of canvasLeaves) {
+		let view = leaf.view as CanvasView
+
+		view.canvas?.nodes?.forEach(node => {
+			let nodeView = node.child
+			
+			if (nodeView) {
+				updateCoverForView(nodeView, plugin);
+			}
+		})
+	}
+
+
 
 }
 

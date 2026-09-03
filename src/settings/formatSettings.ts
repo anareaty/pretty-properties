@@ -203,6 +203,21 @@ export const showFormatSettingsTab = (settingTab: PPSettingTab) => {
     let dateTimePlaceholder = "DD-MM-YYYY HH:mm"
     
     if (plugin.settings.enableCustomDateFormat) {
+
+
+        new Setting(containerEl)
+        .setName(i18n.t("ENABLE_CUSTOM_DATE_FORMAT_IN_BASES"))
+        .addToggle(toggle => toggle
+            .setValue(plugin.settings.enableCustomDateFormatInBases)
+            .onChange(async (value) => {
+                plugin.settings.enableCustomDateFormatInBases = value
+                await plugin.saveSettings();
+                settingTab.display();
+                updateAllProperties(plugin);
+        }));
+
+
+
         new Setting(containerEl)
         .setName(i18n.t("CUSTOM_DATE_FORMAT"))
         .addText(text => text
@@ -226,16 +241,7 @@ export const showFormatSettingsTab = (settingTab: PPSettingTab) => {
             }));
     }
 
-    new Setting(containerEl)
-    .setName(i18n.t("ENABLE_CUSTOM_DATE_FORMAT_IN_BASES"))
-    .addToggle(toggle => toggle
-        .setValue(plugin.settings.enableCustomDateFormatInBases)
-        .onChange(async (value) => {
-            plugin.settings.enableCustomDateFormatInBases = value
-            await plugin.saveSettings();
-            settingTab.display();
-            updateAllProperties(plugin);
-    }));
+    
 
 
 
@@ -250,13 +256,6 @@ export const showFormatSettingsTab = (settingTab: PPSettingTab) => {
 		text: "README",
 		href: "https://github.com/anareaty/pretty-properties/blob/master/README.md",
 	});
-
-
-
-    
-
-
-	
 
 
 
@@ -278,17 +277,39 @@ export const showFormatSettingsTab = (settingTab: PPSettingTab) => {
         }
     );
 
-
-
-
-
     if (plugin.settings.showExtraFormattings) { 
         showFormatSettings(settingTab)
     }
 
 
 
-    
+
+
+
+    new Setting(containerEl)
+    .setName(i18n.t("SHOW_MARKDOWN_PROPERTIES_LIST"))
+    .addButton(button =>
+        {
+            let icon = "chevron-right"
+            if (plugin.settings.showMdProperties) {
+                icon = "chevron-down"
+            }
+            button.setIcon(icon)
+            .setClass("bare-button")
+            .onClick(async () => {
+                plugin.settings.showMdProperties = !plugin.settings.showMdProperties
+                await plugin.saveSettings()
+                settingTab.display()
+            })
+        }
+    );
+
+    if (plugin.settings.showMdProperties) { 
+        showMdPropsList(settingTab)
+    }
+
+
+
 
 
 }
@@ -304,18 +325,12 @@ export const showFormatSettingsTab = (settingTab: PPSettingTab) => {
 
 const showFormatSettings = (settingTab: PPSettingTab) => {
     const {containerEl, plugin} = settingTab
-
     let formatSettingsWrapper = containerEl.createDiv()
-
     formatSettingsWrapper.classList.add("pp-settings-list-container")
-
     let formatSettingsEl = formatSettingsWrapper.createDiv()
-
 
 	const addFormatSetting = (property: string) => {
         let propertyFormatSetting = new Setting(formatSettingsEl)
-
-
 		let entry = plugin.settings.propertyFormats[property]
 
         if (!entry) {
@@ -326,15 +341,6 @@ const showFormatSettings = (settingTab: PPSettingTab) => {
 
         propertyFormatSetting
 		.setName(property)
-
-
-
-
-		
-
-
-
-
 		.addTextArea((text) => {
             enhanceFormatTextArea(plugin, text, entry.format, async (value) => {
                 entry.format = value;
@@ -342,9 +348,6 @@ const showFormatSettings = (settingTab: PPSettingTab) => {
                 updateAllProperties(plugin);
             });
 		})
-
-
-
         .addButton(btn => btn
             .setIcon("x")
             .onClick(async () => {
@@ -356,12 +359,9 @@ const showFormatSettings = (settingTab: PPSettingTab) => {
         )
     }
 
-
 	for (let property in plugin.settings.propertyFormats) {
 		addFormatSetting(property)
 	}
-
-
 
     let newProperty = ""
     new Setting(formatSettingsWrapper)
@@ -384,8 +384,6 @@ const showFormatSettings = (settingTab: PPSettingTab) => {
 				suggester.close();
 			});
 		})
-
-
         .addButton(btn => btn
             .setIcon("plus")
             .onClick(async () => {
@@ -395,6 +393,77 @@ const showFormatSettings = (settingTab: PPSettingTab) => {
 						format: ""
 					}
                     await plugin.saveSettings()
+                    settingTab.display();
+                }
+            })
+        )
+}
+
+
+
+
+
+
+
+
+
+
+
+const showMdPropsList = (settingTab: PPSettingTab) => {
+    const {containerEl, plugin} = settingTab
+    let formatSettingsWrapper = containerEl.createDiv()
+    formatSettingsWrapper.classList.add("pp-settings-list-container")
+    let formatSettingsEl = formatSettingsWrapper.createDiv()
+
+	const addFormatSetting = (property: string) => {
+        let propertyFormatSetting = new Setting(formatSettingsEl)
+
+        propertyFormatSetting
+		.setName(property)
+        .addButton(btn => btn
+            .setIcon("x")
+            .onClick(async () => {
+                plugin.settings.markdownProperties = plugin.settings.markdownProperties.filter((p) => p != property)
+                await plugin.saveSettings();
+                updateAllProperties(plugin);
+                settingTab.display();
+            })
+        )
+    }
+
+	for (let property of plugin.settings.markdownProperties) {
+		addFormatSetting(property)
+	}
+
+    let newProperty = ""
+    new Setting(formatSettingsWrapper)
+        .setName(i18n.t("ADD_PROPERTY_FORMAT"))
+		.addSearch((search) => {
+			search.setValue("");
+			search.setPlaceholder(i18n.t("PROPERTY_SEARCH_PLACEHOLDER"));
+
+			const persist = async (value: string) => {
+				newProperty = value;
+			};
+			search.onChange(async (value) => {
+				await persist(value);
+			});
+
+			const suggester = new PropertyNameSuggest(plugin.app, search.inputEl, ["text", "number", "date", "datetime"]);
+			suggester.onSelect(async (value) => {
+				await persist(value);
+				suggester.setValue(value);
+				suggester.close();
+			});
+		})
+        .addButton(btn => btn
+            .setIcon("plus")
+            .onClick(async () => {
+				newProperty = newProperty.trim()
+                if (newProperty && !plugin.settings.markdownProperties.find(p => p == newProperty)) {
+                    plugin.settings.markdownProperties.push(newProperty)
+                    await plugin.saveSettings()
+                    updateAllProperties(plugin);
                     settingTab.display();
                 }
             })

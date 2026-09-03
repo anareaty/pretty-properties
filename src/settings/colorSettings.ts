@@ -23,13 +23,17 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
     let propertyLongtextColorsKeys = Object.keys(plugin.settings.propertyLongtextColors)
 
 
+    let format = "L"
+    if (plugin.settings.enableCustomDateFormat && plugin.settings.customDateFormat) {
+        format = plugin.settings.customDateFormat
+    }
+   
 
-    let format = plugin.settings.customDateFormat
-    if (!format) {format = "L"}
 
     let pastDate = moment().subtract(1, "days").format(format)
     let presentDate = moment().format(format)
     let futureDate = moment().add(1, "days").format(format)
+
    
 
 

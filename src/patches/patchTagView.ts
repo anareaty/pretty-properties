@@ -8,7 +8,7 @@ import { TagView } from "@obsidian-typings/obsidian-public-latest";
 
 interface TagViewExtended extends TagView {
   requestUpdateTags: () => unknown,
-  tagDoms: Record<string, HTMLElement>[]
+  tagDoms: Record<string, {el: HTMLElement}>
 }
 
 
@@ -24,8 +24,6 @@ export const patchTagView = (plugin: PrettyPropertiesPlugin) => {
 
             view.requestUpdateTags = new Proxy(view.requestUpdateTags, {
               apply(requestUpdateTags, thisArg2) {
-
-               
                 let update = requestUpdateTags.call(thisArg2)
                 updateTagPaneTags(view.containerEl, plugin)   
                 return update
@@ -35,29 +33,30 @@ export const patchTagView = (plugin: PrettyPropertiesPlugin) => {
             view.updateTags()
             let tagDoms = view.tagDoms
 
-          
-            Object.keys(tagDoms).forEach((key) => {
-              let tag = Number(key)
-              let tagEl = tagDoms[tag]?.el
+            Object.keys(tagDoms).forEach((tag: string) => {
+              let tagEl = tagDoms[tag as keyof typeof tagDoms]?.el
+
               if (tagEl) {
                 updateTagPaneTags(tagEl, plugin)
               }
             })
 
-
-            
             return view
           })
         }
     })
 
 
-    plugin.app.workspace.onLayoutReady(async () => {
+    plugin.app.workspace.onLayoutReady(() => {
       let tagLeaves = plugin.app.workspace.getLeavesOfType("tag")
       for (let tagLeaf of tagLeaves) {
-        await tagLeaf.rebuildView()
+        tagLeaf.rebuildView()
       }
     })
+
+
+
+
   }
 }
 

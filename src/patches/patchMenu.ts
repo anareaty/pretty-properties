@@ -19,15 +19,17 @@ export const patchMenu = (plugin: PrettyPropertiesPlugin) => {
     
       return dedupe("pp-patch-menu-around-key", old, function(this: Menu, e) {
         
-        let target = e.target
-        
+        let target = e.currentTarget
+
+        if (!(target instanceof Element)) {
+            target = e.target
+        }
+
         if (target instanceof Element) {
 
 
-    
-
-
             // Tag menu
+            
             let tag = target.closest(".cm-hashtag")
             if (tag?.instanceOf(HTMLElement)) {
                 handleTagMenu(this, tag, plugin);

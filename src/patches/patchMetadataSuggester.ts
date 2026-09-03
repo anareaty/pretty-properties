@@ -62,7 +62,7 @@ export const patchMetadataSuggester = (plugin: PrettyPropertiesPlugin) => {
             let text = suggestEl.innerText
               setPillStyles(suggestEl, "data-tag-value", text, "tag", plugin)
               suggestEl.classList.add("multi-suggest-item")
-              this.suggestInnerEl.classList.add("metadata-multi-suggestion")
+              this.suggestInnerEl?.classList.add("metadata-multi-suggestion")
           }
         }
 

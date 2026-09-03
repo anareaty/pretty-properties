@@ -35,15 +35,11 @@ interface Popover extends HoverPopover {
 
 export const updateAllProperties = (plugin:PrettyPropertiesPlugin) => { 
 
-    
-
     let mdLeaves = plugin.app.workspace.getLeavesOfType("markdown");
     for (let leaf of mdLeaves) {
-        
         let view = leaf.view
 
         if (view instanceof MarkdownView) {
-
             view.metadataEditor?.rendered?.forEach(p => {
                 p.renderProperty(p.entry, !0)
             })
@@ -62,12 +58,6 @@ export const updateAllProperties = (plugin:PrettyPropertiesPlugin) => {
                 editorView.dispatch({
                     effects: [updateTags.of(null)]
                 })
-
-                
-
-                
-
-                
             }
         }
     }
@@ -220,69 +210,59 @@ export const updateEmptyProperties = (plugin: PrettyPropertiesPlugin) => {
 
 
 export const updateImagesInPopover = (popover: HoverPopover, plugin: PrettyPropertiesPlugin) => {
-
     let embed = (popover as Popover).embed
     
-
-    
-
     if (embed) {
         let file = embed.file
 
         let contentEl = popover.hoverEl
         if (file instanceof TFile) {
             let cache = plugin.app.metadataCache.getFileCache(file);
-            let frontmatter = cache?.frontmatter;
             let sourcePath = file.path || "";
-                
-            if (frontmatter && getNestedProperty(frontmatter, plugin.settings.bannerProperty)  && plugin.settings.enableBanner && plugin.settings.enableBannersInPopover) {
-                void renderBanner(contentEl, frontmatter, sourcePath, popover, plugin);
-            } else {
-                let oldBannerDivSource = contentEl?.querySelector(".cm-scroller .pp-banner");
-                let oldBannerDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .pp-banner");
-                oldBannerDivSource?.remove();
-                oldBannerDivPreview?.remove();
-                contentEl.classList.remove("has-banner")
-            }
-
-            
-
-            let hasCover = false
-
-            if (frontmatter) {
-				for (let extraCover of plugin.settings.coverProperties) {
-					if (getNestedProperty(frontmatter, extraCover.property)) {
-						hasCover = true
-						break
-					}
-				}
-            }
-
-            
-
-            if (frontmatter && hasCover && plugin.settings.enableCover && plugin.settings.enableCoversInPopover) {
-                
-                void renderCover(popover, contentEl, frontmatter, sourcePath, plugin);
-            } else {    
-                let oldCoverDiv = contentEl?.querySelector(".pp-cover");
-                oldCoverDiv?.remove();
-                const mdContainer = contentEl.querySelector(".metadata-container");
-                mdContainer?.classList.remove("has-cover")
-            }
-            if (frontmatter && getNestedProperty(frontmatter, plugin.settings.iconProperty)  && plugin.settings.enableIcon && plugin.settings.enableIconsInPopover) {
-                renderIcon(contentEl, frontmatter, sourcePath, popover, plugin);
-            } else {
-                let oldIconDivSource = contentEl?.querySelector(".cm-scroller .icon-wrapper");
-                let oldIconDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .icon-wrapper");
-                oldIconDivSource?.remove();
-                oldIconDivPreview?.remove();
-                contentEl.classList.remove("has-icon")
-                let titleIconWrappers = contentEl?.querySelectorAll(".title-icon-wrapper")
-                for (let titleIconWrapper of titleIconWrappers) {
-                    titleIconWrapper.remove()
-                }
-            }
+            updateImagesWithCacheForView(cache, popover, contentEl, sourcePath, "popover", plugin)
         }
+    }
+}
+
+
+
+export const updateImagesForView = (view: MarkdownView, plugin: PrettyPropertiesPlugin) => {
+    let file = view.file;
+
+    if (file) {
+        let cache = plugin.app.metadataCache.getFileCache(file);
+        let sourcePath = file.path || "";
+        let contentEl = view.contentEl;
+        updateImagesWithCacheForView(cache, view, contentEl, sourcePath, "normal", plugin)
+    }
+};
+
+
+
+export const updateImagesOnCacheChanged = (file: TFile, cache: CachedMetadata, plugin: PrettyPropertiesPlugin) => {
+    
+    let sourcePath = file.path || ""
+
+    let mdLeaves = plugin.app.workspace.getLeavesOfType("markdown");
+    for (let leaf of mdLeaves) {
+        let view = leaf.view;
+        if (view instanceof MarkdownView && view.file?.path == sourcePath) {
+            let contentEl = view.contentEl;
+            updateImagesWithCacheForView(cache, view, contentEl, sourcePath, "normal", plugin)
+        }
+    }
+
+    let canvasLeaves = plugin.app.workspace.getLeavesOfType("canvas");
+    for (let leaf of canvasLeaves) {
+        let view = leaf.view as CanvasView
+
+        view.canvas?.nodes?.forEach(node => {
+            let nodeView = node.child
+
+            if (nodeView && nodeView.file?.path == sourcePath) {
+                updateCoverForView(nodeView, plugin);
+            }
+        })
     }
 }
 
@@ -293,142 +273,61 @@ export const updateImagesInPopover = (popover: HoverPopover, plugin: PrettyPrope
 
 
 
-export const updateImagesForView = (view: MarkdownView, plugin: PrettyPropertiesPlugin) => {
 
+
+export const updateImagesWithCacheForView = (cache: CachedMetadata, view: MarkdownView, contentEl: HTMLElement, sourcePath: string, type: string, plugin: PrettyPropertiesPlugin) => {
+    let frontmatter = cache?.frontmatter;
+    let enableBanner = plugin.settings.enableBanner
+    let enableCover = plugin.settings.enableCover
+    let enableIcon = plugin.settings.enableIcon
+
+    if (type == "popover") {
+        enableBanner = plugin.settings.enableBanner && plugin.settings.enableBannersInPopover
+        enableCover = plugin.settings.enableCover && plugin.settings.enableCoversInPopover
+        enableIcon = plugin.settings.enableIcon && plugin.settings.enableIconsInPopover
+    }
     
+    if (frontmatter && getNestedProperty(frontmatter, plugin.settings.bannerProperty)  && enableBanner) {
+        void renderBanner(contentEl, frontmatter, sourcePath, view, plugin);
+    } else {
+        let oldBannerDivSource = contentEl?.querySelector(".cm-scroller .pp-banner");
+        let oldBannerDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .pp-banner");
+        oldBannerDivSource?.remove();
+        oldBannerDivPreview?.remove();
+        contentEl.classList.remove("has-banner")
+    }
 
-    let file = view.file;
-    let contentEl = view.contentEl;
+    let hasCover = false
 
-    if (file) {
-        let cache = plugin.app.metadataCache.getFileCache(file);
-        let frontmatter = cache == null ? void 0 : cache.frontmatter;
-        let sourcePath = file.path || "";
-          
-        if (frontmatter && getNestedProperty(frontmatter, plugin.settings.bannerProperty)  && plugin.settings.enableBanner) {
-            void renderBanner(contentEl, frontmatter, sourcePath, view, plugin);
-        } else {
-            let oldBannerDivSource = contentEl?.querySelector(".cm-scroller .pp-banner");
-            let oldBannerDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .pp-banner");
-            oldBannerDivSource?.remove();
-            oldBannerDivPreview?.remove();
-            contentEl.classList.remove("has-banner")
-        }
-    
-        let hasCover = false
-
-
-        
-    
-        if (frontmatter) {
-			for (let extraCover of plugin.settings.coverProperties) {
-				if (getNestedProperty(frontmatter, extraCover.property)) {
-					hasCover = true
-					break
-				}
-			}
-        }
-
-        
-    
-        if (frontmatter && hasCover  && plugin.settings.enableCover) {
-            void renderCover(view, contentEl, frontmatter, sourcePath, plugin);
-        } else {    
-            let oldCoverDiv = contentEl?.querySelector(".pp-cover");
-            oldCoverDiv?.remove();
-            const mdContainer = contentEl.querySelector(".metadata-container");
-            mdContainer?.classList.remove("has-cover")
-        }
-        if (frontmatter && getNestedProperty(frontmatter, plugin.settings.iconProperty)  && plugin.settings.enableIcon) {
-            renderIcon(contentEl, frontmatter, sourcePath, view, plugin);
-            
-        } else {
-            let oldIconDivSource = contentEl?.querySelector(".cm-scroller .icon-wrapper");
-            let oldIconDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .icon-wrapper");
-            oldIconDivSource?.remove();
-            oldIconDivPreview?.remove();
-            contentEl.classList.remove("has-icon")
-            let titleIconWrappers = contentEl?.querySelectorAll(".title-icon-wrapper")
-            for (let titleIconWrapper of titleIconWrappers) {
-                titleIconWrapper.remove()
+    if (frontmatter) {
+        for (let extraCover of plugin.settings.coverProperties) {
+            if (getNestedProperty(frontmatter, extraCover.property)) {
+                hasCover = true
+                break
             }
         }
     }
 
-
-  };
-
-
-
-
-
-
-
-
-
-export const updateImagesOnCacheChanged = (file: TFile, cache: CachedMetadata, plugin: PrettyPropertiesPlugin) => {
-
-    let sourcePath = file.path || ""
-    let leaves = plugin.app.workspace.getLeavesOfType("markdown");
-    for (let leaf of leaves) {
-      let view = leaf.view;
-      if (view instanceof MarkdownView && view.file?.path == sourcePath) {
-        let frontmatter = cache?.frontmatter;
-        let contentEl = view.contentEl;
-      
-        if (frontmatter && getNestedProperty(frontmatter, plugin.settings.bannerProperty)  && plugin.settings.enableBanner) {
-          void renderBanner(contentEl, frontmatter, sourcePath, view, plugin);
-        } else {
-            let oldBannerDivSource = contentEl?.querySelector(".cm-scroller .pp-banner");
-            let oldBannerDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .pp-banner");
-            oldBannerDivSource?.remove();
-            oldBannerDivPreview?.remove();
-            contentEl.classList.remove("has-banner")
-        }
-
-        let hasCover = false
-
-        if (frontmatter) {
-			for (let extraCover of plugin.settings.coverProperties) {
-				if (getNestedProperty(frontmatter, extraCover.property)) {
-					hasCover = true
-					break
-				}
-			}
-        }
-
-
-
-        if (frontmatter && hasCover && plugin.settings.enableCover) {
-          void renderCover(view, contentEl, frontmatter, sourcePath, plugin);
-        } else {
-          let oldCoverDiv = contentEl?.querySelector(".pp-cover");
-          oldCoverDiv?.remove();
-          const mdContainer = contentEl.querySelector(".metadata-container");
-          mdContainer?.classList.remove("has-cover")
-        }
-        if (frontmatter && getNestedProperty(frontmatter, plugin.settings.iconProperty)  && plugin.settings.enableIcon) {
-          renderIcon(contentEl, frontmatter, sourcePath, view, plugin);
-         
-        } else {
-            let oldIconDivSource = contentEl?.querySelector(".cm-scroller .icon-wrapper");
-            let oldIconDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .icon-wrapper");
-            oldIconDivSource?.remove();
-            oldIconDivPreview?.remove();
-            contentEl.classList.remove("has-icon")
-            let titleIconWrappers = contentEl?.querySelectorAll(".title-icon-wrapper")
-            for (let titleIconWrapper of titleIconWrappers) {
-                titleIconWrapper.remove()
-            }
-        }
-      }
+    if (frontmatter && hasCover && enableCover) {
+        void renderCover(view, contentEl, frontmatter, sourcePath, plugin);
+    } else {
+        let oldCoverDiv = contentEl?.querySelector(".pp-cover");
+        oldCoverDiv?.remove();
+        const mdContainer = contentEl.querySelector(".metadata-container");
+        mdContainer?.classList.remove("has-cover")
     }
-
-
-
-
-
-
-
-
-  }
+    if (frontmatter && getNestedProperty(frontmatter, plugin.settings.iconProperty)  && enableIcon) {
+        renderIcon(contentEl, frontmatter, sourcePath, view, plugin);
+        
+    } else {
+        let oldIconDivSource = contentEl?.querySelector(".cm-scroller .icon-wrapper");
+        let oldIconDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .icon-wrapper");
+        oldIconDivSource?.remove();
+        oldIconDivPreview?.remove();
+        contentEl.classList.remove("has-icon")
+        let titleIconWrappers = contentEl?.querySelectorAll(".title-icon-wrapper")
+        for (let titleIconWrapper of titleIconWrappers) {
+            titleIconWrapper.remove()
+        }
+    }
+}
