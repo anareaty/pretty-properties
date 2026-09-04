@@ -241,13 +241,15 @@ Pretty properties mainly uses the handlebar helpers listed above. However to mak
 ##### `{{durationAbbreviated}}`
 
 Converts a duration into an abbreviated format, omitting leading zero units.
+
 **Params:**
 - `time` **{Number}**: The input value
 - `unit` **{String}**: The unit of the input value
 - `returns` **{String}**
-### `{{durationFormatted}}`
+
+#### `{{durationFormatted}}`
 Turns a duration into the specified format.
-#### Params
+##### Params
 - `time` **{Number}**: The input value
 - `unit` **{String}**: The unit of the input value
 - `format` **{Boolean}**: Optional. See [dayjs](https://day.js.org/docs/en/display/format)
