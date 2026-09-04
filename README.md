@@ -97,16 +97,32 @@ You can select custom formats for the date and datetime properties. Set format i
 
 ![custom dates](images/image_custom_date.png)
 
-Keep in mind that the date presentation is changed by adding extra element to the property and hiding the actual input text. Because of that the text of the date will become uneditable. You can still edit the date with calendar picker, or selecting it and pressing enter. This also makes the changed date to look a little different, especially with color.
-
-Custom dates in bases are disabled by default, because they can make bases slower. You can turn them on in settings (an alternative could be a formula in bases like `datetime_property.format("YYYY-MM-DD HH:mm:ss")`). This function is also not supported in base cards: if you want the custom date format in base cards, you should use the formula instead, because dates in cards are not editable anyway.
-
-> [!WARNING]  
-> This is an experimental feature and can work incorrectly on some devices! If you expirience some issues with custom dates, please open an issue and provide information about your OS.
+Custom dates in bases are disabled by default, because they can make bases slower. You can turn them on in settings (an alternative could be a formula in bases like `datetime_property.format("YYYY-MM-DD HH:mm:ss")`). 
 
 ### Progress bars
 
-Add simple progress bar to any number property. By default maximum value of progress bar is 100 and property value is treated as percent. If you want to add custom number as progress maximum, you need to add additional number property to the note and in the first property menu select the option "Set max progress from another property".
+Right-click on the number property icon to add simple progress bar to any number property. By default maximum value of progress bar is 100 and property value is treated as percent. If you want to add custom number as progress maximum, you need to add additional number property to the note and in the first property menu select the option "Set max progress from another property".
+
+Progress bars are not supported in bases, because you can create progress-bars using regular base formulas. Here is a couple of examples of formulas you can use (or you can write your own).
+
+Progress-bar formula:
+
+```
+if( note["maxProperty"], html("<progress class='metadata-progress' max='" + 
+note["maxProperty"] + "' value='" + 
+if(note["valueProperty"], note["valueProperty"], 0) + 
+"' aria-label='" + 
+if(note["maxProperty"], (if(note["valueProperty"], note["valueProperty"], 0) / note["maxProperty"] * 100).round(), " ") + " %" + 
+"' data-tooltip-position='top' data-tooltip-delay='500'>"), "")
+```
+
+Progress circle formula:
+
+```
+if(note["maxProperty"], html("<div class='metadata-circle-progress'  style='background: radial-gradient(closest-side, var(--background-primary) 64%, transparent 65% 100%), conic-gradient(var(--color-accent-1) " + if(note["maxProperty"], (if(note["valueProperty"], note["valueProperty"], 0) / note["maxProperty"] * 100).round(), 0) + "%" + ", var(--background-secondary) 0);' aria-label='" + 
+if(note["maxProperty"], (if(note["valueProperty"], note["valueProperty"], 0) / note["maxProperty"] * 100).round(), " ") + " %" + 
+"' data-tooltip-position='top' data-tooltip-delay='500'></div>"), "")
+```
 
 ![progress bar](images/image-6.png)
 

@@ -92,6 +92,10 @@ export const updateDateInput = (input: HTMLInputElement, plugin: PrettyPropertie
 				let customDateEl = createSpan()
 				customDateEl.classList.add("custom-date")
 
+				customDateEl.onclick = () => {
+					input.focus()
+				}
+
 
 				setOverlayContent(customDate, propertyFormatObj.textFormat, customDateEl, grandParent, plugin)
 
@@ -160,6 +164,9 @@ export const updateDateTimeInput = (input: HTMLInputElement, plugin: PrettyPrope
 			} else if (!existingCustomDateElement && customDate != "Invalid date") {
 				let customDateEl = createSpan()
 				customDateEl.classList.add("custom-date")
+				customDateEl.onclick = () => {
+					input.focus()
+				}
 				customDateEl.append(customDate)
 				input.after(customDateEl)
 				parent.classList.add("has-custom-date")
