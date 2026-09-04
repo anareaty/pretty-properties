@@ -248,9 +248,9 @@ Params:
 - unit {String}: The unit of the input value
 - returns {String}
 ```
-- `time` **{Number}**: The input value
-- `unit` **{String}**: The unit of the input value
-- `returns` **{String}**
+- `time` {Number}: The input value
+- `unit` {String}: The unit of the input value
+- `returns` {String}
 
 #### `{{durationFormatted}}`
 Turns a duration into the specified format.
