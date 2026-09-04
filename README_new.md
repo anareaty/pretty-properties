@@ -243,6 +243,11 @@ Pretty properties mainly uses the handlebar helpers listed above. However to mak
 Converts a duration into an abbreviated format, omitting leading zero units.
 
 Params:
+```
+- time: {Number}: The input value
+- unit {String}: The unit of the input value
+- returns {String}
+```
 - `time` **{Number}**: The input value
 - `unit` **{String}**: The unit of the input value
 - `returns` **{String}**
