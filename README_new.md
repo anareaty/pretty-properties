@@ -238,11 +238,11 @@ Currently supported helper packages are:
 
 Pretty properties mainly uses the handlebar helpers listed above. However to make some functionality more easily accessible it also adds custom helpers:
 
-##### `{{durationAbbreviated}}`
+**`{{durationAbbreviated}}`**
 
 Converts a duration into an abbreviated format, omitting leading zero units.
 
-**Params:**
+Params:
 - `time` **{Number}**: The input value
 - `unit` **{String}**: The unit of the input value
 - `returns` **{String}**
