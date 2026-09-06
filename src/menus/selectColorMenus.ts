@@ -4,7 +4,7 @@ import { i18n } from "src/localization/localization";
 import { ColorPickerModal } from "src/modals/colorPickerModal";
 import { updateRelativeDateColors } from "src/updates/updateStyles";
 import { updateAllProperties } from "src/updates/updateElements";
-import { PillColorSettings, PPSettingTab } from "src/settings/settings";
+import { PillColorSettings } from "src/settings/settings";
 
 
 

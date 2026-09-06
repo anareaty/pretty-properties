@@ -166,102 +166,42 @@ Custom dates in bases are disabled by default, because they can make bases slowe
 
 # Formatting templates
 
-The formatting settings allow you to display properties differently by replacing the value with a special template. This allows you to for example store a number property that represents a duration in seconds (eg. `829`), but render it visually as a human readable duration (eg. `13m 49s`). This avoids having to store the same value twice in a note in multiple formats.
+The formatting settings is an experimental feature that allow you to display properties differently by replacing the value with a special template. This allows you to for example store a number property that represents a duration in seconds (eg. `829`), but render it visually as a human readable duration (eg. `13m 49s`). This avoids having to store the same value twice in a note in multiple formats.
 
 ![property-formatting.png](images/property-formatting.png)
 
-This is accomplished using [Handlebars](https://handlebarsjs.com/), a templating language similar to Obsidian's built in date/time template syntax.
+You can set the formatting templates in the plugin settins. The template should be written using [Handlebars](https://handlebarsjs.com/), a templating language similar to Obsidian's built in date/time template syntax.
 The syntax uses double curly braces around helper names. Arguments are passed as space-separated values and can be nested.
 Pretty Properties adds `{{propertyValue}}` and `{{propertyName}}`, which will be replaced by the respective content.
 
-Currently supported helper packages are:
-- [@budibase/handlebars-helpers](https://www.npmjs.com/package/%40budibase/handlebars-helpers) for general utilities
-- [handlebars.moment](https://www.npmjs.com/package/handlebars.moment) for time and duration
-
-### Custom helpers
-
-
-
-
-
 ## Supported helpers
 
-### Just Handlebars Helpers
+Currently supported helper packages are:
+- [just-handlebars-helpers](https://www.npmjs.com/package/just-handlebars-helpers) for general utilities;
+- [handlebars.moment](https://www.npmjs.com/package/handlebars.moment) for time and duration.
 
-| Helper                                                                                   | Description                                           |
-| ---------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| [eq](https://www.npmjs.com/package/just-handlebars-helpers#eq)                           | Strict equality `===`                                 |
-| [eqw](https://www.npmjs.com/package/just-handlebars-helpers#eqw)                         | Equality `==`                                         |
-| [neq](https://www.npmjs.com/package/just-handlebars-helpers#neq)                         | Strict inequality `!==`                               |
-| [neqw](https://www.npmjs.com/package/just-handlebars-helpers#neqw)                       | Inequality `!=`                                       |
-| [lt](https://www.npmjs.com/package/just-handlebars-helpers#lt)                           | Less than `<`                                         |
-| [lte](https://www.npmjs.com/package/just-handlebars-helpers#lte)                         | Less than or equal `<=`                               |
-| [gt](https://www.npmjs.com/package/just-handlebars-helpers#gt)                           | Greater than `>`                                      |
-| [gte](https://www.npmjs.com/package/just-handlebars-helpers#gte)                         | Greater than or equal `>=`                            |
-| [not](https://www.npmjs.com/package/just-handlebars-helpers#not)                         | Not `!`                                               |
-| [ifx](https://www.npmjs.com/package/just-handlebars-helpers#ifx)                         | Imitates conditional operator `?:`                    |
-| [empty](https://www.npmjs.com/package/just-handlebars-helpers#empty)                     | Check if an array is empty                            |
-| [count](https://www.npmjs.com/package/just-handlebars-helpers#count)                     | Length of an array                                    |
-| [and](https://www.npmjs.com/package/just-handlebars-helpers#and)                         | Logical AND operation                                 |
-| [or](https://www.npmjs.com/package/just-handlebars-helpers#or)                           | Logical OR operation                                  |
-| [coalesce](https://www.npmjs.com/package/just-handlebars-helpers#coalesce)               | Returns first non-falsy value from list of parameters |
-| [includes](https://www.npmjs.com/package/just-handlebars-helpers#includes)               | Check for a value inside an array                     |
-| [excerpt](https://www.npmjs.com/package/just-handlebars-helpers#excerpt)                 | Extract a sub-string from a string                    |
-| [sanitize](https://www.npmjs.com/package/just-handlebars-helpers#sanitize)               | Sanitize a string to url friendly dash/kebab case     |
-| [newLineToBr](https://www.npmjs.com/package/just-handlebars-helpers#newlinetobr)         | Replace new line with line breaks `<br>` of a string  |
-| [capitalizeEach](https://www.npmjs.com/package/just-handlebars-helpers#capitalizeeach)   | Capitalize the first letter of each word in a string  |
-| [capitalizeFirst](https://www.npmjs.com/package/just-handlebars-helpers#capitalizefirst) | Capitalize the first letter of a string               |
-| [sprintf](https://www.npmjs.com/package/just-handlebars-helpers#sprintf)                 | String produced according to the formatting format    |
-| [lowercase](https://www.npmjs.com/package/just-handlebars-helpers#lowercase)             | String to lowercase                                   |
-| [uppercase](https://www.npmjs.com/package/just-handlebars-helpers#uppercase)             | String to uppercase                                   |
-| [first](https://www.npmjs.com/package/just-handlebars-helpers#first)                     | First element of an array                             |
-| [last](https://www.npmjs.com/package/just-handlebars-helpers#last)                       | Last element of an array                              |
-| [concat](https://www.npmjs.com/package/just-handlebars-helpers#concat)                   | Concatenate two or more strings                       |
-| [join](https://www.npmjs.com/package/just-handlebars-helpers#join)                       | Join elements of an array using a delimeter           |
-| [sum](https://www.npmjs.com/package/just-handlebars-helpers#sum)                         | Sum of two numbers                                    |
-| [difference](https://www.npmjs.com/package/just-handlebars-helpers#difference)           | Difference of two numbers                             |
-| [multiplication](https://www.npmjs.com/package/just-handlebars-helpers#multiplication)   | Multiplication of two numbers                         |
-| [division](https://www.npmjs.com/package/just-handlebars-helpers#division)               | Division of two numbers                               |
-| [remainder](https://www.npmjs.com/package/just-handlebars-helpers#remainder)             | Remainder of two numbers                              |
-| [ceil](https://www.npmjs.com/package/just-handlebars-helpers#ceil)                       | Round a number upward to its nearest integer          |
-| [floor](https://www.npmjs.com/package/just-handlebars-helpers#floor)                     | Round a number downward to its nearest integer        |
-| [abs](https://www.npmjs.com/package/just-handlebars-helpers#abs)                         | Find the absolute value of a number                   |
-| [formatDate](https://www.npmjs.com/package/just-handlebars-helpers#formatdate)           | Format date to specified format                       |
-| [showIf](https://www.npmjs.com/package/just-handlebars-helpers#showif)                   | Show HTML element if expression is true               |
-| [hideIf](https://www.npmjs.com/package/just-handlebars-helpers#hideif)                   | Hide HTML element if expression is true               |
-| [selectedIf](https://www.npmjs.com/package/just-handlebars-helpers#selectedif)           | Select `<option>` if expression is true               |
-| [checkedIf](https://www.npmjs.com/package/just-handlebars-helpers#checkedif)             | Check the `<input>` checkbox if expression is true    |
-| [options](https://www.npmjs.com/package/just-handlebars-helpers#options)                 | Generate `<option>` list for `<select>`               |
-| [formatCurrency](https://www.npmjs.com/package/just-handlebars-helpers#formatcurrency)   | Format currency value according to country            |
+Additionally to make some functionality more easily accessible Pretty properties also adds custom helpers:
 
-### Additional helpers
-
-Pretty properties mainly uses the handlebar helpers listed above. However to make some functionality more easily accessible it also adds custom helpers:
-
-**`{{durationAbbreviated}}`**
+#### `{{durationAbbreviated}}`**
 
 Converts a duration into an abbreviated format, omitting leading zero units.
 
-Params:
-```
-- time: {Number}: The input value
-- unit {String}: The unit of the input value
-- returns {String}
-```
-- `time` {Number}: The input value
-- `unit` {String}: The unit of the input value
-- `returns` {String}
+**Params:**
+- `time` **{Number}**: The input value
+- `unit` **{String}**: The unit of the input value
+- `returns` **{String}**
 
 #### `{{durationFormatted}}`
 Turns a duration into the specified format.
-##### Params
+**Params:**
 - `time` **{Number}**: The input value
 - `unit` **{String}**: The unit of the input value
 - `format` **{Boolean}**: Optional. See [dayjs](https://day.js.org/docs/en/display/format)
 - `returns` **{String}**
-### `{{durationHumanized}}`
+
+#### `{{durationHumanized}}`
 Converts a duration into a natural-sounding string.
-#### Params
+**Params:**
 - `time` **{Number}**: The input value
 - `unit` **{String}**: The unit of the input value
 - `withSuffix` **{Boolean}**: Optional. Will add "in " at the front or " ago" at the end.
@@ -276,6 +216,11 @@ Reverse the order of a property:
 ````
 {{reverse propertyValue}}
 ````
+Show a number as as abbreviated (eg. `1234567` -> `1.23M`):
+````
+{{uppercase (toAbbr propertyValue)}}
+````
+
 Show a duration originally in seconds as human readable (eg. `829` -> `in 14 minutes`):
 ````
 {{durationHumanized propertyValue "s" true}}
@@ -294,7 +239,7 @@ Show a [Meta Bind](https://github.com/mProjectsCode/obsidian-meta-bind-plugin) s
 ````
 ![meta-bind](images/meta-bind.png)
 
-Show a steamid property as an iframe (as a cover):
+Show a steamid property as an iframe (to render cover as iframe add this template to the cover setting instead of the property format settings):
 ````
 <iframe src="https://store.steampowered.com/widget/{{propertyValue}}" frameborder="0" width="100%" height="190"></iframe>
 ````

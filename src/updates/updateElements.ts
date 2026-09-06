@@ -320,7 +320,7 @@ export const updateImagesWithCacheForView = (cache: CachedMetadata, view: Markdo
         mdContainer?.classList.remove("has-cover")
     }
     if (frontmatter && getNestedProperty(frontmatter, plugin.settings.iconProperty)  && enableIcon) {
-        renderIcon(contentEl, frontmatter, sourcePath, view, plugin);
+        void renderIcon(contentEl, frontmatter, sourcePath, view, plugin);
         
     } else {
         let oldIconDivSource = contentEl?.querySelector(".cm-scroller .icon-wrapper");

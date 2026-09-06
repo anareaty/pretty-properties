@@ -5,9 +5,8 @@ import { PPSettingTab } from 'src/settings/settings';
 import { showColoredListSettings } from './coloredListSettings';
 import { showColoredTagsSettings } from './coloredTagsSettings';
 import { showColoredTextSettings } from './coloredTextSettings';
-import { setPillStyles, updateTagPaneTagsAll } from 'src/updates/updatePills';
+import { setPillStyles } from 'src/updates/updatePills';
 import { setColorMenuItems } from 'src/menus/selectColorMenus';
-import { updateColoredTagsStyle } from 'src/updates/updateStyles';
 import { AddTextModal } from 'src/modals/settingItemModals';
 
 

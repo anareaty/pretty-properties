@@ -1,7 +1,5 @@
 import { AbstractInputSuggest, App } from "obsidian";
 
-type PropertyInfo = { name: string; widget: string; };
-
 export class PropertyNameSuggest extends AbstractInputSuggest<string> {
 	private allowedTypes?: Set<string>;
 
@@ -26,18 +24,13 @@ export class PropertyNameSuggest extends AbstractInputSuggest<string> {
 	}
 
 	private getAllPropertyNamesRestricted(allowedTypes: Set<string> | undefined): string[] {
-		const cacheAny = this.app.metadataCache
-		if (typeof cacheAny.getAllPropertyInfos === "function") {
-			const infos = cacheAny.getAllPropertyInfos() as Record<string,PropertyInfo>;
-			
-			const names = Object.values(infos)
-				.filter((p): p is PropertyInfo => !allowedTypes || allowedTypes.has(p?.widget))
-				.map((p) => p?.name)
-				.filter((n): n is string => typeof n === "string" && n.length > 0);
+		let properties = this.app.metadataTypeManager.getAllProperties()
 
-			return Array.from(new Set(names)).sort((a, b) => a.localeCompare(b));
-		}
+		const names = Object.values(properties)
+			.filter(p => !allowedTypes || allowedTypes.has(p?.widget))
+			.map((p) => p?.name)
+			.filter(n => typeof n === "string" && n.length > 0);
 
-		return[];
+		return Array.from(new Set(names)).sort((a, b) => a.localeCompare(b));
 	}
 }

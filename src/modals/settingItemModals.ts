@@ -35,7 +35,7 @@ export class AddPropertyModal extends Modal {
                 suggester.setValue(value);
                 suggester.close();
                 this.result = value
-                this.modalCallback(this.result)
+                void this.modalCallback(this.result)
                 this.close()
             });
         })
@@ -47,7 +47,7 @@ export class AddPropertyModal extends Modal {
             .setButtonText(i18n.t("SAVE"))
             .setCta()
             .onClick(async () => {
-                this.modalCallback(this.result)
+                void this.modalCallback(this.result)
                 this.close()
             })
         )
@@ -109,7 +109,7 @@ export class AddTextModal extends Modal {
             .setButtonText(i18n.t("SAVE"))
             .setCta()
             .onClick(async () => {
-                this.modalCallback(this.result)
+                void this.modalCallback(this.result)
                 this.close()
             })
         )
@@ -180,7 +180,7 @@ export class FormatTemplateModal extends Modal {
             .setButtonText(i18n.t("SAVE"))
             .setCta()
             .onClick(async () => {
-                this.modalCallback(this.result)
+                void this.modalCallback(this.result)
                 this.close()
             })
         )

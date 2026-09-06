@@ -228,14 +228,8 @@ Converts a duration into a natural-sounding string.
 
 
 ## Example Templates
-Reverse the order of a property:
-````
-{{reverse propertyValue}}
-````
-Show a number as as abbreviated (eg. `1234567` -> `1.23M`):
-````
-{{uppercase (toAbbr propertyValue)}}
-````
+
+
 Show a duration originally in seconds as human readable (eg. `829` -> `in 14 minutes`):
 ````
 {{durationHumanized propertyValue "s" true}}

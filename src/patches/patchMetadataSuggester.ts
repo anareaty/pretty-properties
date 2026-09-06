@@ -4,6 +4,11 @@ import { PopoverSuggest } from "obsidian";
 import { setPillStyles } from "src/updates/updatePills";
 
 
+interface PropertyPopoverSuggest extends PopoverSuggest<string> {
+  textInputEl: HTMLElement,
+  suggestInnerEl: HTMLElement
+}
+
 
 
 export const patchMetadataSuggester = (plugin: PrettyPropertiesPlugin) => {
@@ -19,9 +24,10 @@ export const patchMetadataSuggester = (plugin: PrettyPropertiesPlugin) => {
       
 
     
-      return dedupe("pp-patch-suggest-around-key", old, function(this: any) {
+      return dedupe("pp-patch-suggest-around-key", old, function(this: PropertyPopoverSuggest) {
 
         let elements = this.suggestions.suggestions
+
         let textInputEl = this.textInputEl
 
         if (textInputEl instanceof HTMLElement) {
@@ -57,7 +63,8 @@ export const patchMetadataSuggester = (plugin: PrettyPropertiesPlugin) => {
                   }
                 }
             }
-        } else if (this.suggestions.values[0]?.tag) {
+        //} else if (this.suggestions.values[0]?.tag) {
+          } else if (this.suggestions.values[0] && "tag" in this.suggestions.values[0]) {
           for (let suggestEl of elements) {
             let text = suggestEl.innerText
               setPillStyles(suggestEl, "data-tag-value", text, "tag", plugin)

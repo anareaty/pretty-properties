@@ -1,4 +1,4 @@
-import { MarkdownView, FrontMatterCache, getIcon, MarkdownRenderer, Component } from "obsidian";
+import { MarkdownView, FrontMatterCache, getIcon, Component } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { getNestedProperty } from "../utils/propertyUtils";
 import { getImageValue, renderImageFromValue } from "../utils/imageUtils";
@@ -271,7 +271,7 @@ export const updateIconForView = (
         let sourcePath = view.file?.path || ""
         if (frontmatter) {
 
-        renderIcon(contentEl, frontmatter, sourcePath, view, plugin)
+        void renderIcon(contentEl, frontmatter, sourcePath, view, plugin)
         }
     }
 }

@@ -9,6 +9,9 @@ import PrettyPropertiesPlugin from "src/main";
 import { getNestedProperty } from "../utils/propertyUtils";
 import { CanvasView, EmbedMarkdownComponent, WidgetEditorView } from "@obsidian-typings/obsidian-public-latest";
 import { getImageValue, renderImageFromValue } from "../utils/imageUtils";
+import { getFormattedString } from "src/utils/formatUtils";
+
+
 
 
 interface EmbedMarkdownComponentExtended extends EmbedMarkdownComponent {
@@ -66,7 +69,7 @@ export const renderCover = async (
 
 			const formatString = entry.format;
 			if (formatString) {
-				coverVal = plugin.formatter.format(entry.property, coverVal, formatString)
+				coverVal = getFormattedString(entry.property, coverVal, formatString)
 			}
 			break
 		}

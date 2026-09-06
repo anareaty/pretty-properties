@@ -1,6 +1,6 @@
 import PrettyPropertiesPlugin from "src/main";
 import { querySelectorsWithIframes, querySelectorsWithIframesForContainer } from "../utils/querySelectorsHelper";
-import { CanvasView, EditorView, MetadataEditor, WidgetEditorView, EmbedMarkdownComponent } from "@obsidian-typings/obsidian-public-latest";
+import { CanvasView, MetadataEditor, EmbedMarkdownComponent } from "@obsidian-typings/obsidian-public-latest";
 import { MarkdownView } from "obsidian";
 
 

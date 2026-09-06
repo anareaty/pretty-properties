@@ -6,7 +6,7 @@ import css from "@eslint/css";
 import globals from 'globals';
 
 export default defineConfig([
-  //...obsidianmd.configs.recommended,
+  ...obsidianmd.configs.recommended,
   {
     files: ["**/*.ts"],
     languageOptions: {
@@ -26,7 +26,8 @@ export default defineConfig([
       // example: add a rule not in the recommended set and set its severity
       //"obsidianmd/prefer-file-manager-trash": "error",
       "no-undef": "off",
-      "@typescript-eslint/unbound-method": "off"
+      "@typescript-eslint/unbound-method": "off",
+      "@typescript-eslint/no-deprecated": "off"
     },
   },
   {
@@ -36,22 +37,23 @@ export default defineConfig([
     },
     language: "css/css",
     rules: {
-      "css/no-empty-blocks": "warn",
-      "css/no-duplicate-imports": "warn",
-      "css/no-important": "warn",
-      "css/use-baseline": ["warn"]
+      //"css/no-empty-blocks": "warn",
+      //"css/no-duplicate-imports": "warn",
+      //"css/no-important": "warn",
+      //"css/use-baseline": ["warn"]
     },
   },
   {
 	ignores: [
+      "**/*.css",
+      "package.json",
       "node_modules",
       "dist",
       "esbuild.config.mjs",
       "eslint.config.js",
       "version-bump.mjs",
       "versions.json",
-      "main.js",
-      "src/utils/handlebars_moment.cjs"
+      "main.js"
     ],
   },
 ]);

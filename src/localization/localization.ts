@@ -18,7 +18,7 @@ export class LocalizationService {
     if (requireApiVersion("1.8.7")) {
       locale = getLanguage();
     } else {
-      locale = window.localStorage.language;
+      locale = window.localStorage.language as string | undefined;
     }
 
     if (locale && locales[locale]) this.currentLocale = locale;

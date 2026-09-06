@@ -1,4 +1,4 @@
-import { Component, ImageValue, loadPdfJs, MarkdownRenderer, Menu, normalizePath, setIcon, TFile } from "obsidian";
+import { Component, loadPdfJs, MarkdownRenderer, Menu, normalizePath, setIcon, TFile } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { getNestedProperty } from "./propertyUtils";
 import { LocalImageSuggestModal } from "src/modals/localImageSuggestModal";
@@ -187,7 +187,7 @@ export const renderImageFromValue = async (
     const svg = imageTemp.querySelector("svg");
 	if (svg instanceof SVGElement) {
 		svg.classList.add("pp-image-svg");
-		return createImageWrapper(svg as any as HTMLElement, value, "mode-image", type)
+		return createImageWrapper(svg as unknown as HTMLElement, value, "mode-image", type)
 	}
 
     if (type == "icon") return

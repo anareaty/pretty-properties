@@ -34,7 +34,7 @@ export const patchTagView = (plugin: PrettyPropertiesPlugin) => {
             let tagDoms = view.tagDoms
 
             Object.keys(tagDoms).forEach((tag: string) => {
-              let tagEl = tagDoms[tag as keyof typeof tagDoms]?.el
+              let tagEl = tagDoms[tag]?.el
 
               if (tagEl) {
                 updateTagPaneTags(tagEl, plugin)
@@ -50,7 +50,7 @@ export const patchTagView = (plugin: PrettyPropertiesPlugin) => {
     plugin.app.workspace.onLayoutReady(() => {
       let tagLeaves = plugin.app.workspace.getLeavesOfType("tag")
       for (let tagLeaf of tagLeaves) {
-        tagLeaf.rebuildView()
+        void tagLeaf.rebuildView()
       }
     })
 

@@ -4,6 +4,7 @@ import { HSL } from "obsidian"
 import { hideMetadataContainerIfAllPropertiesHidden } from "./updateHiddenProperties";
 import { querySelectorsWithIframesForContainer } from "../utils/querySelectorsHelper";
 import { getPropertyFormatObj, updatePropertyFormatting } from "./updatePropertyFormattings";
+import { updateProgress } from "./updateProgress";
 
 
 export const getTextLightness = (color: HSL) => {
@@ -470,3 +471,20 @@ export const updateTagPaneTagsAll = (plugin: PrettyPropertiesPlugin) => {
 	
 }
 
+
+
+
+
+
+
+export const updateNumberWidget = (propName: string, value: string, parent: HTMLElement, sourcePath: string, plugin: PrettyPropertiesPlugin) => {
+	let propertyFormatObj = getPropertyFormatObj(propName, value, plugin)
+	updateProgress(parent, plugin, sourcePath)
+	updatePropertyFormatting(parent, propName, value, "number", propertyFormatObj.format, propertyFormatObj.textFormat, plugin)
+
+	if (value === "") {
+		parent.classList.add("is-empty")
+	} else {
+		parent.classList.remove("is-empty")
+	}
+}

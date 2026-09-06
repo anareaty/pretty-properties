@@ -3,7 +3,7 @@ import { updateImagesForView } from "src/updates/updateElements"
 import { around, dedupe } from "monkey-around";
 import { MarkdownView } from "obsidian";
 import { renderTitleIcon } from "src/updates/updateIcons";
-import { updateHiddenCSSClasses, updateMetadataEditor } from "src/updates/updateHiddenProperties";
+import { updateMetadataEditor } from "src/updates/updateHiddenProperties";
 import { MetadataEditor } from "@obsidian-typings/obsidian-public-latest";
 
 
@@ -62,7 +62,7 @@ export const patchMarkdownView = (plugin: PrettyPropertiesPlugin) => {
           apply(old2, thisArg2) {
             let result = old2.call(thisArg2) 
             let view = getView()
-            renderTitleIcon(view, plugin)
+            void renderTitleIcon(view, plugin)
             return result
           }
         })

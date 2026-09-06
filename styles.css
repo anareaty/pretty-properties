@@ -522,6 +522,7 @@ body.is-mobile .pp-cover {
 
 .pp-cover-has-iframe {
 	position: relative;
+  margin: auto;
 }
 
 .pp-cover-menu-button {
@@ -1401,9 +1402,9 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 .pp-pill-padding-colored .metadata-input-longtext.colored,
 .pp-pill-padding-non-transparent .metadata-input-longtext.colored,
 
-.pp-pill-padding-all .pp-formatted-value-overlay,
-.pp-pill-padding-colored .pp-formatted-value-overlay.colored,
-.pp-pill-padding-non-transparent .pp-formatted-value-overlay.colored {
+.pp-pill-padding-all .pp-formatted-value-overlay.text-overlay,
+.pp-pill-padding-colored .pp-formatted-value-overlay.text-overlay.colored,
+.pp-pill-padding-non-transparent .pp-formatted-value-overlay.text-overlay.colored {
   padding-left: var(--tag-padding-x);
   padding-right: var(--tag-padding-x);
 }
@@ -1843,11 +1844,9 @@ button.longtext-color-button:hover {
 .pp-formatted-value-overlay {
   font-family: var(--metadata-input-font);
   font-size: var(--metadata-input-font-size);
-}
-
-.pp-formatted-value-overlay.text-overlay {
   margin: auto 8px;
 }
+
 
 
 
@@ -1923,4 +1922,10 @@ button.cover-has-format {
 
 .multi-select-pill-content > span {
   display: block;
+}
+
+
+.custom-date p {
+  margin-block-start: 0;
+  margin-block-end: 0;
 }

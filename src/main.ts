@@ -34,14 +34,14 @@ import { patchBaseTable } from "./patches/patchBaseTable";
 import { unPatchWidgets } from "./patches/removePatches";
 import { patchHoverPopover } from "./patches/patchHoverPopover";
 import { API, createApi } from "./utils/createApi";
-import {PropertyFormatter, registerPropertyFormatter} from "./utils/propertyFormatter";
 import { patchMenu } from "./patches/patchMenu";
 import { reloadAllTabs } from "./utils/reload";
 import { patchEmbed } from "./patches/patchEmbed";
 import { GlobalSearchPluginInstance } from "@obsidian-typings/obsidian-public-latest";
 import { patchMetadataSuggester } from "./patches/patchMetadataSuggester";
-import { Platform } from "obsidian";
 import { patchBaseKanban } from "./patches/patchBaseKanban";
+import { MarkdownRenderChild } from "obsidian";
+import { clearUnusedRenderComponents } from "./updates/updatePropertyFormattings";
 
 type Patch = () => void
 type PatchList = Record<string, Patch>
@@ -54,8 +54,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 	settings: PPPluginSettings;
 	patches: Record<string, PatchList | Patch>;
 	api: API;
-	formatter: PropertyFormatter;
 	settingTab: PPSettingTab
+	activeRenderComponents: MarkdownRenderChild[]
 
 
 	async onload() {
@@ -63,9 +63,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 		createApi(this)
 		i18n.setLocale();
+		this.activeRenderComponents = []
 		this.patches = {}
-
-		registerPropertyFormatter(this)
 
 		patchPropertyWidgets(this)
 		patchTagView(this)
@@ -122,6 +121,19 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		this.registerEvent(
 			this.app.workspace.on('css-change', () => {
 				updateTheme(this)
+			})
+		);
+
+
+		this.registerEvent(
+			this.app.workspace.on('layout-change', () => {
+				clearUnusedRenderComponents(this)
+			})
+		);
+
+		this.registerEvent(
+			this.app.workspace.on('active-leaf-change', () => {
+				clearUnusedRenderComponents(this)
 			})
 		);
 
@@ -220,9 +232,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 	onunload() {
 		unPatchWidgets(this)
 		reloadAllTabs(this)
-		if (this.formatter) {
-			this.formatter.clearCache();
-		}
+		clearUnusedRenderComponents(this)
 	}
 
 
