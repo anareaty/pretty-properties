@@ -1,7 +1,7 @@
 import PrettyPropertiesPlugin from "src/main"
 import { around, dedupe } from "monkey-around";
 import { Menu } from "obsidian";
-import { createColorMenu, createColorMenu } from "src/menus/selectColorMenus";
+import { createColorMenu } from "src/menus/selectColorMenus";
 import { i18n } from "src/localization/localization";
 import { handlePropertyMenu } from "src/menus/propertyMenu";
 import { handleBannerMenu } from "src/menus/bannerMenu";
