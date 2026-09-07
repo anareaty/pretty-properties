@@ -68,7 +68,7 @@ export const registerTagFixExtension = (plugin: PrettyPropertiesPlugin) => {
                                 if (node.type.name.includes('hashtag-end')) {
                                     
                                     let tagId = view.state.doc.sliceString(tagTextStart, node.to)
-                                    let styles = generateInlineStyles(tagId, "tag", plugin)
+                                    let styles = generateInlineStyles("tags", tagId, plugin)
                                     let { styleProps, colorClass, textColorClass } = styles
                                     let styleText = ""
                                     for (let key in styleProps) {
@@ -77,7 +77,7 @@ export const registerTagFixExtension = (plugin: PrettyPropertiesPlugin) => {
     
                                     let decoBegin = Decoration.mark({ 
                                         attributes: {
-                                            "data-tag-value": tagId, 
+                                            "data-property-value": tagId, 
                                             style: styleText
                                         }, 
                                         class: "cm-hashtag-inner cm-hashtag cm-hashtag-begin cm-meta cm-tag-" + tagId + " " + colorClass + " " + textColorClass
@@ -85,7 +85,7 @@ export const registerTagFixExtension = (plugin: PrettyPropertiesPlugin) => {
     
                                     let decoMiddle = Decoration.mark({ 
                                         attributes: {
-                                            "data-tag-value": tagId, 
+                                            "data-property-value": tagId, 
                                             style: styleText
                                         }, 
                                         class: "cm-hashtag-inner cm-hashtag cm-hashtag-middle cm-meta cm-tag-" + tagId + " " + colorClass + " " + textColorClass
@@ -93,7 +93,7 @@ export const registerTagFixExtension = (plugin: PrettyPropertiesPlugin) => {
     
                                     let decoEnd = Decoration.mark({ 
                                         attributes: {
-                                            "data-tag-value": tagId, 
+                                            "data-property-value": tagId, 
                                             style: styleText
                                         }, 
                                         class: "cm-hashtag-inner cm-hashtag cm-hashtag-end cm-meta cm-tag-" + tagId + " " + colorClass + " " + textColorClass

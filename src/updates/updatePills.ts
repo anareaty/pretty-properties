@@ -19,41 +19,17 @@ export const getTextLightness = (color: HSL) => {
 }
 
 
-export const generateInlineStyles = (text: string, type: string, plugin: PrettyPropertiesPlugin) => {
+export const generateInlineStyles = (propName: string, propVal: string, plugin: PrettyPropertiesPlugin) => {
     let colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink"];
-    let colorSettings
+    
     let colorClass = ""
 	let textColorClass = "";
 	let styleProps: Record<string, string> = {}
-
-
-
-
-	
-
-    if (type == "tag") {
-        colorSettings = plugin.settings.tagColors
-    }
-
-    if (type == "multiselect-pill") {
-        colorSettings = plugin.settings.propertyPillColors
-    }
-
-    if (type == "longtext") {
-        colorSettings = plugin.settings.propertyLongtextColors
-    }
-
-	if (type == "tag-pane-tag") {
-		colorSettings = plugin.settings.tagColors
-	}
-
-
+	let colorSettings = plugin.settings.propertyColors[propName]
 
     if (colorSettings) {
 
-		
-
-		let colorSetting = colorSettings[text];
+		let colorSetting = colorSettings[propVal];
 
 		if (colorSetting) {
 	
@@ -118,23 +94,27 @@ export const generateInlineStyles = (text: string, type: string, plugin: PrettyP
 
 export const setPillStyles = (
 	pill: HTMLElement,
-	attributeName: string,
-	value: string,
-	type: string,
+	propName: string,
+	propVal: string,
 	plugin: PrettyPropertiesPlugin
 ) => {
+
+	//console.log("set pill styles")
 
 	
 
 
 	let colorClasses = ["colored", "transparent-color", "text-colored", "none-text-color"];
 	
-	pill.removeAttribute("data-property-pill-value")
-	pill.removeAttribute("data-tag-value")
-	pill.setAttribute(attributeName, value);
+	pill.removeAttribute("data-property-value")
+	pill.removeAttribute("data-property-key")
+
+	pill.setAttribute("data-property-value", propVal);
+	pill.setAttribute("data-property-key", propName);
 	
 	
-	let styles = generateInlineStyles(value, type, plugin)
+	let styles = generateInlineStyles(propName, propVal, plugin)
+
 
 
 	for (let className of colorClasses) {
@@ -165,7 +145,7 @@ export const setPillStyles = (
 
 
 
-export const updateMultiselectPill = (pill: HTMLElement, plugin: PrettyPropertiesPlugin) => {
+export const updateMultiselectPill = (pill: HTMLElement, propName: string, plugin: PrettyPropertiesPlugin) => {
 
 
 
@@ -173,24 +153,25 @@ export const updateMultiselectPill = (pill: HTMLElement, plugin: PrettyPropertie
 		let content = pill.querySelector(".multi-select-pill-content");
 		if (content?.instanceOf(HTMLElement)) {
 			let value = content.innerText;
-			setPillStyles(pill, "data-property-pill-value", value, "multiselect-pill", plugin);
+			setPillStyles(pill, propName, value, plugin);
 		}
 	}
 }
 
 
-export const updateValueListElement = (pill: HTMLElement, dataValueString: string, styleType: string, plugin: PrettyPropertiesPlugin) => {
+export const updateValueListElement = (pill: HTMLElement, propName: string, styleType: string, plugin: PrettyPropertiesPlugin) => {
 
 	
 	if (plugin.settings.enableColoredProperties) {
 		let value = pill.innerText;
-		setPillStyles(pill, dataValueString, value, styleType, plugin);
+		setPillStyles(pill, propName, value, plugin);
 	}
 }
 
 
 export const updateTagPill = (pill: HTMLElement, plugin: PrettyPropertiesPlugin) => {
 
+	//console.log("update tag pill")
 
 
 	if (plugin.settings.enableColoredProperties) {
@@ -200,18 +181,17 @@ export const updateTagPill = (pill: HTMLElement, plugin: PrettyPropertiesPlugin)
 			if (value.startsWith("#")) {
 			value = value.replace("#", "");
 			}
-			setPillStyles(pill, "data-tag-value", value, "tag", plugin);
+			setPillStyles(pill, "tags", value, plugin);
 		}
 	}
 }
 
 
 export const updateTag = (tag: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-
 	let value = tag.innerText.replace("#", "")
 
 	if (plugin.settings.enableColoredProperties) {
-		setPillStyles(tag, "data-tag-value", value, "tag", plugin)
+		setPillStyles(tag, "tags", value, plugin)
 	}
 }
 
@@ -221,10 +201,10 @@ export const updateTag = (tag: HTMLElement, plugin: PrettyPropertiesPlugin) => {
 
 
 
-const updateColorButton = (parent: HTMLElement, value:string, isBase: boolean | undefined, plugin:PrettyPropertiesPlugin) => {
+const updateColorButton = (parent: HTMLElement, propName: string, value:string, isBase: boolean | undefined, plugin:PrettyPropertiesPlugin) => {
 	if (plugin.settings.enableColoredProperties) {
 		if (parent) {
-			createColorButton(parent, value, plugin)
+			createColorButton(parent, propName, value, plugin)
 		}
 	}
 }
@@ -281,14 +261,14 @@ export const updateLongtext = (pill: HTMLElement, plugin: PrettyPropertiesPlugin
 				text = text.slice(0, 200).trim()
 			}
 
-			setPillStyles(pill, "data-property-longtext-value", text, "longtext", plugin)
+			setPillStyles(pill, propName, text, plugin)
 
 			if (overlayElement) {
-				setPillStyles(overlayElement, "data-property-longtext-value", text, "longtext", plugin)
+				setPillStyles(overlayElement, propName, text, plugin)
 			}
 
 			if (parent) {
-				updateColorButton(parent, text, isBase, plugin)
+				updateColorButton(parent, propName, text, isBase, plugin)
 			}
 		}
 
@@ -313,7 +293,9 @@ export const updateLongtext = (pill: HTMLElement, plugin: PrettyPropertiesPlugin
 }
 
 
-export const updateCardLongtext = (pill: HTMLElement, plugin: PrettyPropertiesPlugin) => {
+export const updateCardLongtext = (pill: HTMLElement, propName: string, plugin: PrettyPropertiesPlugin) => {
+
+
 
 	if (plugin.settings.enableColoredProperties || plugin.settings.enableMath) {
 		let text = pill.innerText
@@ -331,11 +313,12 @@ export const updateCardLongtext = (pill: HTMLElement, plugin: PrettyPropertiesPl
 			if (text) {
 				text = text.slice(0, 200).trim()
 			}
-			setPillStyles(pill, "data-property-longtext-value", text, "longtext", plugin)
+			setPillStyles(pill, propName, text, plugin)
 		}
 
 	}
 }
+
 
 
 
@@ -356,9 +339,12 @@ export const updateLongTexts = (container: HTMLElement, plugin: PrettyProperties
 
 	let cardsLongtexts = container.querySelectorAll(".bases-cards-line:not(:has(*))")
 
+	
+
 	for (let pill of cardsLongtexts) {
 		if (pill?.instanceOf(HTMLElement)) {
-			updateCardLongtext(pill, plugin)
+			let propName = pill.getAttribute("data-property-key") || ""
+			updateCardLongtext(pill, propName, plugin)
 		}
 	}
 
@@ -366,7 +352,8 @@ export const updateLongTexts = (container: HTMLElement, plugin: PrettyProperties
 
 	for (let pill of listLongtexts) {
 		if (pill?.instanceOf(HTMLElement)) {
-			updateCardLongtext(pill, plugin)
+			let propName = pill.getAttribute("data-property-key") || ""
+			updateCardLongtext(pill, propName, plugin)
 		}
 	}
 }
@@ -378,9 +365,10 @@ export const updateSettingPills = (plugin: PrettyPropertiesPlugin) => {
 	for (let pill of pills) {
 	  if (pill?.instanceOf(HTMLElement)) {
 		let content = pill.querySelector(".multi-select-pill-content");
+		let propName = pill.getAttribute("data-property-key") || ""
 		if (content?.instanceOf(HTMLElement)) {
 			let text = content?.innerText
-			setPillStyles(pill, "data-property-pill-value", text, "multiselect-pill", plugin)
+			setPillStyles(pill, propName, text, plugin)
 		}
 	  }
 	}
@@ -391,7 +379,7 @@ export const updateSettingPills = (plugin: PrettyPropertiesPlugin) => {
 		let content = pill.querySelector(".multi-select-pill-content");
 		if (content?.instanceOf(HTMLElement)) {
 			let text = content?.innerText
-			setPillStyles(pill, "data-tag-value", text, "tag", plugin)
+			setPillStyles(pill, "tags", text, plugin)
 		}
 		
 	  }
@@ -401,7 +389,8 @@ export const updateSettingPills = (plugin: PrettyPropertiesPlugin) => {
 	for (let pill of longtextPills) {
 	  if (pill?.instanceOf(HTMLElement)) {
 		let text = pill.innerText
-		setPillStyles(pill, "data-property-longtext-value", text, "longtext", plugin);
+		let propName = pill.getAttribute("data-property-key") || ""
+		setPillStyles(pill, propName, text, plugin);
 	  }
 	}
 }
@@ -450,11 +439,11 @@ export const updateTagPaneTags = (container: HTMLElement, plugin: PrettyProperti
 				let parentValue = parentTag.innerText
 				if (parentValue) {
 					value = parentValue + value
-					setPillStyles(parentTag, "data-tag-value", value, "tag-pane-tag", plugin);
+					setPillStyles(parentTag, "tags", value, plugin);
 				}
 			}
 
-			setPillStyles(tag, "data-tag-value", value, "tag-pane-tag", plugin);
+			setPillStyles(tag, "tags", value, plugin);
 		}
     }
 }

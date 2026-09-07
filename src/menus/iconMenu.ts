@@ -32,8 +32,11 @@ export const handleIconMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => {
         .setIcon("lucide-eye")
         .setSection("pretty-properties")
         .onClick(async () => {
-            if (propName)
-                plugin.settings.hiddenProperties.remove(propName);
+            if (propName) {
+                plugin.settings.hiddenProperties = plugin.settings.hiddenProperties.filter(p => p.toLowerCase() != propName.toLowerCase())
+            }
+                
+            
             await plugin.saveSettings();
             updateHiddenProperties(plugin);
             plugin.settingTab?.update()

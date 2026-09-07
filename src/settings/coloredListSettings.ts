@@ -1,9 +1,11 @@
 import { Setting, TextComponent, Menu } from 'obsidian';
 import { i18n } from 'src/localization/localization';
-import { PPSettingTab } from 'src/settings/settings';
+import { PPSettingTab, PillColorSettings } from 'src/settings/settings';
 import { setPillStyles } from 'src/updates/updatePills';
-import { setColorMenuItems } from 'src/menus/selectColorMenus';
+import { propertyColorSaveCallback, setColorMenuItems } from 'src/menus/selectColorMenus';
 import { updateAllProperties } from 'src/updates/updateElements';
+
+
 
 
 
@@ -11,42 +13,50 @@ export const showColoredListSettings = (settingTab: PPSettingTab) => {
     const {containerEl, plugin} = settingTab
 
     let colorSettingsWrapper = containerEl.createDiv()
-
     colorSettingsWrapper.classList.add("pp-settings-list-container")
-
     let colorSettingsEl = colorSettingsWrapper.createDiv()
 
-    const addColorSetting = (property: string) => {
+    const addColorSetting = (propName: string, propVal: string) => {
         
         let propertyColorSetting = new Setting(colorSettingsEl)
 
         let pillEl = propertyColorSetting.nameEl.createDiv({
             cls: "multi-select-pill setting-multi-select-pill"
         })   
-        setPillStyles(pillEl, "data-property-pill-value", property, "multiselect-pill", plugin)
+        setPillStyles(pillEl, propName, propVal, plugin)
 
-        pillEl.createDiv({text: property, cls: "multi-select-pill-content"})
+        pillEl.createDiv({text: propVal, cls: "multi-select-pill-content"})
+
+
+
+
+
+        let pillColorSettings = plugin.settings.propertyColors[propName]?.[propVal]
+        let saveCallback = (pillColorSettings: PillColorSettings) => {
+            propertyColorSaveCallback(propName, propVal, pillColorSettings, plugin)
+        }
+
+
 
         propertyColorSetting
         .addButton((btn) => {
             btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
                 let menu = new Menu();
-                setColorMenuItems(menu, property, "propertyPillColors", "pillColor", plugin);
+                setColorMenuItems(menu, "pillColor", pillColorSettings, saveCallback, plugin);
                 menu.showAtMouseEvent(e);
             });
         })
-
-            .addButton((btn) => {
+        .addButton((btn) => {
             btn.setIcon("type").setClass("property-color-setting-button").onClick((e) => {
                 let menu = new Menu();
-                setColorMenuItems(menu, property, "propertyPillColors", "textColor", plugin);
+                setColorMenuItems(menu, "textColor", pillColorSettings, saveCallback, plugin);
                 menu.showAtMouseEvent(e);
             });
         })
         .addButton(btn => btn
             .setIcon("x")
             .onClick(async () => {
-                delete plugin.settings.propertyPillColors[property]
+                delete plugin.settings.propertyColors[propName]![propVal]
                 await plugin.saveSettings()
                 propertyColorSetting.settingEl.remove()
                 updateAllProperties(plugin)
@@ -54,8 +64,40 @@ export const showColoredListSettings = (settingTab: PPSettingTab) => {
         )
     }
     
-    for (let property in plugin.settings.propertyPillColors) {
-        addColorSetting(property)
+    for (let propName in plugin.settings.propertyColors) {
+
+        let propertySetting = new Setting(colorSettingsEl)
+        .setName(propName)
+        .addButton(button =>
+            {
+                let icon = "chevron-right"
+                if (plugin.settings.propertyColorSettingRevealed == propName) {
+                    icon = "chevron-down"
+                }
+                button.setIcon(icon)
+                .setClass("bare-button")
+                .onClick(async () => {
+
+                    if (plugin.settings.propertyColorSettingRevealed == propName) {
+                        plugin.settings.propertyColorSettingRevealed = ""
+                    } else {
+                        plugin.settings.propertyColorSettingRevealed = propName
+                    }
+                    await plugin.saveSettings()
+                    settingTab.display()
+                })
+            }
+        )
+
+
+        if (plugin.settings.propertyColorSettingRevealed == propName) {
+            for (let propVal in plugin.settings.propertyColors[propName]) {
+                addColorSetting(propName, propVal)
+            }
+        }
+
+        
+        
     }
 
 

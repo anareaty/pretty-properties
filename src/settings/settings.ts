@@ -5,7 +5,6 @@ import PrettyPropertiesPlugin from "../main";
 import { getBannerSettingsDefinitions, showBannerSettings } from './bannerSettings';
 import { getIconSettingsDefinitions, showIconSettings } from './iconSettings';
 import { getCoverSettingsDefinitions, showCoverSettings } from './coversettings';
-import { showDatesSettings } from './datesSettings';
 import { getOtherSettingsDefinitions, showOtherSettings } from './otherSettings';
 import { getColorSettingsDefinitions, showColorSettings } from './colorSettings';
 import { getHiddenSettingsDefinitions, showHiddenSettingsTab } from './hiddenSettingsTab';
@@ -96,21 +95,24 @@ export interface PPPluginSettings {
 	dataVersion: number;
 	dateColors: Record<string, PillColorSettings>;
 	coverPosition: string;
-	enableBannersInPopover: boolean
-	enableIconsInPopover: boolean
-	enableCoversInPopover: boolean
-	hideAllEmptyProperties: boolean
-	hiddenWhenEmptyProperties: string[],
-	iconInTitle: boolean,
-	titleIconSize: number,
-	titleTextIconMatchTitleSize: boolean,
-	imageLinkFormat: string,
-	hideMetadataContainerIfAllPropertiesHiddenEditing: boolean,
-	hideMetadataContainerIfAllPropertiesHiddenReading: boolean,
-	autoHidePropertiesWithBanner: boolean,	
-	hideCoverCollapsed: boolean,
-	hidePropTitle: boolean,
-	hideAddPropertyButton: boolean,
+	enableBannersInPopover: boolean;
+	enableIconsInPopover: boolean;
+	enableCoversInPopover: boolean;
+	hideAllEmptyProperties: boolean;
+	hiddenWhenEmptyProperties: string[];
+	iconInTitle: boolean;
+	titleIconSize: number;
+	titleTextIconMatchTitleSize: boolean;
+	imageLinkFormat: string;
+	hideMetadataContainerIfAllPropertiesHiddenEditing: boolean;
+	hideMetadataContainerIfAllPropertiesHiddenReading: boolean;
+	autoHidePropertiesWithBanner: boolean;
+	hideCoverCollapsed: boolean;
+	hidePropTitle: boolean;
+	hideAddPropertyButton: boolean;
+	dontShowColorMigrationMessage: boolean;
+	propertyColors: Record<string, Record<string, PillColorSettings>>;
+	propertyColorSettingRevealed: string
 }
 
 
@@ -223,6 +225,9 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	hideCoverCollapsed: false,
 	hidePropTitle: false,
 	hideAddPropertyButton: false,
+	dontShowColorMigrationMessage: false,
+	propertyColors: {},
+	propertyColorSettingRevealed: ""
 
 }
 
@@ -358,9 +363,7 @@ export class PPSettingTab extends PluginSettingTab {
 
 
 
-		else if (this.plugin.settings.settingsTab == "DATES") {
-			showDatesSettings(this)
-		}
+
 
 		else if (this.plugin.settings.settingsTab == "OTHER") {
 			showOtherSettings(this)

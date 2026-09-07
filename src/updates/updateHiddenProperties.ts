@@ -46,6 +46,8 @@ export const hideMetadataContainerIfAllPropertiesHidden = (metadataContainer: HT
 
     let properties = querySelectorsWithIframesForContainer(".metadata-property", metadataContainer)
 
+    //console.log(properties)
+
     let mcHidden = true
 
     for (let property of properties) {
@@ -63,6 +65,8 @@ export const hideMetadataContainerIfAllPropertiesHidden = (metadataContainer: HT
         mcHidden = false
     }
 
+    //console.log("hide")
+
 
     metadataContainer.classList.toggle("pp-mc-hidden", mcHidden)
 }
@@ -74,7 +78,7 @@ export const updateAllMetadataContainers = (plugin: PrettyPropertiesPlugin) => {
     for (let metadataContainer of metadataContainers) {
         if (metadataContainer?.instanceOf(HTMLElement)) {
             try {
-                hideMetadataContainerIfAllPropertiesHidden(metadataContainer, plugin)
+                //hideMetadataContainerIfAllPropertiesHidden(metadataContainer, plugin)
             } catch {
                 console.error("Can not update hiding metadata container")
             }
@@ -88,9 +92,15 @@ export const updateAllMetadataContainers = (plugin: PrettyPropertiesPlugin) => {
 export const updateMetadataEditor = (metadataEditor: MetadataEditor, plugin: PrettyPropertiesPlugin) => {
     let mcHidden = true
 
+    //if (metadataEditor.rendered.length == 0) mcHidden = false
+
     for (let r of metadataEditor.rendered) {
+
+        
         let propEl = r.containerEl
         updateHiddenCSSClasses(propEl, r.entry.key, plugin)
+
+        //console.log(propEl)
 
         if (propEl.classList.contains("pp-property-hidden")) {
             continue
@@ -105,6 +115,10 @@ export const updateMetadataEditor = (metadataEditor: MetadataEditor, plugin: Pre
 
         mcHidden = false
     }
+
+    //console.log(mcHidden)
+
+    //console.log("hide")
 
     metadataEditor.containerEl.classList.toggle("pp-mc-hidden", mcHidden)
 }

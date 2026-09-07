@@ -59,10 +59,10 @@ export const handleBannerMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => 
             .setSection("pretty-properties")
             .onClick(async () => {
                 if (propName && bannerPropHidden) {
-                    plugin.settings.hiddenProperties.remove(propName);
+                    plugin.settings.hiddenProperties = plugin.settings.hiddenProperties.filter(p => p.toLowerCase() != propName.toLowerCase())
                 }
                 if (positionPropName && bannerPositionPropHidden) {
-                    plugin.settings.hiddenProperties.remove(positionPropName);
+                    plugin.settings.hiddenProperties = plugin.settings.hiddenProperties.filter(p => p.toLowerCase() != positionPropName.toLowerCase())
                 }
                     
                 await plugin.saveSettings();

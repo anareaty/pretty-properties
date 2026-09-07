@@ -33,6 +33,8 @@ interface Popover extends HoverPopover {
 
 export const updateAllProperties = (plugin:PrettyPropertiesPlugin) => { 
 
+    console.log("update")
+
     let mdLeaves = plugin.app.workspace.getLeavesOfType("markdown");
     for (let leaf of mdLeaves) {
         let view = leaf.view
@@ -192,6 +194,8 @@ export const updateAllProperties = (plugin:PrettyPropertiesPlugin) => {
     updateTagPaneTagsAll(plugin)
     
     updateSettingPills(plugin)
+
+    
     updateAllMetadataContainers(plugin)
 }
 
@@ -222,7 +226,10 @@ export const updateImagesInPopover = (popover: HoverPopover, plugin: PrettyPrope
         if (file instanceof TFile) {
             let cache = plugin.app.metadataCache.getFileCache(file);
             let sourcePath = file.path || "";
-            updateImagesWithCacheForView(cache, popover, contentEl, sourcePath, "popover", plugin)
+            if (cache) {
+                updateImagesWithCacheForView(cache, popover, contentEl, sourcePath, "popover", plugin)
+            }
+            
         }
     }
 }
@@ -236,7 +243,10 @@ export const updateImagesForView = (view: MarkdownView, plugin: PrettyProperties
         let cache = plugin.app.metadataCache.getFileCache(file);
         let sourcePath = file.path || "";
         let contentEl = view.contentEl;
-        updateImagesWithCacheForView(cache, view, contentEl, sourcePath, "normal", plugin)
+        if (cache) {
+            updateImagesWithCacheForView(cache, view, contentEl, sourcePath, "normal", plugin)
+        }
+        
     }
 };
 
@@ -278,7 +288,7 @@ export const updateImagesOnCacheChanged = (file: TFile, cache: CachedMetadata, p
 
 
 
-export const updateImagesWithCacheForView = (cache: CachedMetadata, view: MarkdownView, contentEl: HTMLElement, sourcePath: string, type: string, plugin: PrettyPropertiesPlugin) => {
+export const updateImagesWithCacheForView = (cache: CachedMetadata, view: MarkdownView | HoverPopover, contentEl: HTMLElement, sourcePath: string, type: string, plugin: PrettyPropertiesPlugin) => {
     let frontmatter = cache?.frontmatter;
     let enableBanner = plugin.settings.enableBanner
     let enableCover = plugin.settings.enableCover

@@ -53,7 +53,7 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
       parent?.classList.remove("is-empty")
     }
     for (let element of elements) {
-      updateMultiselectPill(element, plugin)
+      updateMultiselectPill(element, propName, plugin)
     }
   }
 
@@ -216,6 +216,8 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
   if (plugin.settings.hiddenWhenEmptyProperties.find(p => p.toLowerCase() == propName.toLowerCase())) {
     parent?.classList.add("pp-property-hidden-when-empty")
   }
+
+  //console.log("test")
 
   updateAllMetadataContainers(plugin)
   

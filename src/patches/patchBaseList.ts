@@ -73,7 +73,7 @@ const processBaseListProperty = (property: ListCell, plugin: PrettyPropertiesPlu
         let elements = property.el.querySelectorAll("a.tag")
         for (let el of elements) {
             if (el?.instanceOf(HTMLElement)) {
-                updateValueListElement(el, "data-tag-value", "tag", plugin)
+                updateValueListElement(el, "tags", "tag", plugin)
             }
         }
     }
@@ -86,14 +86,14 @@ const processBaseListProperty = (property: ListCell, plugin: PrettyPropertiesPlu
             let elements = property.el.querySelectorAll(".value-list-element")
             for (let el of elements) {
                 if (el?.instanceOf(HTMLElement)) {
-                    updateValueListElement(el, "data-property-pill-value", "multiselect-pill", plugin)
+                    updateValueListElement(el, propName, "multiselect-pill", plugin)
                 }
             }
         } 
        
         else if (type == "text") {
             let el = property.el
-            updateCardLongtext(el, plugin);
+            updateCardLongtext(el, propName, plugin);
         } 
  
         else if (type == "date") {

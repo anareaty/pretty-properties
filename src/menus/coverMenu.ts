@@ -74,13 +74,16 @@ export const handleCoverMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => {
                 .setSection('pretty-properties')
                 .onClick(async () => {
                     if (propName && coverPropHidden) {
-                        plugin.settings.hiddenProperties.remove(propName)
+                        plugin.settings.hiddenProperties = plugin.settings.hiddenProperties.filter(p => p.toLowerCase() != propName.toLowerCase())
+                
                     }
                     if (coverPositionPropName && coverPositionPropHidden) {
-                        plugin.settings.hiddenProperties.remove(coverPositionPropName)
+                        plugin.settings.hiddenProperties = plugin.settings.hiddenProperties.filter(p => p.toLowerCase() != coverPositionPropName.toLowerCase())
+                
                     }
                     if (coverShapePropName && coverShapePropHidden) {
-                        plugin.settings.hiddenProperties.remove(coverShapePropName)
+                        plugin.settings.hiddenProperties = plugin.settings.hiddenProperties.filter(p => p.toLowerCase() != coverShapePropName.toLowerCase())
+                
                     }
 
                     await plugin.saveSettings()

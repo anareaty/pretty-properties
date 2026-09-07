@@ -34,21 +34,15 @@ export const patchMetadataSuggester = (plugin: PrettyPropertiesPlugin) => {
             let metadataEl = textInputEl.closest(".metadata-property-value")
             if (metadataEl instanceof HTMLElement) {
                 let type = metadataEl.getAttribute("data-property-type")
+                let propName = metadataEl.getAttribute("data-property-key")
 
-                if (type) {
+                if (type && propName) {
                   for (let suggestEl of elements) {
 
 
                     
                     let text = suggestEl.innerText
-
-                    if (type == "tags") {
-                      setPillStyles(suggestEl, "data-tag-value", text, "tag", plugin)
-                    } 
-                    
-                    else if (type == "multitext" || type == "aliases") {
-                      setPillStyles(suggestEl, "data-property-pill-value", text, "multiselect-pill", plugin)
-                    }
+                    setPillStyles(suggestEl, propName, text, plugin)
 
                     if (type == "tags" || type == "multitext" || type == "aliases") {
                       suggestEl.classList.add("multi-suggest-item")
@@ -56,18 +50,16 @@ export const patchMetadataSuggester = (plugin: PrettyPropertiesPlugin) => {
                     }
 
                     if (type == "text") {
-                      setPillStyles(suggestEl, "data-property-longtext-value", text, "longtext", plugin)
                       suggestEl.classList.add("longtext-suggest-item")
                       this.suggestInnerEl.classList.add("metadata-longtext-suggestion")
                     }
                   }
                 }
             }
-        //} else if (this.suggestions.values[0]?.tag) {
           } else if (this.suggestions.values[0] && "tag" in this.suggestions.values[0]) {
           for (let suggestEl of elements) {
             let text = suggestEl.innerText
-              setPillStyles(suggestEl, "data-tag-value", text, "tag", plugin)
+              setPillStyles(suggestEl, "tags", text, plugin)
               suggestEl.classList.add("multi-suggest-item")
               this.suggestInnerEl?.classList.add("metadata-multi-suggestion")
           }

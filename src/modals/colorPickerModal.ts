@@ -1,32 +1,26 @@
-import { Modal, App, Setting } from "obsidian";
+import { Modal, Setting } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
-import { PillColorSettings, PPSettingTab } from "src/settings/settings";
-import { updateAllProperties } from "src/updates/updateElements";
-import { updateRelativeDateColors } from "src/updates/updateStyles";
+import { PillColorSettings } from "src/settings/settings";
+
 
 
 export class ColorPickerModal extends Modal {
     plugin: PrettyPropertiesPlugin
-    propVal: string
-    colorList: "propertyPillColors" | "propertyLongtextColors" | "tagColors" | "dateColors"
     colorType: string
-    settingsTab?: PPSettingTab
+    pillColorSettings: PillColorSettings | undefined
+    saveCallback: (pillColorSettings: PillColorSettings | undefined) => void
 
     constructor(
-        app: App, 
-        plugin: PrettyPropertiesPlugin, 
-        propVal: string, 
-        colorList: "propertyPillColors" | "propertyLongtextColors" | "tagColors" | "dateColors", 
         colorType: string,
-        settingsTab?: PPSettingTab
-    
+        pillColorSettings: PillColorSettings | undefined,
+        saveCallback: (pillColorSettings: PillColorSettings | undefined) => void,
+        plugin: PrettyPropertiesPlugin, 
     ) {
-        super(app);
-        this.propVal = propVal
+        super(plugin.app);
         this.plugin = plugin
-        this.colorList = colorList
         this.colorType = colorType
-        this.settingsTab = settingsTab
+        this.pillColorSettings = pillColorSettings
+        this.saveCallback = saveCallback
     }
     
     onOpen() {
@@ -35,25 +29,9 @@ export class ColorPickerModal extends Modal {
 
         new Setting(contentEl)
         .addColorPicker(color => {
-            let pillColorSettings: PillColorSettings | undefined
 
-            if (
-                this.colorList == "propertyPillColors" ||
-                this.colorList == "propertyLongtextColors" ||
-                this.colorList == "tagColors"
-            ) {
-               pillColorSettings = this.plugin.settings[this.colorList][this.propVal]
-            }
-
-            else if (
-                this.colorList == "dateColors" && 
-                (this.propVal == "future" || this.propVal == "present" || this.propVal == "past")
-            ) {
-               pillColorSettings = this.plugin.settings[this.colorList][this.propVal]
-            }
-
-            if (pillColorSettings && (this.colorType == "pillColor" || this.colorType == "textColor")) {
-                let savedColor = pillColorSettings[this.colorType]
+            if (this.pillColorSettings && (this.colorType == "pillColor" || this.colorType == "textColor")) {
+                let savedColor = this.pillColorSettings[this.colorType]
 
                 if (savedColor && typeof savedColor != "string") {
                     color.setValueHsl(savedColor)
@@ -63,29 +41,18 @@ export class ColorPickerModal extends Modal {
             color.onChange(async (value) => {
                 let hsl = color.getValueHsl()
             
-                if (!pillColorSettings) {
-                    pillColorSettings = {
+                if (!this.pillColorSettings) {
+                    this.pillColorSettings = {
                       pillColor: "default",
                       textColor: "default"
                     }
                 }
 
                 if (this.colorType == "pillColor" || this.colorType == "textColor") {
-                    pillColorSettings[this.colorType] = hsl
+                    this.pillColorSettings[this.colorType] = hsl
                 }
 
-                this.plugin.settings[this.colorList][this.propVal] = pillColorSettings
-
-
-                await this.plugin.saveSettings()
-
-        
-                this.plugin.settingTab?.update()
-
-                updateAllProperties(this.plugin)
-                if (this.colorList == "dateColors") {
-                    updateRelativeDateColors(this.plugin)
-                }
+                this.saveCallback(this.pillColorSettings)
             })
         })
     }

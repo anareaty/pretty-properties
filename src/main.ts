@@ -42,6 +42,7 @@ import { patchMetadataSuggester } from "./patches/patchMetadataSuggester";
 import { patchBaseKanban } from "./patches/patchBaseKanban";
 import { MarkdownRenderChild } from "obsidian";
 import { clearUnusedRenderComponents } from "./updates/updatePropertyFormattings";
+import { migrateColorSettings, migrateCoverSettings } from "./utils/settingsMigration";
 
 type Patch = () => void
 type PatchList = Record<string, Patch>
@@ -60,6 +61,9 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 	async onload() {
 		await this.loadSettings();
+
+
+		
 
 		createApi(this)
 		i18n.setLocale();
@@ -222,7 +226,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 		// We need to reload all tabs to update existing properties
-		this.app.workspace.onLayoutReady(() => {
+		this.app.workspace.onLayoutReady(async () => {
+			await migrateColorSettings(this)
 			reloadAllTabs(this)
 		})
 		
@@ -238,31 +243,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 	async loadSettings() {
 		const data = ((await this.loadData()) ?? {}) as PPPluginSettings;
-		await this.migrateSettings(data);
+		await migrateCoverSettings(data, this);
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
-	}
-
-	
-
-	async migrateSettings(data: PPPluginSettings){
-		if (!Array.isArray(data.coverProperties)) {
-			const coverProperty = data.coverProperty ?? DEFAULT_SETTINGS.coverProperties[0]?.property;
-			const extra = Array.isArray(data.extraCoverProperties) ? data.extraCoverProperties : [];
-
-			if (coverProperty) {
-				data.coverProperties = [
-					{ property: coverProperty, format: "" },
-					...extra.map((p: string) => ({ property: p, format: "" })),
-				];
-				delete data.coverProperty;
-				delete data.extraCoverProperties;
-			}
-			
-
-			
-
-			await this.saveData(data);
-		}
 	}
 
 	async saveSettings() {

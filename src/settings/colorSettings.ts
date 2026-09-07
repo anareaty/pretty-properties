@@ -1,13 +1,11 @@
 import { Menu, Setting, moment } from 'obsidian';
 import { i18n } from 'src/localization/localization';
 import { updateAllProperties } from 'src/updates/updateElements';
-import { PPSettingTab } from 'src/settings/settings';
+import { PPSettingTab, PillColorSettings } from 'src/settings/settings';
 import { showColoredListSettings } from './coloredListSettings';
-import { showColoredTagsSettings } from './coloredTagsSettings';
-import { showColoredTextSettings } from './coloredTextSettings';
 import { setPillStyles } from 'src/updates/updatePills';
-import { setColorMenuItems } from 'src/menus/selectColorMenus';
-import { AddTextModal } from 'src/modals/settingItemModals';
+import { propertyColorSaveCallback, setColorMenuItems, setDateColorMenuItems } from 'src/menus/selectColorMenus';
+import { AddPropertyModal, AddTextModal } from 'src/modals/settingItemModals';
 
 
 
@@ -17,9 +15,7 @@ import { AddTextModal } from 'src/modals/settingItemModals';
 export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
     let plugin = tab.plugin
 
-    let propertyPillColorsKeys = Object.keys(plugin.settings.propertyPillColors)
-    let tagColorsKeys = Object.keys(plugin.settings.tagColors)
-    let propertyLongtextColorsKeys = Object.keys(plugin.settings.propertyLongtextColors)
+    let propertyColorsKeys = Object.keys(plugin.settings.propertyColors) || []
 
 
     let format = "L"
@@ -58,13 +54,14 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
             items: [
                 {
                     type: "list",
-                    heading: i18n.t("COLORED_PROPERTIES"),
+                    heading: i18n.t("PROPERTIES"),
                     addItem: {
-                        name: i18n.t("ADD_COLORED_PROPERTY"),
+                        name: i18n.t("ADD_PROPERTY"),
                         action: () => {
-                            new AddTextModal(plugin, async (newProperty) => {
-                                if (newProperty && !plugin.settings.propertyPillColors[newProperty]) {
-                                    plugin.settings.propertyPillColors[newProperty] = {}
+
+                            new AddPropertyModal(["text", "multitext", "tags", "aliases"], plugin, async (newProperty) => {
+                                if (newProperty && !plugin.settings.propertyColors[newProperty]) {
+                                    plugin.settings.propertyColors[newProperty] = {}
                                     await plugin.saveSettings()
                                     tab.update()
                                 }
@@ -72,175 +69,86 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
                         }
                     },
                     onDelete: async (idx: number) => {
-                        let key = propertyPillColorsKeys[idx] || ""
-                        delete plugin.settings.propertyPillColors[key]
+                        let key = propertyColorsKeys[idx] || ""
+                        delete plugin.settings.propertyColors[key]
                         await plugin.saveSettings();
                         tab.update();
+
                     },
-                    items: propertyPillColorsKeys.map(property => ({
-                        name: property,
-                        searchable: false,
-                        render: (setting: Setting) => {
+                    items: propertyColorsKeys.map(propName => ({
+                        type: "page",
+                        name: propName,
+                        items: [
+                            {
+                                type: "list",
+                                heading: i18n.t("COLORED_VALUES_OF_PROPERTY") + " " + propName,
+                                addItem: {
+                                    name: i18n.t("ADD_COLORED_PROPERTY_VALUE"),
+                                    action: () => {
+                                        new AddTextModal(plugin, async (newValue) => {
+                                            if (newValue && !plugin.settings.propertyColors[propName]![newValue]) {
+                                                plugin.settings.propertyColors[propName]![newValue] = {}
+                                                await plugin.saveSettings()
+                                                tab.update()
+                                            }
+                                        }).open()
+                                    }
+                                },
+                                onDelete: async (idx: number) => {
+                                    let key = Object.keys(plugin.settings.propertyColors[propName]!)[idx] || ""
+                                    delete plugin.settings.propertyColors[propName]![key]
+                                    await plugin.saveSettings();
+                                    tab.update();
+                                },
+                                items: Object.keys(plugin.settings.propertyColors[propName]!).map((propVal) => ({
+                                    name: propVal,
+                                    searchable: false,
+                                    render: (setting: Setting) => {
 
-                            setting.nameEl.empty()
-                            let pillEl = setting.nameEl.createDiv({
-                                cls: "multi-select-pill setting-multi-select-pill"
-                            })   
-                            setPillStyles(pillEl, "data-property-pill-value", property, "multiselect-pill", plugin)
-                            pillEl.createDiv({text: property, cls: "multi-select-pill-content"})
+                                        setting.nameEl.empty()
+                                        let pillEl = setting.nameEl.createDiv({
+                                            cls: "multi-select-pill setting-multi-select-pill"
+                                        })   
+                                        setPillStyles(pillEl, propName, propVal, plugin)
+                                        pillEl.createDiv({text: propVal, cls: "multi-select-pill-content"})
 
-                            setting.addButton((btn) => {
-                                btn
-                                .setIcon("paintbrush")
-                                .setClass("property-color-setting-button")
-                                .onClick((e) => {
-                                    let menu = new Menu();
-                                    setColorMenuItems(menu, property, "propertyPillColors", "pillColor", plugin);
-                                    menu.showAtMouseEvent(e);
-                                });
-                            })
-                            .addButton((btn) => {
-                                btn
-                                .setIcon("type")
-                                .setClass("property-color-setting-button")
-                                .onClick((e) => {
-                                    let menu = new Menu();
-                                    setColorMenuItems(menu, property, "propertyPillColors", "textColor", plugin);
-                                    menu.showAtMouseEvent(e);
-                                });
-                            })
-                        }
+                                        let pillColorSettings = plugin.settings.propertyColors[propName]?.[propVal]
+                                        let saveCallback = (pillColorSettings: PillColorSettings) => {
+                                            propertyColorSaveCallback(propName, propVal, pillColorSettings, plugin)
+                                        }
+
+                                        setting.addButton((btn) => {
+                                            btn
+                                            .setIcon("paintbrush")
+                                            .setClass("property-color-setting-button")
+                                            .onClick((e) => {
+                                                let menu = new Menu();
+                                                setColorMenuItems(menu, "pillColor", pillColorSettings, saveCallback, plugin);
+                                                menu.showAtMouseEvent(e);
+                                            });
+                                        })
+                                        .addButton((btn) => {
+                                            btn
+                                            .setIcon("type")
+                                            .setClass("property-color-setting-button")
+                                            .onClick((e) => {
+                                                let menu = new Menu();
+                                                setColorMenuItems(menu, "textColor", pillColorSettings, saveCallback, plugin);
+                                                menu.showAtMouseEvent(e);
+                                            });
+                                        })
+                                    }
+                                }))
+                            }
+                        ]
+
                     }))
                 },
             ]
         },
-        {
-            type: "page",
-            name: i18n.t("SHOW_COLORED_TAGS"),
-            visible: plugin.settings.enableColoredProperties,
-            items: [
-                {
-                    type: "list",
-                    heading: i18n.t("COLORED_TAGS"),
-                    addItem: {
-                        name: i18n.t("ADD_COLORED_TAG"),
-                        action: () => {
-                            new AddTextModal(plugin, async (newProperty) => {
-                                if (newProperty && !plugin.settings.tagColors[newProperty]) {
-                                    plugin.settings.tagColors[newProperty] = {}
-                                    await plugin.saveSettings()
-                                    tab.update()
-                                }
-                            }).open()
-                        }
-                    },
-                    onDelete: async (idx: number) => {
-                        let key = tagColorsKeys[idx] || ""
-                        delete plugin.settings.tagColors[key]
-                        await plugin.saveSettings();
-                        tab.update();
-                    },
-                    items: tagColorsKeys.map(property => ({
-                        name: property,
-                        searchable: false,
-                        render: (setting: Setting) => {
 
-                            setting.nameEl.empty()
-                            let pillEl = setting.nameEl.createDiv({
-                                cls: "multi-select-pill setting-tag-pill"
-                            })   
-                            setPillStyles(pillEl, "data-tag-value", property, "tag", plugin)
-                            pillEl.createDiv({text: property, cls: "multi-select-pill-content"})
 
-                            setting.addButton((btn) => {
-                                btn
-                                .setIcon("paintbrush")
-                                .setClass("property-color-setting-button")
-                                .onClick((e) => {
-                                    let menu = new Menu();
-                                    setColorMenuItems(menu, property, "tagColors", "pillColor", plugin);
-                                    menu.showAtMouseEvent(e);
-                                });
-                            })
-                            .addButton((btn) => {
-                                btn
-                                .setIcon("type")
-                                .setClass("property-color-setting-button")
-                                .onClick((e) => {
-                                    let menu = new Menu();
-                                    setColorMenuItems(menu, property, "tagColors", "textColor", plugin);
-                                    menu.showAtMouseEvent(e);
-                                });
-                            })
-                        }
-                    }))
-                }
-            ]
-        }, 
-        {
-            type: "page",
-            name: i18n.t("SHOW_TEXT_COLORED_PROPERTIES"),
-            visible: plugin.settings.enableColoredProperties,
-            items: [
-                {
-                    type: "list",
-                    heading: i18n.t("TEXT_COLORED_PROPERTIES"),
-                    addItem: {
-                        name: i18n.t("ADD_TEXT_COLORED_PROPERTY"),
-                        action: () => {
-                            new AddTextModal(plugin, async (newProperty) => {
-                                if (newProperty && !plugin.settings.propertyLongtextColors[newProperty]) {
-                                    plugin.settings.propertyLongtextColors[newProperty] = {}
-                                    await plugin.saveSettings()
-                                    tab.update()
-                                }
-                            }).open()
-                        }
-                    },
-                    onDelete: async (idx: number) => {
-                        let key = propertyLongtextColorsKeys[idx] || ""
-                        delete plugin.settings.propertyLongtextColors[key]
-                        await plugin.saveSettings();
-                        tab.update();
-                    },
-                    items: propertyLongtextColorsKeys.map(property => ({
-                        name: property,
-                        searchable: false,
-                        render: (setting: Setting) => {
-
-                            setting.nameEl.empty()
-                            let pillEl = setting.nameEl.createDiv({
-                                text: property,
-                                cls: "metadata-input-longtext setting-longtext-pill"
-                            })   
-                            setPillStyles(pillEl, "data-property-longtext-value", property, "longtext", plugin)
-                            
-
-                            setting.addButton((btn) => {
-                                btn
-                                .setIcon("paintbrush")
-                                .setClass("property-color-setting-button")
-                                .onClick((e) => {
-                                    let menu = new Menu();
-                                    setColorMenuItems(menu, property, "propertyLongtextColors", "pillColor", plugin);
-                                    menu.showAtMouseEvent(e);
-                                });
-                            })
-                            .addButton((btn) => {
-                                btn
-                                .setIcon("type")
-                                .setClass("property-color-setting-button")
-                                .onClick((e) => {
-                                    let menu = new Menu();
-                                    setColorMenuItems(menu, property, "propertyLongtextColors", "textColor", plugin);
-                                    menu.showAtMouseEvent(e);
-                                });
-                            })
-                        }
-                    }))
-                },
-            ]
-        },
+        
 
 
 
@@ -254,7 +162,7 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
                 .addButton((btn) => {
                     btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
                         let menu = new Menu();
-                        setColorMenuItems(menu, "past", "dateColors", "pillColor", plugin);
+                        setDateColorMenuItems(menu, "past", "pillColor", plugin);
                         
                         menu.showAtMouseEvent(e);
                     });
@@ -262,7 +170,7 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
                 .addButton((btn) => {
                     btn.setIcon("type").setClass("property-color-setting-button").onClick((e) => {
                         let menu = new Menu();
-                        setColorMenuItems(menu, "past", "dateColors", "textColor", plugin);
+                        setDateColorMenuItems(menu, "past", "textColor", plugin);
                         menu.showAtMouseEvent(e);
                     });
                 })
@@ -278,14 +186,14 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
                 .addButton((btn) => {
                     btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
                         let menu = new Menu();
-                        setColorMenuItems(menu, "present", "dateColors", "pillColor", plugin);
+                        setDateColorMenuItems(menu, "present", "pillColor", plugin);
                         menu.showAtMouseEvent(e);
                     });
                 })
                 .addButton((btn) => {
                     btn.setIcon("type").setClass("property-color-setting-button").onClick((e) => {
                         let menu = new Menu();
-                        setColorMenuItems(menu, "present", "dateColors", "textColor", plugin);
+                        setDateColorMenuItems(menu, "present", "textColor", plugin);
                         menu.showAtMouseEvent(e);
                     });
                 })
@@ -301,14 +209,14 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
                 .addButton((btn) => {
                     btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
                         let menu = new Menu();
-                        setColorMenuItems(menu, "future", "dateColors", "pillColor", plugin);
+                        setDateColorMenuItems(menu, "future", "pillColor", plugin);
                         menu.showAtMouseEvent(e);
                     });
                 })
                 .addButton((btn) => {
                     btn.setIcon("type").setClass("property-color-setting-button").onClick((e) => {
                         let menu = new Menu();
-                        setColorMenuItems(menu, "future", "dateColors", "textColor", plugin);
+                        setDateColorMenuItems(menu, "future", "textColor", plugin);
                         menu.showAtMouseEvent(e);
                     });
                 })
@@ -382,69 +290,6 @@ export const showColorSettings = (settingTab: PPSettingTab) => {
 
 
 
-    new Setting(containerEl)
-    .setName(i18n.t("SHOW_COLORED_TAGS"))
-    .addButton(button =>
-        {
-            let icon = "chevron-right"
-            if (plugin.settings.showTagColorSettings) {
-                icon = "chevron-down"
-            }
-            button.setIcon(icon)
-            .setClass("bare-button")
-            .onClick(async () => {
-                plugin.settings.showTagColorSettings = !plugin.settings.showTagColorSettings
-                await plugin.saveSettings()
-                settingTab.display()
-            })
-        }
-    );
-
-
-
-
-
-
-    if (plugin.settings.showTagColorSettings) { 
-        showColoredTagsSettings(settingTab)
-    }
-
-
-
-
-
-    new Setting(containerEl)
-    .setName(i18n.t("SHOW_TEXT_COLORED_PROPERTIES"))
-    .addButton(button =>
-        {
-            let icon = "chevron-right"
-            if (plugin.settings.showTextColorSettings) {
-                icon = "chevron-down"
-            }
-            button.setIcon(icon)
-            .setClass("bare-button")
-            .onClick(async () => {
-                plugin.settings.showTextColorSettings = !plugin.settings.showTextColorSettings
-                await plugin.saveSettings()
-                settingTab.display()
-            })
-        }
-    );
-
-
-
-
-    if (plugin.settings.showTextColorSettings) { 
-        showColoredTextSettings(settingTab)
-    }
-
-
-
-
-
-
-
-
 
 
 
@@ -452,68 +297,68 @@ export const showColorSettings = (settingTab: PPSettingTab) => {
 
 
     let format = plugin.settings.customDateFormat
-        if (!format) {format = "L"}
+    if (!format) {format = "L"}
 
-        let pastDate = moment().subtract(1, "days").format(format)
-        let presentDate = moment().format(format)
-        let futureDate = moment().add(1, "days").format(format)
+    let pastDate = moment().subtract(1, "days").format(format)
+    let presentDate = moment().format(format)
+    let futureDate = moment().add(1, "days").format(format)
 
-        let pastSetting = new Setting(containerEl)
-        pastSetting.controlEl.createSpan({text: pastDate, cls: "setting-custom-date-past"})
-        pastSetting.setName(i18n.t("PAST_DATE_COLOR"))
+    let pastSetting = new Setting(containerEl)
+    pastSetting.controlEl.createSpan({text: pastDate, cls: "setting-custom-date-past"})
+    pastSetting.setName(i18n.t("PAST_DATE_COLOR"))
 
-        .addButton((btn) => {
-            btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
-                let menu = new Menu();
-                setColorMenuItems(menu, "past", "dateColors", "pillColor", plugin);
-                menu.showAtMouseEvent(e);
-            });
-        })
-        .addButton((btn) => {
-            btn.setIcon("type").setClass("property-color-setting-button").onClick((e) => {
-                let menu = new Menu();
-                setColorMenuItems(menu, "past", "dateColors", "textColor", plugin);
-                menu.showAtMouseEvent(e);
-            });
-        })
+    .addButton((btn) => {
+        btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
+            let menu = new Menu();
+            setDateColorMenuItems(menu, "past", "pillColor", plugin);
+            menu.showAtMouseEvent(e);
+        });
+    })
+    .addButton((btn) => {
+        btn.setIcon("type").setClass("property-color-setting-button").onClick((e) => {
+            let menu = new Menu();
+            setDateColorMenuItems(menu, "past", "textColor", plugin);
+            menu.showAtMouseEvent(e);
+        });
+    })
 
 
-        
-        let presentSEtting = new Setting(containerEl)
-        presentSEtting.controlEl.createSpan({text: presentDate, cls: "setting-custom-date-present"})
-        presentSEtting.setName(i18n.t("PRESENT_DATE_COLOR"))
-        .addButton((btn) => {
-            btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
-                let menu = new Menu();
-                setColorMenuItems(menu, "present", "dateColors", "pillColor", plugin);
-                menu.showAtMouseEvent(e);
-            });
-        })
-        .addButton((btn) => {
-            btn.setIcon("type").setClass("property-color-setting-button").onClick((e) => {
-                let menu = new Menu();
-                setColorMenuItems(menu, "present", "dateColors", "textColor", plugin);
-                menu.showAtMouseEvent(e);
-            });
-        })
-        
-        let futureSetting = new Setting(containerEl)
-        futureSetting.controlEl.createSpan({text: futureDate, cls: "setting-custom-date-future"})
-        futureSetting.setName(i18n.t("FUTURE_DATE_COLOR"))
-        .addButton((btn) => {
-            btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
-                let menu = new Menu();
-                setColorMenuItems(menu, "future", "dateColors", "pillColor", plugin);
-                menu.showAtMouseEvent(e);
-            });
-        })
-        .addButton((btn) => {
-            btn.setIcon("type").setClass("property-color-setting-button").onClick((e) => {
-                let menu = new Menu();
-                setColorMenuItems(menu, "future", "dateColors", "textColor", plugin);
-                menu.showAtMouseEvent(e);
-            });
-        })
+    
+    let presentSEtting = new Setting(containerEl)
+    presentSEtting.controlEl.createSpan({text: presentDate, cls: "setting-custom-date-present"})
+    presentSEtting.setName(i18n.t("PRESENT_DATE_COLOR"))
+    .addButton((btn) => {
+        btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
+            let menu = new Menu();
+            setDateColorMenuItems(menu, "present", "pillColor", plugin);
+            menu.showAtMouseEvent(e);
+        });
+    })
+    .addButton((btn) => {
+        btn.setIcon("type").setClass("property-color-setting-button").onClick((e) => {
+            let menu = new Menu();
+            setDateColorMenuItems(menu, "present", "textColor", plugin);
+            menu.showAtMouseEvent(e);
+        });
+    })
+    
+    let futureSetting = new Setting(containerEl)
+    futureSetting.controlEl.createSpan({text: futureDate, cls: "setting-custom-date-future"})
+    futureSetting.setName(i18n.t("FUTURE_DATE_COLOR"))
+    .addButton((btn) => {
+        btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
+            let menu = new Menu();
+            setDateColorMenuItems(menu, "future", "pillColor", plugin);
+            menu.showAtMouseEvent(e);
+        });
+    })
+    .addButton((btn) => {
+        btn.setIcon("type").setClass("property-color-setting-button").onClick((e) => {
+            let menu = new Menu();
+            setDateColorMenuItems(menu, "future", "textColor", plugin);
+            menu.showAtMouseEvent(e);
+        });
+    })
 
 
 

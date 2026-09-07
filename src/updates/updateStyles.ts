@@ -118,13 +118,13 @@ export const updateRelativeDateColors = (plugin: PrettyPropertiesPlugin) => {
   let present= plugin.settings.dateColors.present
   let past = plugin.settings.dateColors.past
 
-  let futureColor = future.pillColor
-  let presentColor = present.pillColor
-  let pastColor = past.pillColor
+  let futureColor = future?.pillColor
+  let presentColor = present?.pillColor
+  let pastColor = past?.pillColor
 
-  let futureBaseTextColor = future.textColor
-  let presentBaseTextColor = present.textColor
-  let pastBaseTextColor = past.textColor
+  let futureBaseTextColor = future?.textColor
+  let presentBaseTextColor = present?.textColor
+  let pastBaseTextColor = past?.textColor
 
   
 

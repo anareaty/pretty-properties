@@ -1,7 +1,7 @@
 import PrettyPropertiesPlugin from "src/main"
 import { around, dedupe } from "monkey-around";
 import { Menu } from "obsidian";
-import { createColorMenu } from "src/menus/selectColorMenus";
+import { createColorMenu, createColorMenu } from "src/menus/selectColorMenus";
 import { i18n } from "src/localization/localization";
 import { handlePropertyMenu } from "src/menus/propertyMenu";
 import { handleBannerMenu } from "src/menus/bannerMenu";
@@ -140,10 +140,10 @@ const handleTagMenu = (menu: Menu, tag: Element | null, plugin: PrettyProperties
         }
 
         if (tag?.instanceOf(HTMLElement)) {
-            let tagText = tag.getAttribute("data-tag-value") || ""
+            let tagText = tag.getAttribute("data-property-value") || ""
             if (tagText) {
-                createColorMenu(tagText, "tagColors", "pillColor", plugin, menu);
-                createColorMenu(tagText, "tagColors", "textColor", plugin, menu);
+                createColorMenu("tags", tagText, "pillColor", menu, plugin);
+                createColorMenu("tags", tagText, "textColor", menu, plugin);
             }
         }
     }
@@ -192,16 +192,14 @@ const removeTagAtCursor = (plugin: PrettyPropertiesPlugin) => {
 
 const handlePillMenu = (menu: Menu, pill: HTMLElement, plugin: PrettyPropertiesPlugin) => {
     if (plugin.settings.enableColoredProperties) {
-        let pillVal = pill.getAttribute("data-property-pill-value");
-        let tagVal = pill.getAttribute("data-tag-value");
 
-        if (pillVal) {
-            createColorMenu(pillVal, "propertyPillColors", "pillColor", plugin, menu);
-            createColorMenu(pillVal, "propertyPillColors", "textColor", plugin, menu);
-        } else if (tagVal) {
-            createColorMenu(tagVal, "tagColors", "pillColor", plugin, menu);
-            createColorMenu(tagVal, "tagColors", "textColor", plugin, menu);
-        }
+        let propName = pill.getAttribute("data-property-key")
+        let pillVal = pill.getAttribute("data-property-value");
+
+        if (propName && pillVal) {
+            createColorMenu(propName, pillVal, "pillColor", menu, plugin);
+            createColorMenu(propName, pillVal, "textColor", menu, plugin);
+        } 
     }
 }
 
@@ -220,8 +218,8 @@ const handleTagPaneMenu = (menu: Menu, tagPaneTag: HTMLElement, plugin: PrettyPr
         if (tag?.instanceOf(HTMLElement)) {
             let tagText = parentText + tag.innerText
             if (tagText) {
-                createColorMenu(tagText, "tagColors", "pillColor", plugin, menu);
-                createColorMenu(tagText, "tagColors", "textColor", plugin, menu);
+                createColorMenu("tags", tagText, "pillColor", menu, plugin);
+                createColorMenu("tags", tagText, "textColor", menu, plugin);
             }
         }
     }

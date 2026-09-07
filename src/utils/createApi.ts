@@ -64,27 +64,11 @@ export class API {
     }
 
     getPropertyBackgroundColorSetting (propName: string, propValue: string) {
-        let propType = getPropertyType(propName, this.plugin)
-        if (propType == "text") {
-            return this.plugin.settings.propertyLongtextColors?.[propValue]?.pillColor || "default"
-        } else if (propType == "multitext" || propType == "aliases") {
-            return this.plugin.settings.propertyPillColors?.[propValue]?.pillColor || "default"
-        } else if (propType == "tags") {
-            return this.plugin.settings.tagColors?.[propValue]?.pillColor || "default"
-        }
-        return "default"
+        return this.plugin.settings.propertyColors?.[propName]?.[propValue]?.pillColor || "default"
     }
 
     getPropertyTextColorSetting (propName: string, propValue: string) {
-        let propType = getPropertyType(propName, this.plugin)
-        if (propType == "text") {
-            return this.plugin.settings.propertyLongtextColors?.[propValue]?.textColor || "default"
-        } else if (propType == "multitext" || propType == "aliases") {
-            return this.plugin.settings.propertyPillColors?.[propValue]?.textColor || "default"
-        } else if (propType == "tags") {
-            return this.plugin.settings.tagColors?.[propValue]?.textColor || "default"
-        }
-        return "default"
+        return this.plugin.settings.propertyColors?.[propName]?.[propValue]?.textColor || "default"
     }
 
     setPPColorStyles (el: HTMLElement, propName: string, propValue: string) {

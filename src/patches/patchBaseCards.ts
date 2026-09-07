@@ -63,7 +63,7 @@ export const processBaseCardProperty = (property: CardProp, plugin: PrettyProper
         let elements = property.lineEl.querySelectorAll("a.tag")
         for (let el of elements) {
             if (el?.instanceOf(HTMLElement)) {
-                updateValueListElement(el, "data-tag-value", "tag", plugin)
+                updateValueListElement(el, "tags", "tag", plugin)
             }
         }
     }
@@ -76,14 +76,14 @@ export const processBaseCardProperty = (property: CardProp, plugin: PrettyProper
             let elements = property.lineEl.querySelectorAll(".value-list-element")
             for (let el of elements) {
                 if (el?.instanceOf(HTMLElement)) {
-                    updateValueListElement(el, "data-property-pill-value", "multiselect-pill", plugin)
+                    updateValueListElement(el, propName, "multiselect-pill", plugin)
                 }
             }
         } 
         
         else if (type == "text") {
             let el = property.lineEl
-            updateCardLongtext(el, plugin);
+            updateCardLongtext(el, propName, plugin);
         } 
 
         else if (type == "date") {

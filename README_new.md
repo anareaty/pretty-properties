@@ -121,8 +121,8 @@ You can also add you own styling to the properties via CSS. For this each proper
 
 ```
 [data-property-pill-value="my-list-property-value"] {    /* my styles */}
-[data-property-longtext-value="my-text-property-value"] {    /* my styles */}
-[data-tag-value="my-tag-value"] {    /* my styles */}
+[data-property-value="my-text-property-value"] {    /* my styles */}
+[data-property-value="my-tag-value"] {    /* my styles */}
 ```
 
 # Relative date colors

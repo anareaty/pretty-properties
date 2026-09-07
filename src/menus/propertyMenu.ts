@@ -20,10 +20,9 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                 .setIcon("lucide-eye")
                 .setSection("pretty-properties")
                 .onClick(async () => {
-                    if (propName)
-                        plugin.settings.hiddenProperties.remove(
-                            propName
-                        );
+                    if (propName) {
+                        plugin.settings.hiddenProperties = plugin.settings.hiddenProperties.filter(p => p.toLowerCase() != propName.toLowerCase())
+                    }
                     await plugin.saveSettings();
                     updateHiddenProperties(plugin);
                     plugin.settingTab?.update()
@@ -55,10 +54,10 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                 .setIcon("lucide-eye")
                 .setSection("pretty-properties")
                 .onClick(async () => {
-                    if (propName)
-                        plugin.settings.hiddenWhenEmptyProperties.remove(
-                            propName
-                        );
+
+                    if (propName) {
+                        plugin.settings.hiddenWhenEmptyProperties = plugin.settings.hiddenWhenEmptyProperties.filter(p => p.toLowerCase() != propName.toLowerCase())
+                    }
                     await plugin.saveSettings();
                     updateHiddenProperties(plugin);
                     plugin.settingTab?.update()
@@ -111,7 +110,7 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                     .setIcon("code-2")
                     .setSection("pretty-properties")
                     .onClick(async () => {
-                        plugin.settings.markdownProperties = markdownProperties.filter(p => p != propName)
+                        plugin.settings.markdownProperties = markdownProperties.filter(p => p.toLowerCase() != propName.toLowerCase())
                         await plugin.saveSettings();
                         updateAllProperties(plugin);
                         plugin.settingTab?.update()
