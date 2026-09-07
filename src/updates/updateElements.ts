@@ -33,7 +33,7 @@ interface Popover extends HoverPopover {
 
 export const updateAllProperties = (plugin:PrettyPropertiesPlugin) => { 
 
-    console.log("update")
+
 
     let mdLeaves = plugin.app.workspace.getLeavesOfType("markdown");
     for (let leaf of mdLeaves) {

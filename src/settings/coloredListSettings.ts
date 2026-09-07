@@ -1,4 +1,4 @@
-import { Setting, TextComponent, Menu } from 'obsidian';
+import { Setting, Menu } from 'obsidian';
 import { i18n } from 'src/localization/localization';
 import { PPSettingTab, PillColorSettings } from 'src/settings/settings';
 import { setPillStyles } from 'src/updates/updatePills';
@@ -34,7 +34,7 @@ export const showColoredListSettings = (settingTab: PPSettingTab) => {
 
         let pillColorSettings = plugin.settings.propertyColors[propName]?.[propVal]
         let saveCallback = (pillColorSettings: PillColorSettings) => {
-            propertyColorSaveCallback(propName, propVal, pillColorSettings, plugin)
+            void propertyColorSaveCallback(propName, propVal, pillColorSettings, plugin)
         }
 
 
@@ -70,7 +70,7 @@ export const showColoredListSettings = (settingTab: PPSettingTab) => {
         let propContainer = colorSettingsEl.createDiv()
         propContainer.classList.add("pp-settings-list-inner-container")
 
-        let propertySetting = new Setting(propContainer)
+        new Setting(propContainer)
         .setName(propName)
         .addButton(button => {
             button
@@ -119,32 +119,13 @@ export const showColoredListSettings = (settingTab: PPSettingTab) => {
     }
 
 
-    let newProperty = ""
-    let newPropertySetting = new Setting(colorSettingsWrapper)
+
+    new Setting(colorSettingsWrapper)
         .setName(i18n.t("ADD_COLORED_PROPERTY"))
 
-        /*
-        .addText(text => text
-            .setValue("")
-            .onChange(value => newProperty = value)
-        )
-        */
         .addButton(btn => btn
             .setIcon("plus")
             .onClick(async () => {
-
-                /*
-                newProperty = newProperty.trim()
-                if (newProperty && !plugin.settings.propertyPillColors[newProperty]) {
-                    plugin.settings.propertyPillColors[newProperty] = {}
-                    await plugin.saveSettings()
-                    addColorSetting(newProperty)
-                    let inputSetting = newPropertySetting.components[0]
-                    if (inputSetting instanceof TextComponent) {
-                        inputSetting.setValue("")
-                    }
-                }
-                */
 
                 new AddPropertyModal(["text", "multitext", "tags", "aliases"], plugin, async (newProperty) => {
                     if (newProperty && !plugin.settings.propertyColors[newProperty]) {

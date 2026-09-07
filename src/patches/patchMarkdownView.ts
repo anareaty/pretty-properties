@@ -1,7 +1,7 @@
 import PrettyPropertiesPlugin from "src/main"
 import { updateImagesForView } from "src/updates/updateElements"
 import { around, dedupe } from "monkey-around";
-import { MarkdownView, TFile } from "obsidian";
+import { MarkdownView } from "obsidian";
 import { renderTitleIcon } from "src/updates/updateIcons";
 import { updateMetadataEditor } from "src/updates/updateHiddenProperties";
 import { MetadataEditor } from "@obsidian-typings/obsidian-public-latest";
@@ -28,7 +28,7 @@ export const patchMarkdownView = (plugin: PrettyPropertiesPlugin) => {
 
         let file = args[0]
 
-        //console.log(file)
+
 
         let cache = plugin.app.metadataCache.getFileCache(file)
 
@@ -39,7 +39,7 @@ export const patchMarkdownView = (plugin: PrettyPropertiesPlugin) => {
           let mcHidden = true
 
           for (let propName in frontmatter) {
-            let value = frontmatter[propName]
+            let value: unknown = frontmatter[propName]
 
 
             if (plugin.settings.hiddenProperties.includes(propName)) {
@@ -65,7 +65,7 @@ export const patchMarkdownView = (plugin: PrettyPropertiesPlugin) => {
         let metadataEditor = this.metadataEditor as MetadataEditorPatched
 
 
-        //console.log(metadataEditor)
+
 
         
         if (metadataEditor && !metadataEditor.pp_patched) {
@@ -74,7 +74,7 @@ export const patchMarkdownView = (plugin: PrettyPropertiesPlugin) => {
           metadataEditor.save = new Proxy(metadataEditor.save, {
             apply(save, thisArg) {
               let result = save.call(thisArg);
-              //console.log("hide on metadata save")
+
               updateMetadataEditor(metadataEditor, plugin)
               return result;
             }

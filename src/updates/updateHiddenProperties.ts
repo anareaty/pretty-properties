@@ -46,7 +46,7 @@ export const hideMetadataContainerIfAllPropertiesHidden = (metadataContainer: HT
 
     let properties = querySelectorsWithIframesForContainer(".metadata-property", metadataContainer)
 
-    //console.log(properties)
+
 
     let mcHidden = true
 
@@ -65,7 +65,7 @@ export const hideMetadataContainerIfAllPropertiesHidden = (metadataContainer: HT
         mcHidden = false
     }
 
-    //console.log("hide")
+
 
 
     metadataContainer.classList.toggle("pp-mc-hidden", mcHidden)
@@ -100,7 +100,7 @@ export const updateMetadataEditor = (metadataEditor: MetadataEditor, plugin: Pre
         let propEl = r.containerEl
         updateHiddenCSSClasses(propEl, r.entry.key, plugin)
 
-        //console.log(propEl)
+   
 
         if (propEl.classList.contains("pp-property-hidden")) {
             continue
@@ -116,9 +116,7 @@ export const updateMetadataEditor = (metadataEditor: MetadataEditor, plugin: Pre
         mcHidden = false
     }
 
-    //console.log(mcHidden)
-
-    //console.log("hide")
+  
 
     metadataEditor.containerEl.classList.toggle("pp-mc-hidden", mcHidden)
 }

@@ -32,9 +32,19 @@ export const patchMetadataSuggester = (plugin: PrettyPropertiesPlugin) => {
 
         if (textInputEl instanceof HTMLElement) {
             let metadataEl = textInputEl.closest(".metadata-property-value")
-            if (metadataEl instanceof HTMLElement) {
+            let propertyEl = textInputEl.closest(".metadata-property")
+            let basePropertyEl = textInputEl.closest(".bases-td")
+
+            if (metadataEl instanceof HTMLElement && (propertyEl || basePropertyEl)) {
                 let type = metadataEl.getAttribute("data-property-type")
-                let propName = metadataEl.getAttribute("data-property-key")
+                let propName
+
+                if (propertyEl instanceof HTMLElement) {
+                  propName = propertyEl.getAttribute("data-property-key")
+                } else if (basePropertyEl instanceof HTMLElement) {
+                  let prop = basePropertyEl.getAttribute("data-property")
+                  propName = prop?.replace(/^note\./, "")
+                }
 
                 if (type && propName) {
                   for (let suggestEl of elements) {
@@ -42,6 +52,8 @@ export const patchMetadataSuggester = (plugin: PrettyPropertiesPlugin) => {
 
                     
                     let text = suggestEl.innerText
+
+
                     setPillStyles(suggestEl, propName, text, plugin)
 
                     if (type == "tags" || type == "multitext" || type == "aliases") {

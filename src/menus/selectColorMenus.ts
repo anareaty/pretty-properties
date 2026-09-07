@@ -33,7 +33,7 @@ export const propertyColorSaveCallback = async (
     plugin: PrettyPropertiesPlugin
 ) => {
     if (!plugin.settings.propertyColors[propName]) plugin.settings.propertyColors[propName] = {}
-    plugin.settings.propertyColors[propName]![propVal] = pillColorSettings
+    plugin.settings.propertyColors[propName][propVal] = pillColorSettings
     await plugin.saveSettings();
     updateAllProperties(plugin)
     plugin.settingTab?.update()
@@ -63,7 +63,7 @@ export const setDateColorMenuItems = (
 ) => {
     let pillColorSettings = plugin.settings.dateColors[relativeVal]
     let saveCallback = (pillColorSettings: PillColorSettings) => {
-        dateColorSaveCallback(relativeVal, pillColorSettings, plugin)
+        void dateColorSaveCallback(relativeVal, pillColorSettings, plugin)
     }
     setColorMenuItems(menu, colorType, pillColorSettings, saveCallback, plugin)
 }
@@ -177,7 +177,7 @@ export const createColorMenu = (
 
     let pillColorSettings = plugin.settings.propertyColors[propName]?.[propVal]
     let saveCallback = (pillColorSettings: PillColorSettings) => {
-        propertyColorSaveCallback(propName, propVal, pillColorSettings, plugin)
+        void propertyColorSaveCallback(propName, propVal, pillColorSettings, plugin)
     }
 
     let itemTitle = i18n.t("SELECT_COLOR")

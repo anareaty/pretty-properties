@@ -114,7 +114,7 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
 
                                         let pillColorSettings = plugin.settings.propertyColors[propName]?.[propVal]
                                         let saveCallback = (pillColorSettings: PillColorSettings) => {
-                                            propertyColorSaveCallback(propName, propVal, pillColorSettings, plugin)
+                                            void propertyColorSaveCallback(propName, propVal, pillColorSettings, plugin)
                                         }
 
                                         setting.addButton((btn) => {

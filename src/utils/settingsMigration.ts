@@ -22,7 +22,7 @@ export const migrateColorSettings = async (plugin:PrettyPropertiesPlugin) => {
             let type = getPropertyType(propName, plugin);
 
             if (type == "aliases") type = "multitext";
-            if (!type) type == "text";
+            if (!type) type = "text";
             if (type != "text" && type != "multitext") continue;
             
             let values = plugin.app.metadataCache.getFrontmatterPropertyValuesForKey(propName)
@@ -41,7 +41,7 @@ export const migrateColorSettings = async (plugin:PrettyPropertiesPlugin) => {
                     if (!plugin.settings.propertyColors[propName]) {
                         plugin.settings.propertyColors[propName] = {}
                     }
-                    plugin.settings.propertyColors[propName]![value] = colorSettingsObj
+                    plugin.settings.propertyColors[propName][value] = colorSettingsObj
                 }
             }
         }

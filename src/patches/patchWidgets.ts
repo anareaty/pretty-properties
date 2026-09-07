@@ -217,7 +217,7 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
     parent?.classList.add("pp-property-hidden-when-empty")
   }
 
-  //console.log("test")
+
 
   updateAllMetadataContainers(plugin)
   

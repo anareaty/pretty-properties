@@ -99,7 +99,7 @@ export const setPillStyles = (
 	plugin: PrettyPropertiesPlugin
 ) => {
 
-	//console.log("set pill styles")
+
 
 	
 
@@ -171,7 +171,7 @@ export const updateValueListElement = (pill: HTMLElement, propName: string, styl
 
 export const updateTagPill = (pill: HTMLElement, plugin: PrettyPropertiesPlugin) => {
 
-	//console.log("update tag pill")
+
 
 
 	if (plugin.settings.enableColoredProperties) {
@@ -234,7 +234,6 @@ export const updateLongtext = (pill: HTMLElement, plugin: PrettyPropertiesPlugin
 		//let text = pill.innerText
 
 		let propEl = parent?.parentElement
-		//let propName = propEl?.getAttribute("data-property-key") || ""
 
 		propName = propName || ""
 
@@ -248,12 +247,7 @@ export const updateLongtext = (pill: HTMLElement, plugin: PrettyPropertiesPlugin
 
 		let overlayElement
 		if (grandParent) {
-
 			overlayElement = updatePropertyFormatting(grandParent, propName, text, "text", propertyFormatObj.format, propertyFormatObj.textFormat, plugin)
-
-			
-
-			
 		}
 
 		if (plugin.settings.enableColoredProperties) {

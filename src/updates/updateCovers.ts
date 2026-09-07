@@ -30,11 +30,11 @@ export const renderCover = async (
 	plugin: PrettyPropertiesPlugin
 ) => {
 
-	//console.log("render cover")
+
 
 	const mdContainer = contentEl.querySelector(".metadata-container");
 
-	//console.log(contentEl)
+
 
 	if (!(mdContainer?.instanceOf(HTMLElement))) return;
 

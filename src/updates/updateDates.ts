@@ -5,8 +5,6 @@ import { computeFormattedValue, getPropertyFormatObj, setOverlayContent } from "
 
 
 export const updateDateInput = (input: HTMLInputElement, plugin: PrettyPropertiesPlugin) => {
-
-	
 	let value = input.value;
 	let parent = input.parentElement
 	let grandParent = parent?.parentElement
@@ -42,7 +40,7 @@ export const updateDateInput = (input: HTMLInputElement, plugin: PrettyPropertie
 
 		if (plugin.settings.enableCustomDateFormat && 
 			(customDateFormat || propertyFormatObj.format) && 
-			(!isBase || plugin.settings.enableCustomDateFormatInBases)) {
+			(!isBase || plugin.settings.enableCustomDateFormatInBases || propertyFormatObj.format)) {
 
 			
 
@@ -51,10 +49,8 @@ export const updateDateInput = (input: HTMLInputElement, plugin: PrettyPropertie
 			let customDate = ""
 
 			if (propertyFormatObj.format) {
-				
 				customDate = computeFormattedValue(plugin, propName, propertyFormatObj.format, value)
 			} else if (customDateFormat) {
-				
 				customDate = moment(value).format(customDateFormat);
 			}
 
@@ -142,23 +138,57 @@ export const updateDateTimeInput = (input: HTMLInputElement, plugin: PrettyPrope
 	let value = input.value;
 	let parent = input.parentElement
 	let grandParent = parent?.parentElement
+
+	if (!grandParent) return
+
+	let propName = grandParent.getAttribute("data-property-key")
+
+	if (!propName) {
+		propName = grandParent.getAttribute("data-property") || ""
+		propName = propName?.replace("note.", "")
+	}
+
+	if (!propName) return
+
+	let propertyFormatObj = getPropertyFormatObj(propName, value, plugin)
+
+
+
+
+
+
 	let customDateTimeFormat = plugin.settings.customDateTimeFormat
 
 	if (parent?.instanceOf(HTMLElement)) {
 		let isBase = parent.classList.contains("bases-table-cell")
 		let existingCustomDateElement = parent.querySelector(".custom-date")
 
-		if (plugin.settings.enableCustomDateFormat && 
-			customDateTimeFormat && 
-			(!isBase || plugin.settings.enableCustomDateFormatInBases)) {
 
-			let customDate = moment(value).format(customDateTimeFormat);
+		if (plugin.settings.enableCustomDateFormat && 
+			(customDateTimeFormat || propertyFormatObj.format) && 
+			(!isBase || plugin.settings.enableCustomDateFormatInBases || propertyFormatObj.format)) {
+
+
+			let customDate = ""
+
+			if (propertyFormatObj.format) {
+				customDate = computeFormattedValue(plugin, propName, propertyFormatObj.format, value)
+			} else if (customDateTimeFormat) {
+				customDate = moment(value).format(customDateTimeFormat);
+			}
+
+
 			
 			if (existingCustomDateElement?.instanceOf(HTMLElement) && 
 				existingCustomDateElement.innerText != customDate && 
 				customDate != "Invalid date") {
 	
-				existingCustomDateElement.textContent = customDate
+				//existingCustomDateElement.textContent = customDate
+				existingCustomDateElement.empty()
+
+
+				setOverlayContent(customDate, propertyFormatObj.textFormat, existingCustomDateElement, grandParent, plugin)
+
 				parent.classList.add("has-custom-date")
 				
 			} else if (!existingCustomDateElement && customDate != "Invalid date") {
@@ -167,7 +197,12 @@ export const updateDateTimeInput = (input: HTMLInputElement, plugin: PrettyPrope
 				customDateEl.onclick = () => {
 					input.focus()
 				}
-				customDateEl.append(customDate)
+
+
+
+
+				setOverlayContent(customDate, propertyFormatObj.textFormat, customDateEl, grandParent, plugin)
+
 				input.after(customDateEl)
 				parent.classList.add("has-custom-date")
 	
