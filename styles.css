@@ -1908,9 +1908,22 @@ button.cover-has-format {
 
 
 .pp-settings-list-container {
-  border: 1px solid var(--text-accent);
+  border: 1px solid var(--background-modifier-border);
   border-radius: 4px;
   padding: 8px;
+}
+
+/*
+.pp-settings-list-inner-container {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  margin: 4px;
+  padding: 4px;
+}
+  */
+
+.pp-settings-list-inner-container > .setting-item:not(:first-child) {
+  margin-left: 2em;
 }
 
 

@@ -4,6 +4,7 @@ import { PPSettingTab, PillColorSettings } from 'src/settings/settings';
 import { setPillStyles } from 'src/updates/updatePills';
 import { propertyColorSaveCallback, setColorMenuItems } from 'src/menus/selectColorMenus';
 import { updateAllProperties } from 'src/updates/updateElements';
+import { AddPropertyModal, AddTextModal } from 'src/modals/settingItemModals';
 
 
 
@@ -16,9 +17,9 @@ export const showColoredListSettings = (settingTab: PPSettingTab) => {
     colorSettingsWrapper.classList.add("pp-settings-list-container")
     let colorSettingsEl = colorSettingsWrapper.createDiv()
 
-    const addColorSetting = (propName: string, propVal: string) => {
+    const addColorSetting = (propName: string, propVal: string, propContainer: HTMLElement) => {
         
-        let propertyColorSetting = new Setting(colorSettingsEl)
+        let propertyColorSetting = new Setting(propContainer)
 
         let pillEl = propertyColorSetting.nameEl.createDiv({
             cls: "multi-select-pill setting-multi-select-pill"
@@ -66,8 +67,25 @@ export const showColoredListSettings = (settingTab: PPSettingTab) => {
     
     for (let propName in plugin.settings.propertyColors) {
 
-        let propertySetting = new Setting(colorSettingsEl)
+        let propContainer = colorSettingsEl.createDiv()
+        propContainer.classList.add("pp-settings-list-inner-container")
+
+        let propertySetting = new Setting(propContainer)
         .setName(propName)
+        .addButton(button => {
+            button
+            .setIcon("plus")
+            .setClass("bare-button")
+            .onClick(async () => {
+                new AddTextModal(plugin, async (newValue) => {
+                    if (newValue && !plugin.settings.propertyColors[propName]![newValue]) {
+                        plugin.settings.propertyColors[propName]![newValue] = {}
+                        await plugin.saveSettings()
+                        addColorSetting(propName, newValue, propContainer)
+                    }
+                }).open()
+            })
+        })
         .addButton(button =>
             {
                 let icon = "chevron-right"
@@ -92,7 +110,7 @@ export const showColoredListSettings = (settingTab: PPSettingTab) => {
 
         if (plugin.settings.propertyColorSettingRevealed == propName) {
             for (let propVal in plugin.settings.propertyColors[propName]) {
-                addColorSetting(propName, propVal)
+                addColorSetting(propName, propVal, propContainer)
             }
         }
 
@@ -104,13 +122,18 @@ export const showColoredListSettings = (settingTab: PPSettingTab) => {
     let newProperty = ""
     let newPropertySetting = new Setting(colorSettingsWrapper)
         .setName(i18n.t("ADD_COLORED_PROPERTY"))
+
+        /*
         .addText(text => text
             .setValue("")
             .onChange(value => newProperty = value)
         )
+        */
         .addButton(btn => btn
             .setIcon("plus")
             .onClick(async () => {
+
+                /*
                 newProperty = newProperty.trim()
                 if (newProperty && !plugin.settings.propertyPillColors[newProperty]) {
                     plugin.settings.propertyPillColors[newProperty] = {}
@@ -121,6 +144,15 @@ export const showColoredListSettings = (settingTab: PPSettingTab) => {
                         inputSetting.setValue("")
                     }
                 }
+                */
+
+                new AddPropertyModal(["text", "multitext", "tags", "aliases"], plugin, async (newProperty) => {
+                    if (newProperty && !plugin.settings.propertyColors[newProperty]) {
+                        plugin.settings.propertyColors[newProperty] = {}
+                        await plugin.saveSettings()
+                        settingTab.display()
+                    }
+                }).open()
             })
         )
 }
