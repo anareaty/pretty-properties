@@ -1,4 +1,4 @@
-import { Setting } from 'obsidian';
+import { Setting, requireApiVersion } from 'obsidian';
 import { i18n } from 'src/localization/localization';
 import { updateAllProperties } from 'src/updates/updateElements';
 import { PPSettingTab } from 'src/settings/settings';
@@ -11,7 +11,9 @@ import { AddPropertyModal, FormatTemplateModal } from 'src/modals/settingItemMod
 
 
 export const getFormatSettingsDefinitions = (tab: PPSettingTab) => {
-    let plugin = tab.plugin
+    if (!requireApiVersion("1.13.0")) return []
+	
+	let plugin = tab.plugin
     let datePlaceholder = "DD.MM.YYYY"
     let dateTimePlaceholder = "DD.MM.YYYY HH:mm"
 
