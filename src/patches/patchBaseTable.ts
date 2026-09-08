@@ -46,7 +46,7 @@ export const patchBaseTable = (plugin: PrettyPropertiesPlugin) => {
                 let old_view_updateVirtualDisplay = view.updateVirtualDisplay
             
                 view.updateVirtualDisplay = (...args2) => {
-                    let update = old_view_updateVirtualDisplay.call(view, args2)
+                    let update = old_view_updateVirtualDisplay.call(view)
                     if (plugin.settings.enableColoredProperties) {
                         for (let row of view.rows) {
                             for (let cell of row.cells) {

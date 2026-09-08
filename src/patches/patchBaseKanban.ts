@@ -35,7 +35,7 @@ export const patchBaseKanban = (plugin: PrettyPropertiesPlugin) => {
             let old_view_updateVirtualDisplay = view.updateVirtualDisplay
             
             view.updateVirtualDisplay = (...args2) => {
-                let update = old_view_updateVirtualDisplay.call(view, args2)
+                let update = old_view_updateVirtualDisplay.call(view)
                 processBaseKanbanProperties(view, plugin)
                 return update
             }

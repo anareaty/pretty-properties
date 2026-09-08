@@ -36,7 +36,7 @@ export const patchBaseList = (plugin: PrettyPropertiesPlugin) => {
             let old_view_updateVirtualDisplay = view.updateVirtualDisplay
             
             view.updateVirtualDisplay = (...args2) => {
-                let update = old_view_updateVirtualDisplay.call(view, args2)
+                let update = old_view_updateVirtualDisplay.call(view)
                 processBaseListProperties(view, plugin)
                 return update
             }
