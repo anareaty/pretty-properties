@@ -1,4 +1,4 @@
-import { Menu, MenuItem } from "obsidian";
+import { Menu, MenuItem, requireApiVersion } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { i18n } from "src/localization/localization";
 import { updateHiddenProperties } from "src/updates/updateHiddenProperties";
@@ -67,7 +67,9 @@ export const handleBannerMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => 
                     
                 await plugin.saveSettings();
                 updateHiddenProperties(plugin);
-                plugin.settingTab?.update()
+				if (requireApiVersion("1.14.0")) {
+                    plugin.settingTab?.update()
+				}
         }))
     }
 
