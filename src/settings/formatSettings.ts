@@ -11,7 +11,7 @@ import { AddPropertyModal, FormatTemplateModal } from 'src/modals/settingItemMod
 
 
 export const getFormatSettingsDefinitions = (tab: PPSettingTab) => {
-    if (!requireApiVersion("1.13.0")) return []
+    if (requireApiVersion("1.13.0")) {
 	
 	let plugin = tab.plugin
     let datePlaceholder = "DD.MM.YYYY"
@@ -177,6 +177,7 @@ export const getFormatSettingsDefinitions = (tab: PPSettingTab) => {
             ]
         }
     ]
+} else return []
 }
 
 
