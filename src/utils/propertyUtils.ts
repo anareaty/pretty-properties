@@ -28,7 +28,7 @@ export const getNestedProperty = (obj: FrontMatterCache, path: string): string |
             result = result[key] as FrontMatterCache
 
             if (i == keys.length - 1) {
-                val = result as unknown
+                val = result
             } 
         }   
     }

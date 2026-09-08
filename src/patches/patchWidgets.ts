@@ -254,14 +254,16 @@ export const patchPropertyWidgets = (plugin: PrettyPropertiesPlugin) => {
 
             if (type == "multitext" || type == "tags" || type == "aliases") {
               let multiRendered = rendered as MultitextPropertyWidgetComponent
-              let renderValues = multiRendered.multiselect.renderValues
-                multiRendered.multiselect.renderValues = new Proxy(renderValues, {
-                  apply(renderValues, thisArg2) {
-                    renderValues.call(thisArg2)
-                    updateWidgets(type, rendered, widgetArgs, plugin)
-                    return undefined
-                  }
-                })
+
+              const multiselect = multiRendered.multiselect
+              const old_renderValues = multiselect.renderValues
+
+              multiselect.renderValues = (...args2) => {
+                old_renderValues.call(multiselect, ...args2)
+                updateWidgets(type, rendered, widgetArgs, plugin)
+                return undefined
+              }
+
             }
             return rendered
           })

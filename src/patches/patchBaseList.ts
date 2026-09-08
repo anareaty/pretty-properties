@@ -3,7 +3,7 @@ import { updateDateInput, updateDateTimeInput } from "src/updates/updateDates";
 import { updateCardLongtext, updateValueListElement } from "src/updates/updatePills";
 import { around, dedupe } from "monkey-around";
 import { BasesPluginInstance } from "@obsidian-typings/obsidian-public-latest";
-import { BasesEntry, BasesView, BasesViewRegistration } from "obsidian";
+import { BasesEntry, BasesView, BasesViewRegistration, requireApiVersion } from "obsidian";
 import { getPropertyType } from "src/utils/propertyUtils";
 
 interface Bases extends BasesPluginInstance {
@@ -33,13 +33,14 @@ export const patchBaseList = (plugin: PrettyPropertiesPlugin) => {
             return dedupe("pp-patch-base-list-around-key", oldFactory, (...args) => {
             let view = oldFactory && oldFactory.apply(this, args) as ListBasesView
 
-            view.updateVirtualDisplay = new Proxy(view.updateVirtualDisplay, {
-                apply(updateVirtualDisplay, thisArg2) {
-                    let update = updateVirtualDisplay.call(thisArg2)
-                    processBaseListProperties(view, plugin)
-                    return update
-                }
-            })
+            let old_view_updateVirtualDisplay = view.updateVirtualDisplay
+            
+            view.updateVirtualDisplay = (...args2) => {
+                let update = old_view_updateVirtualDisplay.call(view, args2)
+                processBaseListProperties(view, plugin)
+                return update
+            }
+
             return view
             })
         }
@@ -50,18 +51,21 @@ export const patchBaseList = (plugin: PrettyPropertiesPlugin) => {
 
 
 export const processBaseListProperties = (view: ListBasesView, plugin: PrettyPropertiesPlugin) => {
-    let data = view.data?.data
-    if (data) {
-        for (let entry of data) {
-            let row = view.rowsMap.get(entry)
-           
-            if (row) {
-                for (let cell of row.cells) {
-                    processBaseListProperty(cell, plugin)
+    if (requireApiVersion("1.10.0")) {
+        let data = view.data?.data
+        if (data) {
+            for (let entry of data) {
+                let row = view.rowsMap.get(entry)
+            
+                if (row) {
+                    for (let cell of row.cells) {
+                        processBaseListProperty(cell, plugin)
+                    }
                 }
             }
         }
     }
+        
 }
 
 

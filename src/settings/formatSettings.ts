@@ -1,4 +1,4 @@
-import { Setting } from 'obsidian';
+import { Setting, requireApiVersion } from 'obsidian';
 import { i18n } from 'src/localization/localization';
 import { updateAllProperties } from 'src/updates/updateElements';
 import { PPSettingTab } from 'src/settings/settings';
@@ -31,7 +31,9 @@ export const getFormatSettingsDefinitions = (tab: PPSettingTab) => {
                             .onChange(async (value) => {
                                 plugin.settings.enableCustomDateFormat = value
                                 await plugin.saveSettings();
-                                tab.update()
+                                if (requireApiVersion("1.13.0")) {
+                                    tab.update()			
+                                }
                                 updateAllProperties(plugin);
                             }));
                     }
@@ -44,7 +46,9 @@ export const getFormatSettingsDefinitions = (tab: PPSettingTab) => {
                             .onChange(async (value) => {
                                 plugin.settings.enableCustomDateFormatInBases = value
                                 await plugin.saveSettings();
-                                tab.update()
+                                if (requireApiVersion("1.13.0")) {
+                                    tab.update()			
+                                }
                                 updateAllProperties(plugin);
                         }));
                     }
@@ -97,7 +101,9 @@ export const getFormatSettingsDefinitions = (tab: PPSettingTab) => {
                                         format: ""
                                     }
                                     await plugin.saveSettings()
-                                    tab.update()
+                                    if (requireApiVersion("1.13.0")) {
+                                        tab.update()			
+                                    }
                                 }
                             }).open()
                         }
@@ -107,7 +113,9 @@ export const getFormatSettingsDefinitions = (tab: PPSettingTab) => {
                         delete plugin.settings.propertyFormats[key]
                         await plugin.saveSettings();
                         updateAllProperties(plugin);
-                        tab.update();
+                        if (requireApiVersion("1.13.0")) {
+                            tab.update()			
+                        }
                     },
                     items: propertyFormatsKeys.map(key => ({
                         name: key,
@@ -131,7 +139,9 @@ export const getFormatSettingsDefinitions = (tab: PPSettingTab) => {
                                         property.format = newFormat
                                         await plugin.saveSettings();
                                         updateAllProperties(plugin);
-                                        tab.update()
+                                        if (requireApiVersion("1.13.0")) {
+                                            tab.update()			
+                                        }
                                     }).open()
                                 })
                             })
@@ -155,7 +165,9 @@ export const getFormatSettingsDefinitions = (tab: PPSettingTab) => {
                                     plugin.settings.markdownProperties.push(newProperty)
                                     await plugin.saveSettings()
                                     updateAllProperties(plugin);
-                                    tab.update()
+                                    if (requireApiVersion("1.13.0")) {
+                                        tab.update()			
+                                    }
                                 }
                             }).open()
                         }
@@ -164,7 +176,9 @@ export const getFormatSettingsDefinitions = (tab: PPSettingTab) => {
                         plugin.settings.markdownProperties.splice(idx, 1);
                         await plugin.saveSettings();
                         updateAllProperties(plugin);
-                        tab.update();
+                        if (requireApiVersion("1.13.0")) {
+                            tab.update()			
+                        }
                     },
                     items: plugin.settings.markdownProperties.map(property => ({
                         name: property,

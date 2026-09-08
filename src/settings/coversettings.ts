@@ -1,4 +1,4 @@
-import { Setting } from 'obsidian';
+import { Setting, requireApiVersion } from 'obsidian';
 import { i18n } from 'src/localization/localization';
 import {   
     updateCoverStyles
@@ -32,7 +32,9 @@ export const getCoverSettingsDefinitions = (tab: PPSettingTab) => {
             .onChange(async (value) => {
                 plugin.settings.enableCover = value
                 await plugin.saveSettings();
-                tab.update()
+                if (requireApiVersion("1.13.0")) {
+                    tab.update()			
+                }
                 updateAllCovers(plugin)
                 updateCoverStyles(plugin)
             }));
@@ -51,7 +53,9 @@ export const getCoverSettingsDefinitions = (tab: PPSettingTab) => {
                         if (newProperty && !plugin.settings.coverProperties.find(c => c.property == newProperty)) {
                         plugin.settings.coverProperties.push({ property: newProperty, format: "" });
                         await plugin.saveSettings()
-                        tab.update()
+                        if (requireApiVersion("1.13.0")) {
+                            tab.update()			
+                        }
 
                     }
                     }).open()
@@ -60,7 +64,9 @@ export const getCoverSettingsDefinitions = (tab: PPSettingTab) => {
             onDelete: async (idx: number) => {
                 plugin.settings.coverProperties.splice(idx, 1);
                 await plugin.saveSettings();
-                tab.update();
+                if (requireApiVersion("1.13.0")) {
+                    tab.update()			
+                }
             },
             items: plugin.settings.coverProperties.map(cover => ({
                 name: cover.property,
@@ -80,7 +86,9 @@ export const getCoverSettingsDefinitions = (tab: PPSettingTab) => {
                                 cover.format = newFormat
                                 await plugin.saveSettings();
                                 updateAllCovers(plugin);
-                                tab.update()
+                                if (requireApiVersion("1.13.0")) {
+                                    tab.update()			
+                                }
                             }).open()
                         })
                     })

@@ -1,4 +1,4 @@
-import { TFile, Menu, MenuItem } from "obsidian";
+import { TFile, Menu, MenuItem, requireApiVersion } from "obsidian";
 import { i18n } from "src/localization/localization";
 import PrettyPropertiesPlugin from "src/main";
 import { updateHiddenProperties } from "src/updates/updateHiddenProperties";
@@ -88,7 +88,9 @@ export const handleCoverMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => {
 
                     await plugin.saveSettings()
                     updateHiddenProperties(plugin)
-                    plugin.settingTab?.update()			
+                    if (requireApiVersion("1.13.0")) {
+                        plugin.settingTab?.update()			
+                    }
                 }))
 
             } 
@@ -113,7 +115,9 @@ export const handleCoverMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => {
 
                     await plugin.saveSettings();
                     updateHiddenProperties(plugin);
-                    plugin.settingTab?.update()
+                    if (requireApiVersion("1.13.0")) {
+                        plugin.settingTab?.update()			
+                    }
                 }))
             }
         }

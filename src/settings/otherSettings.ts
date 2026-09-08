@@ -1,4 +1,4 @@
-import { Setting, Notice, Platform, Modal } from 'obsidian';
+import { Setting, Notice, Platform, Modal, requireApiVersion } from 'obsidian';
 import { i18n } from 'src/localization/localization';
 import { DEFAULT_SETTINGS, PPSettingTab } from 'src/settings/settings';
 import { updateAutoHideProps, updateBannerStyles, updateCoverStyles, updateHiddenEmptyProperties, updateHiddenMetadataContainer, updateHiddenPropertiesInPropTab, updateHideMetadataAddButton, updateHidePropTitle, updateIconStyles, updatePillPaddings, updateRelativeDateColors } from 'src/updates/updateStyles';
@@ -212,7 +212,9 @@ export const getOtherSettingsDefinitions = (tab: PPSettingTab) => {
                         updateHidePropTitle(plugin)
                         updateHideMetadataAddButton(plugin)
                         updateAllProperties(plugin)
-                        tab.update();
+                        if (requireApiVersion("1.13.0")) {
+                            tab.update()			
+                        }
                         new Notice(i18n.t("CLEAR_SETTINGS_NOTICE"))
                     }))
             }

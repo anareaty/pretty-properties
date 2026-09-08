@@ -25,6 +25,8 @@ export default defineConfig([
       //"obsidianmd/sample-names": "off",
       // example: add a rule not in the recommended set and set its severity
       //"obsidianmd/prefer-file-manager-trash": "error",
+      "obsidianmd/no-unsupported-api": "error",
+      "obsidianmd/no-static-styles-assignment": "error",
       "no-undef": "off",
       "@typescript-eslint/unbound-method": "off",
       "@typescript-eslint/no-deprecated": "off"

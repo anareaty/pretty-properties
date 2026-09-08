@@ -27,13 +27,16 @@ export const patchEmbed = (plugin: PrettyPropertiesPlugin) => {
                 let view = old && old.apply(this, args) as EmbedMarkdownComponentExtended
                 
                     if (view.containerEl.classList.contains("canvas-node-content")) {
-                        (view.previewMode.renderer as ReadViewRendererExtended).onRender = new Proxy((view.previewMode.renderer as ReadViewRendererExtended).onRender, {
-                            apply(onRender, thisArg2) {
-                                let result = onRender.call(thisArg2)
-                                updateCoverForView(view, plugin)  
-                                return result
-                            }
-                        })
+
+                        const renderer = view.previewMode.renderer as ReadViewRendererExtended
+                        const old_renderer_onRender = renderer.onRender
+
+                        renderer.onRender = (...args2) => {
+                            let result = old_renderer_onRender.call(renderer, ...args2)
+                            updateCoverForView(view, plugin)  
+                            return result
+                        }
+
                     }
                 return view
             })

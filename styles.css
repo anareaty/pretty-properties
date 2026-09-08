@@ -1398,7 +1398,7 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
   line-height: normal;
 }
 
-.pp-pill-padding-all .metadata-input-longtext,
+.pp-pill-padding-all .metadata-input-longtext:not([data-property-value=""]),
 .pp-pill-padding-colored .metadata-input-longtext.colored,
 .pp-pill-padding-non-transparent .metadata-input-longtext.colored,
 
@@ -1650,9 +1650,10 @@ button.longtext-color-button:hover {
 
 
 
-.metadata-property-value .internal-link, .markdown-rendered .internal-link {
+.metadata-property-value .internal-link {
     cursor: var(--cursor-link);
-    text-decoration-line: var(--link-decoration);
+    /*text-decoration-line: var(--link-decoration);*/
+    text-decoration: var(--link-decoration);
     --font-weight: var(--link-weight);
     color: var(--link-color);
     transition: opacity var(--anim-duration-fast) ease-in-out;
@@ -1881,18 +1882,18 @@ button.bare-button {
 
 
 
-.markdown-source-view.mod-cm6 .pp-formatted-value-overlay .math-block > mjx-container {
+.markdown-source-view.mod-cm6 .pp-formatted-value-overlay .math-block > .MathJax {
   padding: 0; 
   font-size: 1.1em;
   
 }
 
-.pp-formatted-value-overlay mjx-container[jax="CHTML"] {
+.pp-formatted-value-overlay .MathJax[jax="CHTML"] {
   line-height: normal;
   font-size: 1.1em;
 }
 
-.pp-formatted-value-overlay mjx-container[jax="CHTML"][display="true"] {
+.pp-formatted-value-overlay .MathJax[jax="CHTML"][display="true"] {
     margin: 0;
 }
 

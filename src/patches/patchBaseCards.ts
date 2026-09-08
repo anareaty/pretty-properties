@@ -31,13 +31,14 @@ export const patchBaseCards = (plugin: PrettyPropertiesPlugin) => {
             return dedupe("pp-patch-base-cards-around-key", oldFactory, (...args) => {
             let view = oldFactory && oldFactory.apply(this, args) as CardsBasesView
 
-            view.updateVirtualDisplay = new Proxy(view.updateVirtualDisplay, {
-                apply(updateVirtualDisplay, thisArg2) {
-                    let update = updateVirtualDisplay.call(thisArg2)
-                    processBaseCardProperties(view, plugin)
-                    return update
-                }
-            })
+            let old_view_updateVirtualDisplay = view.updateVirtualDisplay
+
+            view.updateVirtualDisplay = (...args2) => {
+                let update = old_view_updateVirtualDisplay.call(view, args2)
+                processBaseCardProperties(view, plugin)
+                return update
+            }
+
             return view
             })
         }

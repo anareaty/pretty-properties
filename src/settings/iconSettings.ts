@@ -1,4 +1,4 @@
-import { Setting } from 'obsidian';
+import { Setting, requireApiVersion } from 'obsidian';
 import { i18n } from 'src/localization/localization';
 import {   
 	updateIconStyles
@@ -25,7 +25,9 @@ export const getIconSettingsDefinitions = (tab: PPSettingTab) => {
             .onChange(async (value) => {
                 plugin.settings.enableIcon = value
                 await plugin.saveSettings();
-                tab.update()
+                if (requireApiVersion("1.13.0")) {
+                    tab.update()			
+                }
                 updateAllIcons(plugin)
                 updateIconStyles(plugin);
             }));
@@ -167,7 +169,9 @@ export const getIconSettingsDefinitions = (tab: PPSettingTab) => {
             .setIcon("rotate-ccw")
             .onClick(async (e) => {
                 plugin.settings.iconColor = ""
-                tab.update()
+                if (requireApiVersion("1.13.0")) {
+                    tab.update()			
+                }
                 await plugin.saveSettings();
                 updateIconStyles(plugin);
                 
@@ -191,7 +195,9 @@ export const getIconSettingsDefinitions = (tab: PPSettingTab) => {
             .setIcon("rotate-ccw")
             .onClick(async (e) => {
                 plugin.settings.iconColorDark = ""
-                tab.update()
+                if (requireApiVersion("1.13.0")) {
+                    tab.update()			
+                }
                 await plugin.saveSettings();
                 updateIconStyles(plugin);
                 

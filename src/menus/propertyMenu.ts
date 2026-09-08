@@ -1,4 +1,4 @@
-import { Menu, MenuItem } from "obsidian";
+import { Menu, MenuItem, requireApiVersion } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { i18n } from "src/localization/localization";
 import { updateHiddenProperties } from "src/updates/updateHiddenProperties";
@@ -25,7 +25,9 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                     }
                     await plugin.saveSettings();
                     updateHiddenProperties(plugin);
-                    plugin.settingTab?.update()
+                    if (requireApiVersion("1.13.0")) {
+                        plugin.settingTab?.update()			
+                    }
                 }));
 
         } else {
@@ -42,7 +44,9 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                         );
                     await plugin.saveSettings();
                     updateHiddenProperties(plugin);
-                    plugin.settingTab?.update()
+                    if (requireApiVersion("1.13.0")) {
+                        plugin.settingTab?.update()			
+                    }
                 }));
         }
 
@@ -60,7 +64,9 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                     }
                     await plugin.saveSettings();
                     updateHiddenProperties(plugin);
-                    plugin.settingTab?.update()
+                    if (requireApiVersion("1.13.0")) {
+                        plugin.settingTab?.update()			
+                    }
                 }));
 
         } else {
@@ -77,7 +83,9 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                         );
                     await plugin.saveSettings();
                     updateHiddenProperties(plugin);
-                    plugin.settingTab?.update()
+                    if (requireApiVersion("1.13.0")) {
+                        plugin.settingTab?.update()			
+                    }
                 }));
         }
 
@@ -113,7 +121,9 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                         plugin.settings.markdownProperties = markdownProperties.filter(p => p.toLowerCase() != propName.toLowerCase())
                         await plugin.saveSettings();
                         updateAllProperties(plugin);
-                        plugin.settingTab?.update()
+                        if (requireApiVersion("1.13.0")) {
+                            plugin.settingTab?.update()			
+                        }
                     })  
                 );
             } else if (propertyType == "text" || (propertyFormatObj && propertyFormatObj.format)) {
@@ -126,7 +136,9 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                         plugin.settings.markdownProperties.push(propName)
                         await plugin.saveSettings();
                         updateAllProperties(plugin);
-                        plugin.settingTab?.update()
+                        if (requireApiVersion("1.13.0")) {
+                            plugin.settingTab?.update()			
+                        }
                     })  
                 );
             }

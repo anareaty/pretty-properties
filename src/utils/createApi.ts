@@ -73,9 +73,9 @@ export class API {
     setPPColorStyles (el: HTMLElement, propName: string, propValue: string) {
         let bgColor = this.getPropertyBackgroundColorValue(propName, propValue)
         let textColor = this.getPropertyTextColorValue(propName, propValue)
-        el.setCssProps({
-            "background-color": bgColor,
-            "color": textColor
+        el.setCssStyles({
+            backgroundColor: bgColor,
+            color: textColor
         })
 
         
@@ -83,15 +83,15 @@ export class API {
 
     setPPTextColor (el: HTMLElement, propName: string, propValue: string) {
         let textColor = this.getPropertyTextColorValue(propName, propValue)
-        el.setCssProps({
-            "color": textColor
+        el.setCssStyles({
+            color: textColor
         })
     }
 
     setPPBackgroundColor (el: HTMLElement, propName: string, propValue: string) {
         let bgColor = this.getPropertyBackgroundColorValue(propName, propValue)
-        el.setCssProps({
-            "background-color": bgColor
+        el.setCssStyles({
+            backgroundColor: bgColor
         })
     }
 }

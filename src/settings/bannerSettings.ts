@@ -1,4 +1,4 @@
-import { Setting } from 'obsidian';
+import { Setting, requireApiVersion } from 'obsidian';
 import { i18n } from 'src/localization/localization';
 import { 
 	updateBannerStyles,  
@@ -29,7 +29,9 @@ export const getBannerSettingsDefinitions = (tab: PPSettingTab) => {
                     .onChange(async (value) => {
                         plugin.settings.enableBanner = value
                         await plugin.saveSettings();
-                        tab.update()
+                        if (requireApiVersion("1.13.0")) {
+                            tab.update()			
+                        }
                         updateAllBanners(plugin);
                         updateBannerStyles(plugin);
                     }));

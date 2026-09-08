@@ -22,13 +22,14 @@ export const patchTagView = (plugin: PrettyPropertiesPlugin) => {
           return dedupe("pp-patch-tag-view-around-key", oldTag, (...args) => {
             let view = oldTag && oldTag.apply(this, args) as TagViewExtended
 
-            view.requestUpdateTags = new Proxy(view.requestUpdateTags, {
-              apply(requestUpdateTags, thisArg2) {
-                let update = requestUpdateTags.call(thisArg2)
-                updateTagPaneTags(view.containerEl, plugin)   
-                return update
-              }
-            })
+
+            const old_requestUpdateTags = view.requestUpdateTags
+
+            view.requestUpdateTags = (...args2) => {
+              let update = old_requestUpdateTags.call(view, ...args2)
+              updateTagPaneTags(view.containerEl, plugin)   
+              return update
+            }
 
             view.updateTags()
             let tagDoms = view.tagDoms

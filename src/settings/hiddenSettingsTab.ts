@@ -1,4 +1,4 @@
-import { Setting } from 'obsidian';
+import { Setting, requireApiVersion } from 'obsidian';
 import { i18n } from 'src/localization/localization';
 import { PPSettingTab } from 'src/settings/settings';
 import { 
@@ -121,7 +121,9 @@ export const getHiddenSettingsDefinitions = (tab: PPSettingTab) => {
                                     plugin.settings.hiddenProperties.push(newProperty)
                                     await plugin.saveSettings()
                                     updateHiddenProperties(plugin)
-                                    tab.update()
+                                    if (requireApiVersion("1.13.0")) {
+                                        tab.update()			
+                                    }
                                 }
                             }).open()
                         }
@@ -130,7 +132,9 @@ export const getHiddenSettingsDefinitions = (tab: PPSettingTab) => {
                         plugin.settings.hiddenProperties.splice(idx, 1);
                         await plugin.saveSettings();
                         updateHiddenProperties(plugin)
-                        tab.update();
+                        if (requireApiVersion("1.13.0")) {
+                            tab.update()			
+                        }
                     },
                     items: plugin.settings.hiddenProperties.map(property => ({
                         name: property,
@@ -155,7 +159,9 @@ export const getHiddenSettingsDefinitions = (tab: PPSettingTab) => {
                                     plugin.settings.hiddenWhenEmptyProperties.push(newProperty)
                                     await plugin.saveSettings()
                                     updateHiddenProperties(plugin)
-                                    tab.update()
+                                    if (requireApiVersion("1.13.0")) {
+                                        tab.update()			
+                                    }
                                 }
                             }).open()
                         }
@@ -164,7 +170,9 @@ export const getHiddenSettingsDefinitions = (tab: PPSettingTab) => {
                         plugin.settings.hiddenWhenEmptyProperties.splice(idx, 1);
                         await plugin.saveSettings();
                         updateHiddenProperties(plugin)
-                        tab.update();
+                        if (requireApiVersion("1.13.0")) {
+                            tab.update()			
+                        }
                     },
                     items: plugin.settings.hiddenWhenEmptyProperties.map(property => ({
                         name: property,

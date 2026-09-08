@@ -1,4 +1,4 @@
-import { TFile, CachedMetadata, MarkdownView, BasesView, HoverPopover } from "obsidian";
+import { TFile, CachedMetadata, MarkdownView, BasesView, HoverPopover, requireApiVersion } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { renderCover, updateCoverForView } from "./updateCovers";
 import { renderIcon, updateIconForView } from "./updateIcons";
@@ -119,69 +119,73 @@ export const updateAllProperties = (plugin:PrettyPropertiesPlugin) => {
           
 
 
-            
+            if (requireApiVersion("1.10.0")) {
+                let baseViewType = baseView.type
 
-            if (baseView.type == "table") {
+                if (baseViewType == "table") {
 
-                let tableBaseView = baseView as unknown as TableBasesView
-
-                
-                for (let row of tableBaseView.rows) {
-                    for (let cell of row.cells) {
-
-
-                        let propertyEditor = cell.renderer.propertyEditor
-
-                        if (propertyEditor) {
-                            let type = cell.renderer.inferredType.type
-                            let value: string | string[] | number | boolean | null | undefined
+                    let tableBaseView = baseView as unknown as TableBasesView
+    
+                    
+                    for (let row of tableBaseView.rows) {
+                        for (let cell of row.cells) {
+    
+    
+                            let propertyEditor = cell.renderer.propertyEditor
+    
+                            if (propertyEditor) {
+                                let type = cell.renderer.inferredType.type
+                                let value: string | string[] | number | boolean | null | undefined
+                                
+                                let ctx = {
+                                    key: cell.prop.replace("note.", ""),
+                                    sourcePath: cell.renderer.entry.file.path
+                                }
+                                
+                                if (propertyEditor.type == "multitext" || propertyEditor.type == "tags" || propertyEditor.type == "aliases") {
+                                    let rendered = propertyEditor as MultitextPropertyWidgetComponent | AliasesPropertyWidgetComponent | TagsPropertyWidgetComponent
+                                    value = rendered.multiselect?.values
+                                } else if (propertyEditor.type == "text" || propertyEditor.type == "datetime") {
+                                    let rendered = propertyEditor as TextPropertyWidgetComponent | DatePropertyWidgetComponentBase
+                                    value = rendered.value
+                                } else if (propertyEditor.type == "number" || propertyEditor.type == "checkbox") {
+                                    value = cell.renderer.val
+                                } 
+    
+    
+                                
+    
                             
-                            let ctx = {
-                                key: cell.prop.replace("note.", ""),
-                                sourcePath: cell.renderer.entry.file.path
+                                updateWidgets(type, propertyEditor, [cell.renderer.el, value, ctx], plugin)
+    
+    
+    
+                                
+    
+                            } else {
+                                processBaseTableCellTags(cell, plugin)
                             }
-                            
-                            if (propertyEditor.type == "multitext" || propertyEditor.type == "tags" || propertyEditor.type == "aliases") {
-                                let rendered = propertyEditor as MultitextPropertyWidgetComponent | AliasesPropertyWidgetComponent | TagsPropertyWidgetComponent
-                                value = rendered.multiselect?.values
-                            } else if (propertyEditor.type == "text" || propertyEditor.type == "datetime") {
-                                let rendered = propertyEditor as TextPropertyWidgetComponent | DatePropertyWidgetComponentBase
-                                value = rendered.value
-                            } else if (propertyEditor.type == "number" || propertyEditor.type == "checkbox") {
-                                value = cell.renderer.val
-                            } 
-
-
-                            
-
-                        
-                            updateWidgets(type, propertyEditor, [cell.renderer.el, value, ctx], plugin)
-
-
-
-                            
-
-                        } else {
-                            processBaseTableCellTags(cell, plugin)
                         }
                     }
                 }
+    
+                else if (baseViewType == "cards") {
+                    let cardsBaseView = baseView as unknown as CardsBasesView
+                    processBaseCardProperties(cardsBaseView, plugin)
+                }
+    
+                else if (baseViewType == "kanban") {
+                    let kanbanBaseView = baseView as unknown as KanbanBasesView
+                    processBaseKanbanProperties(kanbanBaseView, plugin)
+                }
+    
+                else if (baseViewType == "list") {
+                    let listBaseView = baseView as unknown as ListBasesView
+                    processBaseListProperties(listBaseView, plugin)
+                }
             }
 
-            else if (baseView.type == "cards") {
-                let cardsBaseView = baseView as unknown as CardsBasesView
-                processBaseCardProperties(cardsBaseView, plugin)
-            }
-
-            else if (baseView.type == "kanban") {
-                let kanbanBaseView = baseView as unknown as KanbanBasesView
-                processBaseKanbanProperties(kanbanBaseView, plugin)
-            }
-
-            else if (baseView.type == "list") {
-                let listBaseView = baseView as unknown as ListBasesView
-                processBaseListProperties(listBaseView, plugin)
-            }
+            
         }
 
         

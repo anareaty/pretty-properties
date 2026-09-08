@@ -1,4 +1,4 @@
-import { Menu, Setting, moment } from 'obsidian';
+import { Menu, Setting, moment, requireApiVersion } from 'obsidian';
 import { i18n } from 'src/localization/localization';
 import { updateAllProperties } from 'src/updates/updateElements';
 import { PPSettingTab, PillColorSettings } from 'src/settings/settings';
@@ -42,7 +42,9 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
                         plugin.settings.enableColoredProperties = value
                         await plugin.saveSettings()
                         updateAllProperties(plugin);
-                        tab.update()
+                        if (requireApiVersion("1.13.0")) {
+                            tab.update()			
+                        }
                     })
                 });
             }
@@ -63,7 +65,9 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
                                 if (newProperty && !plugin.settings.propertyColors[newProperty]) {
                                     plugin.settings.propertyColors[newProperty] = {}
                                     await plugin.saveSettings()
-                                    tab.update()
+                                    if (requireApiVersion("1.13.0")) {
+                                        tab.update()			
+                                    }
                                 }
                             }).open()
                         }
@@ -72,7 +76,9 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
                         let key = propertyColorsKeys[idx] || ""
                         delete plugin.settings.propertyColors[key]
                         await plugin.saveSettings();
-                        tab.update();
+                        if (requireApiVersion("1.13.0")) {
+                            tab.update()			
+                        }
 
                     },
                     items: propertyColorsKeys.map(propName => ({
@@ -89,7 +95,9 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
                                             if (newValue && !plugin.settings.propertyColors[propName]![newValue]) {
                                                 plugin.settings.propertyColors[propName]![newValue] = {}
                                                 await plugin.saveSettings()
-                                                tab.update()
+                                                if (requireApiVersion("1.13.0")) {
+                                                    tab.update()			
+                                                }
                                             }
                                         }).open()
                                     }
@@ -98,7 +106,9 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
                                     let key = Object.keys(plugin.settings.propertyColors[propName]!)[idx] || ""
                                     delete plugin.settings.propertyColors[propName]![key]
                                     await plugin.saveSettings();
-                                    tab.update();
+                                    if (requireApiVersion("1.13.0")) {
+                                        tab.update()			
+                                    }
                                 },
                                 items: Object.keys(plugin.settings.propertyColors[propName]!).map((propVal) => ({
                                     name: propVal,

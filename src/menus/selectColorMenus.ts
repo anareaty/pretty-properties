@@ -1,4 +1,4 @@
-import { HSL, Menu, MenuItem, setIcon } from "obsidian";
+import { HSL, Menu, MenuItem, setIcon, requireApiVersion } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { i18n } from "src/localization/localization";
 import { ColorPickerModal } from "src/modals/colorPickerModal";
@@ -36,7 +36,9 @@ export const propertyColorSaveCallback = async (
     plugin.settings.propertyColors[propName][propVal] = pillColorSettings
     await plugin.saveSettings();
     updateAllProperties(plugin)
-    plugin.settingTab?.update()
+    if (requireApiVersion("1.13.0")) {
+        plugin.settingTab?.update()			
+    }
 }
 
 
@@ -49,7 +51,9 @@ export const dateColorSaveCallback = async (
     plugin.settings.dateColors[relativeVal] = pillColorSettings
     await plugin.saveSettings();
     updateAllProperties(plugin)
-    plugin.settingTab?.update()
+    if (requireApiVersion("1.13.0")) {
+        plugin.settingTab?.update()			
+    }
     updateRelativeDateColors(plugin) 
 }
 

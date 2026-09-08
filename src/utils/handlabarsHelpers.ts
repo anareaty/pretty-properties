@@ -406,7 +406,7 @@ export const registerCustomHelpers = (handlebars: typeof Handlebars) => {
             momentObj = date.clone();
         } else {
             let momentFn = params.utc ? moment.utc : moment;
-            momentObj = momentFn(date, params.input as boolean | undefined);
+            momentObj = momentFn(date, params.input);
         }
 
 
@@ -604,7 +604,7 @@ export const registerCustomHelpers = (handlebars: typeof Handlebars) => {
     if (hasKey(durationObj, method)) {
         const durationMethod = durationObj[method]  as (m: typeof methodArg) => string
         if (typeof durationMethod === "function") {
-            durationOutput = (durationMethod as (methodArg: string | undefined) => string).call(durationObj, methodArg);
+            durationOutput = durationMethod.call(durationObj, methodArg);
         }
     } 
 

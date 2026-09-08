@@ -30,7 +30,7 @@ export const patchMetadataSuggester = (plugin: PrettyPropertiesPlugin) => {
 
         let textInputEl = this.textInputEl
 
-        if (textInputEl instanceof HTMLElement) {
+        if (textInputEl.instanceOf(HTMLElement)) {
             let metadataEl = textInputEl.closest(".metadata-property-value")
             let propertyEl = textInputEl.closest(".metadata-property")
             let basePropertyEl = textInputEl.closest(".bases-td")

@@ -22,25 +22,38 @@ export const patchHoverPopover = (plugin: PrettyPropertiesPlugin) => {
           if (embed.containerEl?.classList.contains("markdown-embed")) {
             updateImagesInPopover(this, plugin)
 
-            if (embed.previewMode) {
-              embed.previewMode.onRenderComplete = new Proxy(embed.previewMode.onRenderComplete, {
-                apply(old2, thisArg2) {
-                  let popover = getPopover()
-                  updateImagesInPopover(popover, plugin)
-                  return old2.call(thisArg2)
-                }
-              })
+            const previewMode = embed.previewMode
+
+            if (previewMode) {
+
+              const old_onRenderComplete = previewMode.onRenderComplete
+
+              previewMode.onRenderComplete = (...args2) => {
+                let popover = getPopover()
+                updateImagesInPopover(popover, plugin)
+                return old_onRenderComplete.call(previewMode, ...args2)
+              }
+
             }
             
             if (embed.showEditor) {
-              embed.showEditor = new Proxy(embed.showEditor, {
-                apply(old2, thisArg2, args2: {x: number, y: number}[]) {
-                  let result = old2.call(thisArg2, ...args2)
-                  let popover = getPopover()
-                  updateImagesInPopover(popover, plugin)
-                  return result
-                }
-              })
+
+              const old_showEditor = embed.showEditor
+
+              embed.showEditor = (...args2) => {
+                let result = old_showEditor.call(embed, ...args2)
+                let popover = getPopover()
+                updateImagesInPopover(popover, plugin)
+                return result
+              }
+
+
+
+
+
+
+
+
             }
           }
         }
