@@ -1424,11 +1424,25 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 
 }
 
+
+/*
+
 .colored-dates:is(.pp-pill-padding-all, .pp-pill-padding-colored, .pp-pill-padding-non-transparent) 
   .metadata-property-value:not(.has-custom-date) .metadata-input.mod-date,
 .colored-dates:is(.pp-pill-padding-all, .pp-pill-padding-colored, .pp-pill-padding-non-transparent) 
   .metadata-property-value:not(.has-custom-date) .metadata-input.mod-datetime {
   margin: 0 8px;
+}
+
+*/
+
+
+
+
+
+
+.metadata-input-text.mod-datetime {
+    padding-inline-end: 0;
 }
 
 

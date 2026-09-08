@@ -48,7 +48,7 @@ export const updatePropertyFormatting = (
     el.classList.remove("has-property-formatting")
     
 
-    if (!propertyFormat) return
+    if (!propertyFormat || !value) return
 
     let overlayElement = createSpan()
     overlayElement.classList.add("pp-formatted-value-overlay")

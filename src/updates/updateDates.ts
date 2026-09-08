@@ -38,7 +38,7 @@ export const updateDateInput = (input: HTMLInputElement, plugin: PrettyPropertie
 		let existingCustomDateElement = parent.querySelector(".custom-date")
 
 
-		if (plugin.settings.enableCustomDateFormat && 
+		if (value && plugin.settings.enableCustomDateFormat && 
 			(customDateFormat || propertyFormatObj.format) && 
 			(!isBase || plugin.settings.enableCustomDateFormatInBases || propertyFormatObj.format)) {
 
@@ -164,7 +164,7 @@ export const updateDateTimeInput = (input: HTMLInputElement, plugin: PrettyPrope
 		let existingCustomDateElement = parent.querySelector(".custom-date")
 
 
-		if (plugin.settings.enableCustomDateFormat && 
+		if (value && plugin.settings.enableCustomDateFormat && 
 			(customDateTimeFormat || propertyFormatObj.format) && 
 			(!isBase || plugin.settings.enableCustomDateFormatInBases || propertyFormatObj.format)) {
 
