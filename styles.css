@@ -1339,7 +1339,7 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 
 
 
-.metadata-property-value .multi-select-pill {
+.metadata-property-value .multi-select-pill.colored {
   --pill-border-width: var(--tag-border-width);
 }
 
@@ -1354,6 +1354,8 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
   --pill-color-remove-hover: var(--pp-color);
   --pill-background: var(--pp-bg);
   --pill-background-hover: var(--pp-bg-hov);
+  --pill-border-width: var(--tag-border-width);
+
 }
 
 

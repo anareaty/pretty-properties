@@ -1,7 +1,6 @@
 /* Here we are using some helpers from https://www.npmjs.com/package/handlebars.moment */
 /* but rewritten to work better with Obsidian */
 
-import lodash from "lodash"
 import { moment } from "obsidian";
 import momentDurationFormatSetup from "moment-duration-format";
 
@@ -98,217 +97,9 @@ function hasKey<T extends object>(obj: T, key: string): key is Extract<keyof T, 
 export const registerCustomHelpers = (handlebars: typeof Handlebars) => {
 
 
-
-    /*
     handlebars.registerHelper("moment", function(...args) {
         let options = args.pop() as {hash: {
-            params?: string,
-            date?: string | number,
-            max?: string, 
-            unixmax?: string,
-            min?: string,
-            unixmin?: string,
-            unix?: string,
-            format?: string,
-            fn?: string,
-            startOf?: moment.unitOfTime.StartOf,
-            startof?: moment.unitOfTime.StartOf,
-            endOf?: moment.unitOfTime.StartOf,
-            endof?: moment.unitOfTime.StartOf,
-            type?: string | null,
-            utc?: string,
-            input?: string,
-            suffix?: string,
-            nosuffix?: boolean,
-            from?: string,
-            unixfrom?: string,
-            diff?: string,
-            unixdiff?: string,
-            unitdiff?: string,
-            amount?: string,
-            local?: string,
-            add?: string,
-            addparam?: string,
-            subtract?: string,
-            subtractparam?: string,
-
-        }}
-        let date = args.shift() as string | number | undefined
-        let format = args.shift() as string | undefined
-        let formatParams = args.shift() as number | boolean | undefined
-        let formatParams1 = args.shift() as string | boolean | undefined
-        let formatParams2 = args.shift() as boolean | undefined
-
-
-        if (options.hash && options.hash.params) {
-            options.hash = lodash.extend({}, options.hash.params, options.hash);
-            delete options.hash.params;
-        }
-        let params = options.hash;
-        
-        if (!date) {
-            date = params.date;
-        }
-
-
-
-        function marshallDate (date: unknown, unix: unknown): number | undefined {
-            let resultDate
-            if (typeof date === "string" && date.match(/^\d+(\.\d+){0,1}$/)) {
-                resultDate = +date;
-            }
-            if (unix && typeof resultDate === "number") {
-                resultDate = resultDate * 1000;
-            }
-            return resultDate;
-        }
-
-        date = marshallDate(date, params.unix);
-
-
-
-        
-        let max = marshallDate(params.max, params.unixmax);
-        let min = marshallDate(params.min, params.unixmin);
-
-        if (!format) {
-            format = params.format || params.fn;
-        }
-        if (format && momentFormatMap[format]) {
-            format = momentFormatMap[format];
-        }
-        if (format === "weekday") {
-            params.type = typeof params.type == "string" ? params.type.toUpperCase() : null;
-            if (params.type !== "NUMBER") {
-                if (params.type && weekdayMap[params.type]) {
-                    format = weekdayMap[params.type];
-                } else {
-                    format = weekdayMap.L;
-                }
-            }
-        }
-
-        let ofMethod = "start";
-        let ofType = params.startOf || params.startof;
-        if (!ofType) {
-            ofType = params.endOf || params.endof;
-            if (ofType) {
-                ofMethod = "end";
-            }
-        }
-
-
-        let momentObj: moment.Moment
-
-        if (moment.isMoment(date)) {
-            momentObj = date.clone();
-        } else {
-            let momentFn = params.utc ? moment.utc : moment;
-            momentObj = momentFn(date, params.input as boolean | undefined);
-        }
-
-
-        if (max) {
-            momentObj = moment.max(moment(max), momentObj);
-        }
-        if (min) {
-            momentObj = moment.min(moment(min), momentObj);
-        }
-
-        if (ofType) {
-            if (ofMethod == "start") {
-                momentObj = momentObj.startOf(ofType)
-            } else if (ofMethod == "end") {
-                momentObj = momentObj.endOf(ofType)
-            }
-        }
-
-        if (params.nosuffix === undefined && params.suffix !== undefined) {
-            params.nosuffix = !params.suffix;
-        }
-
-        if (params.from) {
-            format = "from";
-            formatParams = marshallDate(params.from, params.unixfrom);
-        }
-        if (format === "fromNow") {
-            if (formatParams === undefined) {
-                formatParams = params.nosuffix;
-            }
-        }
-        if (format === "from") {
-            if (formatParams1 === undefined) {
-                formatParams1 = params.nosuffix;
-            }
-        }
-        if (params.diff) {
-            format = "diff";
-            formatParams = marshallDate(params.diff, params.unixdiff);
-        }
-        if (format === "diff") {
-            if (formatParams1 === undefined) {
-                formatParams1 = params.unitdiff;
-            }
-            if (formatParams2 === undefined) {
-                formatParams2 = params.nosuffix;
-            }
-        }
-
-        function manipulateMoment(method: "add" | "subtract") {
-            let arg = params[method];
-
-
-            if (arg) {
-
-                let argParam = params[method + "param" as "addparam" | "subtractparam"];
-                if (argParam === undefined) {
-                    argParam = params.amount;
-                }
-                let args: string | Record<string, number> = arg;
-                if (argParam) {
-                    let addNum = +arg;
-                    args = {};
-                    if (isNaN(addNum)) {
-                        args[arg] = +argParam;
-                    } else {
-                        args[argParam] = addNum;
-                    }
-                }
-                momentObj[method](args);
-            }
-        }
-        manipulateMoment("add");
-        manipulateMoment("subtract");
-
-        if (params.local) {
-            momentObj.local();
-        } else if (params.utc) {
-            momentObj.utc();
-        }
-
-        let momentOutput = ""
-
-
-        if (format && hasKey(momentObj, format)) {
-            let getMomentOutput = momentObj[format] as (f: typeof formatParams, f1: typeof formatParams1, f2: typeof formatParams2) => string
-            momentOutput = getMomentOutput(formatParams, formatParams1, formatParams2)
-        } else {
-            momentOutput = momentObj.format(format)
-        }
-
-
-        return momentOutput;
-    });
-
-    */
-
-
-
-
-
-    handlebars.registerHelper("moment", function(...args) {
-        let options = args.pop() as {hash: {
-            params?: string,
+            params?: Record<string, any>,
             date?: string | number,
             max?: string, 
             unixmax?: string,
@@ -346,7 +137,7 @@ export const registerCustomHelpers = (handlebars: typeof Handlebars) => {
         let formatParams2 = args.shift() as boolean | undefined
 
         if (options.hash && options.hash.params) {
-            options.hash = lodash.extend({}, options.hash.params, options.hash);
+            options.hash = { ...(options.hash?.params || {}), ...(options.hash || {}) }
             delete options.hash.params;
         }
         let params = options.hash;
@@ -519,28 +310,30 @@ export const registerCustomHelpers = (handlebars: typeof Handlebars) => {
     handlebars.registerHelper("duration", function(...args) {
 
     const options = args.pop() as {hash: {
-                params?: string,
-                duration: string,
-                input?: moment.DurationInputArg2,
-                add?: string,
-                addparam?: moment.DurationInputArg2,
-                addunit?: moment.DurationInputArg2,
-                subtract?: string,
-                subtractparam?: moment.DurationInputArg2,
-                subtractunit?: moment.DurationInputArg2,
-                method?: string,
-                as?: string,
-                get?: string,
-                suffix?: string,
-            }
+            params?: Record<string, any>,
+            duration: string,
+            input?: moment.DurationInputArg2,
+            add?: string,
+            addparam?: moment.DurationInputArg2,
+            addunit?: moment.DurationInputArg2,
+            subtract?: string,
+            subtractparam?: moment.DurationInputArg2,
+            subtractunit?: moment.DurationInputArg2,
+            method?: string,
+            as?: string,
+            get?: string,
+            suffix?: string,
         }
+    }
     
     let duration = args.shift() as string | number | undefined
     let method = args.shift() as string | undefined
     let methodArg = args.shift() as string | undefined
 
     if (options.hash && options.hash.params) {
-        options.hash = lodash.extend({}, options.hash.params, options.hash);
+        options.hash = { ...(options.hash?.params || {}), ...(options.hash || {}) }
+
+
         delete options.hash.params;
     }
     
