@@ -42,7 +42,7 @@ import { patchMetadataSuggester } from "./patches/patchMetadataSuggester";
 import { patchBaseKanban } from "./patches/patchBaseKanban";
 import { MarkdownRenderChild } from "obsidian";
 import { clearUnusedRenderComponents } from "./updates/updatePropertyFormattings";
-import { migrateColorSettings, migrateCoverSettings } from "./utils/settingsMigration";
+import { migrateColorSettings, migrateCoverProperties, migrateCoverSettings } from "./utils/settingsMigration";
 
 type Patch = () => void
 type PatchList = Record<string, Patch>
@@ -228,6 +228,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		// We need to reload all tabs to update existing properties
 		this.app.workspace.onLayoutReady(async () => {
 			await migrateColorSettings(this)
+			await migrateCoverProperties(this)
 			reloadAllTabs(this)
 		})
 		

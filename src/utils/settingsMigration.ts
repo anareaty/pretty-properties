@@ -1,6 +1,7 @@
 import PrettyPropertiesPlugin from "src/main"
 import { getPropertyType } from "./propertyUtils";
 import { DEFAULT_SETTINGS, PPPluginSettings } from "src/settings/settings";
+import { FrontMatterCache } from "obsidian";
 
 
 export const migrateColorSettings = async (plugin:PrettyPropertiesPlugin) => {
@@ -69,4 +70,89 @@ export const migrateCoverSettings = async (data: PPPluginSettings, plugin: Prett
         }
         await plugin.saveData(data);
     }
+}
+
+
+
+
+
+export const migrateCoverProperties = async (plugin: PrettyPropertiesPlugin) => {
+
+    if (plugin.settings.coverClassesMigrated) return
+
+    let files = plugin.app.vault.getMarkdownFiles()
+    for (let file of files) {
+        await plugin.app.fileManager.processFrontMatter(file, (fm: FrontMatterCache) => {
+
+            let cssclasses = fm.cssclasses as string[] | null
+
+            if (Array.isArray(cssclasses)) {
+                
+                if (cssclasses.includes("cover-vertical")) {
+                    fm.cover_shape = "vertical-cover"
+
+                }
+
+                if (cssclasses.includes("cover-vertical-cover")) {
+                    fm.cover_shape = "vertical-cover"
+                }
+
+                if (cssclasses.includes("cover-vertical-contain")) {
+                    fm.cover_shape = "vertical-contain"
+                }
+
+                if (cssclasses.includes("cover-horizontal")) {
+                    fm.cover_shape = "horizontal-cover"
+                }
+
+                if (cssclasses.includes("cover-horizontal-cover")) {
+                    fm.cover_shape = "horizontal-cover"
+                }
+
+                if (cssclasses.includes("cover-horizontal-contain")) {
+                    fm.cover_shape = "horizontal-contain"
+                }
+
+                if (cssclasses.includes("cover-square")) {
+                    fm.cover_shape = "square"
+                }
+
+                if (cssclasses.includes("cover-circle")) {
+                    fm.cover_shape = "circle"
+                }
+
+
+                if (cssclasses.includes("cover-initial")) {
+                    fm.cover_shape = "initial"
+                }
+
+                if (cssclasses.includes("cover-initial-width-2")) {
+                    fm.cover_shape = "initial-2"
+                }
+
+                if (cssclasses.includes("cover-initial-width-3")) {
+                    fm.cover_shape = "initial-3"
+                }
+
+                if (cssclasses.includes("cover-left")) {
+                    fm.cover_position = "left"
+                }
+
+                if (cssclasses.includes("cover-right")) {
+                    fm.cover_position = "right"
+                }
+
+                if (cssclasses.includes("cover-top")) {
+                    fm.cover_position = "top"
+                }
+
+                if (cssclasses.includes("cover-bottom")) {
+                    fm.cover_position = "bottom"
+                }
+            }
+        })
+    }
+
+    plugin.settings.coverClassesMigrated = true
+    plugin.saveSettings()
 }

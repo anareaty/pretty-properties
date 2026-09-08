@@ -92,7 +92,6 @@ export interface PPPluginSettings {
 	hidePropertiesInPropTab: boolean;
 	mathProperties: string[];
 	enableMath: boolean;
-	dataVersion: number;
 	dateColors: Record<string, PillColorSettings>;
 	coverPosition: string;
 	enableBannersInPopover: boolean;
@@ -113,6 +112,7 @@ export interface PPPluginSettings {
 	dontShowColorMigrationMessage: boolean;
 	propertyColors: Record<string, Record<string, PillColorSettings>>;
 	propertyColorSettingRevealed: string
+	coverClassesMigrated: boolean
 }
 
 
@@ -194,7 +194,6 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	hidePropertiesInPropTab: false,
 	mathProperties: [],
 	enableMath: false,
-	dataVersion: 0,
 	dateColors: {
 		past: {
 			pillColor: "default",
@@ -227,8 +226,8 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	hideAddPropertyButton: false,
 	dontShowColorMigrationMessage: false,
 	propertyColors: {},
-	propertyColorSettingRevealed: ""
-
+	propertyColorSettingRevealed: "",
+	coverClassesMigrated: false
 }
 
 
