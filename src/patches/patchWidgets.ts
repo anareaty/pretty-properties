@@ -256,7 +256,10 @@ export const patchPropertyWidgets = (plugin: PrettyPropertiesPlugin) => {
               let multiRendered = rendered as MultitextPropertyWidgetComponent
 
               const multiselect = multiRendered.multiselect
-              const old_renderValues = multiselect.renderValues
+
+
+              const untypedMultiselect = (multiselect as unknown) as Record<string, unknown>
+              const old_renderValues = untypedMultiselect.renderValues as (...args: unknown[]) => unknown
 
               multiselect.renderValues = (...args2) => {
                 old_renderValues.call(multiselect, ...args2)

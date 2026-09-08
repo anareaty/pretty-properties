@@ -54,7 +54,8 @@ export const patchMarkdownView = (plugin: PrettyPropertiesPlugin) => {
         if (metadataEditor && !metadataEditor.pp_patched) {
           metadataEditor.pp_patched = true
 
-          const old_metadataEditor_save = metadataEditor.save
+          const untypedMetadataEditor = (metadataEditor as unknown) as Record<string, unknown>
+          const old_metadataEditor_save = untypedMetadataEditor.save as (...args: unknown[]) => unknown
 
           metadataEditor.save = (...args2) => {
             let result = old_metadataEditor_save.call(metadataEditor, ...args2);
@@ -68,7 +69,10 @@ export const patchMarkdownView = (plugin: PrettyPropertiesPlugin) => {
         // Update images after the view is completely rendered
 
         const previewMode = this.previewMode
-        const old_onRenderComplete = previewMode.onRenderComplete
+
+
+        const untypedPreviewMode = (previewMode as unknown) as Record<string, unknown>
+        const old_onRenderComplete = untypedPreviewMode.onRenderComplete as (...args: unknown[]) => unknown
 
 
         previewMode.onRenderComplete = (...args2) => {
@@ -85,7 +89,9 @@ export const patchMarkdownView = (plugin: PrettyPropertiesPlugin) => {
         // Update title icon if needed
 
         const editMode = this.editMode
-        const old_editMode_show = editMode.show
+        const untypedEditMode = (editMode as unknown) as Record<string, unknown>
+        const old_editMode_show = untypedEditMode.show as (...args: unknown[]) => unknown
+
 
         editMode.show = (...args2) => {
           let result = old_editMode_show.call(editMode, ...args2) 

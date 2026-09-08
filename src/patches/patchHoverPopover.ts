@@ -26,22 +26,20 @@ export const patchHoverPopover = (plugin: PrettyPropertiesPlugin) => {
 
             if (previewMode) {
 
-              //const old_onRenderComplete = previewMode.onRenderComplete
-
-              const old_onRenderComplete = previewMode.onRenderComplete as (this: unknown, ...args: unknown[]) => unknown
-
+              const untypedPreviewMode = (previewMode as unknown) as Record<string, unknown>
+              const old_onRenderComplete = untypedPreviewMode.onRenderComplete as (...args: unknown[]) => unknown
 
               previewMode.onRenderComplete = (...args2) => {
                 let popover = getPopover()
                 updateImagesInPopover(popover, plugin)
                 return old_onRenderComplete.call(previewMode, ...args2)
               }
-
             }
             
             if (embed.showEditor) {
 
-              const old_showEditor = embed.showEditor
+              const untypedEmbed = (embed as unknown) as Record<string, unknown>
+              const old_showEditor = untypedEmbed.showEditor as (...args: unknown[]) => unknown
 
               embed.showEditor = (...args2) => {
                 let result = old_showEditor.call(embed, ...args2)

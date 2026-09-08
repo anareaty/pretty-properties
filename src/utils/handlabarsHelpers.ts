@@ -99,7 +99,7 @@ export const registerCustomHelpers = (handlebars: typeof Handlebars) => {
 
     handlebars.registerHelper("moment", function(...args) {
         let options = args.pop() as {hash: {
-            params?: Record<string, any>,
+            params?: Record<string, unknown>,
             date?: string | number,
             max?: string, 
             unixmax?: string,
@@ -310,7 +310,7 @@ export const registerCustomHelpers = (handlebars: typeof Handlebars) => {
     handlebars.registerHelper("duration", function(...args) {
 
     const options = args.pop() as {hash: {
-            params?: Record<string, any>,
+            params?: Record<string, unknown>,
             duration: string,
             input?: moment.DurationInputArg2,
             add?: string,
