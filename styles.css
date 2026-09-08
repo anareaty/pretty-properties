@@ -1543,7 +1543,7 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 
   
   display: block;
-  max-width: fit-content !important;
+  max-width: fit-content;
 }
 
 
@@ -1552,7 +1552,9 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 
 
 
-
+.bases-list-property .bases-rendered-value[data-property-value]{
+  padding: 0px var(--pill-padding-x);
+}
 
 
 
