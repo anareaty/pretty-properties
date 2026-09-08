@@ -230,7 +230,7 @@ export const showBannerSettings = (settingTab: PPSettingTab) => {
             .onChange(async (value) => {
                 plugin.settings.enableBanner = value
                 await plugin.saveSettings();
-				if (!requireApiVersion("1.14.0")) {
+				if (!requireApiVersion("1.13.0")) {
                     settingTab.display();
 				}
                 updateAllBanners(plugin);
