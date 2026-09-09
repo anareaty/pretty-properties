@@ -6,88 +6,77 @@ import { setPillStyles } from "src/updates/updatePills";
 
 interface PropertyPopoverSuggest extends PopoverSuggest<string> {
   textInputEl: HTMLElement,
-  suggestInnerEl: HTMLElement
 }
 
 
 
 export const patchMetadataSuggester = (plugin: PrettyPropertiesPlugin) => {
-
-
-  
   plugin.patches.uninstallPPSuggesterPatch = around(PopoverSuggest.prototype, {
 
-
-    
     open(old) {
-
-      
-
-    
       return dedupe("pp-patch-suggest-around-key", old, function(this: PropertyPopoverSuggest) {
 
         let elements = this.suggestions.suggestions
-
         let textInputEl = this.textInputEl
 
         if (textInputEl?.instanceOf(HTMLElement)) {
-            let metadataEl = textInputEl.closest(".metadata-property-value")
-            let propertyEl = textInputEl.closest(".metadata-property")
-            let basePropertyEl = textInputEl.closest(".bases-td")
 
-            if (metadataEl instanceof HTMLElement && (propertyEl || basePropertyEl)) {
-                let type = metadataEl.getAttribute("data-property-type")
-                let propName
+          // Property suggestions
 
-                if (propertyEl instanceof HTMLElement) {
-                  propName = propertyEl.getAttribute("data-property-key")
-                } else if (basePropertyEl instanceof HTMLElement) {
-                  let prop = basePropertyEl.getAttribute("data-property")
-                  propName = prop?.replace(/^note\./, "")
-                }
+          let metadataEl = textInputEl.closest(".metadata-property-value")
+          let propertyEl = textInputEl.closest(".metadata-property")
+          let basePropertyEl = textInputEl.closest(".bases-td")
 
-                if (type && propName) {
-                  for (let suggestEl of elements) {
+          if (metadataEl instanceof HTMLElement && (propertyEl || basePropertyEl)) {
+              let type = metadataEl.getAttribute("data-property-type")
+              let propName
 
+              if (propertyEl instanceof HTMLElement) {
+                propName = propertyEl.getAttribute("data-property-key")
+              } else if (basePropertyEl instanceof HTMLElement) {
+                let prop = basePropertyEl.getAttribute("data-property")
+                propName = prop?.replace(/^note\./, "")
+              }
 
-                    
-                    let text = suggestEl.innerText
+              if (type && propName) {
+                for (let suggestEl of elements) {
 
+                  let text = suggestEl.innerText
+                  suggestEl.classList.add("metadata-suggest-item")
+                  suggestEl.empty()
 
-                    setPillStyles(suggestEl, propName, text, plugin)
+                  let suggestPill = suggestEl.createDiv()
+                  suggestPill.append(text)
+                  suggestPill.classList.add("suggestion-pill")
+                  setPillStyles(suggestPill, propName, text, plugin)
 
-                    if (type == "tags" || type == "multitext" || type == "aliases") {
-                      suggestEl.classList.add("multi-suggest-item")
-                      this.suggestInnerEl.classList.add("metadata-multi-suggestion")
-                    }
+                  if (type == "tags" || type == "multitext" || type == "aliases") {
+                    suggestPill.classList.add("multi-suggest-pill")
+                  }
 
-                    if (type == "text") {
-                      suggestEl.classList.add("longtext-suggest-item")
-                      this.suggestInnerEl.classList.add("metadata-longtext-suggestion")
-                    }
+                  if (type == "text") {
+                    suggestPill.classList.add("longtext-suggest-pill")
                   }
                 }
-            }
-          } else if (this.suggestions.values[0] && "tag" in this.suggestions.values[0]) {
+              }
+          }
+        } else if (this.suggestions.values[0] && "tag" in this.suggestions.values[0]) {
+
+          // Inline tag suggestions
+
           for (let suggestEl of elements) {
             let text = suggestEl.innerText
-              setPillStyles(suggestEl, "tags", text, plugin)
-              suggestEl.classList.add("multi-suggest-item")
-              this.suggestInnerEl?.classList.add("metadata-multi-suggestion")
+            suggestEl.classList.add("metadata-suggest-item")
+            suggestEl.empty()
+            let suggestPill = suggestEl.createDiv()
+            suggestPill.append(text)
+            suggestPill.classList.add("suggestion-pill")
+            suggestPill.classList.add("multi-suggest-pill")
+            setPillStyles(suggestPill, "tags", text, plugin)
           }
         }
 
-
-        
-
-        let result = old && old.apply(this)
-
-
-        
-
-        
-        
-        return result
+        return old && old.apply(this)
       })
     }
 

@@ -112,7 +112,7 @@ export interface PPPluginSettings {
 	dontShowColorMigrationMessage: boolean;
 	propertyColors: Record<string, Record<string, PillColorSettings>>;
 	propertyColorSettingRevealed: string
-	coverClassesMigrated: boolean
+	coverClassesMigrated2: boolean
 }
 
 
@@ -227,7 +227,7 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	dontShowColorMigrationMessage: false,
 	propertyColors: {},
 	propertyColorSettingRevealed: "",
-	coverClassesMigrated: false
+	coverClassesMigrated2: false
 }
 
 

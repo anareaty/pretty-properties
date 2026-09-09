@@ -1,15 +1,45 @@
 import PrettyPropertiesPlugin from "src/main"
 import { updateImagesForView } from "src/updates/updateElements"
 import { around, dedupe } from "monkey-around";
-import { MarkdownView } from "obsidian";
+import { MarkdownEditView, MarkdownPreviewView, MarkdownView } from "obsidian";
 import { renderTitleIcon } from "src/updates/updateIcons";
 import { updateMetadataEditor } from "src/updates/updateHiddenProperties";
 import { MetadataEditor } from "@obsidian-typings/obsidian-public-latest";
 
 
-interface MetadataEditorPatched extends MetadataEditor {
-  pp_patched: boolean
+export interface MetadataEditorPatched extends MetadataEditor {
+  pp_patched: boolean,
+  synchronize: (...args: unknown[]) => unknown
 }
+
+export interface MarkdownPreviewViewPatched extends MarkdownPreviewView {
+  pp_patched: boolean,
+  onRenderComplete: (...args: unknown[]) => unknown
+}
+
+export interface MarkdownEditViewPatched extends MarkdownEditView {
+  pp_patched: boolean,
+  show: (...args: unknown[]) => unknown
+}
+
+
+// Patch metadata editor so we can update the hidden state of properties block every time when properties are changed
+
+export const patchMetadataEditor = (metadataEditor: MetadataEditorPatched | undefined, plugin: PrettyPropertiesPlugin) => {
+  if (metadataEditor && !metadataEditor.pp_patched) {
+    metadataEditor.pp_patched = true
+    const old_metadataEditor_synchronize = metadataEditor.synchronize
+
+    metadataEditor.synchronize = (...args2) => {
+      let result = old_metadataEditor_synchronize.call(metadataEditor, ...args2);
+      updateMetadataEditor(metadataEditor, plugin)
+      return result;
+    }
+  }
+}
+
+
+
 
 
 export const patchMarkdownView = (plugin: PrettyPropertiesPlugin) => {
@@ -17,63 +47,19 @@ export const patchMarkdownView = (plugin: PrettyPropertiesPlugin) => {
   plugin.patches.uninstallPPMarkdownPatch = around(MarkdownView.prototype, {
 
     onLoadFile(old) {
+
       return dedupe("pp-patch-markdown-around-key", old, async function(this: MarkdownView, ...args) {
 
-        // We need a function to bind this, so we can reach it later in lover level functions
+        // We need a function to bind this, so we can reach it later in lower level functions
         const getView = () => this
-        let file = args[0]
-        let cache = plugin.app.metadataCache.getFileCache(file)
-        let frontmatter = cache?.frontmatter
 
-        if (frontmatter) {
-          let mcHidden = true
-
-          for (let propName in frontmatter) {
-            let value: unknown = frontmatter[propName]
-
-            if (plugin.settings.hiddenProperties.includes(propName)) {
-              continue
-            }
-
-            if (value == null || value == "") {
-              if (plugin.settings.hiddenWhenEmptyProperties.includes(propName) || plugin.settings.hideAllEmptyProperties) {
-                continue
-              }
-            }
-            mcHidden = false
-          }
-
-          this.metadataEditor.containerEl.classList.toggle("pp-mc-hidden", mcHidden)
-        }
-
-
-        // Patch metadata editor so we can update hidden properties when the property name is edited
-
-        let metadataEditor = this.metadataEditor as MetadataEditorPatched
-
-        if (metadataEditor && !metadataEditor.pp_patched) {
-          metadataEditor.pp_patched = true
-
-          const untypedMetadataEditor = (metadataEditor as unknown) as Record<string, unknown>
-          const old_metadataEditor_save = untypedMetadataEditor.save as (...args: unknown[]) => unknown
-
-          metadataEditor.save = (...args2) => {
-            let result = old_metadataEditor_save.call(metadataEditor, ...args2);
-            updateMetadataEditor(metadataEditor, plugin)
-            return result;
-          }
-        }
-
-
+        let metadataEditor = this.metadataEditor as MetadataEditorPatched | undefined
+        patchMetadataEditor(metadataEditor, plugin)
 
         // Update images after the view is completely rendered
 
-        const previewMode = this.previewMode
-
-
-        const untypedPreviewMode = (previewMode as unknown) as Record<string, unknown>
-        const old_onRenderComplete = untypedPreviewMode.onRenderComplete as (...args: unknown[]) => unknown
-
+        const previewMode = this.previewMode as MarkdownPreviewViewPatched
+        const old_onRenderComplete = previewMode.onRenderComplete
 
         previewMode.onRenderComplete = (...args2) => {
           let result = old_onRenderComplete.call(previewMode, ...args2) 
@@ -83,15 +69,10 @@ export const patchMarkdownView = (plugin: PrettyPropertiesPlugin) => {
         }
 
 
-
-
-
         // Update title icon if needed
 
-        const editMode = this.editMode
-        const untypedEditMode = (editMode as unknown) as Record<string, unknown>
-        const old_editMode_show = untypedEditMode.show as (...args: unknown[]) => unknown
-
+        const editMode = this.editMode as MarkdownEditViewPatched
+        const old_editMode_show = editMode.show
 
         editMode.show = (...args2) => {
           let result = old_editMode_show.call(editMode, ...args2) 

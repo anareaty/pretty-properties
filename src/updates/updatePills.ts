@@ -1,7 +1,6 @@
 import PrettyPropertiesPlugin from "src/main";
 import { createColorButton } from "src/menus/selectColorMenus";
 import { HSL } from "obsidian"
-import { hideMetadataContainerIfAllPropertiesHidden } from "./updateHiddenProperties";
 import { querySelectorsWithIframesForContainer } from "../utils/querySelectorsHelper";
 import { getPropertyFormatObj, updatePropertyFormatting } from "./updatePropertyFormattings";
 import { updateProgress } from "./updateProgress";
@@ -276,14 +275,6 @@ export const updateLongtext = (pill: HTMLElement, plugin: PrettyPropertiesPlugin
 	//}
 
 
-	
-	
-	let metadataContainer = pill.closest(".metadata-container")
-	if (metadataContainer?.instanceOf(HTMLElement)) {
-		hideMetadataContainerIfAllPropertiesHidden(metadataContainer, plugin)
-	}
-	
-	
 }
 
 

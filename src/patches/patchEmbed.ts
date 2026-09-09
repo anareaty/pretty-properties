@@ -4,19 +4,19 @@ import { updateCoverForView } from "src/updates/updateCovers";
 import { MarkdownPreviewView } from "obsidian";
 import { EmbedMarkdownComponent, ReadViewRenderer } from "@obsidian-typings/obsidian-public-latest";
 import { TFile } from "obsidian";
+import { MetadataEditorPatched, patchMetadataEditor } from "./patchMarkdownView";
 
 
 interface ReadViewRendererExtended extends ReadViewRenderer {
   onRender: () => void
 }
 
-
 interface EmbedMarkdownComponentExtended extends EmbedMarkdownComponent {
     containerEl: HTMLElement,
     previewMode: MarkdownPreviewView,
-	file: TFile
+	file: TFile,
+    metadataEditor: MetadataEditorPatched | undefined
 }
-
 
 
 export const patchEmbed = (plugin: PrettyPropertiesPlugin) => {
@@ -28,6 +28,9 @@ export const patchEmbed = (plugin: PrettyPropertiesPlugin) => {
                 
                     if (view.containerEl.classList.contains("canvas-node-content")) {
 
+                        let metadataEditor = view.metadataEditor
+                        patchMetadataEditor(metadataEditor, plugin)
+
                         const renderer = view.previewMode.renderer as ReadViewRendererExtended
                         const old_renderer_onRender = renderer.onRender
 
@@ -36,21 +39,9 @@ export const patchEmbed = (plugin: PrettyPropertiesPlugin) => {
                             updateCoverForView(view, plugin)  
                             return result
                         }
-
                     }
                 return view
             })
         }
     })
 }
-
-
-
-
-
-
-
-
-
-
-

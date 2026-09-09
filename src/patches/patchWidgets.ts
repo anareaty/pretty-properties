@@ -3,7 +3,6 @@ import PrettyPropertiesPlugin from "src/main"
 import { updateLongtext, updateMultiselectPill, updateNumberWidget, updateTagPill } from "src/updates/updatePills"
 import { updateDateInput, updateDateTimeInput } from "src/updates/updateDates"
 import { around, dedupe } from "monkey-around";
-import { updateAllMetadataContainers } from "src/updates/updateHiddenProperties";
 import { AliasesPropertyWidgetComponent, MultitextPropertyWidgetComponent, PropertyWidgetComponentBase, TagsPropertyWidgetComponent, TypeInfo } from "@obsidian-typings/obsidian-public-latest";
 
 
@@ -123,7 +122,6 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
     updateNumberWidget(propName, input!.value, parent, sourcePath, plugin)
     input!.onchange = () => {
       updateNumberWidget(propName, input!.value, parent, sourcePath, plugin)
-      updateAllMetadataContainers(plugin)
     }
   }
 
@@ -142,14 +140,12 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
       longText.onblur = () => {
         updateLongtext(longText, plugin, propName);
         let link = el.querySelector(".metadata-link");
-        if (link) {
+        if (link instanceof HTMLElement && link.innerText) {
           parent?.classList.remove("is-empty")
-          updateAllMetadataContainers(plugin)
         }
       };
-    } else if (link) {
+    } else if (link instanceof HTMLElement && link.innerText) {
       parent?.classList.remove("is-empty")
-      updateAllMetadataContainers(plugin)
     }
 
     
@@ -199,7 +195,6 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
         } else {
           parent?.classList.remove("is-empty")
         }
-        updateAllMetadataContainers(plugin)
       }
     }
   }
@@ -216,10 +211,6 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
   if (plugin.settings.hiddenWhenEmptyProperties.find(p => p.toLowerCase() == propName.toLowerCase())) {
     parent?.classList.add("pp-property-hidden-when-empty")
   }
-
-
-
-  updateAllMetadataContainers(plugin)
   
 }
 

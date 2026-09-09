@@ -262,6 +262,7 @@ export const updateHiddenPropertiesInPropTab = (plugin: PrettyPropertiesPlugin) 
 export const updateHiddenEmptyProperties = (plugin: PrettyPropertiesPlugin) => {
   let hideAllEmptyProperties = plugin.settings.hideAllEmptyProperties
   document.body.classList.toggle("hide-all-empty-properties", hideAllEmptyProperties)
+  updateHiddenProperties(plugin)
 }
 
 

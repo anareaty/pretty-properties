@@ -5,7 +5,6 @@ import { renderIcon, updateIconForView } from "./updateIcons";
 import { updateSettingPills, updateTagPaneTagsAll } from "./updatePills";
 import { renderBanner, updateBannerForView } from "./updateBanners";
 import { getNestedProperty } from "../utils/propertyUtils";
-import { updateAllMetadataContainers } from "./updateHiddenProperties";
 import { processTagsInPreviewElement } from "src/extensions/tagPostProcessor";
 import { updateWidgets } from "src/patches/patchWidgets";
 import { CardsBasesView, processBaseCardProperties } from "src/patches/patchBaseCards";
@@ -196,11 +195,7 @@ export const updateAllProperties = (plugin:PrettyPropertiesPlugin) => {
     }
 
     updateTagPaneTagsAll(plugin)
-    
     updateSettingPills(plugin)
-
-    
-    updateAllMetadataContainers(plugin)
 }
 
 

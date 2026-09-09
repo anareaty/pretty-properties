@@ -3,13 +3,20 @@ import { updateImagesInPopover } from "src/updates/updateElements"
 import { around, dedupe } from "monkey-around";
 import { HoverPopover } from "obsidian";
 import { EmbeddedEditorView } from "@obsidian-typings/obsidian-public-latest";
+import { MetadataEditorPatched, patchMetadataEditor } from "./patchMarkdownView";
+import { updateMetadataEditor } from "src/updates/updateHiddenProperties";
 
+
+interface EmbeddedEditorViewPatched extends EmbeddedEditorView {
+  metadataEditor: MetadataEditorPatched | undefined
+}
 
 interface Popover extends HoverPopover {
-    embed: EmbeddedEditorView
+    embed: EmbeddedEditorViewPatched
 }
 
 export const patchHoverPopover = (plugin: PrettyPropertiesPlugin) => {
+  
   plugin.patches.uninstallPPPopoverPatch = around(HoverPopover.prototype, {
     load(old) {
       return dedupe("pp-patch-popover-show-around-key", old, function(this: Popover, ...args) {
@@ -21,6 +28,10 @@ export const patchHoverPopover = (plugin: PrettyPropertiesPlugin) => {
 
           if (embed.containerEl?.classList.contains("markdown-embed")) {
             updateImagesInPopover(this, plugin)
+
+            let metadataEditor = embed.metadataEditor
+            patchMetadataEditor(metadataEditor, plugin)
+            if (metadataEditor) updateMetadataEditor(metadataEditor, plugin)
 
             const previewMode = embed.previewMode
 
@@ -47,18 +58,9 @@ export const patchHoverPopover = (plugin: PrettyPropertiesPlugin) => {
                 updateImagesInPopover(popover, plugin)
                 return result
               }
-
-
-
-
-
-
-
-
             }
           }
         }
-      
         return old && old.apply(this, args)
       })
     }   

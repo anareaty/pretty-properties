@@ -1523,7 +1523,7 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 .bases-cards-line.colored,
 .bases-kanban-card-line.colored,
 .bases-rendered-value.colored, 
-.suggestion-item.colored,
+.suggestion-pill.colored,
 .pp-formatted-value-overlay.colored {
   background-color: var(--pp-bg);
   color: var(--pp-color)
@@ -1879,23 +1879,9 @@ button.bare-button {
 }
 
 
-.multi-suggest-item {
-  border-radius: var(--tag-radius);
-}
 
 
-.multi-suggest-item,
-.suggestion-container.mod-property-value .multi-suggest-item,
-.suggestion-container.mod-property-value .longtext-suggest-item {
-  padding: 3px var(--tag-padding-x);
-  margin: 4px 0;
-  width: fit-content;
-}
 
-.metadata-multi-suggestion,
-.metadata-longtext-suggestion {
-  padding: 2px 6px
-}
 
 
 
@@ -1961,3 +1947,25 @@ button.cover-has-format {
   margin-block-start: 0;
   margin-block-end: 0;
 }
+
+
+
+
+.suggestion .suggestion-item.metadata-suggest-item {
+  padding: 4px 4px ;
+  margin: 0;
+}
+
+.suggestion-pill {
+  padding: 3px var(--tag-padding-x);
+  width: fit-content;
+}
+
+.multi-suggest-pill {
+  border-radius: var(--tag-radius);
+}
+
+.longtext-suggest-pill {
+  border-radius: 4px;
+}
+
