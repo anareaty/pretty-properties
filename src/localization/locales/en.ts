@@ -204,4 +204,6 @@ export default {
   SET_COVER_TEMPLATE: "Set cover formatting template",
   SET_PROPERTY_FORMAT: "Set property formatting template",
   ADD_MARKDOWN_PROPERTY: "Add property to render as Markdown",
+  DELETE_PROPERTY_FORMAT_PROMPT: "Are you sure you want to delete property format template?",
+  DELETE_COVER_PROPERTY_PROMPT: "Are you sure you want to delete cover property? If you have a cover formatting template set it will be lost.",
 };

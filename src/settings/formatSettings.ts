@@ -5,6 +5,7 @@ import { PPSettingTab } from 'src/settings/settings';
 import {PropertyNameSuggest} from "../utils/propertyNameSuggester";
 import {enhanceFormatTextArea} from "../utils/settingsHelper";
 import { AddPropertyModal, FormatTemplateModal } from 'src/modals/settingItemModals';
+import { ConfirmModal } from 'src/modals/confirmModal';
 
 
 
@@ -109,13 +110,19 @@ export const getFormatSettingsDefinitions = (tab: PPSettingTab) => {
                         }
                     },
                     onDelete: async (idx: number) => {
-                        let key = propertyFormatsKeys[idx] || ""
-                        delete plugin.settings.propertyFormats[key]
-                        await plugin.saveSettings();
-                        updateAllProperties(plugin);
-                        if (requireApiVersion("1.13.0")) {
-                            tab.update()			
-                        }
+                        let text = i18n.t("DELETE_PROPERTY_FORMAT_PROMPT")
+
+                        new ConfirmModal(text, plugin, async () => {
+                            let key = propertyFormatsKeys[idx] || ""
+                            delete plugin.settings.propertyFormats[key]
+                            await plugin.saveSettings();
+                            updateAllProperties(plugin);
+                            if (requireApiVersion("1.13.0")) {
+                                tab.update()			
+                            }
+
+                        }).open()
+
                     },
                     items: propertyFormatsKeys.map(key => ({
                         name: key,
@@ -135,7 +142,7 @@ export const getFormatSettingsDefinitions = (tab: PPSettingTab) => {
                                 .setIcon("code-square")
                                 .setTooltip(i18n.t("SET_PROPERTY_FORMAT"))
                                 .onClick(() => {
-                                    new FormatTemplateModal(plugin, "PROPERTY_FORMAT_TEMPLATE", format, async (newFormat) => {
+                                    new FormatTemplateModal(plugin, key, i18n.t("PROPERTY_FORMAT_TEMPLATE"), format, async (newFormat) => {
                                         property.format = newFormat
                                         await plugin.saveSettings();
                                         updateAllProperties(plugin);

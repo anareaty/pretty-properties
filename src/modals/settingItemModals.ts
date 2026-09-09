@@ -145,18 +145,21 @@ export class FormatTemplateModal extends Modal {
     plugin: PrettyPropertiesPlugin
     result: string
     templateName: string
+    templateDesc: string
     format: string
     modalCallback: (value: string) => Promise<void> | void
    
     constructor(
         plugin: PrettyPropertiesPlugin, 
         templateName: string,
+        templateDesc: string,
         format: string,
         modalCallback: (value: string) => Promise<void> | void
     ) {
         super(plugin.app)
         this.plugin = plugin
         this.templateName = templateName
+        this.templateDesc = templateDesc
         this.format = format
         this.modalCallback = modalCallback
         this.result = this.format
@@ -168,7 +171,8 @@ export class FormatTemplateModal extends Modal {
         const {contentEl} = this
 
         new Setting(contentEl)
-        .setName(i18n.t(this.templateName))
+        .setName(this.templateName)
+        .setDesc(this.templateDesc)
         .addTextArea((text) => {
             enhanceFormatTextArea(this.plugin, text, this.format, async (value) => {
                 this.result = value

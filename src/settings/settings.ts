@@ -4,7 +4,7 @@ import PrettyPropertiesPlugin from "../main";
 
 import { getBannerSettingsDefinitions, showBannerSettings } from './bannerSettings';
 import { getIconSettingsDefinitions, showIconSettings } from './iconSettings';
-import { getCoverSettingsDefinitions, showCoverSettings } from './coversettings';
+import { getCoverSettingsDefinitions, showCoverSettings } from './coverSettings';
 import { getOtherSettingsDefinitions, showOtherSettings } from './otherSettings';
 import { getColorSettingsDefinitions, showColorSettings } from './colorSettings';
 import { getHiddenSettingsDefinitions, showHiddenSettingsTab } from './hiddenSettingsTab';

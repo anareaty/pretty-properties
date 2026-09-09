@@ -9,6 +9,7 @@ import {PropertyNameSuggest} from "../utils/propertyNameSuggester";
 import {enhanceFormatTextArea} from "../utils/settingsHelper";
 
 import { AddPropertyModal, FormatTemplateModal } from 'src/modals/settingItemModals';
+import { ConfirmModal } from 'src/modals/confirmModal';
 
 
 
@@ -62,11 +63,19 @@ export const getCoverSettingsDefinitions = (tab: PPSettingTab) => {
                 }
             },
             onDelete: async (idx: number) => {
-                plugin.settings.coverProperties.splice(idx, 1);
-                await plugin.saveSettings();
-                if (requireApiVersion("1.13.0")) {
-                    tab.update()			
-                }
+                let text = i18n.t("DELETE_COVER_PROPERTY_PROMPT")
+                
+                new ConfirmModal(text, plugin, async () => {
+                    plugin.settings.coverProperties.splice(idx, 1);
+                    await plugin.saveSettings();
+                    if (requireApiVersion("1.13.0")) {
+                        tab.update()			
+                    }
+                }).open()
+
+
+
+                
             },
             items: plugin.settings.coverProperties.map(cover => ({
                 name: cover.property,
@@ -82,7 +91,12 @@ export const getCoverSettingsDefinitions = (tab: PPSettingTab) => {
                         .setTooltip(i18n.t("SET_COVER_TEMPLATE"))
                         .onClick(() => {
 
-                            new FormatTemplateModal(plugin, "PROPERTY_FORMAT_TEMPLATE", cover.format, async (newFormat) => {
+                            new FormatTemplateModal(
+                            plugin, 
+                            cover.property, 
+                            i18n.t("PROPERTY_FORMAT_TEMPLATE"), 
+                            cover.format, 
+                            async (newFormat) => {
                                 cover.format = newFormat
                                 await plugin.saveSettings();
                                 updateAllCovers(plugin);
