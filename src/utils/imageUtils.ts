@@ -9,8 +9,9 @@ import { ImageSuggestModal } from "src/modals/imageSuggestModal";
 
 const pdfRegex = /^(!)?(?:\[\[(.+\.pdf)\]\]|\[([^\]]*)\]\((.+\.pdf)\))$/;
 const urlRegex = /^(?:http[s]?:\/\/.)?(?:www\.)?[-a-zA-Z0-9@%._+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_+.~#?&//=]*)$/i;
-const localFileRegex = /^(file:\/\/\/\/.)[-a-zA-Z0-9@%._+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_+.~#?&//=]*)$/i;
+const localFileRegex = /^(file:\/\/\/\/.).+\.[a-z]{2,6}$/i;
 const wikiLinkRegex = /^\[\[.+?\]\]$/;
+const imagePathRegex = /^[^\n]+\.(?:avif|bmp|gif|jpeg|jpg|png|svg|webp)$/
 const base64Regex = /^data:image\/.*?;base64.*/i;
 
 
@@ -132,7 +133,7 @@ export const getImageValue = (value: string) => {
     else if (urlRegex.test(value) || localFileRegex.test(value)) {
         value = value.replace(/^(https:\/\/www\.youtube.com\/watch\?v=)(.*)/, "https://img.youtube.com/vi/$2/maxresdefault.jpg")
 		value = `![](${value})`
-    } else if (wikiLinkRegex.test(value)) {
+    }  else if (wikiLinkRegex.test(value)) {
 		value = `!${value}`;
 	} 
     return value
@@ -168,6 +169,10 @@ export const renderImageFromValue = async (
 		value = value.replace(/^(https:\/\/www\.youtube.com\/watch\?v=)(.*)/, "https://img.youtube.com/vi/$2/maxresdefault.jpg")
 		value = `![](${value})`;
 	} 
+
+    else if (imagePathRegex.test(value)) {
+		value = `![[${value}]]`;
+	}
 	
 	else if (wikiLinkRegex.test(value)) {
 		value = `!${value}`;
