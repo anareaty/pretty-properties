@@ -49,6 +49,7 @@ export const patchBaseCards = (plugin: PrettyPropertiesPlugin) => {
 
 
 export const processBaseCardProperties = (view: CardsBasesView, plugin: PrettyPropertiesPlugin) => {
+
     for (let item of view.items) {
         for (let property of item.props) {
             processBaseCardProperty(property, plugin)

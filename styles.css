@@ -1400,15 +1400,31 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
   line-height: normal;
 }
 
-.pp-pill-padding-all .metadata-input-longtext:not([data-property-value=""]),
+.pp-pill-padding-all .metadata-input-longtext,
 .pp-pill-padding-colored .metadata-input-longtext.colored,
 .pp-pill-padding-non-transparent .metadata-input-longtext.colored,
+
+.pp-pill-padding-all .is-empty .multi-select-input,
+.pp-pill-padding-all .metadata-property-value[data-property-type="checkbox"],
 
 .pp-pill-padding-all .pp-formatted-value-overlay.text-overlay,
 .pp-pill-padding-colored .pp-formatted-value-overlay.text-overlay.colored,
 .pp-pill-padding-non-transparent .pp-formatted-value-overlay.text-overlay.colored {
   padding-left: var(--tag-padding-x);
   padding-right: var(--tag-padding-x);
+}
+
+
+.pp-pill-padding-all .metadata-input-number {
+  padding-left: calc(var(--tag-padding-x) + 8px);
+}
+
+
+
+
+.pp-pill-padding-all .metadata-input-text.mod-date,
+.pp-pill-padding-all .metadata-input-text.mod-datetime {
+  margin-left: var(--tag-padding-x);
 }
 
 .pp-pill-padding-all .multi-select-pill,

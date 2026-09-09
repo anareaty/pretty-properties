@@ -185,7 +185,7 @@ export default {
   MARKDOWN: "Markdown",
   RENDER_MARKDOWN: "Render Markdown",
   DO_NOT_RENDER_MARKDOWN: "Do not render Markdown",
-  COLORED_PROPERTIES: "Colored properties",
+  COLORED_PROPERTIES: "Colors",
   HIDDEN_PROPERTIES: "Hidden properties",
   PROPERTY_FORMATTINGS: "Property formattings",
   COVER_SHAPE_PROPERTY: "Cover shape property",
