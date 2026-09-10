@@ -231,6 +231,12 @@ Show a [Meta Bind](https://github.com/mProjectsCode/obsidian-meta-bind-plugin) s
 ````
 ![meta-bind](images/meta-bind.png)
 
+Show a [Meta Bind](https://github.com/mProjectsCode/obsidian-meta-bind-plugin) select input for the current property:
+
+````
+`INPUT[suggester(option(apple), option(banana), option(lemon)):{{propertyName}}]`
+````
+
 Show a steamid property as an iframe (to render cover as iframe add this template to the cover setting instead of the property format settings):
 ````
 <iframe src="https://store.steampowered.com/widget/{{propertyValue}}" frameborder="0" width="100%" height="190"></iframe>

@@ -1298,6 +1298,8 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
   font-size: 0;
 }
 
+
+
 .has-property-formatting:focus-within .pp-formatted-value-overlay  {
   display: none;
 }
@@ -1985,3 +1987,84 @@ button.cover-has-format {
   border-radius: 4px;
 }
 
+
+/* meta bind*/
+
+.pp-formatted-value-overlay .mb-button-inner {
+  margin-top: 0;
+}
+
+.pp-formatted-value-overlay .mb-suggest-input {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  font-family: var(--metadata-input-font);
+  color: inherit;
+}
+
+
+.pp-formatted-value-overlay .mb-input {
+  font-family: inherit;
+}
+
+.pp-formatted-value-overlay .mb-suggest-input .mb-button-inner {
+  background-color: transparent;
+  color: inherit;
+  box-shadow: none;
+  opacity: 0.5;
+}
+
+.pp-formatted-value-overlay .mb-suggest-input .mb-button-inner:hover {
+  opacity: 1;
+}
+
+.pp-formatted-value-overlay .mb-suggest-input .mb-icon-wrapper {
+  width: 1em;
+  height: 1em;
+  --icon-size: 1em;
+}
+
+/*
+
+.pp-property-select {
+  display: inline-flex;
+}
+
+.pp-property-select-value {
+  display: inline-block
+}
+
+.metadata-property button.pp-property-select-button {
+  margin: 0 0 0 6px;
+  background-color: transparent;
+  box-shadow: none;
+  padding: 0;
+  --icon-size: 1em;
+  height: unset;
+  color: inherit;
+}
+
+
+*/
+
+
+
+
+
+
+
+.metadata-property button.pp-property-select-button {
+  margin: 0 0 0 6px;
+  background-color: transparent;
+  box-shadow: none;
+  padding: 0;
+  --icon-size: 1.1em;
+  color: inherit;
+  height: unset;
+  vertical-align: middle;
+  opacity: 0.5;
+}
+
+.metadata-property button.pp-property-select-button:hover {
+  opacity: 1;
+}

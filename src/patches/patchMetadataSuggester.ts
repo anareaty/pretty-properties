@@ -28,7 +28,6 @@ export const patchMetadataSuggester = (plugin: PrettyPropertiesPlugin) => {
           let basePropertyEl = textInputEl.closest(".bases-td")
 
           if (metadataEl instanceof HTMLElement && (propertyEl || basePropertyEl)) {
-              let type = metadataEl.getAttribute("data-property-type")
               let propName
 
               if (propertyEl instanceof HTMLElement) {
@@ -38,7 +37,7 @@ export const patchMetadataSuggester = (plugin: PrettyPropertiesPlugin) => {
                 propName = prop?.replace(/^note\./, "")
               }
 
-              if (type && propName) {
+              if (propName) {
                 for (let suggestEl of elements) {
 
                   let text = suggestEl.innerText
@@ -50,11 +49,11 @@ export const patchMetadataSuggester = (plugin: PrettyPropertiesPlugin) => {
                   suggestPill.classList.add("suggestion-pill")
                   setPillStyles(suggestPill, propName, text, plugin)
 
-                  if (type == "tags" || type == "multitext" || type == "aliases") {
+                  if (textInputEl.classList.contains("multi-select-input")) {
                     suggestPill.classList.add("multi-suggest-pill")
                   }
 
-                  if (type == "text") {
+                  if (textInputEl.classList.contains("metadata-input-longtext")) {
                     suggestPill.classList.add("longtext-suggest-pill")
                   }
                 }
