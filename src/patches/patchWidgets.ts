@@ -91,7 +91,7 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
     let input = el.querySelector("input");
 
     if (input) {
-      updateDateTimeInput(input!, plugin)
+      updateDateTimeInput(input, plugin)
       input.onchange = () => {
         updateDateTimeInput(input, plugin);
       };
@@ -107,7 +107,7 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
   if (type == "number") {
     let input = el.querySelector("input");
     if (input) {
-      updateNumberWidget(propName, input!.value, parent, sourcePath, plugin)
+      updateNumberWidget(propName, input.value, parent, sourcePath, plugin)
       input.onchange = () => {
         updateNumberWidget(propName, input.value, parent, sourcePath, plugin);
       };
@@ -134,12 +134,12 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
 
     checkAndUpdateLongText()
     let textRendered = rendered as TextPropertyWidgetComponent
-    let old_onChange = textRendered.ctx.onChange
+    let old_onChange = textRendered.ctx.onChange.bind(textRendered.ctx)
 
     textRendered.ctx.onChange = (...args) => {
-      old_onChange(...args)
-      checkAndUpdateLongText()
-    }
+      old_onChange(...args);
+      checkAndUpdateLongText();
+    };
 
 
     if (propName == plugin.settings.bannerProperty) {

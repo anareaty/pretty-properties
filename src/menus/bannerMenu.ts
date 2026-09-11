@@ -1,7 +1,7 @@
 import { Menu, MenuItem, requireApiVersion } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { i18n } from "src/localization/localization";
-import { updateProperties } from "src/updates/updateHiddenProperties";
+import { updateHiddenProperties } from "src/updates/updateHiddenProperties";
 import { selectBannerPosition } from "src/utils/imageUtils";
 import { removeProperty } from "src/utils/propertyUtils";
 import { ImageSuggestModal } from "src/modals/imageSuggestModal";

@@ -58,7 +58,7 @@ export const updateMetadataEditor = (metadataEditor: MetadataEditor, plugin: Pre
 // We don't need to update metadata editor in hover popover 
 // because it is probably not active when this function is called
 
-export const updateProperties = (plugin: PrettyPropertiesPlugin) => {
+export const updateHiddenProperties = (plugin: PrettyPropertiesPlugin) => {
     
     let leaves = plugin.app.workspace.getLeavesOfType("markdown");
     for (let leaf of leaves) {

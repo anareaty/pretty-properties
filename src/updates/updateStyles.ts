@@ -1,7 +1,7 @@
 import PrettyPropertiesPlugin from "src/main";
 import { Platform } from "obsidian";
 import { getTextLightness } from "./updatePills";
-import { updateProperties } from "./updateHiddenProperties";
+import { updateHiddenProperties } from "./updateHiddenProperties";
 
 
 export const updateBannerStyles = (plugin: PrettyPropertiesPlugin) => {

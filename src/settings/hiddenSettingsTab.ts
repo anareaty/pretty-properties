@@ -11,7 +11,7 @@ import {
 } from 'src/updates/updateStyles';
 import { showHiddenEmptySettings, showHiddenSettings } from './hiddenSettings';
 import { AddPropertyModal } from 'src/modals/settingItemModals';
-import { updateProperties } from 'src/updates/updateHiddenProperties';
+import { updateHiddenProperties } from 'src/updates/updateHiddenProperties';
 
 
 
