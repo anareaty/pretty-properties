@@ -140,7 +140,8 @@ export const getPropertyFormatObj = (propName: string, text: string, plugin: Pre
     let propertyFormatObj = plugin.settings.propertyFormats[propName]
     let propertyFormat = propertyFormatObj?.format
     let propertyTextFormat = "raw"
-    let isMD = plugin.settings.markdownProperties.find(p => p == propName)
+
+    let isMD = plugin.settings.markdownProperties.find(p => p.toLowerCase() == propName.toLowerCase())
     if (isMD) propertyTextFormat = "markdown"
 
     // Always render as markdown if text is formatted as MathJax

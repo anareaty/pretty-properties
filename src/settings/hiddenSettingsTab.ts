@@ -117,7 +117,7 @@ export const getHiddenSettingsDefinitions = (tab: PPSettingTab) => {
                         name: i18n.t("ADD_HIDDEN_PROPERTY"),
                         action: () => {
                             new AddPropertyModal(allPropertyTypes, plugin, async (newProperty) => {
-                                if (newProperty && !plugin.settings.hiddenProperties.find(p => p == newProperty)) {
+                                if (newProperty && !plugin.settings.hiddenProperties.find(p => p.toLowerCase() == newProperty.toLowerCase())) {
                                     plugin.settings.hiddenProperties.push(newProperty)
                                     await plugin.saveSettings()
                                     updateHiddenProperties(plugin)
@@ -155,7 +155,7 @@ export const getHiddenSettingsDefinitions = (tab: PPSettingTab) => {
                         name: i18n.t("ADD_HIDDEN_EMPTY_PROPERTY"),
                         action: () => {
                             new AddPropertyModal(allPropertyTypes, plugin, async (newProperty) => {
-                                if (newProperty && !plugin.settings.hiddenWhenEmptyProperties.find(p => p == newProperty)) {
+                                if (newProperty && !plugin.settings.hiddenWhenEmptyProperties.find(p => p.toLowerCase() == newProperty.toLowerCase())) {
                                     plugin.settings.hiddenWhenEmptyProperties.push(newProperty)
                                     await plugin.saveSettings()
                                     updateHiddenProperties(plugin)

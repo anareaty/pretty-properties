@@ -12,7 +12,7 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
     let propName = propEl?.getAttribute("data-property-key");
 
     if (propName) {
-        if (plugin.settings.hiddenProperties.find((p) => p == propName)) {
+        if (plugin.settings.hiddenProperties.find((p) => p.toLowerCase() == propName.toLowerCase())) {
 
             menu.addItem((item: MenuItem) =>
                 item
@@ -50,7 +50,7 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                 }));
         }
 
-        if (plugin.settings.hiddenWhenEmptyProperties.find((p) => p == propName)) {
+        if (plugin.settings.hiddenWhenEmptyProperties.find((p) => p.toLowerCase() == propName.toLowerCase())) {
 
             menu.addItem((item: MenuItem) =>
                 item
@@ -111,7 +111,7 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
             
             let markdownProperties = plugin.settings.markdownProperties
 
-            if (markdownProperties.find(p => p == propName)) {
+            if (markdownProperties.find(p => p.toLowerCase() == propName.toLowerCase())) {
                 menu.addItem((item: MenuItem) =>
                     item
                     .setTitle(i18n.t("DO_NOT_RENDER_MARKDOWN"))

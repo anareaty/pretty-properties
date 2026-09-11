@@ -51,7 +51,7 @@ export const getCoverSettingsDefinitions = (tab: PPSettingTab) => {
                 action: () => {
                     
                     new AddPropertyModal(["text"], plugin, async (newProperty) => {
-                        if (newProperty && !plugin.settings.coverProperties.find(c => c.property == newProperty)) {
+                        if (newProperty && !plugin.settings.coverProperties.find(c => c.property.toLowerCase() == newProperty.toLowerCase())) {
                         plugin.settings.coverProperties.push({ property: newProperty, format: "" });
                         await plugin.saveSettings()
                         if (requireApiVersion("1.13.0")) {
@@ -483,7 +483,7 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
             })
 			.addButton((button) =>
 				button.setIcon("plus").onClick(async () => {
-                    if (newProperty && !plugin.settings.coverProperties.find(c => c.property == newProperty)) {
+                    if (newProperty && !plugin.settings.coverProperties.find(c => c.property.toLowerCase() == newProperty.toLowerCase())) {
                         plugin.settings.coverProperties.push({ property: newProperty, format: "" });
                         await plugin.saveSettings()
                         settingTab.display();

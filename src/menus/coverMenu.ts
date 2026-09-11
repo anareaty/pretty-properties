@@ -62,9 +62,9 @@ export const handleCoverMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => {
             }))
 
 
-            let coverPropHidden = plugin.settings.hiddenProperties.find(p => p == propName)
-            let coverPositionPropHidden = plugin.settings.hiddenProperties.find(p => p == coverPositionPropName)
-            let coverShapePropHidden = plugin.settings.hiddenProperties.find(p => p == coverShapePropName)
+            let coverPropHidden = plugin.settings.hiddenProperties.find(p => p.toLowerCase() == propName.toLowerCase())
+            let coverPositionPropHidden = plugin.settings.hiddenProperties.find(p => p.toLowerCase() == coverPositionPropName.toLowerCase())
+            let coverShapePropHidden = plugin.settings.hiddenProperties.find(p => p.toLowerCase() == coverShapePropName.toLowerCase())
 
             if (coverPropHidden || coverPositionPropHidden || coverShapePropHidden) {
 

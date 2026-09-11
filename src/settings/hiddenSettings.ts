@@ -41,7 +41,7 @@ export const showHiddenSettings = (settingTab: PPSettingTab) => {
             .setIcon("plus")
             .onClick(async () => {
                 newProperty = newProperty.trim()
-                if (newProperty && !plugin.settings.hiddenProperties.find(p => p == newProperty)) {
+                if (newProperty && !plugin.settings.hiddenProperties.find(p => p.toLowerCase() == newProperty.toLowerCase())) {
                     plugin.settings.hiddenProperties.push(newProperty)
                     await plugin.saveSettings()
                     updateHiddenProperties(plugin)
@@ -94,7 +94,7 @@ export const showHiddenEmptySettings = (settingTab: PPSettingTab) => {
             .setIcon("plus")
             .onClick(async() => {
                 newProperty = newProperty.trim()
-                if (newProperty && !plugin.settings.hiddenWhenEmptyProperties.find(p => p == newProperty)) {
+                if (newProperty && !plugin.settings.hiddenWhenEmptyProperties.find(p => p.toLowerCase() == newProperty.toLowerCase())) {
                     plugin.settings.hiddenWhenEmptyProperties.push(newProperty)
                     await plugin.saveSettings()
                     updateHiddenProperties(plugin)

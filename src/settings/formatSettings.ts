@@ -168,7 +168,7 @@ export const getFormatSettingsDefinitions = (tab: PPSettingTab) => {
                         name: i18n.t("ADD_MARKDOWN_PROPERTY"),
                         action: () => {
                             new AddPropertyModal(["text", "number", "date", "datetime"], plugin, async (newProperty) => {
-                                if (newProperty && !plugin.settings.markdownProperties.find(p => p == newProperty)) {
+                                if (newProperty && !plugin.settings.markdownProperties.find(p => p.toLowerCase() == newProperty.toLowerCase())) {
                                     plugin.settings.markdownProperties.push(newProperty)
                                     await plugin.saveSettings()
                                     updateAllProperties(plugin);
@@ -481,7 +481,7 @@ const showMdPropsList = (settingTab: PPSettingTab) => {
             .setIcon("plus")
             .onClick(async () => {
 				newProperty = newProperty.trim()
-                if (newProperty && !plugin.settings.markdownProperties.find(p => p == newProperty)) {
+                if (newProperty && !plugin.settings.markdownProperties.find(p => p.toLowerCase() == newProperty.toLowerCase())) {
                     plugin.settings.markdownProperties.push(newProperty)
                     await plugin.saveSettings()
                     updateAllProperties(plugin);

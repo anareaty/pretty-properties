@@ -49,8 +49,8 @@ export const handleBannerMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => 
 
 
 
-    let bannerPropHidden = plugin.settings.hiddenProperties.find(p => p == propName)
-    let bannerPositionPropHidden = plugin.settings.hiddenProperties.find(p => p == positionPropName)
+    let bannerPropHidden = plugin.settings.hiddenProperties.find(p => p.toLowerCase() == propName.toLowerCase())
+    let bannerPositionPropHidden = plugin.settings.hiddenProperties.find(p => p.toLowerCase() == positionPropName.toLowerCase())
 
     if (bannerPropHidden || bannerPositionPropHidden) {
         menu.addItem((item: MenuItem) => item

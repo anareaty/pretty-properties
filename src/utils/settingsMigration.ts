@@ -48,6 +48,11 @@ export const migrateColorSettings = async (plugin:PrettyPropertiesPlugin) => {
         }
 
         plugin.settings.propertyColors.tags = tagColors
+
+
+        plugin.settings.propertyPillColors = {}
+        plugin.settings.propertyLongtextColors = {}
+        plugin.settings.tagColors = {}
         await plugin.saveSettings()
     }
 }

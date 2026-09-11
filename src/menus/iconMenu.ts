@@ -25,7 +25,7 @@ export const handleIconMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => {
             removeProperty(plugin.settings.iconProperty, plugin);
         }))
 
-    if (plugin.settings.hiddenProperties.find(p => p == propName)) {
+    if (plugin.settings.hiddenProperties.find(p => p.toLowerCase() == propName.toLowerCase())) {
 
         menu.addItem((item: MenuItem) => item
         .setTitle(i18n.t("UNHIDE_ICON_PROPERTY"))
