@@ -1308,11 +1308,11 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 	opacity: 0;
 }
 
-.pp-formatted-value-overlay > *:first-child {
-	margin-top: 0;
-}
-.pp-formatted-value-overlay > *:last-child {
+
+.pp-formatted-value-overlay > * {
+  margin-top: 0;
 	margin-bottom: 0;
+  display: inline-block;
 }
 
 
@@ -1604,30 +1604,7 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 
 
 
-button.longtext-color-button {
-  margin: 2px;
-  border: none;
-  box-shadow: none;
-  background-color: var(--background-primary);
-  height: calc(var(--input-height) - 4px);
-  width: 2.5em;
-  display: none;
-  color: var(--text-muted);
-  padding: unset;
-  position: absolute;
-  right: 0;
-  top: 0;
-  opacity: 0.2;
-}
 
-button.longtext-color-button:hover {
-  background-color: var(--background-primary-alt);
-  opacity: 1;
-}
-
-.metadata-property-value:hover button.longtext-color-button, .longtext-color-button:active {
-  display: flex;
-}
 
 .markdown-preview-view .metadata-property-value:hover .metadata-input-longtext,
 .markdown-source-view .metadata-property-value:hover .metadata-input-longtext,
@@ -1991,7 +1968,7 @@ button.cover-has-format {
   padding: 0;
   --icon-size: 1.1em;
   color: inherit;
-  height: unset;
+  height: var(--icon-size);
   vertical-align: middle;
   opacity: 0.5;
 }

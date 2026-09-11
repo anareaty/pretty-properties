@@ -485,7 +485,35 @@ export const registerCustomHelpers = (handlebars: typeof Handlebars) => {
         if (duration.milliseconds() > 0 || parts.length === 0) parts.push(`${duration.milliseconds()}ms`);
         return parts.join(" ");
     });
-	}
+
+
+
+
+
+    handlebars.registerHelper("startsWith", (str: string, substring: string) => {
+        return str.indexOf(substring) === 0;
+    });
+
+
+
+    handlebars.registerHelper("propertySelect", (...args) => {
+        args.pop();
+        let selectOptions = args.join(" ")
+        let selectEl = document.createElement("span")
+        selectEl.classList.add("pp-property-select")
+        //selectEl.createSpan({cls: "pp-property-select-value"})
+        let selectElButton = selectEl.createEl("button", {cls: "pp-property-select-button"})
+        selectElButton.setAttribute("data-options", selectOptions)
+        let selectHTML = selectEl.outerHTML
+
+
+        return new handlebars.SafeString(selectHTML)
+    })
+
+  
+
+
+}
     
 
 

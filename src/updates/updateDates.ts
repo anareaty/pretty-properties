@@ -12,6 +12,9 @@ export const updateDateInput = (input: HTMLInputElement, plugin: PrettyPropertie
 	if (!grandParent) return
 
 
+	let sourcePath = grandParent.getAttribute("data-source-path") || ""
+
+
 
 
 	let propKey = grandParent.getAttribute("data-property-key")
@@ -66,7 +69,7 @@ export const updateDateInput = (input: HTMLInputElement, plugin: PrettyPropertie
 			let customDate = ""
 
 			if (propertyFormatObj.format) {
-				customDate = computeFormattedValue(plugin, propName, propertyFormatObj.format, value)
+				customDate = computeFormattedValue(plugin, propName, propertyFormatObj.format, value, sourcePath)
 			} else if (customDateFormat) {
 				customDate = moment(value).format(customDateFormat);
 			}
@@ -192,7 +195,7 @@ export const updateDateTimeInput = (input: HTMLInputElement, plugin: PrettyPrope
 			let customDate = ""
 
 			if (propertyFormatObj.format) {
-				customDate = computeFormattedValue(plugin, propName, propertyFormatObj.format, value)
+				customDate = computeFormattedValue(plugin, propName, propertyFormatObj.format, value, sourcePath)
 			} else if (customDateTimeFormat) {
 				customDate = moment(value).format(customDateTimeFormat);
 			}

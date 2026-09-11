@@ -4,6 +4,7 @@ import { HSL } from "obsidian"
 import { querySelectorsWithIframesForContainer } from "../utils/querySelectorsHelper";
 import { getPropertyFormatObj, updatePropertyFormatting } from "./updatePropertyFormattings";
 import { updateProgress } from "./updateProgress";
+import { updateSelectButton } from "./updateSelectButton";
 
 
 export const getTextLightness = (color: HSL) => {
@@ -264,7 +265,10 @@ export const updateLongtext = (pill: HTMLElement, plugin: PrettyPropertiesPlugin
 				setPillStyles(overlayElement, propName, text, plugin)
 			}
 
-			if (parent) {
+			if (parent && grandParent) {
+
+				let sourcePath = grandParent.getAttribute("data-source-path") || ""
+				updateSelectButton(pill, propName, text, sourcePath, plugin)
 				updateColorButton(parent, propName, text, isBase, plugin)
 			}
 		}

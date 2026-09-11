@@ -14,11 +14,12 @@ registerCustomHelpers(handlebars);
 export const getFormattedString = (
 	propertyName: string,
 	propertyValue: unknown,
+	filePath: string,
 	formatTemplate: string
 ) => {
 
 	const compiled = handlebars.compile(formatTemplate, {noEscape: false});
-	return compiled({propertyName, propertyValue})
+	return compiled({propertyName, propertyValue, filePath})
 }
 
 
@@ -32,7 +33,7 @@ export const validateFormatTemplate = (formatTemplate: string): string | null =>
 	
 
 
-		compiled({"propertyName": "", "propertyValue": ""});
+		compiled({"propertyName": "", "propertyValue": "", "filePath": ""});
 		return null;
 	} catch (e) {
 		return e instanceof Error ? e.message : String(e);

@@ -56,7 +56,9 @@ export const updatePropertyFormatting = (
     propValueEl.before(overlayElement)
 
     let formattedValue = value || ""
-    formattedValue = computeFormattedValue(plugin, propName, propertyFormat, value)
+    let sourcePath = el.getAttribute("data-source-path") || ""
+        
+    formattedValue = computeFormattedValue(plugin, propName, propertyFormat, value, sourcePath)
     setOverlayContent(formattedValue, propertyTextFormat, overlayElement, el, plugin)
 
     el.classList.add("has-property-formatting")
@@ -71,7 +73,8 @@ export const computeFormattedValue = (
     plugin: PrettyPropertiesPlugin,
     propertyName: string,
     propertyFormat: string,
-    currentValue: string | null 
+    currentValue: string | null,
+    sourcePath: string 
 ): string =>  {
     const rawText = currentValue || ""
 
@@ -80,7 +83,7 @@ export const computeFormattedValue = (
     }
 
     try {
-        return getFormattedString(propertyName, rawText, propertyFormat);
+        return getFormattedString(propertyName, rawText, sourcePath, propertyFormat);
     } catch {
         return rawText;
     }

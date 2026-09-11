@@ -19,6 +19,7 @@ export const patchMetadataSuggester = (plugin: PrettyPropertiesPlugin) => {
 
   plugin.patches.uninstallPPSuggesterPatch = around(PopoverSuggest.prototype, {
 
+
     open(old) {
       return dedupe("pp-patch-suggest-around-key", old, function (this: PropertyPopoverSuggest) {
 

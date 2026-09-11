@@ -69,7 +69,7 @@ export const renderCover = async (
 
 			const formatString = entry.format;
 			if (formatString) {
-				coverVal = getFormattedString(entry.property, coverVal, formatString)
+				coverVal = getFormattedString(entry.property, coverVal, sourcePath, formatString)
 			}
 			break
 		}
