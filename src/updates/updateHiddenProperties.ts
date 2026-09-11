@@ -25,11 +25,19 @@ export const updateHiddenCSSClasses = (propEl: HTMLElement, propName: string, pl
 // We should also count properties that are hidden when empty
 
 export const updateMetadataEditor = (metadataEditor: MetadataEditor, plugin: PrettyPropertiesPlugin) => {
+
     let mcHidden = true
 
     for (let r of metadataEditor.rendered) {
+
+        r.renderProperty(r.entry, !0)
+
+
+        
         let propEl = r.containerEl
-        updateHiddenCSSClasses(propEl, r.entry.key, plugin)
+        
+        //updateHiddenCSSClasses(propEl, r.entry.key, plugin)
+        
 
         if (propEl.classList.contains("pp-property-hidden")) {
             continue
@@ -45,6 +53,17 @@ export const updateMetadataEditor = (metadataEditor: MetadataEditor, plugin: Pre
     }
     metadataEditor.containerEl.classList.toggle("pp-mc-hidden", mcHidden)
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 

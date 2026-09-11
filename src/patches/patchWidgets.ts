@@ -4,6 +4,7 @@ import { updateLongtext, updateMultiselectPill, updateNumberWidget, updateTagPil
 import { updateDateInput, updateDateTimeInput } from "src/updates/updateDates"
 import { around, dedupe } from "monkey-around";
 import { AliasesPropertyWidgetComponent, MultitextPropertyWidgetComponent, PropertyWidgetComponentBase, TagsPropertyWidgetComponent, TypeInfo } from "@obsidian-typings/obsidian-public-latest";
+import { updateHiddenCSSClasses } from "src/updates/updateHiddenProperties";
 
 
 type WidgetArgs = [
@@ -12,10 +13,6 @@ type WidgetArgs = [
     key: string;
     sourcePath: string;
 }]
-
-// Tracks text widgets we've already attached our blur-refresh listener to, so
-// re-renders (which may reuse the same DOM element) don't accumulate duplicates.
-const longtextBlurWired = new WeakSet<HTMLElement>();
 
 
 interface MetadataTypeManagerOld {
@@ -32,7 +29,7 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
   let value = args[1]
   let parent = el.parentElement
 
-
+  
   let valueOldVersion = value as unknown
   if (valueOldVersion && typeof valueOldVersion == "object" && "value" in valueOldVersion) {
     value = valueOldVersion.value as string | number | boolean | string[] | null | undefined
@@ -75,9 +72,6 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
     }
 
     for (let element of elements) {
-
-      
-      
       updateTagPill(element, plugin)
     }
   }
@@ -93,12 +87,17 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
     
     if (input) {
       updateDateInput(input, plugin)
+
+
+      /*
       input.onchange = () => {
         updateDateInput(input, plugin)
       }
       input.onblur = () => {
         updateDateInput(input, plugin)
       }
+      */
+
     }
   }
 
@@ -109,12 +108,16 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
   if (type == "datetime") {
     let input = el.querySelector("input");
     updateDateTimeInput(input!, plugin)
+
+    /*
     input!.onchange = () => {
       updateDateTimeInput(input!, plugin)
     }
     input!.onblur = () => {
       updateDateTimeInput(input!, plugin)
     }
+    */
+
   }
 
 
@@ -124,9 +127,13 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
   if (type == "number") {
     let input = el.querySelector("input");
     updateNumberWidget(propName, input!.value, parent, sourcePath, plugin)
+
+    /*
     input!.onchange = () => {
       updateNumberWidget(propName, input!.value, parent, sourcePath, plugin)
     }
+    */
+
   }
 
 
@@ -159,39 +166,13 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
 
 
     if (longText?.instanceOf(HTMLElement)) {
-
-        // Fix for wikilink values ("[[...]]") not being saved.
-        //
-        // 1) Don't run value post-processing / overlay creation while the user is
-        //    actively editing this field. When typing "[[" Obsidian re-renders the
-        //    text widget (it internally converts the input into a link element), and
-        //    our restyle/overlay logic running mid-edit can tear down the DOM and
-        //    drop the in-progress input, leaving the old committed value in the file.
         const isEditing = longText.matches(":focus") || longText.contains(document.activeElement);
         if (!isEditing) {
           updateLongtext(longText, plugin, propName);
         }
-
-        // 2) Register the blur refresh with addEventListener instead of overwriting
-        //    the `onblur` property. Plain text is committed by Obsidian on `input`,
-        //    but a wikilink value is only finalized/committed on blur (after the link
-        //    suggester resolves it). Overwriting `onblur` here clobbered Obsidian's
-        //    own blur handler, so wikilink edits were never committed. addEventListener
-        //    keeps both handlers. Guard with a WeakSet so repeated renders of the same
-        //    element don't add duplicate listeners.
-        if (!longtextBlurWired.has(longText)) {
-          longtextBlurWired.add(longText);
-          longText.addEventListener("blur", () => {
-            updateLongtext(longText, plugin, propName);
-            let link = el.querySelector(".metadata-link");
-            if (link) {
-              parent?.classList.remove("is-empty")
-            }
-          });
-        }
-      } else if (link) {
-        parent?.classList.remove("is-empty")
-      }
+    } else if (link) {
+      parent?.classList.remove("is-empty")
+    }
 
 
 
@@ -259,6 +240,9 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
         parent?.classList.remove("is-empty")
       }
 
+
+      /*
+
       input.onchange = () => {
         let indeterminate = input.getAttribute("data-indeterminate")
         if (indeterminate == "true") {
@@ -267,13 +251,17 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
           parent?.classList.remove("is-empty")
         }
       }
+
+      */
+
+
     }
   }
 
 
-  
+  updateHiddenCSSClasses(parent, propName, plugin)
 
-  
+  /*
 
   if (plugin.settings.hiddenProperties.find(p => p.toLowerCase() == propName.toLowerCase())) {
     parent?.classList.add("pp-property-hidden")
@@ -282,6 +270,8 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
   if (plugin.settings.hiddenWhenEmptyProperties.find(p => p.toLowerCase() == propName.toLowerCase())) {
     parent?.classList.add("pp-property-hidden-when-empty")
   }
+
+  */
   
 }
 
