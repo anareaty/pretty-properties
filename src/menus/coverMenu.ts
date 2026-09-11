@@ -1,7 +1,7 @@
 import { TFile, Menu, MenuItem, requireApiVersion } from "obsidian";
 import { i18n } from "src/localization/localization";
 import PrettyPropertiesPlugin from "src/main";
-import { updateHiddenProperties } from "src/updates/updateHiddenProperties";
+import { updateProperties } from "src/updates/updateProperties";
 import { getCurrentCoverProperty, selectCoverPosition } from "src/utils/imageUtils";
 import { selectCoverShape } from "src/utils/imageUtils";
 import { removeProperty } from "src/utils/propertyUtils";
@@ -87,7 +87,7 @@ export const handleCoverMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => {
                     }
 
                     await plugin.saveSettings()
-                    updateHiddenProperties(plugin)
+                    updateProperties(plugin)
                     if (requireApiVersion("1.13.0")) {
                         plugin.settingTab?.update()			
                     }
@@ -114,7 +114,7 @@ export const handleCoverMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => {
                     }
 
                     await plugin.saveSettings();
-                    updateHiddenProperties(plugin);
+                    updateProperties(plugin);
                     if (requireApiVersion("1.13.0")) {
                         plugin.settingTab?.update()			
                     }

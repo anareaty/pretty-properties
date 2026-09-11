@@ -32402,7 +32402,7 @@ var updateNumberWidget = (propName, value, parent, sourcePath, plugin) => {
   }
 };
 
-// src/updates/updateHiddenProperties.ts
+// src/updates/updateProperties.ts
 var import_obsidian22 = require("obsidian");
 var updateHiddenCSSClasses = (propEl, propName, plugin) => {
   if (plugin.settings.hiddenProperties.find((p) => p.toLowerCase() == propName.toLowerCase())) {
@@ -32433,7 +32433,7 @@ var updateMetadataEditor = (metadataEditor, plugin) => {
   }
   metadataEditor.containerEl.classList.toggle("pp-mc-hidden", mcHidden);
 };
-var updateHiddenProperties = (plugin) => {
+var updateProperties = (plugin) => {
   var _a, _b;
   let leaves = plugin.app.workspace.getLeavesOfType("markdown");
   for (let leaf of leaves) {
@@ -32659,15 +32659,15 @@ var updatePillPaddings = (plugin) => {
   }
   document.body.classList.add("pp-pill-padding-" + plugin.settings.addPillPadding);
 };
-var updateHiddenPropertiesInPropTab = (plugin) => {
+var updatePropertiesInPropTab = (plugin) => {
   let hidden = plugin.settings.hidePropertiesInPropTab;
   document.body.classList.toggle("hidden-props-in-prop-tab", hidden);
-  updateHiddenProperties(plugin);
+  updateProperties(plugin);
 };
 var updateHiddenEmptyProperties = (plugin) => {
   let hideAllEmptyProperties = plugin.settings.hideAllEmptyProperties;
   document.body.classList.toggle("hide-all-empty-properties", hideAllEmptyProperties);
-  updateHiddenProperties(plugin);
+  updateProperties(plugin);
 };
 var updateHiddenMetadataContainer = (plugin) => {
   let hideMetadataContainerIfAllPropertiesHiddenEditing = plugin.settings.hideMetadataContainerIfAllPropertiesHiddenEditing;
@@ -34324,7 +34324,7 @@ var getOtherSettingsDefinitions = (tab) => {
                     updateIconStyles(plugin);
                     updateCoverStyles(plugin);
                     updatePillPaddings(plugin);
-                    updateHiddenPropertiesInPropTab(plugin);
+                    updatePropertiesInPropTab(plugin);
                     updateHiddenEmptyProperties(plugin);
                     updateHiddenMetadataContainer(plugin);
                     updateAutoHideProps(plugin);
@@ -34353,7 +34353,7 @@ var getOtherSettingsDefinitions = (tab) => {
           updateIconStyles(plugin);
           updateCoverStyles(plugin);
           updatePillPaddings(plugin);
-          updateHiddenPropertiesInPropTab(plugin);
+          updatePropertiesInPropTab(plugin);
           updateHiddenEmptyProperties(plugin);
           updateHiddenMetadataContainer(plugin);
           updateAutoHideProps(plugin);
@@ -34491,7 +34491,7 @@ var showOtherSettings = (settingTab) => {
               updateIconStyles(plugin);
               updateCoverStyles(plugin);
               updatePillPaddings(plugin);
-              updateHiddenPropertiesInPropTab(plugin);
+              updatePropertiesInPropTab(plugin);
               updateHiddenEmptyProperties(plugin);
               updateHiddenMetadataContainer(plugin);
               updateAutoHideProps(plugin);
@@ -34514,7 +34514,7 @@ var showOtherSettings = (settingTab) => {
     updateIconStyles(plugin);
     updateCoverStyles(plugin);
     updatePillPaddings(plugin);
-    updateHiddenPropertiesInPropTab(plugin);
+    updatePropertiesInPropTab(plugin);
     updateHiddenEmptyProperties(plugin);
     updateHiddenMetadataContainer(plugin);
     updateAutoHideProps(plugin);
@@ -34897,7 +34897,7 @@ var showHiddenSettings = (settingTab) => {
         plugin.settings.hiddenProperties = plugin.settings.hiddenProperties.filter((p) => p != property);
         await plugin.saveSettings();
         propertyHiddenSetting.settingEl.remove();
-        updateHiddenProperties(plugin);
+        updateProperties(plugin);
       })
     );
   };
@@ -34913,7 +34913,7 @@ var showHiddenSettings = (settingTab) => {
       if (newProperty && !plugin.settings.hiddenProperties.find((p) => p == newProperty)) {
         plugin.settings.hiddenProperties.push(newProperty);
         await plugin.saveSettings();
-        updateHiddenProperties(plugin);
+        updateProperties(plugin);
         addHiddenSetting(newProperty);
         let inputSetting = newPropertySetting.components[0];
         if (inputSetting instanceof import_obsidian33.TextComponent) {
@@ -34934,7 +34934,7 @@ var showHiddenEmptySettings = (settingTab) => {
         plugin.settings.hiddenWhenEmptyProperties = plugin.settings.hiddenWhenEmptyProperties.filter((p) => p != property);
         await plugin.saveSettings();
         propertyHiddenSetting.settingEl.remove();
-        updateHiddenProperties(plugin);
+        updateProperties(plugin);
       })
     );
   };
@@ -34950,7 +34950,7 @@ var showHiddenEmptySettings = (settingTab) => {
       if (newProperty && !plugin.settings.hiddenWhenEmptyProperties.find((p) => p == newProperty)) {
         plugin.settings.hiddenWhenEmptyProperties.push(newProperty);
         await plugin.saveSettings();
-        updateHiddenProperties(plugin);
+        updateProperties(plugin);
         addHiddenSetting(newProperty);
         let inputSetting = newPropertySetting.components[0];
         if (inputSetting instanceof import_obsidian33.TextComponent) {
@@ -34972,7 +34972,7 @@ var getHiddenSettingsDefinitions = (tab) => {
         setting.addToggle((toggle) => toggle.setValue(plugin.settings.hidePropertiesInPropTab).onChange(async (value) => {
           plugin.settings.hidePropertiesInPropTab = value;
           await plugin.saveSettings();
-          updateHiddenPropertiesInPropTab(plugin);
+          updatePropertiesInPropTab(plugin);
         }));
       }
     },
@@ -35051,7 +35051,7 @@ var getHiddenSettingsDefinitions = (tab) => {
                 if (newProperty && !plugin.settings.hiddenProperties.find((p) => p == newProperty)) {
                   plugin.settings.hiddenProperties.push(newProperty);
                   await plugin.saveSettings();
-                  updateHiddenProperties(plugin);
+                  updateProperties(plugin);
                   if ((0, import_obsidian34.requireApiVersion)("1.13.0")) {
                     tab.update();
                   }
@@ -35062,7 +35062,7 @@ var getHiddenSettingsDefinitions = (tab) => {
           onDelete: async (idx) => {
             plugin.settings.hiddenProperties.splice(idx, 1);
             await plugin.saveSettings();
-            updateHiddenProperties(plugin);
+            updateProperties(plugin);
             if ((0, import_obsidian34.requireApiVersion)("1.13.0")) {
               tab.update();
             }
@@ -35088,7 +35088,7 @@ var getHiddenSettingsDefinitions = (tab) => {
                 if (newProperty && !plugin.settings.hiddenWhenEmptyProperties.find((p) => p == newProperty)) {
                   plugin.settings.hiddenWhenEmptyProperties.push(newProperty);
                   await plugin.saveSettings();
-                  updateHiddenProperties(plugin);
+                  updateProperties(plugin);
                   if ((0, import_obsidian34.requireApiVersion)("1.13.0")) {
                     tab.update();
                   }
@@ -35099,7 +35099,7 @@ var getHiddenSettingsDefinitions = (tab) => {
           onDelete: async (idx) => {
             plugin.settings.hiddenWhenEmptyProperties.splice(idx, 1);
             await plugin.saveSettings();
-            updateHiddenProperties(plugin);
+            updateProperties(plugin);
             if ((0, import_obsidian34.requireApiVersion)("1.13.0")) {
               tab.update();
             }
@@ -35118,7 +35118,7 @@ var showHiddenSettingsTab = (settingTab) => {
   new import_obsidian34.Setting(containerEl).setName(i18n.t("HIDE_PROPERTIES_IN_SIDEBAR")).addToggle((toggle) => toggle.setValue(plugin.settings.hidePropertiesInPropTab).onChange(async (value) => {
     plugin.settings.hidePropertiesInPropTab = value;
     await plugin.saveSettings();
-    updateHiddenPropertiesInPropTab(plugin);
+    updatePropertiesInPropTab(plugin);
   }));
   new import_obsidian34.Setting(containerEl).setName(i18n.t("HIDE_ALL_EMPTY_PROPERTIES")).addToggle((toggle) => toggle.setValue(plugin.settings.hideAllEmptyProperties).onChange(async (value) => {
     plugin.settings.hideAllEmptyProperties = value;
@@ -55548,7 +55548,7 @@ var handlePropertyMenu = (menu, propEl, plugin) => {
           plugin.settings.hiddenProperties = plugin.settings.hiddenProperties.filter((p) => p.toLowerCase() != propName.toLowerCase());
         }
         await plugin.saveSettings();
-        updateHiddenProperties(plugin);
+        updateProperties(plugin);
         if ((0, import_obsidian44.requireApiVersion)("1.13.0")) {
           (_a = plugin.settingTab) == null ? void 0 : _a.update();
         }
@@ -55561,7 +55561,7 @@ var handlePropertyMenu = (menu, propEl, plugin) => {
             propName
           );
         await plugin.saveSettings();
-        updateHiddenProperties(plugin);
+        updateProperties(plugin);
         if ((0, import_obsidian44.requireApiVersion)("1.13.0")) {
           (_a = plugin.settingTab) == null ? void 0 : _a.update();
         }
@@ -55574,7 +55574,7 @@ var handlePropertyMenu = (menu, propEl, plugin) => {
           plugin.settings.hiddenWhenEmptyProperties = plugin.settings.hiddenWhenEmptyProperties.filter((p) => p.toLowerCase() != propName.toLowerCase());
         }
         await plugin.saveSettings();
-        updateHiddenProperties(plugin);
+        updateProperties(plugin);
         if ((0, import_obsidian44.requireApiVersion)("1.13.0")) {
           (_a = plugin.settingTab) == null ? void 0 : _a.update();
         }
@@ -55587,7 +55587,7 @@ var handlePropertyMenu = (menu, propEl, plugin) => {
             propName
           );
         await plugin.saveSettings();
-        updateHiddenProperties(plugin);
+        updateProperties(plugin);
         if ((0, import_obsidian44.requireApiVersion)("1.13.0")) {
           (_a = plugin.settingTab) == null ? void 0 : _a.update();
         }
@@ -55727,7 +55727,7 @@ var handleBannerMenu = (menu, plugin) => {
         plugin.settings.hiddenProperties = plugin.settings.hiddenProperties.filter((p) => p.toLowerCase() != positionPropName.toLowerCase());
       }
       await plugin.saveSettings();
-      updateHiddenProperties(plugin);
+      updateProperties(plugin);
       if ((0, import_obsidian45.requireApiVersion)("1.13.0")) {
         (_a = plugin.settingTab) == null ? void 0 : _a.update();
       }
@@ -55743,7 +55743,7 @@ var handleBannerMenu = (menu, plugin) => {
         plugin.settings.hiddenProperties.push(positionPropName);
       }
       await plugin.saveSettings();
-      updateHiddenProperties(plugin);
+      updateProperties(plugin);
       if ((0, import_obsidian45.requireApiVersion)("1.13.0")) {
         (_a = plugin.settingTab) == null ? void 0 : _a.update();
       }
@@ -55796,7 +55796,7 @@ var handleCoverMenu = (menu, plugin) => {
             plugin.settings.hiddenProperties = plugin.settings.hiddenProperties.filter((p) => p.toLowerCase() != coverShapePropName.toLowerCase());
           }
           await plugin.saveSettings();
-          updateHiddenProperties(plugin);
+          updateProperties(plugin);
           if ((0, import_obsidian46.requireApiVersion)("1.13.0")) {
             (_a = plugin.settingTab) == null ? void 0 : _a.update();
           }
@@ -55815,7 +55815,7 @@ var handleCoverMenu = (menu, plugin) => {
             plugin.settings.hiddenProperties.push(coverShapePropName);
           }
           await plugin.saveSettings();
-          updateHiddenProperties(plugin);
+          updateProperties(plugin);
           if ((0, import_obsidian46.requireApiVersion)("1.13.0")) {
             (_a = plugin.settingTab) == null ? void 0 : _a.update();
           }
@@ -55841,7 +55841,7 @@ var handleIconMenu = (menu, plugin) => {
         plugin.settings.hiddenProperties = plugin.settings.hiddenProperties.filter((p) => p.toLowerCase() != propName.toLowerCase());
       }
       await plugin.saveSettings();
-      updateHiddenProperties(plugin);
+      updateProperties(plugin);
       if ((0, import_obsidian47.requireApiVersion)("1.13.0")) {
         (_a = plugin.settingTab) == null ? void 0 : _a.update();
       }
@@ -55852,7 +55852,7 @@ var handleIconMenu = (menu, plugin) => {
       if (propName)
         plugin.settings.hiddenProperties.push(propName);
       await plugin.saveSettings();
-      updateHiddenProperties(plugin);
+      updateProperties(plugin);
       if ((0, import_obsidian47.requireApiVersion)("1.13.0")) {
         (_a = plugin.settingTab) == null ? void 0 : _a.update();
       }
@@ -56226,7 +56226,7 @@ var PrettyPropertiesPlugin = class extends import_obsidian50.Plugin {
     updateCoverStyles(this);
     updatePillPaddings(this);
     updateEmptyProperties(this);
-    updateHiddenPropertiesInPropTab(this);
+    updatePropertiesInPropTab(this);
     updateHiddenEmptyProperties(this);
     updateHiddenMetadataContainer(this);
     updateAutoHideProps(this);

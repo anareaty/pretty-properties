@@ -567,6 +567,7 @@ body.is-mobile .pp-cover {
   .metadata-container:not(.in-canvas, .in-popover) .pp-cover.right {
     max-height: var(--cover-max-height-top-bottom);
     margin-bottom: var(--pp-cover-gap);
+    grid-row: unset;
   }
 
   .metadata-container:not(.in-canvas, .in-popover) .pp-cover.initial.left .pp-cover-image,

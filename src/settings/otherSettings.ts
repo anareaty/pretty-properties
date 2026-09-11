@@ -1,7 +1,7 @@
 import { Setting, Notice, Platform, Modal, requireApiVersion } from 'obsidian';
 import { i18n } from 'src/localization/localization';
 import { DEFAULT_SETTINGS, PPSettingTab } from 'src/settings/settings';
-import { updateAutoHideProps, updateBannerStyles, updateCoverStyles, updateHiddenEmptyProperties, updateHiddenMetadataContainer, updateHiddenPropertiesInPropTab, updateHideMetadataAddButton, updateHidePropTitle, updateIconStyles, updatePillPaddings, updateRelativeDateColors } from 'src/updates/updateStyles';
+import { updateAutoHideProps, updateBannerStyles, updateCoverStyles, updateHiddenEmptyProperties, updateHiddenMetadataContainer, updatePropertiesInPropTab, updateHideMetadataAddButton, updateHidePropTitle, updateIconStyles, updatePillPaddings, updateRelativeDateColors } from 'src/updates/updateStyles';
 import { updateAllProperties } from 'src/updates/updateElements';
 import { updateLongTexts } from 'src/updates/updatePills';
 
@@ -173,7 +173,7 @@ export const getOtherSettingsDefinitions = (tab: PPSettingTab) => {
                                         updateIconStyles(plugin);
                                         updateCoverStyles(plugin);
                                         updatePillPaddings(plugin)
-                                        updateHiddenPropertiesInPropTab(plugin)
+                                        updatePropertiesInPropTab(plugin)
                                         updateHiddenEmptyProperties(plugin)
                                         updateHiddenMetadataContainer(plugin)
                                         updateAutoHideProps(plugin)
@@ -205,7 +205,7 @@ export const getOtherSettingsDefinitions = (tab: PPSettingTab) => {
                         updateIconStyles(plugin);
                         updateCoverStyles(plugin);
                         updatePillPaddings(plugin)
-                        updateHiddenPropertiesInPropTab(plugin)
+                        updatePropertiesInPropTab(plugin)
                         updateHiddenEmptyProperties(plugin)
                         updateHiddenMetadataContainer(plugin)
                         updateAutoHideProps(plugin)
@@ -391,7 +391,7 @@ export const showOtherSettings = (settingTab: PPSettingTab) => {
                                 updateIconStyles(plugin);
                                 updateCoverStyles(plugin);
                                 updatePillPaddings(plugin)
-                                updateHiddenPropertiesInPropTab(plugin)
+                                updatePropertiesInPropTab(plugin)
                                 updateHiddenEmptyProperties(plugin)
                                 updateHiddenMetadataContainer(plugin)
                                 updateAutoHideProps(plugin)
@@ -425,7 +425,7 @@ export const showOtherSettings = (settingTab: PPSettingTab) => {
                 updateIconStyles(plugin);
                 updateCoverStyles(plugin);
                 updatePillPaddings(plugin)
-                updateHiddenPropertiesInPropTab(plugin)
+                updatePropertiesInPropTab(plugin)
                 updateHiddenEmptyProperties(plugin)
                 updateHiddenMetadataContainer(plugin)
                 updateAutoHideProps(plugin)

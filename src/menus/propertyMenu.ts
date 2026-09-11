@@ -1,7 +1,7 @@
 import { Menu, MenuItem, requireApiVersion } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { i18n } from "src/localization/localization";
-import { updateHiddenProperties } from "src/updates/updateHiddenProperties";
+import { updateProperties } from "src/updates/updateProperties";
 import { updateAllProperties } from "src/updates/updateElements";
 import { getPropertyType } from "src/utils/propertyUtils";
 
@@ -24,7 +24,7 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                         plugin.settings.hiddenProperties = plugin.settings.hiddenProperties.filter(p => p.toLowerCase() != propName.toLowerCase())
                     }
                     await plugin.saveSettings();
-                    updateHiddenProperties(plugin);
+                    updateProperties(plugin);
                     if (requireApiVersion("1.13.0")) {
                         plugin.settingTab?.update()			
                     }
@@ -43,7 +43,7 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                             propName
                         );
                     await plugin.saveSettings();
-                    updateHiddenProperties(plugin);
+                    updateProperties(plugin);
                     if (requireApiVersion("1.13.0")) {
                         plugin.settingTab?.update()			
                     }
@@ -63,7 +63,7 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                         plugin.settings.hiddenWhenEmptyProperties = plugin.settings.hiddenWhenEmptyProperties.filter(p => p.toLowerCase() != propName.toLowerCase())
                     }
                     await plugin.saveSettings();
-                    updateHiddenProperties(plugin);
+                    updateProperties(plugin);
                     if (requireApiVersion("1.13.0")) {
                         plugin.settingTab?.update()			
                     }
@@ -82,7 +82,7 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                             propName
                         );
                     await plugin.saveSettings();
-                    updateHiddenProperties(plugin);
+                    updateProperties(plugin);
                     if (requireApiVersion("1.13.0")) {
                         plugin.settingTab?.update()			
                     }

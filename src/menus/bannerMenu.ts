@@ -1,7 +1,7 @@
 import { Menu, MenuItem, requireApiVersion } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { i18n } from "src/localization/localization";
-import { updateHiddenProperties } from "src/updates/updateHiddenProperties";
+import { updateProperties } from "src/updates/updateProperties";
 import { selectBannerPosition } from "src/utils/imageUtils";
 import { removeProperty } from "src/utils/propertyUtils";
 import { ImageSuggestModal } from "src/modals/imageSuggestModal";
@@ -66,7 +66,7 @@ export const handleBannerMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => 
                 }
                     
                 await plugin.saveSettings();
-                updateHiddenProperties(plugin);
+                updateProperties(plugin);
                 if (requireApiVersion("1.13.0")) {
                     plugin.settingTab?.update()
                 }
@@ -91,7 +91,7 @@ export const handleBannerMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => 
 
 
                 await plugin.saveSettings();
-                updateHiddenProperties(plugin);
+                updateProperties(plugin);
                 if (requireApiVersion("1.13.0")) {
                     plugin.settingTab?.update()
                 }

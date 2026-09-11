@@ -4,7 +4,7 @@ import { updateLongtext, updateMultiselectPill, updateNumberWidget, updateTagPil
 import { updateDateInput, updateDateTimeInput } from "src/updates/updateDates"
 import { around, dedupe } from "monkey-around";
 import { AliasesPropertyWidgetComponent, MultitextPropertyWidgetComponent, PropertyWidgetComponentBase, TagsPropertyWidgetComponent, TypeInfo } from "@obsidian-typings/obsidian-public-latest";
-import { updateHiddenCSSClasses } from "src/updates/updateHiddenProperties";
+import { updateHiddenCSSClasses } from "src/updates/updateProperties";
 
 
 type WidgetArgs = [
@@ -29,7 +29,7 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
   let value = args[1]
   let parent = el.parentElement
 
-  
+
   let valueOldVersion = value as unknown
   if (valueOldVersion && typeof valueOldVersion == "object" && "value" in valueOldVersion) {
     value = valueOldVersion.value as string | number | boolean | string[] | null | undefined
@@ -39,9 +39,6 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
   parent.setAttribute("data-source-path", sourcePath)
 
 
-
-
-  
 
   if (type == "multitext" || type == "aliases") {
     let renderedTyped = rendered as MultitextPropertyWidgetComponent | AliasesPropertyWidgetComponent
@@ -59,10 +56,7 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
 
 
 
-
-
   if (type == "tags") {
-
     let renderedTyped = rendered as TagsPropertyWidgetComponent
     let elements = renderedTyped?.multiselect.elements
     if (elements.length == 0) {
@@ -78,92 +72,32 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
 
 
 
-  
-
-
-
   if (type == "date") {
     let input = el.querySelector("input");
-    
     if (input) {
       updateDateInput(input, plugin)
-
-
-      /*
-      input.onchange = () => {
-        updateDateInput(input, plugin)
-      }
-      input.onblur = () => {
-        updateDateInput(input, plugin)
-      }
-      */
-
     }
   }
-
-
 
 
 
   if (type == "datetime") {
     let input = el.querySelector("input");
     updateDateTimeInput(input!, plugin)
-
-    /*
-    input!.onchange = () => {
-      updateDateTimeInput(input!, plugin)
-    }
-    input!.onblur = () => {
-      updateDateTimeInput(input!, plugin)
-    }
-    */
-
   }
-
-
 
 
 
   if (type == "number") {
     let input = el.querySelector("input");
     updateNumberWidget(propName, input!.value, parent, sourcePath, plugin)
-
-    /*
-    input!.onchange = () => {
-      updateNumberWidget(propName, input!.value, parent, sourcePath, plugin)
-    }
-    */
-
   }
 
 
-  
 
   if (type == "text") {
     let longText = el.querySelector(".metadata-input-longtext");
     let link = el.querySelector(".metadata-link");
-
-
-    
-
-    /*
-
-    if (longText?.instanceOf(HTMLElement)) {
-      updateLongtext(longText, plugin, propName);
-      longText.onblur = () => {
-        updateLongtext(longText, plugin, propName);
-        let link = el.querySelector(".metadata-link");
-        if (link instanceof HTMLElement && link.innerText) {
-          parent?.classList.remove("is-empty")
-        }
-      };
-    } else if (link instanceof HTMLElement && link.innerText) {
-      parent?.classList.remove("is-empty")
-    }
-
-    */
-
-
 
     if (longText?.instanceOf(HTMLElement)) {
         const isEditing = longText.matches(":focus") || longText.contains(document.activeElement);
@@ -174,32 +108,6 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
       parent?.classList.remove("is-empty")
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
 
     if (propName == plugin.settings.bannerProperty) {
       el.classList.add("banner-property-value")
@@ -213,10 +121,6 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
       el.classList.add("cover-property-value")
     }
   }
-
-      
-
-
 
 
 
@@ -239,58 +143,30 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
       } else {
         parent?.classList.remove("is-empty")
       }
-
-
-      /*
-
-      input.onchange = () => {
-        let indeterminate = input.getAttribute("data-indeterminate")
-        if (indeterminate == "true") {
-          parent?.classList.add("is-empty")
-        } else {
-          parent?.classList.remove("is-empty")
-        }
-      }
-
-      */
-
-
     }
   }
 
 
-  updateHiddenCSSClasses(parent, propName, plugin)
-
-  /*
-
-  if (plugin.settings.hiddenProperties.find(p => p.toLowerCase() == propName.toLowerCase())) {
-    parent?.classList.add("pp-property-hidden")
-  }
-
-  if (plugin.settings.hiddenWhenEmptyProperties.find(p => p.toLowerCase() == propName.toLowerCase())) {
-    parent?.classList.add("pp-property-hidden-when-empty")
-  }
-
-  */
-  
+  updateHiddenCSSClasses(parent, propName, plugin)  
 }
+
+
+
 
 
 export const patchPropertyWidgets = (plugin: PrettyPropertiesPlugin) => {
   let metadataTypeManager = plugin.app.metadataTypeManager
   let widgets = metadataTypeManager.registeredTypeWidgets
-
   let unknownWidget
+
   if (metadataTypeManager.getWidget) {
     unknownWidget = metadataTypeManager.getWidget(" ");
   } else {
-
     let metadataTypeManagerOldVersion = metadataTypeManager as unknown as MetadataTypeManagerOld
     unknownWidget = metadataTypeManagerOldVersion.getTypeInfo({key: " ", value: "unknown"}).inferred
-
   }
-  widgets.unknown = unknownWidget;
 
+  widgets.unknown = unknownWidget;
   plugin.patches.uninstallWidgetPatch = {}
 
   for (let type in widgets) {
@@ -306,10 +182,7 @@ export const patchPropertyWidgets = (plugin: PrettyPropertiesPlugin) => {
 
             if (type == "multitext" || type == "tags" || type == "aliases") {
               let multiRendered = rendered as MultitextPropertyWidgetComponent
-
               const multiselect = multiRendered.multiselect
-
-
               const untypedMultiselect = (multiselect as unknown) as Record<string, unknown>
               const old_renderValues = untypedMultiselect.renderValues as (...args: unknown[]) => unknown
 
@@ -318,7 +191,6 @@ export const patchPropertyWidgets = (plugin: PrettyPropertiesPlugin) => {
                 updateWidgets(type, rendered, widgetArgs, plugin)
                 return undefined
               }
-
             }
             return rendered
           })
@@ -326,8 +198,3 @@ export const patchPropertyWidgets = (plugin: PrettyPropertiesPlugin) => {
     })
   }
 }
-
-
-
-
-

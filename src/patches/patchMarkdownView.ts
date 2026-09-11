@@ -3,7 +3,7 @@ import { updateImagesForView } from "src/updates/updateElements"
 import { around, dedupe } from "monkey-around";
 import { MarkdownEditView, MarkdownPreviewView, MarkdownView } from "obsidian";
 import { renderTitleIcon } from "src/updates/updateIcons";
-import { updateMetadataEditor } from "src/updates/updateHiddenProperties";
+import { updateMetadataEditor } from "src/updates/updateProperties";
 import { MetadataEditor } from "@obsidian-typings/obsidian-public-latest";
 
 
@@ -23,7 +23,7 @@ export interface MarkdownEditViewPatched extends MarkdownEditView {
 }
 
 
-// Patch metadata editor so we can update the hidden state of properties block every time when properties are changed
+// Patch metadata editor so we can rerender properties and update the hidden state of properties block every time when properties are changed
 
 export const patchMetadataEditor = (metadataEditor: MetadataEditorPatched | undefined, plugin: PrettyPropertiesPlugin) => {
   if (metadataEditor && !metadataEditor.pp_patched) {

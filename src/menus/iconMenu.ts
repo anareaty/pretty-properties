@@ -1,7 +1,7 @@
 import { Menu, MenuItem, requireApiVersion } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { i18n } from "src/localization/localization";
-import { updateHiddenProperties } from "src/updates/updateHiddenProperties";
+import { updateProperties } from "src/updates/updateProperties";
 import { removeProperty } from "src/utils/propertyUtils";
 import { IconSuggestModal } from "src/modals/iconSuggestModal";
 
@@ -38,7 +38,7 @@ export const handleIconMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => {
                 
             
             await plugin.saveSettings();
-            updateHiddenProperties(plugin);
+            updateProperties(plugin);
             if (requireApiVersion("1.13.0")) {
                 plugin.settingTab?.update()			
             }
@@ -54,7 +54,7 @@ export const handleIconMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => {
             if (propName)
                 plugin.settings.hiddenProperties.push(propName);
             await plugin.saveSettings();
-            updateHiddenProperties(plugin);
+            updateProperties(plugin);
             if (requireApiVersion("1.13.0")) {
                 plugin.settingTab?.update()			
             }
