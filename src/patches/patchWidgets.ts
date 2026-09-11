@@ -3,8 +3,8 @@ import PrettyPropertiesPlugin from "src/main"
 import { updateLongtext, updateMultiselectPill, updateNumberWidget, updateTagPill } from "src/updates/updatePills"
 import { updateDateInput, updateDateTimeInput } from "src/updates/updateDates"
 import { around, dedupe } from "monkey-around";
-import { AliasesPropertyWidgetComponent, MultitextPropertyWidgetComponent, PropertyWidgetComponentBase, TagsPropertyWidgetComponent, TypeInfo } from "@obsidian-typings/obsidian-public-latest";
-import { updateHiddenCSSClasses } from "src/updates/updateProperties";
+import { AliasesPropertyWidgetComponent, MultitextPropertyWidgetComponent, PropertyWidgetComponentBase, TagsPropertyWidgetComponent, TextPropertyWidgetComponent, TypeInfo } from "@obsidian-typings/obsidian-public-latest";
+import { updateHiddenCSSClasses } from "src/updates/updateHiddenProperties";
 
 
 type WidgetArgs = [
@@ -76,6 +76,12 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
     let input = el.querySelector("input");
     if (input) {
       updateDateInput(input, plugin)
+      input.onchange = () => {
+        updateDateInput(input, plugin);
+      };
+      input.onblur = () => {
+        updateDateInput(input, plugin);
+      };
     }
   }
 
@@ -83,29 +89,56 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
 
   if (type == "datetime") {
     let input = el.querySelector("input");
-    updateDateTimeInput(input!, plugin)
+
+    if (input) {
+      updateDateTimeInput(input!, plugin)
+      input.onchange = () => {
+        updateDateTimeInput(input, plugin);
+      };
+      input.onblur = () => {
+        updateDateTimeInput(input, plugin);
+      };
+    }
+    
   }
 
 
 
   if (type == "number") {
     let input = el.querySelector("input");
-    updateNumberWidget(propName, input!.value, parent, sourcePath, plugin)
+    if (input) {
+      updateNumberWidget(propName, input!.value, parent, sourcePath, plugin)
+      input.onchange = () => {
+        updateNumberWidget(propName, input.value, parent, sourcePath, plugin);
+      };
+    }
   }
 
 
 
   if (type == "text") {
-    let longText = el.querySelector(".metadata-input-longtext");
-    let link = el.querySelector(".metadata-link");
 
-    if (longText?.instanceOf(HTMLElement)) {
-        const isEditing = longText.matches(":focus") || longText.contains(document.activeElement);
-        if (!isEditing) {
-          updateLongtext(longText, plugin, propName);
-        }
-    } else if (link) {
-      parent?.classList.remove("is-empty")
+    const checkAndUpdateLongText = () => {
+      let longText = el.querySelector(".metadata-input-longtext");
+      let link = el.querySelector(".metadata-link");
+
+      if (longText?.instanceOf(HTMLElement)) {
+          const isEditing = longText.matches(":focus") || longText.contains(document.activeElement);
+          if (!isEditing) {
+            updateLongtext(longText, plugin, propName);
+          }
+      } else if (link) {
+        parent?.classList.remove("is-empty")
+      }
+    }
+
+    checkAndUpdateLongText()
+    let textRendered = rendered as TextPropertyWidgetComponent
+    let old_onChange = textRendered.ctx.onChange
+
+    textRendered.ctx.onChange = (...args) => {
+      old_onChange(...args)
+      checkAndUpdateLongText()
     }
 
 
@@ -143,6 +176,14 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
       } else {
         parent?.classList.remove("is-empty")
       }
+      input.onchange = () => {
+        let indeterminate = input.getAttribute("data-indeterminate");
+        if (indeterminate == "true") {
+          parent?.classList.add("is-empty")
+        } else {
+          parent?.classList.remove("is-empty")
+        }
+      };
     }
   }
 

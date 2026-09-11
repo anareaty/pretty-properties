@@ -1,7 +1,7 @@
 import PrettyPropertiesPlugin from "src/main";
 import { Platform } from "obsidian";
 import { getTextLightness } from "./updatePills";
-import { updateProperties } from "./updateProperties";
+import { updateProperties } from "./updateHiddenProperties";
 
 
 export const updateBannerStyles = (plugin: PrettyPropertiesPlugin) => {
@@ -255,14 +255,14 @@ export const updatePillPaddings = (plugin: PrettyPropertiesPlugin) => {
 export const updatePropertiesInPropTab = (plugin: PrettyPropertiesPlugin) => {
   let hidden = plugin.settings.hidePropertiesInPropTab
   document.body.classList.toggle("hidden-props-in-prop-tab", hidden)
-  updateProperties(plugin)
+  updateHiddenProperties(plugin)
 }
 
 
 export const updateHiddenEmptyProperties = (plugin: PrettyPropertiesPlugin) => {
   let hideAllEmptyProperties = plugin.settings.hideAllEmptyProperties
   document.body.classList.toggle("hide-all-empty-properties", hideAllEmptyProperties)
-  updateProperties(plugin)
+  updateHiddenProperties(plugin)
 }
 
 

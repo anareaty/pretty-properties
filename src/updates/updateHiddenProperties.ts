@@ -22,16 +22,16 @@ export const updateHiddenCSSClasses = (propEl: HTMLElement, propName: string, pl
 
 
 // Update metadata editor when properties are edited in the note
-// We have to update hidden statuses and also rerender property widgets to reapply colors and formattings
-// Some widgets are rerendered automatically, but not all 
+// We have to update hidden statuses for all properties and the whole block
 // It also helps us to handle property renaming
 
 export const updateMetadataEditor = (metadataEditor: MetadataEditor, plugin: PrettyPropertiesPlugin) => {
     let mcHidden = true
 
     for (let r of metadataEditor.rendered) {
-        r.renderProperty(r.entry, !0)
+
         let propEl = r.containerEl
+        updateHiddenCSSClasses(propEl, r.entry.key, plugin)
 
         if (propEl.classList.contains("pp-property-hidden")) {
             continue
@@ -53,7 +53,7 @@ export const updateMetadataEditor = (metadataEditor: MetadataEditor, plugin: Pre
 
 
 
-// Update all metadata editors to rerender properties in all tabs 
+// Update all metadata editors to update hidden properties 
 // Useful when settings are changed
 // We don't need to update metadata editor in hover popover 
 // because it is probably not active when this function is called

@@ -1,7 +1,7 @@
 import { Setting, TextComponent } from 'obsidian';
 import { i18n } from 'src/localization/localization';
 import { PPSettingTab } from 'src/settings/settings';
-import { updateProperties } from 'src/updates/updateProperties';
+import { updateProperties } from 'src/updates/updateHiddenProperties';
 
 
 export const showHiddenSettings = (settingTab: PPSettingTab) => {
@@ -21,7 +21,7 @@ export const showHiddenSettings = (settingTab: PPSettingTab) => {
                 plugin.settings.hiddenProperties = plugin.settings.hiddenProperties.filter(p => p != property)
                 await plugin.saveSettings()
                 propertyHiddenSetting.settingEl.remove()
-                updateProperties(plugin)
+                updateHiddenProperties(plugin)
             })
         )
     }
@@ -44,7 +44,7 @@ export const showHiddenSettings = (settingTab: PPSettingTab) => {
                 if (newProperty && !plugin.settings.hiddenProperties.find(p => p.toLowerCase() == newProperty.toLowerCase())) {
                     plugin.settings.hiddenProperties.push(newProperty)
                     await plugin.saveSettings()
-                    updateProperties(plugin)
+                    updateHiddenProperties(plugin)
                     addHiddenSetting(newProperty)
                     let inputSetting = newPropertySetting.components[0]
                     if (inputSetting instanceof TextComponent) {
@@ -74,7 +74,7 @@ export const showHiddenEmptySettings = (settingTab: PPSettingTab) => {
                 plugin.settings.hiddenWhenEmptyProperties = plugin.settings.hiddenWhenEmptyProperties.filter(p => p != property)
                 await plugin.saveSettings()
                 propertyHiddenSetting.settingEl.remove()
-                updateProperties(plugin)
+                updateHiddenProperties(plugin)
             })
         )
     }
@@ -97,7 +97,7 @@ export const showHiddenEmptySettings = (settingTab: PPSettingTab) => {
                 if (newProperty && !plugin.settings.hiddenWhenEmptyProperties.find(p => p.toLowerCase() == newProperty.toLowerCase())) {
                     plugin.settings.hiddenWhenEmptyProperties.push(newProperty)
                     await plugin.saveSettings()
-                    updateProperties(plugin)
+                    updateHiddenProperties(plugin)
                     addHiddenSetting(newProperty)
                     let inputSetting = newPropertySetting.components[0]
                     if (inputSetting instanceof TextComponent) {

@@ -11,7 +11,7 @@ import {
 } from 'src/updates/updateStyles';
 import { showHiddenEmptySettings, showHiddenSettings } from './hiddenSettings';
 import { AddPropertyModal } from 'src/modals/settingItemModals';
-import { updateProperties } from 'src/updates/updateProperties';
+import { updateProperties } from 'src/updates/updateHiddenProperties';
 
 
 
@@ -120,7 +120,7 @@ export const getHiddenSettingsDefinitions = (tab: PPSettingTab) => {
                                 if (newProperty && !plugin.settings.hiddenProperties.find(p => p.toLowerCase() == newProperty.toLowerCase())) {
                                     plugin.settings.hiddenProperties.push(newProperty)
                                     await plugin.saveSettings()
-                                    updateProperties(plugin)
+                                    updateHiddenProperties(plugin)
                                     if (requireApiVersion("1.13.0")) {
                                         tab.update()			
                                     }
@@ -131,7 +131,7 @@ export const getHiddenSettingsDefinitions = (tab: PPSettingTab) => {
                     onDelete: async (idx: number) => {
                         plugin.settings.hiddenProperties.splice(idx, 1);
                         await plugin.saveSettings();
-                        updateProperties(plugin)
+                        updateHiddenProperties(plugin)
                         if (requireApiVersion("1.13.0")) {
                             tab.update()			
                         }
@@ -158,7 +158,7 @@ export const getHiddenSettingsDefinitions = (tab: PPSettingTab) => {
                                 if (newProperty && !plugin.settings.hiddenWhenEmptyProperties.find(p => p.toLowerCase() == newProperty.toLowerCase())) {
                                     plugin.settings.hiddenWhenEmptyProperties.push(newProperty)
                                     await plugin.saveSettings()
-                                    updateProperties(plugin)
+                                    updateHiddenProperties(plugin)
                                     if (requireApiVersion("1.13.0")) {
                                         tab.update()			
                                     }
@@ -169,7 +169,7 @@ export const getHiddenSettingsDefinitions = (tab: PPSettingTab) => {
                     onDelete: async (idx: number) => {
                         plugin.settings.hiddenWhenEmptyProperties.splice(idx, 1);
                         await plugin.saveSettings();
-                        updateProperties(plugin)
+                        updateHiddenProperties(plugin)
                         if (requireApiVersion("1.13.0")) {
                             tab.update()			
                         }

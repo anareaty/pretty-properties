@@ -4,7 +4,7 @@ import { around, dedupe } from "monkey-around";
 import { HoverPopover } from "obsidian";
 import { EmbeddedEditorView } from "@obsidian-typings/obsidian-public-latest";
 import { MetadataEditorPatched, patchMetadataEditor } from "./patchMarkdownView";
-import { updateMetadataEditor } from "src/updates/updateProperties";
+import { updateMetadataEditor } from "src/updates/updateHiddenProperties";
 
 
 interface EmbeddedEditorViewPatched extends EmbeddedEditorView {

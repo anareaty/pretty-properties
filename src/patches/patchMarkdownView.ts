@@ -3,7 +3,7 @@ import { updateImagesForView } from "src/updates/updateElements"
 import { around, dedupe } from "monkey-around";
 import { MarkdownEditView, MarkdownPreviewView, MarkdownView } from "obsidian";
 import { renderTitleIcon } from "src/updates/updateIcons";
-import { updateMetadataEditor } from "src/updates/updateProperties";
+import { updateMetadataEditor } from "src/updates/updateHiddenProperties";
 import { MetadataEditor } from "@obsidian-typings/obsidian-public-latest";
 
 
