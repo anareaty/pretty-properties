@@ -1,4 +1,4 @@
-import { SuggestModal, TFile, App, FrontMatterCache } from "obsidian";
+import { SuggestModal, TFile, FrontMatterCache } from "obsidian";
 import { i18n } from "src/localization/localization";
 import PrettyPropertiesPlugin from "src/main";
 import { setNestedProperty } from "src/utils/propertyUtils";

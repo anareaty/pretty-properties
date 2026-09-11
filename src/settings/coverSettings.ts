@@ -1,0 +1,843 @@
+import { Setting, requireApiVersion } from 'obsidian';
+import { i18n } from 'src/localization/localization';
+import {   
+    updateCoverStyles
+} from 'src/updates/updateStyles';
+import { PPSettingTab } from 'src/settings/settings';
+import { updateAllCovers } from 'src/updates/updateCovers';
+import {PropertyNameSuggest} from "../utils/propertyNameSuggester";
+import {enhanceFormatTextArea} from "../utils/settingsHelper";
+
+import { AddPropertyModal, FormatTemplateModal } from 'src/modals/settingItemModals';
+import { ConfirmModal } from 'src/modals/confirmModal';
+
+
+
+
+
+
+
+
+export const getCoverSettingsDefinitions = (tab: PPSettingTab) => {
+    let plugin = tab.plugin
+    let visible = plugin.settings.enableCover
+    let coverShapePlaceholder = "cover_shape"
+    let coverPositionPlaceholder = "cover_position"
+
+    return [
+        {
+            name: i18n.t("ENABLE_COVER"),
+            render: (setting: Setting) => {
+                setting.addToggle(toggle => toggle
+            .setValue(plugin.settings.enableCover)
+            .onChange(async (value) => {
+                plugin.settings.enableCover = value
+                await plugin.saveSettings();
+                if (requireApiVersion("1.13.0")) {
+                    tab.update()			
+                }
+                updateAllCovers(plugin)
+                updateCoverStyles(plugin)
+            }));
+            }
+        }, 
+
+        {
+            type: "list",
+            heading: i18n.t("COVER_PROPERTIES"),
+            visible: visible,
+            addItem: {
+                name: i18n.t("ADD_COVER_PROPERTY"),
+                action: () => {
+                    
+                    new AddPropertyModal(["text"], plugin, async (newProperty) => {
+                        if (newProperty && !plugin.settings.coverProperties.find(c => c.property.toLowerCase() == newProperty.toLowerCase())) {
+                        plugin.settings.coverProperties.push({ property: newProperty, format: "" });
+                        await plugin.saveSettings()
+                        if (requireApiVersion("1.13.0")) {
+                            tab.update()			
+                        }
+
+                    }
+                    }).open()
+                }
+            },
+            onDelete: async (idx: number) => {
+                let text = i18n.t("DELETE_COVER_PROPERTY_PROMPT")
+                
+                new ConfirmModal(text, plugin, async () => {
+                    plugin.settings.coverProperties.splice(idx, 1);
+                    await plugin.saveSettings();
+                    if (requireApiVersion("1.13.0")) {
+                        tab.update()			
+                    }
+                }).open()
+
+
+
+                
+            },
+            items: plugin.settings.coverProperties.map(cover => ({
+                name: cover.property,
+                searchable: false,
+                render: (setting: Setting) => {
+                    setting.addButton(btn => {
+                        if (cover.format) {
+                            btn.setClass("cover-has-format")
+                        }
+                        
+                        btn
+                        .setIcon("code-square")
+                        .setTooltip(i18n.t("SET_COVER_TEMPLATE"))
+                        .onClick(() => {
+
+                            new FormatTemplateModal(
+                            plugin, 
+                            cover.property, 
+                            i18n.t("PROPERTY_FORMAT_TEMPLATE"), 
+                            cover.format, 
+                            async (newFormat) => {
+                                cover.format = newFormat
+                                await plugin.saveSettings();
+                                updateAllCovers(plugin);
+                                if (requireApiVersion("1.13.0")) {
+                                    tab.update()			
+                                }
+                            }).open()
+                        })
+                    })
+                }
+            }))
+        }, {
+            name: i18n.t("COVERS_FOLDER"),
+            visible: visible,
+            control: {
+                type: "folder",
+                key: "coversFolder"
+            }
+        }, {
+            name: i18n.t("COVER_SHAPE_PROPERTY"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => text
+                .setPlaceholder(coverShapePlaceholder)
+                .setValue(plugin.settings.coverShapeProperty)
+                .onChange(async (value) => {
+                    plugin.settings.coverShapeProperty = value;
+                    await plugin.saveSettings();
+                    updateAllCovers(plugin);
+            }));
+
+            }
+        }, {
+            name: i18n.t("COVER_POSITION_PROPERTY"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => text
+                .setPlaceholder(coverPositionPlaceholder)
+                .setValue(plugin.settings.coverPositionProperty)
+                .onChange(async (value) => {
+                    plugin.settings.coverPositionProperty = value;
+                    await plugin.saveSettings();
+                    updateAllCovers(plugin);
+            }));
+
+            }
+        }, {
+            name: i18n.t("SHOW_COVERS_IN_PAGE_PREVIEWS"),
+            visible: visible,
+            control: {
+                type: "toggle",
+                key: "enableCoversInPopover"
+            }
+        }, {
+            name: i18n.t("HIDE_COVER_COLLAPSED"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addToggle(toggle => toggle
+                .setValue(plugin.settings.hideCoverCollapsed)
+                .onChange(async (value) => {
+                    plugin.settings.hideCoverCollapsed = value
+                    await plugin.saveSettings();
+                    updateCoverStyles(plugin);
+                }));
+
+            }
+        }, {
+            name: i18n.t("COVER_POSITION"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addDropdown(dropdown => dropdown
+            .addOptions({
+                "left": i18n.t("LEFT"),
+                "right": i18n.t("RIGHT"),
+                "top": i18n.t("TOP"),
+                "bottom": i18n.t("BOTTOM")
+            })
+            .setValue(plugin.settings.coverPosition)
+            .onChange(async (value) => {
+                plugin.settings.coverPosition = value
+                await plugin.saveSettings();
+                updateAllCovers(plugin)
+            })
+        )
+
+            }
+        }, {
+            name: i18n.t("COVER_MAX_HEIGHT"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverMaxHeight.toString())
+            .setPlaceholder('500')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverMaxHeight = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+            }
+        }, {
+            name: i18n.t("COVER_MAX_HEIGHT_TOP_BOTTOM"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+                    text.inputEl.type = "number"
+                    text.setValue(plugin.settings.coverMaxHeightTopBottom.toString())
+                    .setPlaceholder('400')
+                    .onChange(async (value) => {
+                        if (!value) value = "0"
+                        plugin.settings.coverMaxHeightTopBottom = Number(value);
+                        await plugin.saveSettings();
+                        updateCoverStyles(plugin);
+                    })
+                });
+
+            }
+        }, {
+            name: i18n.t("COVER_MAX_HEIGHT_MOBILE"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+                    text.inputEl.type = "number"
+                    text.setValue(plugin.settings.coverMaxHeightMobile.toString())
+                    .setPlaceholder('200')
+                    .onChange(async (value) => {
+                        if (!value) value = "0"
+                        plugin.settings.coverMaxHeightMobile = Number(value);
+                        await plugin.saveSettings();
+                        updateCoverStyles(plugin);
+                    })
+                });
+
+            }
+        }, {
+            name: i18n.t("COVER_MAX_HEIGHT_TOP_BOTTOM_CANVAS"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+                    text.inputEl.type = "number"
+                    text.setValue(plugin.settings.coverMaxHeightTopBottomCanvas.toString())
+                    .setPlaceholder('200')
+                    .onChange(async (value) => {
+                        if (!value) value = "0"
+                        plugin.settings.coverMaxHeightTopBottomCanvas = Number(value);
+                        await plugin.saveSettings();
+                        updateCoverStyles(plugin);
+                    })
+                });
+
+            }
+        }, {
+            name: i18n.t("DEFAULT_COVER_WIDTH"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverDefaultWidth1.toString())
+            .setPlaceholder('200')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverDefaultWidth1 = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+            }
+        }, {
+            name: i18n.t("DEFAULT_COVER_WIDTH_2"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverDefaultWidth2.toString())
+            .setPlaceholder('250')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverDefaultWidth2 = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+            }
+        }, {
+            name: i18n.t("DEFAULT_COVER_WIDTH_3"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverDefaultWidth3.toString())
+            .setPlaceholder('300')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverDefaultWidth3 = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+            }
+        }, {
+            name: i18n.t("VERTICAL_COVER_WIDTH"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverVerticalWidth.toString())
+            .setPlaceholder('200')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverVerticalWidth = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+            }
+        }, {
+            name: i18n.t("HORIZONTAL_COVER_WIDTH"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverHorizontalWidth.toString())
+            .setPlaceholder('300')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverHorizontalWidth = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+            }
+        }, {
+            name: i18n.t("SQUARE_COVER_WIDTH"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverSquareWidth.toString())
+            .setPlaceholder('250')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverSquareWidth = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+            }
+        }, {
+            name: i18n.t("CIRCLE_COVER_WIDTH"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverCircleWidth.toString())
+            .setPlaceholder('250')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverCircleWidth = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+            }
+        }, {
+            name: i18n.t("MAX_COVER_WIDTH_POPOVER"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverMaxWidthPopover.toString())
+            .setPlaceholder('150')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverMaxWidthPopover = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+            }
+        }, {
+            name: i18n.t("MAX_COVER_WIDTH_CANVAS"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverMaxWidthCanvas.toString())
+            .setPlaceholder('150')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverMaxWidthCanvas = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+            }
+        }
+    ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+export const showCoverSettings = (settingTab: PPSettingTab) => {
+    const {containerEl, plugin} = settingTab
+
+    new Setting(containerEl)
+        .setName(i18n.t("ENABLE_COVER"))
+        .addToggle(toggle => toggle
+            .setValue(plugin.settings.enableCover)
+            .onChange(async (value) => {
+                plugin.settings.enableCover = value
+                await plugin.saveSettings();
+                settingTab.display();
+                updateAllCovers(plugin)
+                updateCoverStyles(plugin)
+            }));
+
+            
+
+
+    if (plugin.settings.enableCover) {
+
+        let coverSettingsWrapper = containerEl.createDiv()
+        coverSettingsWrapper.classList.add("pp-settings-list-container")
+
+        new Setting(coverSettingsWrapper)
+        .setName(i18n.t("COVER_PROPERTIES"))
+        .setHeading()
+
+        let coverSettingsEl = coverSettingsWrapper.createDiv()
+        let newProperty = ""
+		new Setting(coverSettingsWrapper)
+			.setName(i18n.t("ADD_COVER_PROPERTY"))
+            .addSearch((search) => {
+                search.setValue("");
+                search.setPlaceholder(i18n.t("PROPERTY_SEARCH_PLACEHOLDER"));
+
+                const persist = async (value: string) => {
+                    newProperty = value;
+                };
+                search.onChange(async (value) => {
+                    await persist(value);
+                });
+
+
+                const suggester = new PropertyNameSuggest(plugin.app, search.inputEl, ["text"]);
+                suggester.onSelect(async (value) => {
+                    await persist(value);
+                    suggester.setValue(value);
+                    suggester.close();
+                });
+            })
+			.addButton((button) =>
+				button.setIcon("plus").onClick(async () => {
+                    if (newProperty && !plugin.settings.coverProperties.find(c => c.property.toLowerCase() == newProperty.toLowerCase())) {
+                        plugin.settings.coverProperties.push({ property: newProperty, format: "" });
+                        await plugin.saveSettings()
+                        settingTab.display();
+                    }
+
+
+
+				}),
+			);
+
+		for (let i = 0; i < plugin.settings.coverProperties.length; i++) {
+			const cover = plugin.settings.coverProperties[i];
+            if (!cover) continue
+			new Setting(coverSettingsEl)
+				.setName(cover.property)
+				.addTextArea((text) => {
+					enhanceFormatTextArea(plugin, text, cover.format, async (value) => {
+						cover.format = value;
+						await plugin.saveSettings();
+						updateAllCovers(plugin);
+					});
+				})
+				.addExtraButton((button) =>
+					button
+						.setIcon("arrow-up")
+						.setTooltip("Move up")
+						.setDisabled(i === 0)
+						.onClick(async () => {
+							if (i === 0)
+								return;
+							const covers = plugin.settings.coverProperties;
+
+                            let c1 = covers[i];
+                            let c2 = covers[i - 1];
+
+                            if (c1 && c2) {
+                                [covers[i - 1], covers[i]] = [c1, c2];
+                            }
+
+							await plugin.saveSettings();
+							updateAllCovers(plugin);
+							settingTab.display();
+						}),
+				)
+				.addExtraButton((button) =>
+					button
+						.setIcon("arrow-down")
+						.setTooltip("Move down")
+						.setDisabled(i === plugin.settings.coverProperties.length - 1)
+						.onClick(async () => {
+							if (i === plugin.settings.coverProperties.length - 1)
+								return;
+							const covers = plugin.settings.coverProperties;
+
+
+                            let c1 = covers[i];
+                            let c2 = covers[i + 1];
+
+                            if (c1 && c2) {
+                                [covers[i + 1], covers[i]] = [c1, c2];
+                            }
+							
+
+							await plugin.saveSettings();
+							updateAllCovers(plugin);
+							settingTab.display();
+						}),
+				)
+				.addButton((button) =>
+					button.setIcon("x").onClick(async () => {
+						plugin.settings.coverProperties.splice(i, 1);
+
+						await plugin.saveSettings();
+						updateAllCovers(plugin);
+						settingTab.display();
+					}),
+				);
+		}
+
+
+        new Setting(containerEl)
+        .setName(i18n.t("COVERS_FOLDER"))
+        .addText(text => text
+            .setValue(plugin.settings.coversFolder)
+            .onChange(async (value) => {
+                plugin.settings.coversFolder = value;
+                await plugin.saveSettings();
+            }));
+
+
+
+        let coverShapePlaceholder = "cover_shape"
+        new Setting(containerEl)
+            .setName(i18n.t("COVER_SHAPE_PROPERTY"))
+            .addText(text => text
+                .setPlaceholder(coverShapePlaceholder)
+                .setValue(plugin.settings.coverShapeProperty)
+                .onChange(async (value) => {
+                    plugin.settings.coverShapeProperty = value;
+                    await plugin.saveSettings();
+                    updateAllCovers(plugin);
+            }));
+
+
+
+        let coverPositionPlaceholder = "cover_position"
+        new Setting(containerEl)
+            .setName(i18n.t("COVER_POSITION_PROPERTY"))
+            .addText(text => text
+                .setPlaceholder(coverPositionPlaceholder)
+                .setValue(plugin.settings.coverPositionProperty)
+                .onChange(async (value) => {
+                    plugin.settings.coverPositionProperty = value;
+                    await plugin.saveSettings();
+                    updateAllCovers(plugin);
+            }));
+
+
+
+
+        new Setting(containerEl)
+            .setName(i18n.t("SHOW_COVERS_IN_PAGE_PREVIEWS"))
+            .addToggle(toggle => toggle
+                .setValue(plugin.settings.enableCoversInPopover)
+                .onChange(async (value) => {
+                    plugin.settings.enableCoversInPopover = value
+                    await plugin.saveSettings();
+                }));
+
+        
+        new Setting(containerEl)
+            .setName(i18n.t("HIDE_COVER_COLLAPSED"))
+            .addToggle(toggle => toggle
+                .setValue(plugin.settings.hideCoverCollapsed)
+                .onChange(async (value) => {
+                    plugin.settings.hideCoverCollapsed = value
+                    await plugin.saveSettings();
+                    updateCoverStyles(plugin);
+                }));
+
+
+        new Setting(containerEl)
+        .setName(i18n.t("COVER_POSITION"))
+        .addDropdown(dropdown => dropdown
+            .addOptions({
+                "left": i18n.t("LEFT"),
+                "right": i18n.t("RIGHT"),
+                "top": i18n.t("TOP"),
+                "bottom": i18n.t("BOTTOM")
+            })
+            .setValue(plugin.settings.coverPosition)
+            .onChange(async (value) => {
+                plugin.settings.coverPosition = value
+                await plugin.saveSettings();
+                updateAllCovers(plugin)
+            })
+        )
+
+        new Setting(containerEl)
+        .setName(i18n.t("COVER_MAX_HEIGHT"))
+        .addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverMaxHeight.toString())
+            .setPlaceholder('500')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverMaxHeight = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+
+        new Setting(containerEl)
+        .setName(i18n.t("COVER_MAX_HEIGHT_TOP_BOTTOM"))
+        .addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverMaxHeightTopBottom.toString())
+            .setPlaceholder('400')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverMaxHeightTopBottom = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+
+
+        new Setting(containerEl)
+        .setName(i18n.t("COVER_MAX_HEIGHT_MOBILE"))
+        .addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverMaxHeightMobile.toString())
+            .setPlaceholder('200')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverMaxHeightMobile = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+
+
+        new Setting(containerEl)
+        .setName(i18n.t("COVER_MAX_HEIGHT_TOP_BOTTOM_CANVAS"))
+        .addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverMaxHeightTopBottomCanvas.toString())
+            .setPlaceholder('200')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverMaxHeightTopBottomCanvas = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+
+
+
+
+
+
+        new Setting(containerEl)
+        .setName(i18n.t("DEFAULT_COVER_WIDTH"))
+        .addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverDefaultWidth1.toString())
+            .setPlaceholder('200')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverDefaultWidth1 = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+        new Setting(containerEl)
+        .setName(i18n.t("DEFAULT_COVER_WIDTH_2"))
+        .addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverDefaultWidth2.toString())
+            .setPlaceholder('250')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverDefaultWidth2 = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+        new Setting(containerEl)
+        .setName(i18n.t("DEFAULT_COVER_WIDTH_3"))
+        .addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverDefaultWidth3.toString())
+            .setPlaceholder('300')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverDefaultWidth3 = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+        new Setting(containerEl)
+        .setName(i18n.t("VERTICAL_COVER_WIDTH"))
+        .addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverVerticalWidth.toString())
+            .setPlaceholder('200')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverVerticalWidth = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+        new Setting(containerEl)
+        .setName(i18n.t("HORIZONTAL_COVER_WIDTH"))
+        .addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverHorizontalWidth.toString())
+            .setPlaceholder('300')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverHorizontalWidth = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+        new Setting(containerEl)
+        .setName(i18n.t("SQUARE_COVER_WIDTH"))
+        .addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverSquareWidth.toString())
+            .setPlaceholder('250')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverSquareWidth = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+        new Setting(containerEl)
+        .setName(i18n.t("CIRCLE_COVER_WIDTH"))
+        .addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverCircleWidth.toString())
+            .setPlaceholder('250')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverCircleWidth = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+
+        new Setting(containerEl)
+        .setName(i18n.t("MAX_COVER_WIDTH_POPOVER"))
+        .addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverMaxWidthPopover.toString())
+            .setPlaceholder('150')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverMaxWidthPopover = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+
+        new Setting(containerEl)
+        .setName(i18n.t("MAX_COVER_WIDTH_CANVAS"))
+        .addText(text => {
+            text.inputEl.type = "number"
+            text.setValue(plugin.settings.coverMaxWidthCanvas.toString())
+            .setPlaceholder('150')
+            .onChange(async (value) => {
+                if (!value) value = "0"
+                plugin.settings.coverMaxWidthCanvas = Number(value);
+                await plugin.saveSettings();
+                updateCoverStyles(plugin);
+            })
+        });
+
+
+
+    }
+}

@@ -1,9 +1,10 @@
 import PrettyPropertiesPlugin from "src/main";
-import { querySelectorsWithIframes, querySelectorsWithIframesForContainer } from "../utils/querySelectorsHelper";
+import { CanvasView, MetadataEditor, EmbedMarkdownComponent } from "@obsidian-typings/obsidian-public-latest";
+import { MarkdownView } from "obsidian";
 
 
-export const updateHiddenProperty = (propEl: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-    let propName = propEl.getAttribute("data-property-key") || ""
+
+export const updateHiddenCSSClasses = (propEl: HTMLElement, propName: string, plugin: PrettyPropertiesPlugin) => {
     if (plugin.settings.hiddenProperties.find(p => p.toLowerCase() == propName.toLowerCase())) {
         propEl.classList.add("pp-property-hidden")
     } else {
@@ -15,73 +16,38 @@ export const updateHiddenProperty = (propEl: HTMLElement, plugin: PrettyProperti
     } else {
         propEl.classList.remove("pp-property-hidden-when-empty")
     }
-
-    let metadataContainer = propEl.closest(".metadata-container")
-
-    if (metadataContainer?.instanceOf(HTMLElement)) {
-        hideMetadataContainerIfAllPropertiesHidden(metadataContainer)
-    }
 }
 
 
 
-export const hideMetadataContainerIfAllPropertiesHidden = (metadataContainer: HTMLElement) => {
 
+// Update metadata editor to hide properties block when all properties in it are hidden
+// We should also count properties that are hidden when empty
 
-    let propertiesNotHidden = querySelectorsWithIframesForContainer(".metadata-property:not(.pp-property-hidden, .is-empty.pp-property-hidden-when-empty)", metadataContainer)
+export const updateMetadataEditor = (metadataEditor: MetadataEditor, plugin: PrettyPropertiesPlugin) => {
+    let mcHidden = true
 
-    let propertiesNotEmptyOrHidden = querySelectorsWithIframesForContainer(".metadata-property:not(.pp-property-hidden, .is-empty)", metadataContainer)
+    for (let r of metadataEditor.rendered) {
+        let propEl = r.containerEl
+        updateHiddenCSSClasses(propEl, r.entry.key, plugin)
 
-    
+        if (propEl.classList.contains("pp-property-hidden")) {
+            continue
+        }
 
-    if (propertiesNotHidden.length == 0) {
-        metadataContainer.classList.add("pp-mc-hidden")
-    } else {
-        metadataContainer.classList.remove("pp-mc-hidden")
-    }
-
-    if (propertiesNotEmptyOrHidden.length == 0) {
-        metadataContainer.classList.add("pp-mc-empty-hidden")
-    } else {
-        metadataContainer.classList.remove("pp-mc-empty-hidden")
-    }
-}
-
-
-
-export const updateAllMetadataContainers = (plugin: PrettyPropertiesPlugin) => {
-
-    let metadataContainers = querySelectorsWithIframes(".metadata-container")
-
-  
-    
-    for (let metadataContainer of metadataContainers) {
-        if (metadataContainer?.instanceOf(HTMLElement)) {
-
-            try {
-                hideMetadataContainerIfAllPropertiesHidden(metadataContainer)
-            } catch {
-                console.error("Can not update hiding metadata container")
+        if (r.entry.value === null || r.entry.value === "") {
+            if (propEl.classList.contains("pp-property-hidden-when-empty") || 
+            plugin.settings.hideAllEmptyProperties) {
+            continue
             }
-            
         }
+        mcHidden = false
     }
+    metadataEditor.containerEl.classList.toggle("pp-mc-hidden", mcHidden)
 }
 
 
 
-
-
-export const updateHiddenPropertiesForContainer = (container: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-
-    let properties = querySelectorsWithIframesForContainer(".metadata-property", container)
-
-    for (let propEl of properties) {
-        if (propEl?.instanceOf(HTMLElement)) {
-            updateHiddenProperty(propEl, plugin);
-        }
-    }
-}
 
 
 export const updateHiddenProperties = (plugin: PrettyPropertiesPlugin) => {
@@ -89,19 +55,35 @@ export const updateHiddenProperties = (plugin: PrettyPropertiesPlugin) => {
     let leaves = plugin.app.workspace.getLeavesOfType("markdown");
     for (let leaf of leaves) {
         let view = leaf.view
-        let container = view.containerEl;
-        updateHiddenPropertiesForContainer(container, plugin)
+        if (view instanceof MarkdownView) {
+            updateMetadataEditor(view.metadataEditor, plugin)
+        }
+    }
+
+    let canvasLeaves = plugin.app.workspace.getLeavesOfType("canvas");
+    for (let leaf of canvasLeaves) {
+        let view = leaf.view as CanvasView
+
+        view.canvas?.nodes?.forEach(node => {
+            let nodeView = node.child as EmbedMarkdownComponent
+
+            if (nodeView) {
+                if ("metadataEditor" in nodeView) {
+                    let metadataEditor = nodeView.metadataEditor as MetadataEditor
+                    updateMetadataEditor(metadataEditor, plugin)
+                }
+            }
+        })
     }
 
     let propLeaves = plugin.app.workspace.getLeavesOfType("file-properties");
     for (let leaf of propLeaves) {
         let view = leaf.view
-        let container = view.containerEl;
-        updateHiddenPropertiesForContainer(container, plugin)
+        if ("metadataEditor" in view) {
+            let metadataEditor = view.metadataEditor as MetadataEditor
+            updateMetadataEditor(metadataEditor, plugin)
+        }
     }
 }
-
-
-
 
 

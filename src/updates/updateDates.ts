@@ -1,12 +1,9 @@
 import { moment } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
-import { hideMetadataContainerIfAllPropertiesHidden } from "./updateHiddenProperties";
 import { computeFormattedValue, getPropertyFormatObj, setOverlayContent } from "./updatePropertyFormattings";
 
 
 export const updateDateInput = (input: HTMLInputElement, plugin: PrettyPropertiesPlugin) => {
-
-
 	let value = input.value;
 	let parent = input.parentElement
 	let grandParent = parent?.parentElement
@@ -39,21 +36,20 @@ export const updateDateInput = (input: HTMLInputElement, plugin: PrettyPropertie
 		let isBase = parent.classList.contains("bases-table-cell")
 		let existingCustomDateElement = parent.querySelector(".custom-date")
 
-		if (plugin.settings.enableCustomDateFormat && 
-			(customDateFormat || propertyFormatObj.format) && 
-			(!isBase || plugin.settings.enableCustomDateFormatInBases)) {
 
-				
+		if (value && plugin.settings.enableCustomDateFormat && 
+			(customDateFormat || propertyFormatObj.format) && 
+			(!isBase || plugin.settings.enableCustomDateFormatInBases || propertyFormatObj.format)) {
+
+			
 
 
 
 			let customDate = ""
 
 			if (propertyFormatObj.format) {
-				
 				customDate = computeFormattedValue(plugin, propName, propertyFormatObj.format, value)
 			} else if (customDateFormat) {
-				
 				customDate = moment(value).format(customDateFormat);
 			}
 
@@ -91,6 +87,10 @@ export const updateDateInput = (input: HTMLInputElement, plugin: PrettyPropertie
 				let customDateEl = createSpan()
 				customDateEl.classList.add("custom-date")
 
+				customDateEl.onclick = () => {
+					input.focus()
+				}
+
 
 				setOverlayContent(customDate, propertyFormatObj.textFormat, customDateEl, grandParent, plugin)
 
@@ -102,8 +102,7 @@ export const updateDateInput = (input: HTMLInputElement, plugin: PrettyPropertie
 				parent.classList.remove("has-custom-date")
 			}
 
-		} else if (existingCustomDateElement) {
-			existingCustomDateElement.textContent = ""
+		} else {
 			parent.classList.remove("has-custom-date")
 		}
 
@@ -124,11 +123,6 @@ export const updateDateInput = (input: HTMLInputElement, plugin: PrettyPropertie
 		}
 
 		
-		let metadataContainer = parent.closest(".metadata-container")
-		if (metadataContainer?.instanceOf(HTMLElement)) {
-			hideMetadataContainerIfAllPropertiesHidden(metadataContainer)
-		}
-		
 	}
 }
 
@@ -138,29 +132,71 @@ export const updateDateTimeInput = (input: HTMLInputElement, plugin: PrettyPrope
 	let value = input.value;
 	let parent = input.parentElement
 	let grandParent = parent?.parentElement
+
+	if (!grandParent) return
+
+	let propName = grandParent.getAttribute("data-property-key")
+
+	if (!propName) {
+		propName = grandParent.getAttribute("data-property") || ""
+		propName = propName?.replace("note.", "")
+	}
+
+	if (!propName) return
+
+	let propertyFormatObj = getPropertyFormatObj(propName, value, plugin)
+
+
+
+
+
+
 	let customDateTimeFormat = plugin.settings.customDateTimeFormat
 
 	if (parent?.instanceOf(HTMLElement)) {
 		let isBase = parent.classList.contains("bases-table-cell")
 		let existingCustomDateElement = parent.querySelector(".custom-date")
 
-		if (plugin.settings.enableCustomDateFormat && 
-			customDateTimeFormat && 
-			(!isBase || plugin.settings.enableCustomDateFormatInBases)) {
 
-			let customDate = moment(value).format(customDateTimeFormat);
+		if (value && plugin.settings.enableCustomDateFormat && 
+			(customDateTimeFormat || propertyFormatObj.format) && 
+			(!isBase || plugin.settings.enableCustomDateFormatInBases || propertyFormatObj.format)) {
+
+
+			let customDate = ""
+
+			if (propertyFormatObj.format) {
+				customDate = computeFormattedValue(plugin, propName, propertyFormatObj.format, value)
+			} else if (customDateTimeFormat) {
+				customDate = moment(value).format(customDateTimeFormat);
+			}
+
+
 			
 			if (existingCustomDateElement?.instanceOf(HTMLElement) && 
 				existingCustomDateElement.innerText != customDate && 
 				customDate != "Invalid date") {
 	
-				existingCustomDateElement.textContent = customDate
+				//existingCustomDateElement.textContent = customDate
+				existingCustomDateElement.empty()
+
+
+				setOverlayContent(customDate, propertyFormatObj.textFormat, existingCustomDateElement, grandParent, plugin)
+
 				parent.classList.add("has-custom-date")
 				
 			} else if (!existingCustomDateElement && customDate != "Invalid date") {
 				let customDateEl = createSpan()
 				customDateEl.classList.add("custom-date")
-				customDateEl.append(customDate)
+				customDateEl.onclick = () => {
+					input.focus()
+				}
+
+
+
+
+				setOverlayContent(customDate, propertyFormatObj.textFormat, customDateEl, grandParent, plugin)
+
 				input.after(customDateEl)
 				parent.classList.add("has-custom-date")
 	
@@ -168,8 +204,7 @@ export const updateDateTimeInput = (input: HTMLInputElement, plugin: PrettyPrope
 				existingCustomDateElement.textContent = ""
 				parent.classList.remove("has-custom-date")
 			}
-		}  else if (existingCustomDateElement) {
-			existingCustomDateElement.textContent = ""
+		}  else {
 			parent.classList.remove("has-custom-date")
 		}
 
@@ -189,11 +224,6 @@ export const updateDateTimeInput = (input: HTMLInputElement, plugin: PrettyPrope
 			grandParent?.classList.add("is-empty")
 		}
 
-		
-		let metadataContainer = parent.closest(".metadata-container")
-		if (metadataContainer?.instanceOf(HTMLElement)) {
-			hideMetadataContainerIfAllPropertiesHidden(metadataContainer)
-		}
 		
 	}
 }

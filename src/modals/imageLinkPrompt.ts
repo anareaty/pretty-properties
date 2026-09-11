@@ -9,17 +9,20 @@ export class ImageLinkPrompt extends Modal {
 
     constructor(app: App, propName: string) {
         super(app);
-        this.eventInput = this.eventInput.bind(this)
         this.propName = propName
         this.result = ""
     }
 
-    eventInput(e: KeyboardEvent) {
+
+
+    eventInput = (e: KeyboardEvent) => {
         if (e.key === "Enter") {
             e.preventDefault();
             this.close()
         }
     }
+
+    
     
     onOpen() {
         const {contentEl} = this

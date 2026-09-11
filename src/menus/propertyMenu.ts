@@ -1,4 +1,4 @@
-import { Menu, MenuItem } from "obsidian";
+import { Menu, MenuItem, requireApiVersion } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { i18n } from "src/localization/localization";
 import { updateHiddenProperties } from "src/updates/updateHiddenProperties";
@@ -12,7 +12,7 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
     let propName = propEl?.getAttribute("data-property-key");
 
     if (propName) {
-        if (plugin.settings.hiddenProperties.find((p) => p == propName)) {
+        if (plugin.settings.hiddenProperties.find((p) => p.toLowerCase() == propName.toLowerCase())) {
 
             menu.addItem((item: MenuItem) =>
                 item
@@ -20,12 +20,14 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                 .setIcon("lucide-eye")
                 .setSection("pretty-properties")
                 .onClick(async () => {
-                    if (propName)
-                        plugin.settings.hiddenProperties.remove(
-                            propName
-                        );
+                    if (propName) {
+                        plugin.settings.hiddenProperties = plugin.settings.hiddenProperties.filter(p => p.toLowerCase() != propName.toLowerCase())
+                    }
                     await plugin.saveSettings();
                     updateHiddenProperties(plugin);
+                    if (requireApiVersion("1.13.0")) {
+                        plugin.settingTab?.update()			
+                    }
                 }));
 
         } else {
@@ -42,10 +44,13 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                         );
                     await plugin.saveSettings();
                     updateHiddenProperties(plugin);
+                    if (requireApiVersion("1.13.0")) {
+                        plugin.settingTab?.update()			
+                    }
                 }));
         }
 
-        if (plugin.settings.hiddenWhenEmptyProperties.find((p) => p == propName)) {
+        if (plugin.settings.hiddenWhenEmptyProperties.find((p) => p.toLowerCase() == propName.toLowerCase())) {
 
             menu.addItem((item: MenuItem) =>
                 item
@@ -53,12 +58,15 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                 .setIcon("lucide-eye")
                 .setSection("pretty-properties")
                 .onClick(async () => {
-                    if (propName)
-                        plugin.settings.hiddenWhenEmptyProperties.remove(
-                            propName
-                        );
+
+                    if (propName) {
+                        plugin.settings.hiddenWhenEmptyProperties = plugin.settings.hiddenWhenEmptyProperties.filter(p => p.toLowerCase() != propName.toLowerCase())
+                    }
                     await plugin.saveSettings();
                     updateHiddenProperties(plugin);
+                    if (requireApiVersion("1.13.0")) {
+                        plugin.settingTab?.update()			
+                    }
                 }));
 
         } else {
@@ -75,6 +83,9 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                         );
                     await plugin.saveSettings();
                     updateHiddenProperties(plugin);
+                    if (requireApiVersion("1.13.0")) {
+                        plugin.settingTab?.update()			
+                    }
                 }));
         }
 
@@ -94,18 +105,25 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
 
             let propertyFormatObj = plugin.settings.propertyFormats[propName]
 
+
             
 
-            if (propertyFormatObj && propertyFormatObj.textFormat == "markdown") {
+            
+            let markdownProperties = plugin.settings.markdownProperties
+
+            if (markdownProperties.find(p => p.toLowerCase() == propName.toLowerCase())) {
                 menu.addItem((item: MenuItem) =>
                     item
                     .setTitle(i18n.t("DO_NOT_RENDER_MARKDOWN"))
                     .setIcon("code-2")
                     .setSection("pretty-properties")
                     .onClick(async () => {
-                        propertyFormatObj.textFormat = "raw"
+                        plugin.settings.markdownProperties = markdownProperties.filter(p => p.toLowerCase() != propName.toLowerCase())
                         await plugin.saveSettings();
                         updateAllProperties(plugin);
+                        if (requireApiVersion("1.13.0")) {
+                            plugin.settingTab?.update()			
+                        }
                     })  
                 );
             } else if (propertyType == "text" || (propertyFormatObj && propertyFormatObj.format)) {
@@ -115,17 +133,12 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                     .setIcon("book-open")
                     .setSection("pretty-properties")
                     .onClick(async () => {
-                        if (propertyFormatObj) {
-                            propertyFormatObj.textFormat = "markdown"
-                        } else {
-                            plugin.settings.propertyFormats[propName] = {
-                                format: "",
-                                textFormat: "markdown"
-                            }
-                        }
-
+                        plugin.settings.markdownProperties.push(propName)
                         await plugin.saveSettings();
                         updateAllProperties(plugin);
+                        if (requireApiVersion("1.13.0")) {
+                            plugin.settingTab?.update()			
+                        }
                     })  
                 );
             }

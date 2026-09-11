@@ -1,262 +1,86 @@
 import PrettyPropertiesPlugin from "src/main"
 import { updateImagesForView } from "src/updates/updateElements"
 import { around, dedupe } from "monkey-around";
-import { MarkdownView } from "obsidian";
+import { MarkdownEditView, MarkdownPreviewView, MarkdownView } from "obsidian";
 import { renderTitleIcon } from "src/updates/updateIcons";
-import { updateAllMetadataContainers } from "src/updates/updateHiddenProperties";
-import { updateCoverForView } from "src/updates/updateCovers";
-import { ReadViewRenderer } from "@obsidian-typings/obsidian-public-latest";
+import { updateMetadataEditor } from "src/updates/updateHiddenProperties";
+import { MetadataEditor } from "@obsidian-typings/obsidian-public-latest";
 
 
-type simpleFunc = () => void
-
-interface ReadViewRendererExtended extends ReadViewRenderer {
-  onRendered: (f: simpleFunc) => void
+export interface MetadataEditorPatched extends MetadataEditor {
+  pp_patched: boolean,
+  synchronize: (...args: unknown[]) => unknown
 }
+
+export interface MarkdownPreviewViewPatched extends MarkdownPreviewView {
+  pp_patched: boolean,
+  onRenderComplete: (...args: unknown[]) => unknown
+}
+
+export interface MarkdownEditViewPatched extends MarkdownEditView {
+  pp_patched: boolean,
+  show: (...args: unknown[]) => unknown
+}
+
+
+// Patch metadata editor so we can update the hidden state of properties block every time when properties are changed
+
+export const patchMetadataEditor = (metadataEditor: MetadataEditorPatched | undefined, plugin: PrettyPropertiesPlugin) => {
+  if (metadataEditor && !metadataEditor.pp_patched) {
+    metadataEditor.pp_patched = true
+    const old_metadataEditor_synchronize = metadataEditor.synchronize
+
+    metadataEditor.synchronize = (...args2) => {
+      let result = old_metadataEditor_synchronize.call(metadataEditor, ...args2);
+      updateMetadataEditor(metadataEditor, plugin)
+      return result;
+    }
+  }
+}
+
+
+
+
 
 export const patchMarkdownView = (plugin: PrettyPropertiesPlugin) => {
 
   plugin.patches.uninstallPPMarkdownPatch = around(MarkdownView.prototype, {
 
     onLoadFile(old) {
+
       return dedupe("pp-patch-markdown-around-key", old, async function(this: MarkdownView, ...args) {
 
-        const getView = (() => this).bind(this)
+        // We need a function to bind this, so we can reach it later in lower level functions
+        const getView = () => this
 
+        let metadataEditor = this.metadataEditor as MetadataEditorPatched | undefined
+        patchMetadataEditor(metadataEditor, plugin)
 
+        // Update images after the view is completely rendered
 
+        const previewMode = this.previewMode as MarkdownPreviewViewPatched
+        const old_onRenderComplete = previewMode.onRenderComplete
 
-
-
-        /*
-
-        const onRendered = (this.previewMode.renderer as ReadViewRendererExtended).onRendered;
-
-        (this.previewMode.renderer as ReadViewRendererExtended).onRendered = new Proxy(onRendered, {
-          async apply(old2, thisArg2, args2: simpleFunc[]) {
-
-            let result = old2.call(thisArg2, ...args2) 
-
-
-
-            try {
-              let view = getView()
-              renderTitleIcon(view, plugin)
-
-
-            } catch {
-              console.error("Can not render title icon in preview mode")
-            }
-            
-            return result
-          }
-        })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        this.previewMode.onRenderComplete = new Proxy(this.previewMode.onRenderComplete, {
-          async apply(old2, thisArg2) {
-
-            let result = old2.call(thisArg2) 
-
-
-
-            try {
-              let view = getView()
-              updateCoverForView(view, plugin) 
-
-
-            } catch {
-              console.error("Can not render title icon in preview mode")
-            }
-            
-            return result
-          }
-        })
-
-
-
-
-
-
-
-          
-        this.editMode.show = new Proxy(this.editMode.show, {
-          apply(old2, thisArg2) {
-
-            let result = old2.call(thisArg2) 
-
-            try {
-              let view = getView()
-              renderTitleIcon(view, plugin)
-            } catch {
-              console.error("Can not render title icon in edit mode")
-            }
-            
-            return result
-          }
-        })
-
-
-        console.log(this)
-
-        
-
-
-
-        this.loadFrontmatter = new Proxy(this.loadFrontmatter, {
-          apply(old2, thisArg2, args2: string[]) {
-
-
-            let result = old2.call(thisArg2, ...args2)
-
-            try {
-              let view = getView()
-              //console.log("update md")
-              updateCoverForView(view, plugin)  
-
-
-            } catch {
-              console.error("Can not update cover for markdown view")
-            }
-
-            try {
-              updateAllMetadataContainers(plugin) 
-            } catch {
-              console.error("Can not update metadata containers on loading frontmatter")
-            }
-
-
-
-            
-            
-            
-            return result
-          }
-        })
-
-
-
-
-
-
-
-
-
-
-        this.onload = new Proxy(this.onload, {
-          apply(old2, thisArg2, args2: string[]) {
-            let result = old2.call(thisArg2, ...args2)
-            try {
-              let view = getView()
-              updateCoverForView(view, plugin)  
-            } catch {
-              console.error("Can not update cover for markdown view")
-            }
-            return result
-          }
-        })
-
-
-
-
-
-
-
-
-
-
-
-        try {
-          //console.log("update images")
-          updateImagesForView(this, plugin);
-        } catch {
-          console.error("Can not update images for file view")
-        }
-        
-
-
-        try {
-          renderTitleIcon(this, plugin)
-        } catch {
-          console.error("Can not render title icon on file load")
-        }
-
-        
-        try {
-          updateAllMetadataContainers(plugin) 
-        } catch {
-          console.error("Can not update metadata containers on file load")
+        previewMode.onRenderComplete = (...args2) => {
+          let result = old_onRenderComplete.call(previewMode, ...args2) 
+          let view = getView()
+          updateImagesForView(view, plugin)
+          return result
         }
 
 
+        // Update title icon if needed
 
+        const editMode = this.editMode as MarkdownEditViewPatched
+        const old_editMode_show = editMode.show
 
-        */
+        editMode.show = (...args2) => {
+          let result = old_editMode_show.call(editMode, ...args2) 
+          let view = getView()
+          void renderTitleIcon(view, plugin)
+          return result
+        }
 
-
-        //console.log(this.previewMode)
-
-
-
-        this.previewMode.onRenderComplete = new Proxy(this.previewMode.onRenderComplete, {
-          async apply(old2, thisArg2) {
-
-            let result = old2.call(thisArg2) 
-
-            let view = getView()
-            updateImagesForView(view, plugin)
-            //renderTitleIcon(view, plugin)
-
-            return result
-          }
-        })
-
-
-
-
-
-        this.editMode.show = new Proxy(this.editMode.show, {
-          apply(old2, thisArg2) {
-
-            let result = old2.call(thisArg2) 
-
-            let view = getView()
-            renderTitleIcon(view, plugin)
-            
-            return result
-          }
-        })
-
-
-
-
-
-
-
-        
-
-
-
-
-
-
-
-        //updateImagesForView(this, plugin)
-
-        
         return old && old.apply(this, args)
       })
     }

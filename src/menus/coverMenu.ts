@@ -1,4 +1,4 @@
-import { TFile, Menu, MenuItem } from "obsidian";
+import { TFile, Menu, MenuItem, requireApiVersion } from "obsidian";
 import { i18n } from "src/localization/localization";
 import PrettyPropertiesPlugin from "src/main";
 import { updateHiddenProperties } from "src/updates/updateHiddenProperties";
@@ -13,6 +13,10 @@ export const handleCoverMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => {
 
     if (file instanceof TFile) {
         let propName = getCurrentCoverProperty(plugin);
+        let coverPositionPropName = plugin.settings.coverPositionProperty
+        let coverShapePropName = plugin.settings.coverShapeProperty
+
+
         if (propName) {
 
             menu.addItem((item: MenuItem) => item
@@ -57,31 +61,63 @@ export const handleCoverMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => {
                     removeProperty(plugin.settings.coverShapeProperty, plugin);
             }))
 
-            if (plugin.settings.hiddenProperties.find(p => p == propName)) {
+
+            let coverPropHidden = plugin.settings.hiddenProperties.find(p => p.toLowerCase() == propName.toLowerCase())
+            let coverPositionPropHidden = plugin.settings.hiddenProperties.find(p => p.toLowerCase() == coverPositionPropName.toLowerCase())
+            let coverShapePropHidden = plugin.settings.hiddenProperties.find(p => p.toLowerCase() == coverShapePropName.toLowerCase())
+
+            if (coverPropHidden || coverPositionPropHidden || coverShapePropHidden) {
 
                 menu.addItem((item: MenuItem) => item
                 .setTitle(i18n.t("UNHIDE_COVER_PROPERTY"))
                 .setIcon('lucide-eye')
                 .setSection('pretty-properties')
                 .onClick(async () => {
-                    if (propName) plugin.settings.hiddenProperties.remove(propName)
+                    if (propName && coverPropHidden) {
+                        plugin.settings.hiddenProperties = plugin.settings.hiddenProperties.filter(p => p.toLowerCase() != propName.toLowerCase())
+                
+                    }
+                    if (coverPositionPropName && coverPositionPropHidden) {
+                        plugin.settings.hiddenProperties = plugin.settings.hiddenProperties.filter(p => p.toLowerCase() != coverPositionPropName.toLowerCase())
+                
+                    }
+                    if (coverShapePropName && coverShapePropHidden) {
+                        plugin.settings.hiddenProperties = plugin.settings.hiddenProperties.filter(p => p.toLowerCase() != coverShapePropName.toLowerCase())
+                
+                    }
+
                     await plugin.saveSettings()
-                    updateHiddenProperties(plugin)			
+                    updateHiddenProperties(plugin)
+                    if (requireApiVersion("1.13.0")) {
+                        plugin.settingTab?.update()			
+                    }
                 }))
 
-            } else {
+            } 
+            
+            
+            if (!coverPropHidden || !coverPositionPropHidden || !coverShapePropHidden) {
                 
                 menu.addItem((item: MenuItem) => item
                 .setTitle(i18n.t("HIDE_COVER_PROPERTY"))
                 .setIcon("lucide-eye-off")
                 .setSection("pretty-properties")
                 .onClick(async () => {
-                    if (propName)
-                        plugin.settings.hiddenProperties.push(
-                            propName
-                        );
+                    if (propName && !coverPropHidden) {
+                        plugin.settings.hiddenProperties.push(propName)
+                    }
+                    if (coverPositionPropName && !coverPositionPropHidden) {
+                        plugin.settings.hiddenProperties.push(coverPositionPropName)
+                    }
+                    if (coverShapePropName && !coverShapePropHidden) {
+                        plugin.settings.hiddenProperties.push(coverShapePropName)
+                    }
+
                     await plugin.saveSettings();
                     updateHiddenProperties(plugin);
+                    if (requireApiVersion("1.13.0")) {
+                        plugin.settingTab?.update()			
+                    }
                 }))
             }
         }

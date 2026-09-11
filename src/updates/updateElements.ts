@@ -1,13 +1,10 @@
-import { TFile, CachedMetadata, MarkdownView, BasesView, HoverPopover } from "obsidian";
-
+import { TFile, CachedMetadata, MarkdownView, BasesView, HoverPopover, requireApiVersion } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { renderCover, updateCoverForView } from "./updateCovers";
 import { renderIcon, updateIconForView } from "./updateIcons";
 import { updateSettingPills, updateTagPaneTagsAll } from "./updatePills";
 import { renderBanner, updateBannerForView } from "./updateBanners";
 import { getNestedProperty } from "../utils/propertyUtils";
-import { updateAllMetadataContainers } from "./updateHiddenProperties";
-import { querySelectorsWithIframes } from "../utils/querySelectorsHelper";
 import { processTagsInPreviewElement } from "src/extensions/tagPostProcessor";
 import { updateWidgets } from "src/patches/patchWidgets";
 import { CardsBasesView, processBaseCardProperties } from "src/patches/patchBaseCards";
@@ -24,7 +21,7 @@ import { AliasesPropertyWidgetComponent,
     TextPropertyWidgetComponent 
 } from "@obsidian-typings/obsidian-public-latest";
 import { updateTags } from "src/extensions/tagFixExtension";
-import { updateColoredTagsStyle } from "./updateStyles";
+import { KanbanBasesView, processBaseKanbanProperties } from "src/patches/patchBaseKanban";
 
 
 interface Popover extends HoverPopover {
@@ -35,15 +32,13 @@ interface Popover extends HoverPopover {
 
 export const updateAllProperties = (plugin:PrettyPropertiesPlugin) => { 
 
-    
+
 
     let mdLeaves = plugin.app.workspace.getLeavesOfType("markdown");
     for (let leaf of mdLeaves) {
-        
         let view = leaf.view
 
         if (view instanceof MarkdownView) {
-
             view.metadataEditor?.rendered?.forEach(p => {
                 p.renderProperty(p.entry, !0)
             })
@@ -62,12 +57,6 @@ export const updateAllProperties = (plugin:PrettyPropertiesPlugin) => {
                 editorView.dispatch({
                     effects: [updateTags.of(null)]
                 })
-
-                
-
-                
-
-                
             }
         }
     }
@@ -129,64 +118,73 @@ export const updateAllProperties = (plugin:PrettyPropertiesPlugin) => {
           
 
 
-            
+            if (requireApiVersion("1.10.0")) {
+                let baseViewType = baseView.type
 
-            if (baseView.type == "table") {
+                if (baseViewType == "table") {
 
-                let tableBaseView = baseView as unknown as TableBasesView
-
-                
-                for (let row of tableBaseView.rows) {
-                    for (let cell of row.cells) {
-
-
-                        let propertyEditor = cell.renderer.propertyEditor
-
-                        if (propertyEditor) {
-                            let type = cell.renderer.inferredType.type
-                            let value: string | string[] | number | boolean | null | undefined
+                    let tableBaseView = baseView as unknown as TableBasesView
+    
+                    
+                    for (let row of tableBaseView.rows) {
+                        for (let cell of row.cells) {
+    
+    
+                            let propertyEditor = cell.renderer.propertyEditor
+    
+                            if (propertyEditor) {
+                                let type = cell.renderer.inferredType.type
+                                let value: string | string[] | number | boolean | null | undefined
+                                
+                                let ctx = {
+                                    key: cell.prop.replace("note.", ""),
+                                    sourcePath: cell.renderer.entry.file.path
+                                }
+                                
+                                if (propertyEditor.type == "multitext" || propertyEditor.type == "tags" || propertyEditor.type == "aliases") {
+                                    let rendered = propertyEditor as MultitextPropertyWidgetComponent | AliasesPropertyWidgetComponent | TagsPropertyWidgetComponent
+                                    value = rendered.multiselect?.values
+                                } else if (propertyEditor.type == "text" || propertyEditor.type == "datetime") {
+                                    let rendered = propertyEditor as TextPropertyWidgetComponent | DatePropertyWidgetComponentBase
+                                    value = rendered.value
+                                } else if (propertyEditor.type == "number" || propertyEditor.type == "checkbox") {
+                                    value = cell.renderer.val
+                                } 
+    
+    
+                                
+    
                             
-                            let ctx = {
-                                key: cell.prop.replace("note.", ""),
-                                sourcePath: cell.renderer.entry.file.path
+                                updateWidgets(type, propertyEditor, [cell.renderer.el, value, ctx], plugin)
+    
+    
+    
+                                
+    
+                            } else {
+                                processBaseTableCellTags(cell, plugin)
                             }
-                            
-                            if (propertyEditor.type == "multitext" || propertyEditor.type == "tags" || propertyEditor.type == "aliases") {
-                                let rendered = propertyEditor as MultitextPropertyWidgetComponent | AliasesPropertyWidgetComponent | TagsPropertyWidgetComponent
-                                value = rendered.multiselect?.values
-                            } else if (propertyEditor.type == "text" || propertyEditor.type == "datetime") {
-                                let rendered = propertyEditor as TextPropertyWidgetComponent | DatePropertyWidgetComponentBase
-                                value = rendered.value
-                            } else if (propertyEditor.type == "number" || propertyEditor.type == "checkbox") {
-                                value = cell.renderer.val
-                            } 
-
-
-                            
-
-                        
-                            updateWidgets(type, propertyEditor, [cell.renderer.el, value, ctx], plugin)
-
-
-
-                            
-
-                        } else {
-                            processBaseTableCellTags(cell, plugin)
                         }
                     }
                 }
+    
+                else if (baseViewType == "cards") {
+                    let cardsBaseView = baseView as unknown as CardsBasesView
+                    processBaseCardProperties(cardsBaseView, plugin)
+                }
+    
+                else if (baseViewType == "kanban") {
+                    let kanbanBaseView = baseView as unknown as KanbanBasesView
+                    processBaseKanbanProperties(kanbanBaseView, plugin)
+                }
+    
+                else if (baseViewType == "list") {
+                    let listBaseView = baseView as unknown as ListBasesView
+                    processBaseListProperties(listBaseView, plugin)
+                }
             }
 
-            else if (baseView.type == "cards") {
-                let cardsBaseView = baseView as unknown as CardsBasesView
-                processBaseCardProperties(cardsBaseView, plugin)
-            }
-
-            else if (baseView.type == "list") {
-                let listBaseView = baseView as unknown as ListBasesView
-                processBaseListProperties(listBaseView, plugin)
-            }
+            
         }
 
         
@@ -197,9 +195,7 @@ export const updateAllProperties = (plugin:PrettyPropertiesPlugin) => {
     }
 
     updateTagPaneTagsAll(plugin)
-    
     updateSettingPills(plugin)
-    updateAllMetadataContainers(plugin)
 }
 
 
@@ -220,69 +216,65 @@ export const updateEmptyProperties = (plugin: PrettyPropertiesPlugin) => {
 
 
 export const updateImagesInPopover = (popover: HoverPopover, plugin: PrettyPropertiesPlugin) => {
-
     let embed = (popover as Popover).embed
     
-
-    
-
     if (embed) {
         let file = embed.file
 
         let contentEl = popover.hoverEl
         if (file instanceof TFile) {
             let cache = plugin.app.metadataCache.getFileCache(file);
-            let frontmatter = cache?.frontmatter;
             let sourcePath = file.path || "";
-                
-            if (frontmatter && getNestedProperty(frontmatter, plugin.settings.bannerProperty)  && plugin.settings.enableBanner && plugin.settings.enableBannersInPopover) {
-                void renderBanner(contentEl, frontmatter, sourcePath, popover, plugin);
-            } else {
-                let oldBannerDivSource = contentEl?.querySelector(".cm-scroller .pp-banner");
-                let oldBannerDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .pp-banner");
-                oldBannerDivSource?.remove();
-                oldBannerDivPreview?.remove();
-                contentEl.classList.remove("has-banner")
+            if (cache) {
+                updateImagesWithCacheForView(cache, popover, contentEl, sourcePath, "popover", plugin)
             }
-
             
-
-            let hasCover = false
-
-            if (frontmatter) {
-				for (let extraCover of plugin.settings.coverProperties) {
-					if (getNestedProperty(frontmatter, extraCover.property)) {
-						hasCover = true
-						break
-					}
-				}
-            }
-
-            
-
-            if (frontmatter && hasCover && plugin.settings.enableCover && plugin.settings.enableCoversInPopover) {
-                
-                void renderCover(popover, contentEl, frontmatter, sourcePath, plugin);
-            } else {    
-                let oldCoverDiv = contentEl?.querySelector(".pp-cover");
-                oldCoverDiv?.remove();
-                const mdContainer = contentEl.querySelector(".metadata-container");
-                mdContainer?.classList.remove("has-cover")
-            }
-            if (frontmatter && getNestedProperty(frontmatter, plugin.settings.iconProperty)  && plugin.settings.enableIcon && plugin.settings.enableIconsInPopover) {
-                renderIcon(contentEl, frontmatter, sourcePath, popover, plugin);
-            } else {
-                let oldIconDivSource = contentEl?.querySelector(".cm-scroller .icon-wrapper");
-                let oldIconDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .icon-wrapper");
-                oldIconDivSource?.remove();
-                oldIconDivPreview?.remove();
-                contentEl.classList.remove("has-icon")
-                let titleIconWrappers = contentEl?.querySelectorAll(".title-icon-wrapper")
-                for (let titleIconWrapper of titleIconWrappers) {
-                    titleIconWrapper.remove()
-                }
-            }
         }
+    }
+}
+
+
+
+export const updateImagesForView = (view: MarkdownView, plugin: PrettyPropertiesPlugin) => {
+    let file = view.file;
+
+    if (file) {
+        let cache = plugin.app.metadataCache.getFileCache(file);
+        let sourcePath = file.path || "";
+        let contentEl = view.contentEl;
+        if (cache) {
+            updateImagesWithCacheForView(cache, view, contentEl, sourcePath, "normal", plugin)
+        }
+        
+    }
+};
+
+
+
+export const updateImagesOnCacheChanged = (file: TFile, cache: CachedMetadata, plugin: PrettyPropertiesPlugin) => {
+    
+    let sourcePath = file.path || ""
+
+    let mdLeaves = plugin.app.workspace.getLeavesOfType("markdown");
+    for (let leaf of mdLeaves) {
+        let view = leaf.view;
+        if (view instanceof MarkdownView && view.file?.path == sourcePath) {
+            let contentEl = view.contentEl;
+            updateImagesWithCacheForView(cache, view, contentEl, sourcePath, "normal", plugin)
+        }
+    }
+
+    let canvasLeaves = plugin.app.workspace.getLeavesOfType("canvas");
+    for (let leaf of canvasLeaves) {
+        let view = leaf.view as CanvasView
+
+        view.canvas?.nodes?.forEach(node => {
+            let nodeView = node.child
+
+            if (nodeView && nodeView.file?.path == sourcePath) {
+                updateCoverForView(nodeView, plugin);
+            }
+        })
     }
 }
 
@@ -293,145 +285,61 @@ export const updateImagesInPopover = (popover: HoverPopover, plugin: PrettyPrope
 
 
 
-export const updateImagesForView = (view: MarkdownView, plugin: PrettyPropertiesPlugin) => {
 
+
+export const updateImagesWithCacheForView = (cache: CachedMetadata, view: MarkdownView | HoverPopover, contentEl: HTMLElement, sourcePath: string, type: string, plugin: PrettyPropertiesPlugin) => {
+    let frontmatter = cache?.frontmatter;
+    let enableBanner = plugin.settings.enableBanner
+    let enableCover = plugin.settings.enableCover
+    let enableIcon = plugin.settings.enableIcon
+
+    if (type == "popover") {
+        enableBanner = plugin.settings.enableBanner && plugin.settings.enableBannersInPopover
+        enableCover = plugin.settings.enableCover && plugin.settings.enableCoversInPopover
+        enableIcon = plugin.settings.enableIcon && plugin.settings.enableIconsInPopover
+    }
     
+    if (frontmatter && getNestedProperty(frontmatter, plugin.settings.bannerProperty)  && enableBanner) {
+        void renderBanner(contentEl, frontmatter, sourcePath, view, plugin);
+    } else {
+        let oldBannerDivSource = contentEl?.querySelector(".cm-scroller .pp-banner");
+        let oldBannerDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .pp-banner");
+        oldBannerDivSource?.remove();
+        oldBannerDivPreview?.remove();
+        contentEl.classList.remove("has-banner")
+    }
 
-    let file = view.file;
-    let contentEl = view.contentEl;
+    let hasCover = false
 
-    if (file) {
-        let cache = plugin.app.metadataCache.getFileCache(file);
-        let frontmatter = cache == null ? void 0 : cache.frontmatter;
-        let sourcePath = file.path || "";
-          
-        if (frontmatter && getNestedProperty(frontmatter, plugin.settings.bannerProperty)  && plugin.settings.enableBanner) {
-            void renderBanner(contentEl, frontmatter, sourcePath, view, plugin);
-        } else {
-            let oldBannerDivSource = contentEl?.querySelector(".cm-scroller .pp-banner");
-            let oldBannerDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .pp-banner");
-            oldBannerDivSource?.remove();
-            oldBannerDivPreview?.remove();
-            contentEl.classList.remove("has-banner")
-        }
-    
-        let hasCover = false
-
-
-        
-    
-        if (frontmatter) {
-			for (let extraCover of plugin.settings.coverProperties) {
-				if (getNestedProperty(frontmatter, extraCover.property)) {
-					hasCover = true
-					break
-				}
-			}
-        }
-
-        
-    
-        if (frontmatter && hasCover  && plugin.settings.enableCover) {
-            void renderCover(view, contentEl, frontmatter, sourcePath, plugin);
-        } else {    
-            let oldCoverDiv = contentEl?.querySelector(".pp-cover");
-            oldCoverDiv?.remove();
-            const mdContainer = contentEl.querySelector(".metadata-container");
-            mdContainer?.classList.remove("has-cover")
-        }
-        if (frontmatter && getNestedProperty(frontmatter, plugin.settings.iconProperty)  && plugin.settings.enableIcon) {
-            renderIcon(contentEl, frontmatter, sourcePath, view, plugin);
-            
-        } else {
-            let oldIconDivSource = contentEl?.querySelector(".cm-scroller .icon-wrapper");
-            let oldIconDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .icon-wrapper");
-            oldIconDivSource?.remove();
-            oldIconDivPreview?.remove();
-            contentEl.classList.remove("has-icon")
-            let titleIconWrappers = contentEl?.querySelectorAll(".title-icon-wrapper")
-            for (let titleIconWrapper of titleIconWrappers) {
-                titleIconWrapper.remove()
+    if (frontmatter) {
+        for (let extraCover of plugin.settings.coverProperties) {
+            if (getNestedProperty(frontmatter, extraCover.property)) {
+                hasCover = true
+                break
             }
         }
     }
 
-
-  };
-
-
-
-
-
-
-
-
-
-export const updateImagesOnCacheChanged = (file: TFile, cache: CachedMetadata, plugin: PrettyPropertiesPlugin) => {
-
-    let sourcePath = file.path || ""
-    let leaves = plugin.app.workspace.getLeavesOfType("markdown");
-    for (let leaf of leaves) {
-      let view = leaf.view;
-      if (view instanceof MarkdownView && view.file?.path == sourcePath) {
-        let frontmatter = cache?.frontmatter;
-        let contentEl = view.contentEl;
-      
-        if (frontmatter && getNestedProperty(frontmatter, plugin.settings.bannerProperty)  && plugin.settings.enableBanner) {
-          void renderBanner(contentEl, frontmatter, sourcePath, view, plugin);
-        } else {
-            let oldBannerDivSource = contentEl?.querySelector(".cm-scroller .pp-banner");
-            let oldBannerDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .pp-banner");
-            oldBannerDivSource?.remove();
-            oldBannerDivPreview?.remove();
-            contentEl.classList.remove("has-banner")
-        }
-
-        let hasCover = false
-
-        if (frontmatter) {
-			for (let extraCover of plugin.settings.coverProperties) {
-				if (getNestedProperty(frontmatter, extraCover.property)) {
-					hasCover = true
-					break
-				}
-			}
-        }
-
-
-
-
-        
-
-        if (frontmatter && hasCover && plugin.settings.enableCover) {
-          void renderCover(view, contentEl, frontmatter, sourcePath, plugin);
-        } else {
-          let oldCoverDiv = contentEl?.querySelector(".pp-cover");
-          oldCoverDiv?.remove();
-          const mdContainer = contentEl.querySelector(".metadata-container");
-          mdContainer?.classList.remove("has-cover")
-        }
-        if (frontmatter && getNestedProperty(frontmatter, plugin.settings.iconProperty)  && plugin.settings.enableIcon) {
-          renderIcon(contentEl, frontmatter, sourcePath, view, plugin);
-         
-        } else {
-            let oldIconDivSource = contentEl?.querySelector(".cm-scroller .icon-wrapper");
-            let oldIconDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .icon-wrapper");
-            oldIconDivSource?.remove();
-            oldIconDivPreview?.remove();
-            contentEl.classList.remove("has-icon")
-            let titleIconWrappers = contentEl?.querySelectorAll(".title-icon-wrapper")
-            for (let titleIconWrapper of titleIconWrappers) {
-                titleIconWrapper.remove()
-            }
-        }
-
-
-        
-
-
-
-
-
-      }
+    if (frontmatter && hasCover && enableCover) {
+        void renderCover(view, contentEl, frontmatter, sourcePath, plugin);
+    } else {
+        let oldCoverDiv = contentEl?.querySelector(".pp-cover");
+        oldCoverDiv?.remove();
+        const mdContainer = contentEl.querySelector(".metadata-container");
+        mdContainer?.classList.remove("has-cover")
     }
-  }
+    if (frontmatter && getNestedProperty(frontmatter, plugin.settings.iconProperty)  && enableIcon) {
+        void renderIcon(contentEl, frontmatter, sourcePath, view, plugin);
+        
+    } else {
+        let oldIconDivSource = contentEl?.querySelector(".cm-scroller .icon-wrapper");
+        let oldIconDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .icon-wrapper");
+        oldIconDivSource?.remove();
+        oldIconDivPreview?.remove();
+        contentEl.classList.remove("has-icon")
+        let titleIconWrappers = contentEl?.querySelectorAll(".title-icon-wrapper")
+        for (let titleIconWrapper of titleIconWrappers) {
+            titleIconWrapper.remove()
+        }
+    }
+}

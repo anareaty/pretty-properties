@@ -9,10 +9,7 @@ export const showHiddenSettings = (settingTab: PPSettingTab) => {
 
     let hiddenSettingsWrapper = containerEl.createDiv()
 
-    hiddenSettingsWrapper.setCssProps({
-        border: "1px solid var(--text-accent)",
-        "border-radius": "4px"
-    })
+    hiddenSettingsWrapper.classList.add("pp-settings-list-container")
 
     let hiddenSettingsEl = hiddenSettingsWrapper.createDiv()
     const addHiddenSetting = (property: string) => {
@@ -44,7 +41,7 @@ export const showHiddenSettings = (settingTab: PPSettingTab) => {
             .setIcon("plus")
             .onClick(async () => {
                 newProperty = newProperty.trim()
-                if (newProperty && !plugin.settings.hiddenProperties.find(p => p == newProperty)) {
+                if (newProperty && !plugin.settings.hiddenProperties.find(p => p.toLowerCase() == newProperty.toLowerCase())) {
                     plugin.settings.hiddenProperties.push(newProperty)
                     await plugin.saveSettings()
                     updateHiddenProperties(plugin)
@@ -65,10 +62,7 @@ export const showHiddenEmptySettings = (settingTab: PPSettingTab) => {
 
     let hiddenSettingsWrapper = containerEl.createDiv()
 
-    hiddenSettingsWrapper.setCssProps({
-        border: "1px solid var(--text-accent)",
-        "border-radius": "4px"
-    })
+    hiddenSettingsWrapper.classList.add("pp-settings-list-container")
 
     let hiddenSettingsEl = hiddenSettingsWrapper.createDiv()
     const addHiddenSetting = (property: string) => {
@@ -100,7 +94,7 @@ export const showHiddenEmptySettings = (settingTab: PPSettingTab) => {
             .setIcon("plus")
             .onClick(async() => {
                 newProperty = newProperty.trim()
-                if (newProperty && !plugin.settings.hiddenWhenEmptyProperties.find(p => p == newProperty)) {
+                if (newProperty && !plugin.settings.hiddenWhenEmptyProperties.find(p => p.toLowerCase() == newProperty.toLowerCase())) {
                     plugin.settings.hiddenWhenEmptyProperties.push(newProperty)
                     await plugin.saveSettings()
                     updateHiddenProperties(plugin)
