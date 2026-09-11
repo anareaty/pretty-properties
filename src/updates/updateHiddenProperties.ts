@@ -28,6 +28,8 @@ export const updateHiddenCSSClasses = (propEl: HTMLElement, propName: string, pl
 export const updateMetadataEditor = (metadataEditor: MetadataEditor, plugin: PrettyPropertiesPlugin) => {
     let mcHidden = true
 
+  
+
     for (let r of metadataEditor.rendered) {
 
         let propEl = r.containerEl
