@@ -80,11 +80,16 @@ export const setNestedProperty = (obj: FrontMatterCache, path: string, value: st
  * @param path The path to the property using dot notation (e.g., 'obsidian.icon').
  * @returns true if the property was deleted, false otherwise.
  */
+const dangerousKeys = ["__proto__", "constructor", "prototype"];
+
 export const deleteNestedProperty = (obj: FrontMatterCache, path: string): boolean => {
     if (!obj || !path) {
         return false;
     }
     const keys = path.split('.');
+    if (keys.some(key => dangerousKeys.includes(key))) {
+        return false;
+    }
     let current = obj;
     
     // Navigate to the parent of the target property
