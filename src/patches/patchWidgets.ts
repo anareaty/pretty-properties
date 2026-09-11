@@ -139,6 +139,8 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
 
     
 
+    /*
+
     if (longText?.instanceOf(HTMLElement)) {
       updateLongtext(longText, plugin, propName);
       longText.onblur = () => {
@@ -152,22 +154,11 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
       parent?.classList.remove("is-empty")
     }
 
-    
+    */
 
-    if (propName == plugin.settings.bannerProperty) {
-      el.classList.add("banner-property-value")
-    }
 
-    if (propName == plugin.settings.iconProperty) {
-      el.classList.add("icon-property-value")
-    }
 
-    if (propName == plugin.settings.coverProperties[0]?.property) {
-      el.classList.add("cover-property-value")
-    }
-  }
-
-      if (longText?.instanceOf(HTMLElement)) {
+    if (longText?.instanceOf(HTMLElement)) {
 
         // Fix for wikilink values ("[[...]]") not being saved.
         //
@@ -195,14 +186,54 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
             let link = el.querySelector(".metadata-link");
             if (link) {
               parent?.classList.remove("is-empty")
-              updateAllMetadataContainers(plugin)
             }
           });
         }
       } else if (link) {
         parent?.classList.remove("is-empty")
-        updateAllMetadataContainers(plugin)
       }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+    if (propName == plugin.settings.bannerProperty) {
+      el.classList.add("banner-property-value")
+    }
+
+    if (propName == plugin.settings.iconProperty) {
+      el.classList.add("icon-property-value")
+    }
+
+    if (propName == plugin.settings.coverProperties[0]?.property) {
+      el.classList.add("cover-property-value")
+    }
+  }
+
+      
 
 
 
