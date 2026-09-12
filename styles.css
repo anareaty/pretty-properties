@@ -19,12 +19,14 @@
     top: 0;
     left: 0;
     right: 0;
-    z-index: 1;
+    z-index: -1;
 }
 
-.pp-banner:not(:empty) ~ .cm-sizer,
-.pp-banner:not(:empty) ~ .markdown-preview-sizer {
-  position: relative;
+.has-banner .markdown-preview-view {
+    isolation: isolate;
+}
+
+.has-banner .markdown-preview-sizer {
   z-index: 2;
 }
 
