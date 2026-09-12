@@ -8,7 +8,7 @@ import { CoverPositionSuggestModal } from "src/modals/coverPositionSuggestModal"
 import { ImageSuggestModal } from "src/modals/imageSuggestModal";
 
 const pdfRegex = /^(!)?(?:\[\[(.+\.pdf)\]\]|\[([^\]]*)\]\((.+\.pdf)\))$/;
-const urlRegex = /^(?:http[s]?:\/\/.)?(?:www\.)?[-a-zA-Z0-9@%._+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_+.~#?&//=]*)$/i;
+const urlRegex = /^http[s]?:\/\/[^\s]*$/i;
 const localFileRegex = /^(file:\/\/\/\/.).+\.[a-z]{2,6}$/i;
 const wikiLinkRegex = /^\[\[.+?\]\]$/;
 const imagePathRegex = /^[^\n]+\.(?:avif|bmp|gif|jpeg|jpg|png|svg|webp)$/
@@ -168,6 +168,8 @@ export const renderImageFromValue = async (
 	else if (urlRegex.test(value) || localFileRegex.test(value)) {
 		value = value.replace(/^(https:\/\/www\.youtube.com\/watch\?v=)(.*)/, "https://img.youtube.com/vi/$2/maxresdefault.jpg")
 		value = `![](${value})`;
+
+        console.log(value)
 	} 
 
     else if (imagePathRegex.test(value)) {
