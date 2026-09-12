@@ -10,13 +10,13 @@ export const registerTagPostProcessor = (plugin: PrettyPropertiesPlugin) => {
 
 
 export const processTagsInPreviewElement = (el: HTMLElement, plugin: PrettyPropertiesPlugin) => {
-    if (plugin.settings.enableColoredInlineTags) {
+    if (plugin.settings.enableColoredProperties) {
         const tags = el.findAll("a.tag")
 
         for (let tag of tags) {
             if (tag?.instanceOf(HTMLElement)) {
                 let value = tag.innerText.replace("#", "")
-                setPillStyles(tag, "data-tag-value", value, "tag", plugin)
+                setPillStyles(tag, "tags", value, plugin)
             }
         }
     }

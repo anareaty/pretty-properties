@@ -1,5 +1,6 @@
-import { Component, MarkdownRenderer } from "obsidian";
+import { MarkdownRenderChild, MarkdownRenderer } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
+import { getFormattedString } from "src/utils/formatUtils";
 
 
 export const updatePropertyFormatting = (
@@ -10,8 +11,9 @@ export const updatePropertyFormatting = (
     propertyFormat: string | undefined, 
     propertyTextFormat: string,
 
-    plugin: PrettyPropertiesPlugin
+    plugin: PrettyPropertiesPlugin 
 ) => {
+
 
 
 
@@ -46,7 +48,7 @@ export const updatePropertyFormatting = (
     el.classList.remove("has-property-formatting")
     
 
-    if (!propertyFormat) return
+    if (!propertyFormat || !value) return
 
     let overlayElement = createSpan()
     overlayElement.classList.add("pp-formatted-value-overlay")
@@ -78,7 +80,7 @@ export const computeFormattedValue = (
     }
 
     try {
-        return plugin.formatter.format(propertyName, rawText, propertyFormat);
+        return getFormattedString(propertyName, rawText, propertyFormat);
     } catch {
         return rawText;
     }
@@ -86,14 +88,30 @@ export const computeFormattedValue = (
 
 
 
+
+
+
+
+export const clearUnusedRenderComponents = (plugin: PrettyPropertiesPlugin) => {
+    plugin.activeRenderComponents = plugin.activeRenderComponents.filter((component: MarkdownRenderChild) => {
+        if (!document.body.contains(component.containerEl)) {
+            component.unload()
+            return false
+        }
+        return true
+    })
+}
+
+
+
 export const setOverlayContent = (rawContent: string, propertyTextFormat: string, overlayEl: HTMLElement, propertyEl: HTMLElement, plugin: PrettyPropertiesPlugin) => {
 	if (propertyTextFormat == "markdown") {
 		let sourcePath = propertyEl.getAttribute("data-source-path") || ""
-
-        let renderComponent = new Component()
+        let renderComponent = new MarkdownRenderChild(overlayEl)
+        clearUnusedRenderComponents(plugin)
+        plugin.activeRenderComponents.push(renderComponent)
+        renderComponent.load();
 		void MarkdownRenderer.render(plugin.app, rawContent, overlayEl, sourcePath, renderComponent)
-        renderComponent.unload()
-
 	} else {
 		overlayEl.append(rawContent)
 	}
@@ -121,7 +139,10 @@ const getCurrentPropertyElValue = (propValueEl: HTMLElement, type: string) => {
 export const getPropertyFormatObj = (propName: string, text: string, plugin: PrettyPropertiesPlugin) => {
     let propertyFormatObj = plugin.settings.propertyFormats[propName]
     let propertyFormat = propertyFormatObj?.format
-    let propertyTextFormat = propertyFormatObj?.textFormat || "raw"
+    let propertyTextFormat = "raw"
+
+    let isMD = plugin.settings.markdownProperties.find(p => p.toLowerCase() == propName.toLowerCase())
+    if (isMD) propertyTextFormat = "markdown"
 
     // Always render as markdown if text is formatted as MathJax
     if (plugin.settings.enableMath) {

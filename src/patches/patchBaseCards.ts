@@ -24,30 +24,32 @@ export interface CardsBasesView extends BasesView {
 
 export const patchBaseCards = (plugin: PrettyPropertiesPlugin) => {
     let bases = plugin.app.internalPlugins.getEnabledPluginById("bases") as Bases
+    if (!bases) return
 
-    if (bases) {
-        plugin.patches.uninstallPPBaseCardsPatch = around(bases.registrations.cards, {
-            factory(oldFactory) {
-              return dedupe("pp-patch-base-cards-around-key", oldFactory, (...args) => {
-                let view = oldFactory && oldFactory.apply(this, args) as CardsBasesView
+    plugin.patches.uninstallPPBaseCardsPatch = around(bases.registrations.cards, {
+        factory(oldFactory) {
+            return dedupe("pp-patch-base-cards-around-key", oldFactory, (...args) => {
+            let view = oldFactory && oldFactory.apply(this, args) as CardsBasesView
 
-                view.updateVirtualDisplay = new Proxy(view.updateVirtualDisplay, {
-                    apply(updateVirtualDisplay, thisArg2) {
-                        let update = updateVirtualDisplay.call(thisArg2)
-                        processBaseCardProperties(view, plugin)
-                        return update
-                    }
-                })
-                return view
-              })
+            let old_view_updateVirtualDisplay = view.updateVirtualDisplay
+
+            view.updateVirtualDisplay = (...args2) => {
+                let update = old_view_updateVirtualDisplay.call(view)
+                processBaseCardProperties(view, plugin)
+                return update
             }
-        })
-    }
+
+            return view
+            })
+        }
+    })
+    
 }
 
 
 
 export const processBaseCardProperties = (view: CardsBasesView, plugin: PrettyPropertiesPlugin) => {
+
     for (let item of view.items) {
         for (let property of item.props) {
             processBaseCardProperty(property, plugin)
@@ -56,14 +58,14 @@ export const processBaseCardProperties = (view: CardsBasesView, plugin: PrettyPr
 }
 
 
-const processBaseCardProperty = (property: CardProp, plugin: PrettyPropertiesPlugin) => {
+export const processBaseCardProperty = (property: CardProp, plugin: PrettyPropertiesPlugin) => {
     let prop = property.prop
 
     if (prop == "note.tags" || prop == "file.tags" || prop.startsWith("formula.")) {
         let elements = property.lineEl.querySelectorAll("a.tag")
         for (let el of elements) {
             if (el?.instanceOf(HTMLElement)) {
-                updateValueListElement(el, "data-tag-value", "tag", plugin)
+                updateValueListElement(el, "tags", "tag", plugin)
             }
         }
     }
@@ -76,14 +78,14 @@ const processBaseCardProperty = (property: CardProp, plugin: PrettyPropertiesPlu
             let elements = property.lineEl.querySelectorAll(".value-list-element")
             for (let el of elements) {
                 if (el?.instanceOf(HTMLElement)) {
-                    updateValueListElement(el, "data-property-pill-value", "multiselect-pill", plugin)
+                    updateValueListElement(el, propName, "multiselect-pill", plugin)
                 }
             }
         } 
         
         else if (type == "text") {
             let el = property.lineEl
-            updateCardLongtext(el, plugin);
+            updateCardLongtext(el, propName, plugin);
         } 
 
         else if (type == "date") {

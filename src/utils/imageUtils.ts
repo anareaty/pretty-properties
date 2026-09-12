@@ -1,4 +1,4 @@
-import { Component, ImageValue, loadPdfJs, MarkdownRenderer, Menu, normalizePath, setIcon, TFile } from "obsidian";
+import { Component, loadPdfJs, MarkdownRenderer, Menu, normalizePath, setIcon, TFile } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { getNestedProperty } from "./propertyUtils";
 import { LocalImageSuggestModal } from "src/modals/localImageSuggestModal";
@@ -8,9 +8,12 @@ import { CoverPositionSuggestModal } from "src/modals/coverPositionSuggestModal"
 import { ImageSuggestModal } from "src/modals/imageSuggestModal";
 
 const pdfRegex = /^(!)?(?:\[\[(.+\.pdf)\]\]|\[([^\]]*)\]\((.+\.pdf)\))$/;
-const urlRegex = /^(?:http[s]?:\/\/.)?(?:www\.)?[-a-zA-Z0-9@%._+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_+.~#?&//=]*)$/i;
-const localFileRegex = /^(file:\/\/\/\/.)[-a-zA-Z0-9@%._+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_+.~#?&//=]*)$/i;
+const urlRegex = /^http[s]?:\/\/[^\s]*$/i;
+const localFileRegex = /^(file:\/\/\/\/.).+\.[a-z]{2,6}$/i;
 const wikiLinkRegex = /^\[\[.+?\]\]$/;
+const imagePathRegex = /^[^\n]+\.(?:avif|bmp|gif|jpeg|jpg|png|svg|webp)$/
+const base64Regex = /^data:image\/.*?;base64.*/i;
+
 
 
 
@@ -125,7 +128,16 @@ export const selectCoverImage = (plugin: PrettyPropertiesPlugin) => {
 
 
 
-
+export const getImageValue = (value: string) => {
+    if (pdfRegex.test(value)) return value
+    else if (urlRegex.test(value) || localFileRegex.test(value)) {
+        value = value.replace(/^(https:\/\/www\.youtube.com\/watch\?v=)(.*)/, "https://img.youtube.com/vi/$2/maxresdefault.jpg")
+		value = `![](${value})`
+    }  else if (wikiLinkRegex.test(value)) {
+		value = `!${value}`;
+	} 
+    return value
+}
 
 
 
@@ -137,9 +149,6 @@ export const renderImageFromValue = async (
 	plugin: PrettyPropertiesPlugin
 ) => {
 
-    let imageMode = "mode-markdown"
-
-
 	if(type == "cover" && pdfRegex.test(value)) {
 		const relativePath = extractPdfPath(value);
 		if (relativePath) {
@@ -150,11 +159,20 @@ export const renderImageFromValue = async (
             }
 		}
 	} 
+    
+    else if (base64Regex.test(value)) {
+        const img = createEl("img", {cls: "pp-image-img", attr: {src: value}})
+        return createImageWrapper(img, value, "mode-image", type);
+    }
 	
 	else if (urlRegex.test(value) || localFileRegex.test(value)) {
 		value = value.replace(/^(https:\/\/www\.youtube.com\/watch\?v=)(.*)/, "https://img.youtube.com/vi/$2/maxresdefault.jpg")
 		value = `![](${value})`;
 	} 
+
+    else if (imagePathRegex.test(value)) {
+		value = `![[${value}]]`;
+	}
 	
 	else if (wikiLinkRegex.test(value)) {
 		value = `!${value}`;
@@ -174,7 +192,7 @@ export const renderImageFromValue = async (
     const svg = imageTemp.querySelector("svg");
 	if (svg instanceof SVGElement) {
 		svg.classList.add("pp-image-svg");
-		return createImageWrapper(svg as any as HTMLElement, value, "mode-image", type)
+		return createImageWrapper(svg as unknown as HTMLElement, value, "mode-image", type)
 	}
 
     if (type == "icon") return

@@ -1,8 +1,8 @@
 import {i18n} from "../localization/localization";
-import {Platform, TextAreaComponent} from "obsidian";
+import {TextAreaComponent} from "obsidian";
 import PrettyPropertiesPlugin from "../main";
 import { updateLongTexts } from "../updates/updatePills";
-import { registerPropertyFormatter } from "./propertyFormatter";
+import { validateFormatTemplate } from "./formatUtils";
 
 export function enhanceFormatTextArea(
 	plugin: PrettyPropertiesPlugin,
@@ -28,7 +28,7 @@ export function enhanceFormatTextArea(
 	wrapper.appendChild(errorEl);
 
 	const applyValidationState = (tpl: string) => {
-		const err = plugin.formatter?.validateTemplate(tpl);
+		const err = validateFormatTemplate(tpl);
 
 		if (err) {
 			textareaEl.addClass("pp-format-invalid");
@@ -43,7 +43,6 @@ export function enhanceFormatTextArea(
 	applyValidationState(initialValue);
 
 	text.onChange(async (value: string) => {
-		registerPropertyFormatter(plugin, true)
 		await onValidChange(value);
 		applyValidationState(value);
 		updateLongTexts(document.body, plugin)

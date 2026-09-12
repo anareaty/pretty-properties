@@ -40,20 +40,23 @@ export const patchBaseTable = (plugin: PrettyPropertiesPlugin) => {
               return dedupe("pp-patch-base-table-around-key", oldFactory, (...args) => {
                 let view = oldFactory && oldFactory.apply(this, args) as TableBasesView
 
-                view.updateVirtualDisplay = new Proxy(view.updateVirtualDisplay, {
-                    apply(updateVirtualDisplay, thisArg2) {
-                        let update = updateVirtualDisplay.call(thisArg2)
 
-                        if (plugin.settings.enableColoredProperties) {
-                            for (let row of view.rows) {
-                                for (let cell of row.cells) {
-                                    processBaseTableCellTags(cell, plugin)
-                                }
+
+
+                let old_view_updateVirtualDisplay = view.updateVirtualDisplay
+            
+                view.updateVirtualDisplay = (...args2) => {
+                    let update = old_view_updateVirtualDisplay.call(view)
+                    if (plugin.settings.enableColoredProperties) {
+                        for (let row of view.rows) {
+                            for (let cell of row.cells) {
+                                processBaseTableCellTags(cell, plugin)
                             }
                         }
-                        return update
                     }
-                })
+                    return update
+                }
+
                 return view
               })
             }

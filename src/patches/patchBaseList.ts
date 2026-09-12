@@ -3,7 +3,7 @@ import { updateDateInput, updateDateTimeInput } from "src/updates/updateDates";
 import { updateCardLongtext, updateValueListElement } from "src/updates/updatePills";
 import { around, dedupe } from "monkey-around";
 import { BasesPluginInstance } from "@obsidian-typings/obsidian-public-latest";
-import { BasesEntry, BasesView, BasesViewRegistration } from "obsidian";
+import { BasesEntry, BasesView, BasesViewRegistration, requireApiVersion } from "obsidian";
 import { getPropertyType } from "src/utils/propertyUtils";
 
 interface Bases extends BasesPluginInstance {
@@ -26,42 +26,46 @@ export interface ListBasesView extends BasesView {
 
 export const patchBaseList = (plugin: PrettyPropertiesPlugin) => {
     let bases = plugin.app.internalPlugins.getEnabledPluginById("bases") as Bases
+    if (!bases || !bases.registrations.list) return
 
-    if (bases && bases.registrations.list) {
-        plugin.patches.uninstallPPBaseListPatch = around(bases.registrations.list, {
-            factory(oldFactory) {
-              return dedupe("pp-patch-base-list-around-key", oldFactory, (...args) => {
-                let view = oldFactory && oldFactory.apply(this, args) as ListBasesView
+    plugin.patches.uninstallPPBaseListPatch = around(bases.registrations.list, {
+        factory(oldFactory) {
+            return dedupe("pp-patch-base-list-around-key", oldFactory, (...args) => {
+            let view = oldFactory && oldFactory.apply(this, args) as ListBasesView
 
-                view.updateVirtualDisplay = new Proxy(view.updateVirtualDisplay, {
-                    apply(updateVirtualDisplay, thisArg2) {
-                        let update = updateVirtualDisplay.call(thisArg2)
-                        processBaseListProperties(view, plugin)
-                        return update
-                    }
-                })
-                return view
-              })
+            let old_view_updateVirtualDisplay = view.updateVirtualDisplay
+            
+            view.updateVirtualDisplay = (...args2) => {
+                let update = old_view_updateVirtualDisplay.call(view)
+                processBaseListProperties(view, plugin)
+                return update
             }
-        })
-    }
+
+            return view
+            })
+        }
+    })
+    
 }
 
 
 
 export const processBaseListProperties = (view: ListBasesView, plugin: PrettyPropertiesPlugin) => {
-    let data = view.data?.data
-    if (data) {
-        for (let entry of data) {
-            let row = view.rowsMap.get(entry)
-           
-            if (row) {
-                for (let cell of row.cells) {
-                    processBaseListProperty(cell, plugin)
+    if (requireApiVersion("1.10.0")) {
+        let data = view.data?.data
+        if (data) {
+            for (let entry of data) {
+                let row = view.rowsMap.get(entry)
+            
+                if (row) {
+                    for (let cell of row.cells) {
+                        processBaseListProperty(cell, plugin)
+                    }
                 }
             }
         }
     }
+        
 }
 
 
@@ -73,7 +77,7 @@ const processBaseListProperty = (property: ListCell, plugin: PrettyPropertiesPlu
         let elements = property.el.querySelectorAll("a.tag")
         for (let el of elements) {
             if (el?.instanceOf(HTMLElement)) {
-                updateValueListElement(el, "data-tag-value", "tag", plugin)
+                updateValueListElement(el, "tags", "tag", plugin)
             }
         }
     }
@@ -86,14 +90,14 @@ const processBaseListProperty = (property: ListCell, plugin: PrettyPropertiesPlu
             let elements = property.el.querySelectorAll(".value-list-element")
             for (let el of elements) {
                 if (el?.instanceOf(HTMLElement)) {
-                    updateValueListElement(el, "data-property-pill-value", "multiselect-pill", plugin)
+                    updateValueListElement(el, propName, "multiselect-pill", plugin)
                 }
             }
         } 
        
         else if (type == "text") {
             let el = property.el
-            updateCardLongtext(el, plugin);
+            updateCardLongtext(el, propName, plugin);
         } 
  
         else if (type == "date") {

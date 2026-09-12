@@ -1,4 +1,4 @@
-import { Menu, MenuItem } from "obsidian";
+import { Menu, MenuItem, requireApiVersion } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { i18n } from "src/localization/localization";
 import { updateHiddenProperties } from "src/updates/updateHiddenProperties";
@@ -13,6 +13,7 @@ import { ImageSuggestModal } from "src/modals/imageSuggestModal";
 export const handleBannerMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => {
 
     let propName = plugin.settings.bannerProperty;
+    let positionPropName = plugin.settings.bannerPositionProperty;
 
     menu.addItem((item: MenuItem) => item
         .setTitle(i18n.t("SELECT_BANNER_IMAGE"))
@@ -45,29 +46,62 @@ export const handleBannerMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => 
             removeProperty(plugin.settings.bannerPositionProperty, plugin);
     }))
 
-    if (plugin.settings.hiddenProperties.find(p => p == propName)) {
+
+
+
+    let bannerPropHidden = plugin.settings.hiddenProperties.find(p => p.toLowerCase() == propName.toLowerCase())
+    let bannerPositionPropHidden = plugin.settings.hiddenProperties.find(p => p.toLowerCase() == positionPropName.toLowerCase())
+
+    if (bannerPropHidden || bannerPositionPropHidden) {
         menu.addItem((item: MenuItem) => item
             .setTitle(i18n.t("UNHIDE_BANNER_PROPERTY"))
             .setIcon("lucide-eye")
             .setSection("pretty-properties")
             .onClick(async () => {
-                if (propName)
-                    plugin.settings.hiddenProperties.remove(propName);
+                if (propName && bannerPropHidden) {
+                    plugin.settings.hiddenProperties = plugin.settings.hiddenProperties.filter(p => p.toLowerCase() != propName.toLowerCase())
+                }
+                if (positionPropName && bannerPositionPropHidden) {
+                    plugin.settings.hiddenProperties = plugin.settings.hiddenProperties.filter(p => p.toLowerCase() != positionPropName.toLowerCase())
+                }
+                    
                 await plugin.saveSettings();
                 updateHiddenProperties(plugin);
+                if (requireApiVersion("1.13.0")) {
+                    plugin.settingTab?.update()
+                }
+                
         }))
+    }
 
-    } else {
-        
+
+    if (!bannerPropHidden || !bannerPositionPropHidden) {
         menu.addItem((item: MenuItem) => item
             .setTitle(i18n.t("HIDE_BANNER_PROPERTY"))
             .setIcon("lucide-eye-off")
             .setSection("pretty-properties")
             .onClick(async () => {
-                if (propName)
+
+                if (propName && !bannerPropHidden) {
                     plugin.settings.hiddenProperties.push(propName);
+                }
+                if (positionPropName && !bannerPositionPropHidden) {
+                    plugin.settings.hiddenProperties.push(positionPropName);
+                }
+
+
                 await plugin.saveSettings();
                 updateHiddenProperties(plugin);
+                if (requireApiVersion("1.13.0")) {
+                    plugin.settingTab?.update()
+                }
+                
         }))
     }
+
+   
+
+
+
+
 }

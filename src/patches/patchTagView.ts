@@ -8,7 +8,7 @@ import { TagView } from "@obsidian-typings/obsidian-public-latest";
 
 interface TagViewExtended extends TagView {
   requestUpdateTags: () => unknown,
-  tagDoms: Record<string, HTMLElement>[]
+  tagDoms: Record<string, {el: HTMLElement}>
 }
 
 
@@ -22,42 +22,42 @@ export const patchTagView = (plugin: PrettyPropertiesPlugin) => {
           return dedupe("pp-patch-tag-view-around-key", oldTag, (...args) => {
             let view = oldTag && oldTag.apply(this, args) as TagViewExtended
 
-            view.requestUpdateTags = new Proxy(view.requestUpdateTags, {
-              apply(requestUpdateTags, thisArg2) {
 
-               
-                let update = requestUpdateTags.call(thisArg2)
-                updateTagPaneTags(view.containerEl, plugin)   
-                return update
-              }
-            })
+            const old_requestUpdateTags = view.requestUpdateTags
+
+            view.requestUpdateTags = (...args2) => {
+              let update = old_requestUpdateTags.call(view, ...args2)
+              updateTagPaneTags(view.containerEl, plugin)   
+              return update
+            }
 
             view.updateTags()
             let tagDoms = view.tagDoms
 
-          
-            Object.keys(tagDoms).forEach((key) => {
-              let tag = Number(key)
+            Object.keys(tagDoms).forEach((tag: string) => {
               let tagEl = tagDoms[tag]?.el
+
               if (tagEl) {
                 updateTagPaneTags(tagEl, plugin)
               }
             })
 
-
-            
             return view
           })
         }
     })
 
 
-    plugin.app.workspace.onLayoutReady(async () => {
+    plugin.app.workspace.onLayoutReady(() => {
       let tagLeaves = plugin.app.workspace.getLeavesOfType("tag")
       for (let tagLeaf of tagLeaves) {
-        await tagLeaf.rebuildView()
+        void tagLeaf.rebuildView()
       }
     })
+
+
+
+
   }
 }
 
