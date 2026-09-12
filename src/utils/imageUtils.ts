@@ -168,8 +168,6 @@ export const renderImageFromValue = async (
 	else if (urlRegex.test(value) || localFileRegex.test(value)) {
 		value = value.replace(/^(https:\/\/www\.youtube.com\/watch\?v=)(.*)/, "https://img.youtube.com/vi/$2/maxresdefault.jpg")
 		value = `![](${value})`;
-
-        console.log(value)
 	} 
 
     else if (imagePathRegex.test(value)) {
