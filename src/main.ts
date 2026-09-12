@@ -54,7 +54,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 	api: API;
 	settingTab: PPSettingTab
 	activeRenderComponents: MarkdownRenderChild[]
-	activeSuggest: SelectSuggester
+	activeSuggest: CustomPropertySuggester
 
 
 	async onload() {

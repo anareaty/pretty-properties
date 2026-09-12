@@ -1,9 +1,9 @@
-import { AbstractInputSuggest, FrontMatterCache, PopoverSuggest, setIcon, TFile } from "obsidian"
+import { AbstractInputSuggest, EventRef, FrontMatterCache, PopoverSuggest, setIcon, TFile } from "obsidian"
 import PrettyPropertiesPlugin from "src/main"
 import { setPillStyles } from "./updatePills"
 
 
-export const updateSelectButton = (pill: HTMLElement, propName: string, value: string, sourcePath: string, plugin: PrettyPropertiesPlugin) => {
+export const updateSelectButton = (pill: HTMLElement, propName: string, propVal: string, sourcePath: string, plugin: PrettyPropertiesPlugin) => {
 
     let selectButton = createEl("button")
     setIcon(selectButton, "chevron-down")
@@ -13,13 +13,19 @@ export const updateSelectButton = (pill: HTMLElement, propName: string, value: s
 
     
 
-    selectButton.onmousedown = (e) => {
+    selectButton.onmousedown = (e: PointerEvent) => {
         e.preventDefault()
         e.stopPropagation()
 
         if (plugin.activeSuggest) {
             plugin.activeSuggest.close()
         }
+
+        plugin.activeSuggest = new CustomPropertySuggester(plugin, propName, propVal, sourcePath)
+        plugin.activeSuggest.openAtMouseEvent(e)
+
+
+        /*
         
         let hiddenInput = document.body.createEl("input", {cls: "pp-hidden-suggest-input"})
 
@@ -37,8 +43,93 @@ export const updateSelectButton = (pill: HTMLElement, propName: string, value: s
             originalClose();
             hiddenInput?.remove();
         };
+
+        */
     }
 }
+
+
+export class CustomPropertySuggester extends PopoverSuggest<string> {
+    propName: string
+    plugin: PrettyPropertiesPlugin
+    sourcePath: string
+    propVal: string
+
+    constructor(plugin: PrettyPropertiesPlugin, propName: string, propVal: string, sourcePath: string) {
+        super(plugin.app)
+        this.plugin = plugin
+        this.sourcePath = sourcePath;
+        this.propName = propName;
+        this.propVal = propVal
+
+    }
+
+    getSuggestions(query: string) {
+        return getSelectionOptions(this.propName, this.sourcePath, this.plugin)
+    }
+      
+    renderSuggestion(item: any, el: HTMLElement) {
+        let value = item.text
+        el.classList.add("metadata-suggest-item");
+        let suggestPill = el.createDiv();
+        suggestPill.append(value);
+        suggestPill.classList.add("suggestion-pill");
+        suggestPill.classList.add("longtext-suggest-pill");
+        setPillStyles(suggestPill, this.propName, value, this.plugin);
+    }
+    
+    selectSuggestion(item: any) {
+        let value = item.text
+        let file = this.plugin.app.vault.getAbstractFileByPath(this.sourcePath);
+        if (file instanceof TFile) {
+            this.plugin.app.fileManager.processFrontMatter(file, (fm: FrontMatterCache) => {
+                fm[this.propName] = value;
+            });
+        }
+        this.close();
+    }
+    
+    openAtMouseEvent(e: PointerEvent) {
+        let formattedSuggestions = this.getSuggestions("").map(item => {return {text: item, matches: [], score: 1}})
+        if (formattedSuggestions.length == 0) return
+        this.suggestions.setSuggestions(formattedSuggestions)
+        this.open()
+        const targetRect = new DOMRect(e.clientX, e.clientY + 8, 0, 0);
+        this.reposition(targetRect)
+    }
+}
+
+
+
+const getSelectionOptions = (propName: string, sourcePath: string, plugin: PrettyPropertiesPlugin) => {
+  let propRules = plugin.settings.propertySelectOptions[propName];
+  if (propRules && propRules.length > 0) {
+
+    let pathRules = propRules.filter((s) => {
+      return s.path == "/" || sourcePath.startsWith(s.path)
+    })
+
+    if (pathRules.length > 0) {
+      let preferredRule = pathRules.reduce((a, b) => {
+        if (a.path.length > b.path.length) {
+          return a;
+        } else return b;
+      })
+
+      let options = preferredRule.options
+
+      if (options.length > 0) {
+        return options
+      }
+    }
+  }
+
+  // If no options set get all existing values instead
+
+  return plugin.app.metadataCache.getFrontmatterPropertyValuesForKey(propName) || []
+}
+
+
 
 
 
