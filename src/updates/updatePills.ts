@@ -234,7 +234,7 @@ export const updateLongtext = (pill: HTMLElement, plugin: PrettyPropertiesPlugin
 
 		let propEl = parent?.parentElement
 
-		propName = propName || ""
+		propName = propEl?.getAttribute("data-property-key") || ""
 
 		if (isBase) {
 			propName = propEl?.getAttribute("data-property") || ""
@@ -261,6 +261,11 @@ export const updateLongtext = (pill: HTMLElement, plugin: PrettyPropertiesPlugin
 			}
 
 			if (parent) {
+
+				if (!propName) {
+					console.log("no propname")
+				}
+
 				updateColorButton(parent, propName, text, isBase, plugin)
 			}
 		}

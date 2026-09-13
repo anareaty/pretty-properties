@@ -1,6 +1,7 @@
 import { moment } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { computeFormattedValue, getPropertyFormatObj, setOverlayContent } from "./updatePropertyFormattings";
+import { allowedNodeEnvironmentFlags } from "process";
 
 
 export const updateDateInput = (input: HTMLInputElement, plugin: PrettyPropertiesPlugin) => {
@@ -22,6 +23,8 @@ export const updateDateInput = (input: HTMLInputElement, plugin: PrettyPropertie
 
 	if (!propName) return
 
+	
+
 	let propertyFormatObj = getPropertyFormatObj(propName, value, plugin)
 
 
@@ -37,9 +40,19 @@ export const updateDateInput = (input: HTMLInputElement, plugin: PrettyPropertie
 		let existingCustomDateElement = parent.querySelector(".custom-date")
 
 
-		if (value && plugin.settings.enableCustomDateFormat && 
-			(customDateFormat || propertyFormatObj.format) && 
-			(!isBase || plugin.settings.enableCustomDateFormatInBases || propertyFormatObj.format)) {
+		//if (value && plugin.settings.enableCustomDateFormat && 
+		//	(customDateFormat || propertyFormatObj.format) && 
+		//	(!isBase || plugin.settings.enableCustomDateFormatInBases || propertyFormatObj.format)) {
+
+
+		
+		let allowedRenderCustomDate = !isBase || plugin.settings.enableCustomDateFormatInBases
+		let needRenderCustomDate = plugin.settings.enableCustomDateFormat && customDateFormat && allowedRenderCustomDate
+		let needCustomOverlay = needRenderCustomDate || propertyFormatObj.format
+
+		if (value && needCustomOverlay) {
+
+			
 
 			
 
@@ -144,6 +157,8 @@ export const updateDateTimeInput = (input: HTMLInputElement, plugin: PrettyPrope
 
 	if (!propName) return
 
+	
+
 	let propertyFormatObj = getPropertyFormatObj(propName, value, plugin)
 
 
@@ -157,10 +172,11 @@ export const updateDateTimeInput = (input: HTMLInputElement, plugin: PrettyPrope
 		let isBase = parent.classList.contains("bases-table-cell")
 		let existingCustomDateElement = parent.querySelector(".custom-date")
 
+		let allowedRenderCustomDate = !isBase || plugin.settings.enableCustomDateFormatInBases
+		let needRenderCustomDate = plugin.settings.enableCustomDateFormat && customDateTimeFormat && allowedRenderCustomDate
+		let needCustomOverlay = needRenderCustomDate || propertyFormatObj.format
 
-		if (value && plugin.settings.enableCustomDateFormat && 
-			(customDateTimeFormat || propertyFormatObj.format) && 
-			(!isBase || plugin.settings.enableCustomDateFormatInBases || propertyFormatObj.format)) {
+		if (value && needCustomOverlay) {
 
 
 			let customDate = ""

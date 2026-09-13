@@ -72,6 +72,7 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
                             }).open()
                         }
                     },
+                    /*
                     onDelete: async (idx: number) => {
                         let key = propertyColorsKeys[idx] || ""
                         delete plugin.settings.propertyColors[key]
@@ -81,10 +82,27 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
                         }
 
                     },
+                    */
                     items: propertyColorsKeys.map(propName => ({
                         type: "page",
                         name: propName,
                         items: [
+                            {
+                                name: i18n.t("DELETE_COLOR_SETTINGS_FOR_PROPERTY") + " " + propName,
+                                render: (setting: Setting) => {
+                                    setting.addButton(btn => btn
+                                        .setIcon("x")
+                                        .onClick(async () => {
+                                            delete plugin.settings.propertyColors[propName]
+                                            await plugin.saveSettings();
+                                            updateAllProperties(plugin)
+                                            if (requireApiVersion("1.13.0")) {
+                                                tab.update()			
+                                            }
+                                        })
+                                    )
+                                }
+                            },
                             {
                                 type: "list",
                                 heading: i18n.t("COLORED_VALUES_OF_PROPERTY") + " " + propName,
@@ -106,9 +124,11 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
                                     let key = Object.keys(plugin.settings.propertyColors[propName]!)[idx] || ""
                                     delete plugin.settings.propertyColors[propName]![key]
                                     await plugin.saveSettings();
+                                    updateAllProperties(plugin)
                                     if (requireApiVersion("1.13.0")) {
                                         tab.update()			
                                     }
+                                    
                                 },
                                 items: Object.keys(plugin.settings.propertyColors[propName]!).map((propVal) => ({
                                     name: propVal,

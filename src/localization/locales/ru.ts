@@ -216,4 +216,5 @@ export default {
   ADD_MARKDOWN_PROPERTY: "Добавить свойство, отображаемое как Markdown",
   DELETE_PROPERTY_FORMAT_PROMPT: "Вы точно хотите удалить шаблон форматирования свойства?",
   DELETE_COVER_PROPERTY_PROMPT: "Вы уверены, что хотите удалить свойство обложки? Если у вас настроен шаблон форматирования обложки, он будет потерян.",
+  DELETE_COLOR_SETTINGS_FOR_PROPERTY: "Удалить настройки цвета для свойства",
 };

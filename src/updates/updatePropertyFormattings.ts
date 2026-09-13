@@ -91,15 +91,24 @@ export const computeFormattedValue = (
 
 
 
-export const clearUnusedRenderComponents = (plugin: PrettyPropertiesPlugin) => {
+export const clearUnusedRenderComponents = (plugin: PrettyPropertiesPlugin, overlayEl?: HTMLElement) => {
     plugin.activeRenderComponents = plugin.activeRenderComponents.filter((component: MarkdownRenderChild) => {
-        // Unload components with container elements that are already detached from the DOM
+
+        // Unload component if it's container element is not attached to the DOM
         if (!component.containerEl.isConnected) {
-            component.unload()
-            return false
+
+            // Check if element should be attached
+            // We skip newly rendered elements, because property widgets will render first and be added to the DOM later
+            // This way the component will be unloaded only when we change the layout or edit the existing property,
+            // but it will not be unloaded when the next property in the same note is rendered
+            
+            if (!overlayEl || overlayEl.isConnected) {
+                component.unload()
+                return false
+            }
         }
         return true
-    })
+    })    
 }
 
 
@@ -113,9 +122,6 @@ export const setOverlayContent = (rawContent: string, propertyTextFormat: string
         // However user may chose to use Meta Bind inside Markdown, and it requires the component to stay loaded.
         // Because of that we need to add some logic to unload previously loaded components without breaking Meta Bind
         // We will unload them here and also add events on 'layout-change' and 'active-leaf-change'
-
-        // Unload previously stored render components
-        clearUnusedRenderComponents(plugin)
         
         let renderComponent = new MarkdownRenderChild(overlayEl)
         renderComponent.load();
@@ -132,6 +138,9 @@ export const setOverlayContent = (rawContent: string, propertyTextFormat: string
             // If the is no Meta Bind input, unload immediately for better performance
             renderComponent.unload()
         }
+
+        // Unload previously stored render components that are not used anymore
+        clearUnusedRenderComponents(plugin, overlayEl)
         
 	} else {
 		overlayEl.append(rawContent)
@@ -157,12 +166,23 @@ const getCurrentPropertyElValue = (propValueEl: HTMLElement, type: string) => {
 
 
 
-export const getPropertyFormatObj = (propName: string, text: string, plugin: PrettyPropertiesPlugin) => {
-    let propertyFormatObj = plugin.settings.propertyFormats[propName]
+export const getPropertyFormatObj = (propKey: string, text: string, plugin: PrettyPropertiesPlugin) => {
+
+    // Get the real propname instead of the lowercase version
+    let propName = plugin.app.metadataTypeManager.getPropertyInfo(propKey.toLowerCase())?.name
+
+    let propertyFormatObj
+    let isMD
+
+    if (propName) {
+        propertyFormatObj = plugin.settings.propertyFormats[propName]
+        isMD = plugin.settings.markdownProperties.find(p => p.toLowerCase() == propName.toLowerCase())
+    }
+    
     let propertyFormat = propertyFormatObj?.format
     let propertyTextFormat = "raw"
 
-    let isMD = plugin.settings.markdownProperties.find(p => p.toLowerCase() == propName.toLowerCase())
+    
     if (isMD) propertyTextFormat = "markdown"
 
     // Always render as markdown if text is formatted as MathJax
@@ -181,8 +201,6 @@ export const getPropertyFormatObj = (propName: string, text: string, plugin: Pre
     if (!propertyFormat && propertyTextFormat == "markdown") {
       propertyFormat = "{{propertyValue}}"
     }
-
-    
 
     return {
         format: propertyFormat,

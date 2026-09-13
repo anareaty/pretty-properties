@@ -206,4 +206,5 @@ export default {
   ADD_MARKDOWN_PROPERTY: "Add property to render as Markdown",
   DELETE_PROPERTY_FORMAT_PROMPT: "Are you sure you want to delete property format template?",
   DELETE_COVER_PROPERTY_PROMPT: "Are you sure you want to delete cover property? If you have a cover formatting template set it will be lost.",
+  DELETE_COLOR_SETTINGS_FOR_PROPERTY: "Delete color settings for property",
 };
