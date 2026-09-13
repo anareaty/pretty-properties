@@ -261,11 +261,6 @@ export const updateLongtext = (pill: HTMLElement, plugin: PrettyPropertiesPlugin
 			}
 
 			if (parent) {
-
-				if (!propName) {
-					console.log("no propname")
-				}
-
 				updateColorButton(parent, propName, text, isBase, plugin)
 			}
 		}
