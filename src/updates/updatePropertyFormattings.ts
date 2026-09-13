@@ -91,10 +91,10 @@ export const computeFormattedValue = (
 
 
 
-
 export const clearUnusedRenderComponents = (plugin: PrettyPropertiesPlugin) => {
     plugin.activeRenderComponents = plugin.activeRenderComponents.filter((component: MarkdownRenderChild) => {
-        if (!document.body.contains(component.containerEl)) {
+        // Unload components with container elements that are already detached from the DOM
+        if (!component.containerEl.isConnected) {
             component.unload()
             return false
         }
@@ -107,11 +107,32 @@ export const clearUnusedRenderComponents = (plugin: PrettyPropertiesPlugin) => {
 export const setOverlayContent = (rawContent: string, propertyTextFormat: string, overlayEl: HTMLElement, propertyEl: HTMLElement, plugin: PrettyPropertiesPlugin) => {
 	if (propertyTextFormat == "markdown") {
 		let sourcePath = propertyEl.getAttribute("data-source-path") || ""
-        let renderComponent = new MarkdownRenderChild(overlayEl)
+
+        // We don't have availiable component to render Markdown, so we have to create a new one.
+        // We need to unload component after markdown rendering so plugin do not create tons of unused components.
+        // However user may chose to use Meta Bind inside Markdown, and it requires the component to stay loaded.
+        // Because of that we need to add some logic to unload previously loaded components without breaking Meta Bind
+        // We will unload them here and also add events on 'layout-change' and 'active-leaf-change'
+
+        // Unload previously stored render components
         clearUnusedRenderComponents(plugin)
-        plugin.activeRenderComponents.push(renderComponent)
+        
+        let renderComponent = new MarkdownRenderChild(overlayEl)
         renderComponent.load();
 		void MarkdownRenderer.render(plugin.app, rawContent, overlayEl, sourcePath, renderComponent)
+
+        // We need to check if element has Meta Bind input in it
+        let mbInput = overlayEl.querySelector(".mb-input")
+
+        if (mbInput) {
+            // If there is Meta Bind input, store component to unload it later
+            plugin.activeRenderComponents.push(renderComponent)
+            
+        } else {
+            // If the is no Meta Bind input, unload immediately for better performance
+            renderComponent.unload()
+        }
+        
 	} else {
 		overlayEl.append(rawContent)
 	}
