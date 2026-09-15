@@ -1,7 +1,7 @@
 import { moment } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { computeFormattedValue, getPropertyFormatObj, setOverlayContent } from "./updatePropertyFormattings";
-import { allowedNodeEnvironmentFlags } from "process";
+
 
 
 export const updateDateInput = (input: HTMLInputElement, plugin: PrettyPropertiesPlugin) => {

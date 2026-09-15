@@ -123,7 +123,7 @@ export default {
   PROPERTY_FORMAT_DESC: "Property formats allow rendering properties differently. Use {{propertyValue}} to add the property content. For more infos check out the ",
   PROPERTY_FORMAT: "Property format",
   PROPERTY_SEARCH_PLACEHOLDER: "property",
-  PROPERTY_FORMAT_PLACEHOLDER: "{{reverse propertyValue}}",
+  PROPERTY_FORMAT_PLACEHOLDER: "{{propertyValue}}",
   ENABLE_COLORED_PROPERTIES: "Enable colored properties and tags",
   ENABLE_COLORED_INLINE_TAGS: "Enable colored inline tags",
   ENABLE_NON_LATIN_TAGS_SUPPORT: "Enable non-latin tags styling support",

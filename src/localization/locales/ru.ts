@@ -133,7 +133,7 @@ export default {
   PROPERTY_FORMAT_DESC: "Форматы свойств позволяют отображать свойства по-разному. Используйте {{propertyValue}} для добавления содержимого свойства. Для получения дополнительной информации ознакомьтесь с файлом ",
   PROPERTY_FORMAT: "Формат свойства",
   PROPERTY_SEARCH_PLACEHOLDER: "свойство",
-  PROPERTY_FORMAT_PLACEHOLDER: "{{reverse propertyValue}}",
+  PROPERTY_FORMAT_PLACEHOLDER: "{{propertyValue}}",
   ENABLE_COLORED_PROPERTIES: "Включить цветные свойства и тэги",
   ENABLE_COLORED_INLINE_TAGS: "Включить цветные тэги в тексте заметки",
   ENABLE_NON_LATIN_TAGS_SUPPORT: "Включить поддержку стилей для тэгов с не латинскими символами",
