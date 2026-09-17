@@ -59,19 +59,23 @@ export const patchMetadataSuggester = (plugin: PrettyPropertiesPlugin) => {
                 }
               }
           }
-        } else if (this.suggestions.values[0] && "tag" in this.suggestions.values[0]) {
+        } else {
 
           // Inline tag suggestions
 
-          for (let suggestEl of elements) {
-            let text = suggestEl.innerText
-            suggestEl.classList.add("metadata-suggest-item")
-            suggestEl.empty()
-            let suggestPill = suggestEl.createDiv()
-            suggestPill.append(text)
-            suggestPill.classList.add("suggestion-pill")
-            suggestPill.classList.add("multi-suggest-pill")
-            setPillStyles(suggestPill, "tags", text, plugin)
+          let suggestion = this.suggestions.values[0]
+
+          if (suggestion && typeof suggestion == "object" && "tag" in suggestion) {
+            for (let suggestEl of elements) {
+              let text = suggestEl.innerText
+              suggestEl.classList.add("metadata-suggest-item")
+              suggestEl.empty()
+              let suggestPill = suggestEl.createDiv()
+              suggestPill.append(text)
+              suggestPill.classList.add("suggestion-pill")
+              suggestPill.classList.add("multi-suggest-pill")
+              setPillStyles(suggestPill, "tags", text, plugin)
+            }
           }
         }
 
