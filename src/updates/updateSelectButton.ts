@@ -5,13 +5,13 @@ import { setPillStyles } from "./updatePills"
 
 export const updateSelectButton = (pill: HTMLElement, propName: string, propVal: string, sourcePath: string, plugin: PrettyPropertiesPlugin) => {
 
+    let options = getSelectionOptions(propName, sourcePath, plugin)
+    if (!options) return
+    
     let selectButton = createEl("button")
     setIcon(selectButton, "chevron-down")
     selectButton.classList.add("pp-property-select-button")
     pill.append(selectButton)
-
-
-    
 
     selectButton.onmousedown = (e: PointerEvent) => {
         e.preventDefault()
@@ -24,27 +24,6 @@ export const updateSelectButton = (pill: HTMLElement, propName: string, propVal:
         plugin.activeSuggest = new CustomPropertySuggester(plugin, propName, propVal, sourcePath)
         plugin.activeSuggest.openAtMouseEvent(e)
 
-
-        /*
-        
-        let hiddenInput = document.body.createEl("input", {cls: "pp-hidden-suggest-input"})
-
-        hiddenInput.setCssStyles({
-            left: `${e.clientX}px`,
-            top: `${e.clientY}px`,
-        })
-
-        plugin.activeSuggest = new SelectSuggester(plugin, hiddenInput, propName, sourcePath)
-
-        hiddenInput.focus()
-
-        const originalClose = plugin.activeSuggest.close.bind(plugin.activeSuggest);
-        plugin.activeSuggest.close = () => {
-            originalClose();
-            hiddenInput?.remove();
-        };
-
-        */
     }
 }
 
@@ -65,7 +44,7 @@ export class CustomPropertySuggester extends PopoverSuggest<string> {
     }
 
     getSuggestions(query: string) {
-        return getSelectionOptions(this.propName, this.sourcePath, this.plugin)
+        return getSelectionOptions(this.propName, this.sourcePath, this.plugin) || []
     }
       
     renderSuggestion(item: any, el: HTMLElement) {
@@ -103,6 +82,9 @@ export class CustomPropertySuggester extends PopoverSuggest<string> {
 
 const getSelectionOptions = (propName: string, sourcePath: string, plugin: PrettyPropertiesPlugin) => {
   let propRules = plugin.settings.propertySelectOptions[propName];
+
+  if (!propRules) return
+
   if (propRules && propRules.length > 0) {
 
     let pathRules = propRules.filter((s) => {

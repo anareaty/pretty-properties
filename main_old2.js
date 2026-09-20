@@ -56284,6 +56284,7 @@ var PrettyPropertiesPlugin = class extends import_obsidian51.Plugin {
 
 
 
+      
 
 
 

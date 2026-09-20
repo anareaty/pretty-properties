@@ -830,6 +830,8 @@ body.is-mobile .pp-cover {
     width: fit-content;
     padding-right: var(--pill-padding-x);
     --pill-border-width: 0;
+
+    line-height: normal;
 }
 
 
@@ -1971,6 +1973,10 @@ button.cover-has-format {
   height: var(--icon-size);
   vertical-align: middle;
   opacity: 0.5;
+}
+
+.metadata-property.is-empty button.pp-property-select-button {
+  margin-left: 0;
 }
 
 .metadata-property button.pp-property-select-button:hover {

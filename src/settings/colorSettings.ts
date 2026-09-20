@@ -6,6 +6,7 @@ import { showColoredListSettings } from './coloredListSettings';
 import { setPillStyles } from 'src/updates/updatePills';
 import { propertyColorSaveCallback, setColorMenuItems, setDateColorMenuItems } from 'src/menus/selectColorMenus';
 import { AddPropertyModal, AddTextModal } from 'src/modals/settingItemModals';
+import { updateColoredTagsStyle } from 'src/updates/updateStyles';
 
 
 
@@ -41,7 +42,9 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
                     .onChange(async (value) => {
                         plugin.settings.enableColoredProperties = value
                         await plugin.saveSettings()
+                        updateColoredTagsStyle(plugin)
                         updateAllProperties(plugin);
+
                         if (requireApiVersion("1.13.0")) {
                             tab.update()			
                         }
@@ -109,7 +112,7 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
                                 addItem: {
                                     name: i18n.t("ADD_COLORED_PROPERTY_VALUE"),
                                     action: () => {
-                                        new AddTextModal(plugin, async (newValue) => {
+                                        new AddTextModal(plugin, i18n.t("ADD_PROPERTY_VALUE"), async (newValue) => {
                                             if (newValue && !plugin.settings.propertyColors[propName]![newValue]) {
                                                 plugin.settings.propertyColors[propName]![newValue] = {}
                                                 await plugin.saveSettings()

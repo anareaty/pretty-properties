@@ -307,3 +307,7 @@ export const updateTheme = (plugin: PrettyPropertiesPlugin) => {
 export const updateColoredTagsStyle = (plugin: PrettyPropertiesPlugin) => {
   document.body.classList.toggle("colored-tags", plugin.settings.enableColoredProperties)
 }
+
+export const removeColoredTagsStyle = () => {
+  document.body.classList.remove("colored-tags")
+}

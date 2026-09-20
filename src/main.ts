@@ -3,6 +3,7 @@ import {
 	Menu
 } from "obsidian";
 import { 
+	removeColoredTagsStyle,
 	updateAutoHideProps,
 	updateBannerStyles, 
 	updateColoredTagsStyle, 
@@ -188,6 +189,24 @@ export default class PrettyPropertiesPlugin extends Plugin {
 				},
 				true
 			)
+
+
+
+
+
+			// Close custom suggest popover if clicked outside
+			this.registerDomEvent(
+				win,
+				"mousedown",
+				(e: PointerEvent) => {
+					if (!this.activeSuggest) return
+					let target = e.target
+					let suggestEl = this.activeSuggest.suggestEl
+					if (suggestEl.contains(target as Node)) return
+					this.activeSuggest.close()
+				},
+				true
+			);
 		}
 
 		registerWindowEvents(window);
@@ -210,13 +229,14 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			await migrateCoverProperties(this)
 			reloadAllTabs(this)
 		})
-		
+
 
 	}
 
 	onunload() {
 		unPatchWidgets(this)
 		reloadAllTabs(this)
+		removeColoredTagsStyle()
 		clearUnusedRenderComponents(this)
 	}
 

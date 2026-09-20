@@ -77,7 +77,7 @@ export const showColoredListSettings = (settingTab: PPSettingTab) => {
             .setIcon("plus")
             .setClass("bare-button")
             .onClick(async () => {
-                new AddTextModal(plugin, async (newValue) => {
+                new AddTextModal(plugin, i18n.t("ADD_PROPERTY_VALUE"), async (newValue) => {
                     if (newValue && !plugin.settings.propertyColors[propName]![newValue]) {
                         plugin.settings.propertyColors[propName]![newValue] = {}
                         await plugin.saveSettings()

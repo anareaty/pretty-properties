@@ -26,7 +26,7 @@ export class LocalizationService {
 
   t(key: string): string {
     let localeObj = locales[this.currentLocale] || locales['en']
-    const translation = localeObj![key] || key;
+    const translation = localeObj![key] || locales['en']![key] || key;
     return translation;
   }
 }

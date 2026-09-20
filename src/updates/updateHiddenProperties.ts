@@ -35,6 +35,13 @@ export const updateMetadataEditor = (metadataEditor: MetadataEditor, plugin: Pre
         let propEl = r.containerEl
         updateHiddenCSSClasses(propEl, r.entry.key, plugin)
 
+        /* Update source path just in case in did not update on metadata widget rendering */
+
+        let sourcePath = metadataEditor.owner.file?.path
+        if (sourcePath) {
+            propEl.setAttribute("data-source-path", sourcePath)
+        }
+
         if (propEl.classList.contains("pp-property-hidden")) {
             continue
         }

@@ -80,14 +80,16 @@ export class AddPropertyModal extends Modal {
 
 export class AddTextModal extends Modal {
     plugin: PrettyPropertiesPlugin
+    text: string
     result: string
     modalCallback: (value: string) => Promise<void> | void
    
-    constructor(plugin: PrettyPropertiesPlugin, modalCallback: (value: string) => Promise<void> | void) {
+    constructor(plugin: PrettyPropertiesPlugin, text: string, modalCallback: (value: string) => Promise<void> | void) {
         super(plugin.app)
         this.plugin = plugin
         this.modalCallback = modalCallback
         this.result = ""
+        this.text = text
         
     }
 
@@ -95,7 +97,8 @@ export class AddTextModal extends Modal {
         const {contentEl} = this
 
         new Setting(contentEl)
-        .setName(i18n.t("ADD_PROPERTY"))
+        //.setName(i18n.t("ADD_PROPERTY"))
+        .setName(this.text)
         .addText(txt => txt
             .onChange((value) => {
                 this.result = value
@@ -127,6 +130,9 @@ export class AddTextModal extends Modal {
         contentEl.empty()
     } 
 }
+
+
+
 
 
 
