@@ -156,7 +156,7 @@ export const getPropertyValue = (e: MouseEvent, plugin: PrettyPropertiesPlugin) 
         let checkboxEl = targetEl.closest(".metadata-input-checkbox");
 
         if (valueTextEl?.instanceOf(HTMLElement)) {
-            text = valueTextEl.innerText;
+            text = valueTextEl.textContent || ""
         } else if (valueInputEl?.instanceOf(HTMLInputElement)) {
             text = valueInputEl.value;
         } else if (checkboxEl) {

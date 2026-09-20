@@ -77,7 +77,7 @@ export const updateDateInput = (input: HTMLInputElement, plugin: PrettyPropertie
 
 
 			if (existingCustomDateElement?.instanceOf(HTMLElement) &&
-				existingCustomDateElement.innerText != customDate && 
+				existingCustomDateElement.textContent != customDate && 
 				customDate != "Invalid date") {
 
 
@@ -190,7 +190,7 @@ export const updateDateTimeInput = (input: HTMLInputElement, plugin: PrettyPrope
 
 			
 			if (existingCustomDateElement?.instanceOf(HTMLElement) && 
-				existingCustomDateElement.innerText != customDate && 
+				existingCustomDateElement.textContent != customDate && 
 				customDate != "Invalid date") {
 	
 				//existingCustomDateElement.textContent = customDate

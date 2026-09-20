@@ -213,10 +213,10 @@ const handleTagPaneMenu = (menu: Menu, tagPaneTag: HTMLElement, plugin: PrettyPr
         let parent = tagPaneTag.querySelector("span.tag-pane-tag-parent")
         let parentText = ""
         if (parent?.instanceOf(HTMLElement)) {
-            parentText = parent.innerText
+            parentText = parent.textContent || ""
         }
         if (tag?.instanceOf(HTMLElement)) {
-            let tagText = parentText + tag.innerText
+            let tagText = parentText + tag.textContent
             if (tagText) {
                 createColorMenu("tags", tagText, "pillColor", menu, plugin);
                 createColorMenu("tags", tagText, "textColor", menu, plugin);

@@ -15,7 +15,8 @@ export const processTagsInPreviewElement = (el: HTMLElement, plugin: PrettyPrope
 
         for (let tag of tags) {
             if (tag?.instanceOf(HTMLElement)) {
-                let value = tag.innerText.replace("#", "")
+                let value = tag.textContent || ""
+                value = value.replace("#", "")
                 setPillStyles(tag, "tags", value, plugin)
             }
         }

@@ -159,7 +159,7 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
 
   if (type == "unknown") {
     let input = el.querySelector(".mod-unknown")
-    if (input?.instanceOf(HTMLElement) && input.innerText == "null") {
+    if (input?.instanceOf(HTMLElement) && input.textContent == "null") {
       parent?.classList.add("is-empty")
     } else {
       parent?.classList.remove("is-empty")
