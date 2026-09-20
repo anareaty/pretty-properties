@@ -1,5 +1,6 @@
 import PrettyPropertiesPlugin from "src/main"
 import { around, dedupe } from "monkey-around";
+import { PopoverSuggest, SearchResult } from "obsidian";
 import { setPillStyles } from "src/updates/updatePills";
 
 
