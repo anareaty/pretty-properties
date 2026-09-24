@@ -1968,17 +1968,29 @@ button.cover-has-format {
   background-color: transparent;
   box-shadow: none;
   padding: 0;
-  --icon-size: 1.1em;
+
   color: inherit;
-  height: var(--icon-size);
+
   vertical-align: middle;
   opacity: 0.5;
+
+  height: 100%;
+  margin: auto 0 auto 0;
+
+  display: inline-block;
+
+
 }
 
-.metadata-property.is-empty button.pp-property-select-button {
+
+button.pp-property-select-button  svg {
+  display: block;
+}
+
+.is-empty button.pp-property-select-button {
   margin-left: 0;
 }
 
-.metadata-property button.pp-property-select-button:hover {
+button.pp-property-select-button:hover {
   opacity: 1;
 }

@@ -21,11 +21,12 @@ export const updateSelectButton = (pill: HTMLElement, propName: string, propVal:
             plugin.activeSuggest.close()
         }
 
-        plugin.activeSuggest = new CustomPropertySuggester(plugin, propName, propVal, sourcePath)
+        plugin.activeSuggest = new CustomPropertySuggester(plugin, propName, propVal, sourcePath, selectButton)
         plugin.activeSuggest.openAtMouseEvent(e)
 
     }
 }
+
 
 
 export class CustomPropertySuggester extends PopoverSuggest<string> {
@@ -33,17 +34,24 @@ export class CustomPropertySuggester extends PopoverSuggest<string> {
     plugin: PrettyPropertiesPlugin
     sourcePath: string
     propVal: string
+    selectButton: HTMLElement
 
-    constructor(plugin: PrettyPropertiesPlugin, propName: string, propVal: string, sourcePath: string) {
+    constructor(plugin: PrettyPropertiesPlugin, propName: string, propVal: string, sourcePath: string, selectButton: HTMLElement) {
         super(plugin.app)
         this.plugin = plugin
         this.sourcePath = sourcePath;
         this.propName = propName;
         this.propVal = propVal
+        this.selectButton = selectButton
 
     }
 
     getSuggestions(query: string) {
+        let propertyEl = this.selectButton.parentElement?.parentElement?.parentElement
+        if (propertyEl) {
+            this.sourcePath = propertyEl.getAttribute("data-source-path") || this.sourcePath
+        }
+
         return getSelectionOptions(this.propName, this.sourcePath, this.plugin) || []
     }
       
