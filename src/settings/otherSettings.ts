@@ -63,6 +63,14 @@ export const getOtherSettingsDefinitions = (tab: PPSettingTab) => {
             }
         },
         {
+            name: i18n.t("ENABLE_PROPERTY_SEARCH"),
+            desc: i18n.t("ENABLE_PROPERTY_SEARCH_DESC"),
+            control: { 
+                type: 'toggle', 
+                key: 'enablePropertySearch' 
+            }
+        },
+        {
             name: i18n.t("EXPORT_OR_IMPORT_SETTINGS"),
             render: (setting: Setting) => {
                 setting.addButton(button => {button
@@ -278,6 +286,17 @@ export const showOtherSettings = (settingTab: PPSettingTab) => {
                 plugin.settings.enableMath = value
                 await plugin.saveSettings();
                 updateLongTexts(document.body, plugin)			
+            }));
+
+
+    new Setting(containerEl)
+        .setName(i18n.t("ENABLE_PROPERTY_SEARCH"))
+        .setDesc(i18n.t("ENABLE_PROPERTY_SEARCH_DESC"))
+        .addToggle(toggle => toggle
+            .setValue(plugin.settings.enablePropertySearch)
+            .onChange(async (value) => {
+                plugin.settings.enablePropertySearch = value
+                await plugin.saveSettings();			
             }));
 
 

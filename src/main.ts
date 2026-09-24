@@ -150,22 +150,21 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 			this.registerDomEvent(win, "click", (e: MouseEvent) => {
 
+				if (this.settings.enablePropertySearch) {
+					let searchPlugin = this.app.internalPlugins.getEnabledPluginById("global-search") as GlobalSearchPluginInstanceExtended | null
 
-				
-				let searchPlugin = this.app.internalPlugins.getEnabledPluginById("global-search") as GlobalSearchPluginInstanceExtended | null
-
-				
-				if (searchPlugin && e.target instanceof HTMLElement) {
-					if ((e.ctrlKey || e.metaKey)) {
-						let value = getPropertyValue(e, this);
-						if (value !== undefined) {
-							let propEl = e.target.closest(".metadata-property");
-							let prop = propEl!.getAttribute("data-property-key");
-							if (prop && value && typeof value == "string") {
-								let search = "[" + prop + ': "' + value + '"]';
-								searchPlugin.openGlobalSearch(search);
+					if (searchPlugin && e.target instanceof HTMLElement) {
+						if ((e.ctrlKey || e.metaKey)) {
+							let value = getPropertyValue(e, this);
+							if (value !== undefined) {
+								let propEl = e.target.closest(".metadata-property");
+								let prop = propEl!.getAttribute("data-property-key");
+								if (prop && value && typeof value == "string") {
+									let search = "[" + prop + ': "' + value + '"]';
+									searchPlugin.openGlobalSearch(search);
+								}
+								
 							}
-							
 						}
 					}
 				}

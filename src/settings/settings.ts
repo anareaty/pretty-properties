@@ -113,6 +113,7 @@ export interface PPPluginSettings {
 	propertyColors: Record<string, Record<string, PillColorSettings>>;
 	propertyColorSettingRevealed: string
 	coverClassesMigrated2: boolean
+	enablePropertySearch: boolean
 }
 
 
@@ -227,7 +228,8 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	dontShowColorMigrationMessage: false,
 	propertyColors: {},
 	propertyColorSettingRevealed: "",
-	coverClassesMigrated2: false
+	coverClassesMigrated2: false,
+	enablePropertySearch: true
 }
 
 

@@ -207,4 +207,6 @@ export default {
   DELETE_PROPERTY_FORMAT_PROMPT: "Are you sure you want to delete property format template?",
   DELETE_COVER_PROPERTY_PROMPT: "Are you sure you want to delete cover property? If you have a cover formatting template set it will be lost.",
   DELETE_COLOR_SETTINGS_FOR_PROPERTY: "Delete color settings for property",
+  ENABLE_PROPERTY_SEARCH: "Enable property search",
+  ENABLE_PROPERTY_SEARCH_DESC: "If enabled, you can open search by property value by using Ctrl+click / Cmd+click on the property."
 };
