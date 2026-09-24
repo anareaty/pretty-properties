@@ -1,4 +1,4 @@
-import { AbstractInputSuggest, EventRef, FrontMatterCache, PopoverSuggest, setIcon, TFile } from "obsidian"
+import { AbstractInputSuggest, EventRef, FrontMatterCache, parseLinktext, PopoverSuggest, setIcon, TFile } from "obsidian"
 import PrettyPropertiesPlugin from "src/main"
 import { setPillStyles } from "./updatePills"
 
@@ -54,15 +54,110 @@ export class CustomPropertySuggester extends PopoverSuggest<string> {
 
         return getSelectionOptions(this.propName, this.sourcePath, this.plugin) || []
     }
+
+
+
+
+
+
+
+/*
+
+    t.prototype.renderSuggestion = function(e, t) {
+        if ("text" === e.type)
+            if (e.text.startsWith("[[") && e.text.endsWith("]]")) {
+                t.addClass("mod-complex");
+                var n = t.createDiv("suggestion-content")
+                    , i = t.createDiv("suggestion-aux")
+                    , r = n.createDiv("suggestion-title")
+                    , o = n.createDiv("suggestion-note")
+                    , a = dd(e.text.slice(2, -2))
+                    , s = a.title
+                    , l = a.href
+                    , c = a.isAlias;
+                c && o.setText(l),
+                i.createSpan({
+                    cls: "suggestion-flair"
+                }, (function(e) {
+                    c ? (IM(e, "lucide-forward"),
+                    JM(e, pb.interface.tooltip.alias())) : IM(e, "lucide-link")
+                }
+                )),
+                sx(e.matches, -2),
+                hx(r, s, e)
+            } else
+                t.addClass("mod-nowrap"),
+                hx(t, e.text, e);
+        else
+            IN(e, t, this.manager.global)
+    }
+
+
+*/
+
+
+
+
+
+
+
+
       
     renderSuggestion(item: any, el: HTMLElement) {
-        let value = item.text
-        el.classList.add("metadata-suggest-item");
-        let suggestPill = el.createDiv();
-        suggestPill.append(value);
-        suggestPill.classList.add("suggestion-pill");
-        suggestPill.classList.add("longtext-suggest-pill");
-        setPillStyles(suggestPill, this.propName, value, this.plugin);
+
+
+        if (item.text.startsWith("[[") && item.text.endsWith("]]")) {
+            el.addClass("mod-complex")
+
+
+            let linkText = item.text.slice(2, -2)
+
+            let hasAlias = linkText.match(/(^.*?)(\|)(.+$)/)
+
+            let title = linkText
+            let note = ""
+
+            if (hasAlias) {
+                title = hasAlias[3]
+                note = hasAlias[1]
+            } 
+
+
+            let content = el.createDiv("suggestion-content")
+            let auxEl = el.createDiv("suggestion-aux")
+            let titleEl = content.createDiv("suggestion-title")
+            let noteEl = content.createDiv("suggestion-note")
+
+            titleEl.setText(title)
+            noteEl.setText(note)
+
+            auxEl.createSpan({
+                cls: "suggestion-flair"
+            }, (function(e) {
+                if (hasAlias) {
+                    setIcon(e, "lucide-forward")
+                } else {
+                    setIcon(e, "lucide-link")
+                }
+            }))
+
+
+
+
+
+        } else {
+
+            let value = item.text
+            el.classList.add("metadata-suggest-item");
+            let suggestPill = el.createDiv();
+            suggestPill.append(value);
+            suggestPill.classList.add("suggestion-pill");
+            suggestPill.classList.add("longtext-suggest-pill");
+            setPillStyles(suggestPill, this.propName, value, this.plugin);
+        }
+
+        
+        
     }
     
     selectSuggestion(item: any) {

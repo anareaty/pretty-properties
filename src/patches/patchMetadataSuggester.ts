@@ -23,6 +23,7 @@ export const patchMetadataSuggester = (plugin: PrettyPropertiesPlugin) => {
     open(old) {
       return dedupe("pp-patch-suggest-around-key", old, function (this: PropertyPopoverSuggest) {
 
+
         if (plugin.settings.enableColoredProperties) {
           let elements = this.suggestions.suggestions
           let inputEl = this.inputEl
