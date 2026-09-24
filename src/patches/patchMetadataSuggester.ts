@@ -38,22 +38,26 @@ export const patchMetadataSuggester = (plugin: PrettyPropertiesPlugin) => {
 
               if (propName) {
                 for (let suggestEl of elements) {
-                  let text = suggestEl.textContent || ""
-                  suggestEl.classList.add("metadata-suggest-item")
-                  suggestEl.empty()
 
-                  let suggestPill = suggestEl.createDiv()
-                  suggestPill.append(text)
-                  suggestPill.classList.add("suggestion-pill")
-                  setPillStyles(suggestPill, propName, text, plugin)
+                  if (!suggestEl.classList.contains("mod-complex")) {
+                    let text = suggestEl.textContent || ""
+                    suggestEl.classList.add("metadata-suggest-item")
+                    suggestEl.empty()
 
-                  if (isMultiSelect) {
-                    suggestPill.classList.add("multi-suggest-pill")
+                    let suggestPill = suggestEl.createDiv()
+                    suggestPill.append(text)
+                    suggestPill.classList.add("suggestion-pill")
+                    setPillStyles(suggestPill, propName, text, plugin)
+
+                    if (isMultiSelect) {
+                      suggestPill.classList.add("multi-suggest-pill")
+                    }
+
+                    else if (isLongtext) {
+                      suggestPill.classList.add("longtext-suggest-pill")
+                    }
                   }
-
-                  else if (isLongtext) {
-                    suggestPill.classList.add("longtext-suggest-pill")
-                  }
+                  
                 }
               }
             }
