@@ -24,11 +24,14 @@ export const registerPropertySearch = (e: PointerEvent, plugin: PrettyProperties
                 let value = getClickedPropertyValue(e, plugin, filePath);
 
                 if (value !== undefined) {
-                    let prop = propEl.getAttribute("data-property-key");
+                    let propKey = propEl.getAttribute("data-property-key");
 
-                    if (prop && value && typeof value == "string") {
-                        let search = "[" + prop + ': "' + value + '"]';
-                        searchPlugin.openGlobalSearch(search);
+                    if (propKey) {
+                        let propName = plugin.app.metadataTypeManager.getPropertyInfo(propKey.toLowerCase())?.name || propKey
+                        if (propName && value && typeof value == "string") {
+                                let search = "[" + propName + ': "' + value + '"]';
+                                searchPlugin.openGlobalSearch(search);
+                        }
                     }
                 }
             }
@@ -63,11 +66,15 @@ const getClickedPropertyValue = (e: MouseEvent, plugin: PrettyPropertiesPlugin, 
             e.preventDefault();
             let currentFile = plugin.app.vault.getAbstractFileByPath(filePath)
             let propEl = targetEl.closest(".metadata-property");
-            let prop = propEl!.getAttribute("data-property-key");
-            if (currentFile instanceof TFile && prop) {
-                let frontmatter = plugin.app.metadataCache.getFileCache(currentFile)?.frontmatter
-                if (frontmatter) {
-                    text = getNestedProperty(frontmatter, prop);
+            let propKey = propEl!.getAttribute("data-property-key");
+            if (propKey) {
+                let propName = plugin.app.metadataTypeManager.getPropertyInfo(propKey.toLowerCase())?.name || propKey
+
+                if (currentFile instanceof TFile && propName) {
+                    let frontmatter = plugin.app.metadataCache.getFileCache(currentFile)?.frontmatter
+                    if (frontmatter) {
+                        text = getNestedProperty(frontmatter, propName);
+                    }
                 }
             }
         }

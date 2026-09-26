@@ -9,9 +9,10 @@ import { getPropertyType } from "src/utils/propertyUtils";
 
 export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: PrettyPropertiesPlugin) => {
 
-    let propName = propEl?.getAttribute("data-property-key");
+    let propKey = propEl?.getAttribute("data-property-key");
 
-    if (propName) {
+    if (propKey) {
+        let propName = plugin.app.metadataTypeManager.getPropertyInfo(propKey.toLowerCase())?.name || propKey
         if (plugin.settings.hiddenProperties.find((p) => p.toLowerCase() == propName.toLowerCase())) {
 
             menu.addItem((item: MenuItem) =>

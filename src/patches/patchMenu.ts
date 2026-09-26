@@ -193,12 +193,16 @@ const removeTagAtCursor = (plugin: PrettyPropertiesPlugin) => {
 const handlePillMenu = (menu: Menu, pill: HTMLElement, plugin: PrettyPropertiesPlugin) => {
     if (plugin.settings.enableColoredProperties) {
 
-        let propName = pill.getAttribute("data-property-key")
+        let propKey = pill.getAttribute("data-property-key")
         let pillVal = pill.getAttribute("data-property-value");
 
-        if (propName && pillVal) {
-            createColorMenu(propName, pillVal, "pillColor", menu, plugin);
-            createColorMenu(propName, pillVal, "textColor", menu, plugin);
+        if (propKey) {
+            let propName = plugin.app.metadataTypeManager.getPropertyInfo(propKey.toLowerCase())?.name || propKey
+
+            if (propName && pillVal) {
+                createColorMenu(propName, pillVal, "pillColor", menu, plugin);
+                createColorMenu(propName, pillVal, "textColor", menu, plugin);
+            } 
         } 
     }
 }

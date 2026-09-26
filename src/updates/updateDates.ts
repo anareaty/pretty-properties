@@ -14,7 +14,12 @@ export const updateDateInput = (input: HTMLInputElement, plugin: PrettyPropertie
 
 
 
-	let propName = grandParent.getAttribute("data-property-key")
+	let propKey = grandParent.getAttribute("data-property-key")
+	let propName
+
+	if (propKey) {
+		propName = plugin.app.metadataTypeManager.getPropertyInfo(propKey.toLowerCase())?.name || propKey
+	}
 	
 	if (!propName) {
 		propName = grandParent.getAttribute("data-property") || ""
@@ -148,7 +153,12 @@ export const updateDateTimeInput = (input: HTMLInputElement, plugin: PrettyPrope
 
 	if (!grandParent) return
 
-	let propName = grandParent.getAttribute("data-property-key")
+	let propKey = grandParent.getAttribute("data-property-key")
+
+	let propName
+	if (propKey) {
+		propName = plugin.app.metadataTypeManager.getPropertyInfo(propKey.toLowerCase())?.name || propKey
+	}
 
 	if (!propName) {
 		propName = grandParent.getAttribute("data-property") || ""

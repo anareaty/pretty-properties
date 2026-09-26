@@ -12,7 +12,8 @@ export const updateProgress = (propertyEl: HTMLElement, plugin: PrettyProperties
         return
     }
     
-    let propName = propertyEl.getAttribute("data-property-key") || ""
+    let propKey = propertyEl.getAttribute("data-property-key") || ""
+    let propName = plugin.app.metadataTypeManager.getPropertyInfo(propKey.toLowerCase())?.name || propKey
     let progressSettings = plugin.settings.progressProperties[propName]
     let existingProgressWrapper = propertyEl.querySelector(".metadata-progress-wrapper")
 

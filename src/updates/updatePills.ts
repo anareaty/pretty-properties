@@ -235,7 +235,10 @@ export const updateLongtext = (pill: HTMLElement, plugin: PrettyPropertiesPlugin
 
 		let propEl = parent?.parentElement
 
-		propName = propEl?.getAttribute("data-property-key") || ""
+		let propKey = propEl?.getAttribute("data-property-key") || ""
+
+		propName = plugin.app.metadataTypeManager.getPropertyInfo(propKey.toLowerCase())?.name || propKey
+		
 
 		if (isBase) {
 			propName = propEl?.getAttribute("data-property") || ""
@@ -329,7 +332,11 @@ export const updateLongTexts = (container: HTMLElement, plugin: PrettyProperties
 
 	for (let pill of cardsLongtexts) {
 		if (pill?.instanceOf(HTMLElement)) {
-			let propName = pill.getAttribute("data-property-key") || ""
+			let propKey = pill.getAttribute("data-property-key") || ""
+
+			
+			let propName = plugin.app.metadataTypeManager.getPropertyInfo(propKey.toLowerCase())?.name || propKey
+		
 			updateCardLongtext(pill, propName, plugin)
 		}
 	}
@@ -338,7 +345,8 @@ export const updateLongTexts = (container: HTMLElement, plugin: PrettyProperties
 
 	for (let pill of listLongtexts) {
 		if (pill?.instanceOf(HTMLElement)) {
-			let propName = pill.getAttribute("data-property-key") || ""
+			let propKey = pill.getAttribute("data-property-key") || ""
+			let propName = plugin.app.metadataTypeManager.getPropertyInfo(propKey.toLowerCase())?.name || propKey
 			updateCardLongtext(pill, propName, plugin)
 		}
 	}
@@ -351,7 +359,8 @@ export const updateSettingPills = (plugin: PrettyPropertiesPlugin) => {
 	for (let pill of pills) {
 	  if (pill?.instanceOf(HTMLElement)) {
 		let content = pill.querySelector(".multi-select-pill-content");
-		let propName = pill.getAttribute("data-property-key") || ""
+		let propKey = pill.getAttribute("data-property-key") || ""
+		let propName = plugin.app.metadataTypeManager.getPropertyInfo(propKey.toLowerCase())?.name || propKey
 		if (content?.instanceOf(HTMLElement)) {
 			let text = content?.textContent || ""
 			setPillStyles(pill, propName, text, plugin)
@@ -375,7 +384,8 @@ export const updateSettingPills = (plugin: PrettyPropertiesPlugin) => {
 	for (let pill of longtextPills) {
 	  if (pill?.instanceOf(HTMLElement)) {
 		let text = pill.textContent || ""
-		let propName = pill.getAttribute("data-property-key") || ""
+		let propKey = pill.getAttribute("data-property-key") || ""
+		let propName = plugin.app.metadataTypeManager.getPropertyInfo(propKey.toLowerCase())?.name || propKey
 		setPillStyles(pill, propName, text, plugin);
 	  }
 	}
