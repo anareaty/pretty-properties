@@ -19,7 +19,6 @@ import { i18n } from "./localization/localization";
 import { PPSettingTab, PPPluginSettings, DEFAULT_SETTINGS } from "./settings/settings";
 import { registerCommands } from "./utils/registerCommands";
 import { updateEmptyProperties, updateImagesOnCacheChanged } from "./updates/updateElements";
-import { getPropertyValue } from "./utils/propertyUtils";
 import { registerTagFixExtension } from "./extensions/tagFixExtension";
 import { updatePillPaddings } from "./updates/updateStyles";
 import { registerTagPostProcessor } from "./extensions/tagPostProcessor";
@@ -37,20 +36,18 @@ import { API, createApi } from "./utils/createApi";
 import { patchMenu } from "./patches/patchMenu";
 import { reloadAllTabs } from "./utils/reload";
 import { patchEmbed } from "./patches/patchEmbed";
-import { GlobalSearchPluginInstance } from "@obsidian-typings/obsidian-public-latest";
 import { patchMetadataSuggester } from "./patches/patchMetadataSuggester";
 import { patchBaseKanban } from "./patches/patchBaseKanban";
 import { MarkdownRenderChild } from "obsidian";
 import { clearUnusedRenderComponents } from "./updates/updatePropertyFormattings";
 import { migrateColorSettings, migrateCoverProperties, migrateCoverSettings } from "./utils/settingsMigration";
+import { registerPropertySearch } from "./utils/propertySearch";
 
 type Patch = () => void
 type PatchList = Record<string, Patch>
 
 
-interface GlobalSearchPluginInstanceExtended extends GlobalSearchPluginInstance {
-	openGlobalSearch: (search: string) => void
-}
+
 export default class PrettyPropertiesPlugin extends Plugin {
 	settings: PPPluginSettings;
 	patches: Record<string, PatchList | Patch>;
@@ -148,26 +145,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
     		let plugins = this.app.plugins
 			
 
-			this.registerDomEvent(win, "click", (e: MouseEvent) => {
-
-				if (this.settings.enablePropertySearch) {
-					let searchPlugin = this.app.internalPlugins.getEnabledPluginById("global-search") as GlobalSearchPluginInstanceExtended | null
-
-					if (searchPlugin && e.target instanceof HTMLElement) {
-						if ((e.ctrlKey || e.metaKey)) {
-							let value = getPropertyValue(e, this);
-							if (value !== undefined) {
-								let propEl = e.target.closest(".metadata-property");
-								let prop = propEl!.getAttribute("data-property-key");
-								if (prop && value && typeof value == "string") {
-									let search = "[" + prop + ': "' + value + '"]';
-									searchPlugin.openGlobalSearch(search);
-								}
-								
-							}
-						}
-					}
-				}
+			this.registerDomEvent(win, "click", (e: PointerEvent) => {
+				registerPropertySearch(e, this)
 			});
 
 			this.registerDomEvent(
