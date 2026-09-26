@@ -9,7 +9,6 @@ import { getPropertyType } from "src/utils/propertyUtils";
 
 export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: PrettyPropertiesPlugin) => {
 
-    
     let propKey = propEl?.getAttribute("data-property-key");
 
     if (propKey) {
