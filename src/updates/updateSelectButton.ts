@@ -65,116 +65,70 @@ export class CustomPropertySuggester extends PopoverSuggest<string> {
 
 
 
+     
+    renderSuggestion(item: unknown, el: HTMLElement) {
+
+        if (item && typeof item == "object" && "text" in item && typeof item.text == "string") {
+
+            if (item.text.startsWith("[[") && item.text.endsWith("]]")) {
+                el.addClass("mod-complex")
 
 
+                let linkText = item.text.slice(2, -2)
+
+                let hasAlias = linkText.match(/(^.*?)(\|)(.+$)/)
+
+                let title = linkText
+                let note = ""
+
+                if (hasAlias) {
+                    title = hasAlias[3] || ""
+                    note = hasAlias[1] || ""
+                } 
 
 
-/*
+                let content = el.createDiv("suggestion-content")
+                let auxEl = el.createDiv("suggestion-aux")
+                let titleEl = content.createDiv("suggestion-title")
+                let noteEl = content.createDiv("suggestion-note")
 
-    t.prototype.renderSuggestion = function(e, t) {
-        if ("text" === e.type)
-            if (e.text.startsWith("[[") && e.text.endsWith("]]")) {
-                t.addClass("mod-complex");
-                var n = t.createDiv("suggestion-content")
-                    , i = t.createDiv("suggestion-aux")
-                    , r = n.createDiv("suggestion-title")
-                    , o = n.createDiv("suggestion-note")
-                    , a = dd(e.text.slice(2, -2))
-                    , s = a.title
-                    , l = a.href
-                    , c = a.isAlias;
-                c && o.setText(l),
-                i.createSpan({
+                titleEl.setText(title)
+                noteEl.setText(note)
+
+                auxEl.createSpan({
                     cls: "suggestion-flair"
                 }, (function(e) {
-                    c ? (IM(e, "lucide-forward"),
-                    JM(e, pb.interface.tooltip.alias())) : IM(e, "lucide-link")
-                }
-                )),
-                sx(e.matches, -2),
-                hx(r, s, e)
-            } else
-                t.addClass("mod-nowrap"),
-                hx(t, e.text, e);
-        else
-            IN(e, t, this.manager.global)
-    }
+                    if (hasAlias) {
+                        setIcon(e, "lucide-forward")
+                    } else {
+                        setIcon(e, "lucide-link")
+                    }
+                }))
 
+            } else {
 
-*/
-
-
-
-
-
-
-
-
-      
-    renderSuggestion(item: any, el: HTMLElement) {
-
-
-        if (item.text.startsWith("[[") && item.text.endsWith("]]")) {
-            el.addClass("mod-complex")
-
-
-            let linkText = item.text.slice(2, -2)
-
-            let hasAlias = linkText.match(/(^.*?)(\|)(.+$)/)
-
-            let title = linkText
-            let note = ""
-
-            if (hasAlias) {
-                title = hasAlias[3]
-                note = hasAlias[1]
-            } 
-
-
-            let content = el.createDiv("suggestion-content")
-            let auxEl = el.createDiv("suggestion-aux")
-            let titleEl = content.createDiv("suggestion-title")
-            let noteEl = content.createDiv("suggestion-note")
-
-            titleEl.setText(title)
-            noteEl.setText(note)
-
-            auxEl.createSpan({
-                cls: "suggestion-flair"
-            }, (function(e) {
-                if (hasAlias) {
-                    setIcon(e, "lucide-forward")
-                } else {
-                    setIcon(e, "lucide-link")
-                }
-            }))
-
-
-
-
-
-        } else {
-
-            let value = item.text
-            el.classList.add("metadata-suggest-item");
-            let suggestPill = el.createDiv();
-            suggestPill.append(value);
-            suggestPill.classList.add("suggestion-pill");
-            suggestPill.classList.add("longtext-suggest-pill");
-            setPillStyles(suggestPill, this.propName, value, this.plugin);
-        }
-
-        
-        
+                let value = item.text
+                el.classList.add("metadata-suggest-item");
+                let suggestPill = el.createDiv();
+                suggestPill.append(value);
+                suggestPill.classList.add("suggestion-pill");
+                suggestPill.classList.add("longtext-suggest-pill");
+                setPillStyles(suggestPill, this.propName, value, this.plugin);
+            }
+        } 
     }
     
-    selectSuggestion(item: any) {
-        let value = item.text
-        let file = this.plugin.app.vault.getAbstractFileByPath(this.sourcePath);
-        if (file instanceof TFile) {
-            this.plugin.app.fileManager.processFrontMatter(file, (fm: FrontMatterCache) => {
-                fm[this.propName] = value;
-            });
+
+
+    selectSuggestion(item: unknown) {
+        if (item && typeof item == "object" && "text" in item && typeof item.text == "string") {
+            let value = item.text
+            let file = this.plugin.app.vault.getAbstractFileByPath(this.sourcePath);
+            if (file instanceof TFile) {
+                void this.plugin.app.fileManager.processFrontMatter(file, (fm: FrontMatterCache) => {
+                    fm[this.propName] = value;
+                });
+            }
         }
         this.close();
     }
@@ -277,7 +231,7 @@ export class SelectSuggester extends AbstractInputSuggest<string> {
     selectSuggestion(value: string, evt: MouseEvent | KeyboardEvent): void { 
         let file = this.plugin.app.vault.getAbstractFileByPath(this.sourcePath)
         if (file instanceof TFile) {
-            this.plugin.app.fileManager.processFrontMatter(file, (fm: FrontMatterCache) => {
+            void this.plugin.app.fileManager.processFrontMatter(file, (fm: FrontMatterCache) => {
                 fm[this.propName] = value
             })
         }
