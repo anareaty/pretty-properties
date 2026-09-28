@@ -3,7 +3,7 @@ import PrettyPropertiesPlugin from "src/main"
 import { setPillStyles } from "./updatePills"
 
 
-export const updateSelectButton = (pill: HTMLElement, propName: string, propVal: string, sourcePath: string, plugin: PrettyPropertiesPlugin) => {
+export const updateSelectButton = (pill: HTMLElement, propName: string, sourcePath: string, plugin: PrettyPropertiesPlugin) => {
 
     let options = getSelectionOptions(propName, sourcePath, plugin)
     if (!options) return
@@ -29,7 +29,7 @@ export const updateSelectButton = (pill: HTMLElement, propName: string, propVal:
             plugin.activeSuggest.close()
         }
 
-        plugin.activeSuggest = new CustomPropertySuggester(plugin, propName, propVal, sourcePath, selectButton)
+        plugin.activeSuggest = new CustomPropertySuggester(plugin, propName, sourcePath, selectButton)
         plugin.activeSuggest.openAtMouseEvent(e)
 
     }
@@ -41,15 +41,13 @@ export class CustomPropertySuggester extends PopoverSuggest<string> {
     propName: string
     plugin: PrettyPropertiesPlugin
     sourcePath: string
-    propVal: string
     selectButton: HTMLElement
 
-    constructor(plugin: PrettyPropertiesPlugin, propName: string, propVal: string, sourcePath: string, selectButton: HTMLElement) {
+    constructor(plugin: PrettyPropertiesPlugin, propName: string, sourcePath: string, selectButton: HTMLElement) {
         super(plugin.app)
         this.plugin = plugin
         this.sourcePath = sourcePath;
         this.propName = propName;
-        this.propVal = propVal
         this.selectButton = selectButton
 
     }

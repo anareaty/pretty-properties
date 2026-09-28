@@ -5,6 +5,7 @@ import { updateDateInput, updateDateTimeInput } from "src/updates/updateDates"
 import { around, dedupe } from "monkey-around";
 import { AliasesPropertyWidgetComponent, MultitextPropertyWidgetComponent, PropertyRenderContext, PropertyWidgetComponentBase, TagsPropertyWidgetComponent, TextPropertyWidgetComponent, TypeInfo } from "@obsidian-typings/obsidian-public-latest";
 import { updateHiddenCSSClasses } from "src/updates/updateHiddenProperties";
+import { updateSelectButton } from "src/updates/updateSelectButton";
 
 
 type WidgetArgs = [
@@ -132,6 +133,11 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
           }
       } else if (link) {
         parent?.classList.remove("is-empty")
+
+        let linkEl = link.querySelector(".metadata-link-inner")
+        if (linkEl instanceof HTMLElement && (linkEl.classList.contains("internal-link") || linkEl.classList.contains("external-link"))) {
+          updateSelectButton(linkEl, propName, sourcePath, plugin);
+        } 
       }
     }
 

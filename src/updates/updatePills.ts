@@ -265,6 +265,7 @@ export const updateLongtext = (pill: HTMLElement, plugin: PrettyPropertiesPlugin
 				setPillStyles(overlayElement, propName, text, plugin)
 			}
 
+
 			if (parent && grandParent) {
 				updateColorButton(parent, propName, text, isBase, plugin)
 
@@ -272,9 +273,9 @@ export const updateLongtext = (pill: HTMLElement, plugin: PrettyPropertiesPlugin
 				let linkEl = parent.querySelector(".metadata-link-inner")
 
 				if (linkEl instanceof HTMLElement && (linkEl.classList.contains("internal-link") || linkEl.classList.contains("external-link"))) {
-					updateSelectButton(linkEl, propName, text, sourcePath, plugin);
+					updateSelectButton(linkEl, propName, sourcePath, plugin);
 				} else {
-					updateSelectButton(pill, propName, text, sourcePath, plugin);
+					updateSelectButton(pill, propName, sourcePath, plugin);
 				}
 			}
 		}
