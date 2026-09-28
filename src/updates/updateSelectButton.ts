@@ -1,4 +1,4 @@
-import { AbstractInputSuggest, EventRef, FrontMatterCache, parseLinktext, PopoverSuggest, setIcon, TFile } from "obsidian"
+import { AbstractInputSuggest, FrontMatterCache, PopoverSuggest, setIcon, TFile } from "obsidian"
 import PrettyPropertiesPlugin from "src/main"
 import { setPillStyles } from "./updatePills"
 
@@ -12,6 +12,14 @@ export const updateSelectButton = (pill: HTMLElement, propName: string, propVal:
     setIcon(selectButton, "chevron-down")
     selectButton.classList.add("pp-property-select-button")
     pill.append(selectButton)
+
+
+    // If pill is link prevent link opening
+    
+    selectButton.onclick = (e: PointerEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+    }
 
     selectButton.onmousedown = (e: PointerEvent) => {
         e.preventDefault()

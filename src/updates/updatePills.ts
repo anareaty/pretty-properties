@@ -266,10 +266,16 @@ export const updateLongtext = (pill: HTMLElement, plugin: PrettyPropertiesPlugin
 			}
 
 			if (parent && grandParent) {
-
-				let sourcePath = grandParent.getAttribute("data-source-path") || ""
-				updateSelectButton(pill, propName, text, sourcePath, plugin)
 				updateColorButton(parent, propName, text, isBase, plugin)
+
+				let sourcePath = grandParent.getAttribute("data-source-path") || "";
+				let linkEl = parent.querySelector(".metadata-link-inner")
+
+				if (linkEl instanceof HTMLElement && (linkEl.classList.contains("internal-link") || linkEl.classList.contains("external-link"))) {
+					updateSelectButton(linkEl, propName, text, sourcePath, plugin);
+				} else {
+					updateSelectButton(pill, propName, text, sourcePath, plugin);
+				}
 			}
 		}
 

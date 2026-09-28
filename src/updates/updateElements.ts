@@ -15,6 +15,7 @@ import { AliasesPropertyWidgetComponent,
     CanvasView, 
     DatePropertyWidgetComponentBase,  
     EmbeddedEditorView,  
+    EmbedMarkdownComponent,  
     MetadataEditor, 
     MultitextPropertyWidgetComponent,  
     TagsPropertyWidgetComponent, 
@@ -340,6 +341,68 @@ export const updateImagesWithCacheForView = (cache: CachedMetadata, view: Markdo
         let titleIconWrappers = contentEl?.querySelectorAll(".title-icon-wrapper")
         for (let titleIconWrapper of titleIconWrappers) {
             titleIconWrapper.remove()
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+const updateSourcePathsForView = (path: string, metadataEditor: MetadataEditor) => {
+    for (let r of metadataEditor.rendered) {
+        let propEl = r.containerEl
+        propEl.setAttribute("data-source-path", path)
+    }
+}
+
+
+export const updateSourcePaths = (file: TFile, plugin: PrettyPropertiesPlugin) => {
+    
+    let leaves = plugin.app.workspace.getLeavesOfType("markdown");
+    for (let leaf of leaves) {
+        let view = leaf.view
+        if (view instanceof MarkdownView) {
+            let viewPath = view?.file?.path
+            if (viewPath == file.path) {
+                updateSourcePathsForView(viewPath, view.metadataEditor)
+            }
+        }
+    }
+
+
+    let canvasLeaves = plugin.app.workspace.getLeavesOfType("canvas");
+    for (let leaf of canvasLeaves) {
+        let view = leaf.view as CanvasView
+
+        view.canvas?.nodes?.forEach(node => {
+            let nodeView = node.child as EmbedMarkdownComponent
+
+            if (nodeView) {
+                if ("metadataEditor" in nodeView && "file" in nodeView) {
+                    let metadataEditor = nodeView.metadataEditor as MetadataEditor
+                    let viewFile = nodeView?.file
+                    if (viewFile instanceof TFile && viewFile.path == file.path) {
+                        updateSourcePathsForView(viewFile.path, metadataEditor)
+                    }
+                }
+            }
+        })
+    }
+
+    let propLeaves = plugin.app.workspace.getLeavesOfType("file-properties");
+    for (let leaf of propLeaves) {
+        let view = leaf.view
+        if ("metadataEditor" in view && "file" in view) {
+            let metadataEditor = view.metadataEditor as MetadataEditor
+            let viewFile = view?.file
+            if (viewFile instanceof TFile && viewFile.path == file.path) {
+                updateSourcePathsForView(viewFile.path, metadataEditor)
+            }
         }
     }
 }

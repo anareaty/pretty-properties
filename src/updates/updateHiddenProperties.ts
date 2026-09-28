@@ -61,7 +61,6 @@ export const updateMetadataEditor = (metadataEditor: MetadataEditor, plugin: Pre
 
 
 
-
 // Update all metadata editors to update hidden properties 
 // Useful when settings are changed
 // We don't need to update metadata editor in hover popover 

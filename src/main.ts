@@ -1,6 +1,7 @@
 import {
 	Plugin,
-	Menu
+	Menu,
+	TFile
 } from "obsidian";
 import { 
 	removeColoredTagsStyle,
@@ -19,7 +20,7 @@ import {
 import { i18n } from "./localization/localization";
 import { PPSettingTab, PPPluginSettings, DEFAULT_SETTINGS } from "./settings/settings";
 import { registerCommands } from "./utils/registerCommands";
-import { updateEmptyProperties, updateImagesOnCacheChanged } from "./updates/updateElements";
+import {updateEmptyProperties, updateImagesOnCacheChanged, updateSourcePaths } from "./updates/updateElements";
 import { registerTagFixExtension } from "./extensions/tagFixExtension";
 import { updatePillPaddings } from "./updates/updateStyles";
 import { registerTagPostProcessor } from "./extensions/tagPostProcessor";
@@ -137,6 +138,13 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		this.registerEvent(
 			this.app.workspace.on('active-leaf-change', () => {
 				clearUnusedRenderComponents(this)
+			})
+		);
+
+
+		this.registerEvent(
+			this.app.vault.on("rename", (file: TFile) => {
+			  updateSourcePaths(file, this)
 			})
 		);
 
