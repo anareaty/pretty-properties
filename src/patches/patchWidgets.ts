@@ -3,7 +3,7 @@ import PrettyPropertiesPlugin from "src/main"
 import { updateLongtext, updateMultiselectPill, updateNumberWidget, updateTagPill } from "src/updates/updatePills"
 import { updateDateInput, updateDateTimeInput } from "src/updates/updateDates"
 import { around, dedupe } from "monkey-around";
-import { AliasesPropertyWidgetComponent, MultitextPropertyWidgetComponent, PropertyWidgetComponentBase, TagsPropertyWidgetComponent, TextPropertyWidgetComponent, TypeInfo } from "@obsidian-typings/obsidian-public-latest";
+import { AliasesPropertyWidgetComponent, MultitextPropertyWidgetComponent, PropertyRenderContext, PropertyWidgetComponentBase, TagsPropertyWidgetComponent, TextPropertyWidgetComponent, TypeInfo } from "@obsidian-typings/obsidian-public-latest";
 import { updateHiddenCSSClasses } from "src/updates/updateHiddenProperties";
 
 
@@ -19,6 +19,9 @@ interface MetadataTypeManagerOld {
   getTypeInfo: (obj: {key: string, value: unknown}) => TypeInfo
 }
 
+export interface PropertyRenderContextPatched extends PropertyRenderContext {
+  pp_patched: boolean
+}
 
 
 export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBase, args: WidgetArgs, plugin: PrettyPropertiesPlugin) => {
@@ -134,12 +137,20 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
 
     checkAndUpdateLongText()
     let textRendered = rendered as TextPropertyWidgetComponent
-    let old_onChange = textRendered.ctx.onChange.bind(textRendered.ctx)
+    let ctx = textRendered.ctx as PropertyRenderContextPatched
 
-    textRendered.ctx.onChange = (...args) => {
-      old_onChange(...args);
-      checkAndUpdateLongText();
-    };
+
+    if (!ctx.pp_patched) {
+      ctx.pp_patched = true
+      let old_onChange = ctx.onChange.bind(ctx)
+
+      ctx.onChange = (...args) => {
+        old_onChange(...args);
+        checkAndUpdateLongText();
+      };
+
+    }
+    
 
 
     if (propName == plugin.settings.bannerProperty) {
@@ -214,11 +225,17 @@ export const patchPropertyWidgets = (plugin: PrettyPropertiesPlugin) => {
       let widget = widgets[type]
       if (!widget) continue
 
+
+
+
       plugin.patches.uninstallWidgetPatch[type] = around(widget, {
         render(oldRender) {
           return dedupe("pp-patch-widgets-around-key", oldRender, (...args) => {
             let rendered = oldRender && oldRender.apply(this, args)
             let widgetArgs = args as WidgetArgs
+
+
+        
             updateWidgets(type, rendered, widgetArgs, plugin)
 
             if (type == "multitext" || type == "tags" || type == "aliases") {
@@ -233,6 +250,10 @@ export const patchPropertyWidgets = (plugin: PrettyPropertiesPlugin) => {
                 return undefined
               }
             }
+
+
+
+
             return rendered
           })
         }

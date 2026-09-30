@@ -18,7 +18,8 @@ export interface KanbanBasesView extends BasesView {
                 lineEl: HTMLElement
             }[]
         }[]
-    }[]
+    }[],
+    pp_patched: boolean
     
 }
 
@@ -32,12 +33,15 @@ export const patchBaseKanban = (plugin: PrettyPropertiesPlugin) => {
             return dedupe("pp-patch-base-cards-around-key", oldFactory, (...args) => {
             let view = oldFactory && oldFactory.apply(this, args) as KanbanBasesView
 
-            let old_view_updateVirtualDisplay = view.updateVirtualDisplay
+            if (!view.pp_patched) {
+                view.pp_patched = true
+                let old_view_updateVirtualDisplay = view.updateVirtualDisplay
             
-            view.updateVirtualDisplay = (...args2) => {
-                let update = old_view_updateVirtualDisplay.call(view)
-                processBaseKanbanProperties(view, plugin)
-                return update
+                view.updateVirtualDisplay = (...args2) => {
+                    let update = old_view_updateVirtualDisplay.call(view)
+                    processBaseKanbanProperties(view, plugin)
+                    return update
+                }
             }
 
             return view

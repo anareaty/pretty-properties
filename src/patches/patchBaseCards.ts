@@ -19,7 +19,8 @@ export interface CardsBasesView extends BasesView {
     updateVirtualDisplay: () => void
     items: {
         props: CardProp[]
-    }[]
+    }[],
+    pp_patched: boolean
 }
 
 export const patchBaseCards = (plugin: PrettyPropertiesPlugin) => {
@@ -31,13 +32,18 @@ export const patchBaseCards = (plugin: PrettyPropertiesPlugin) => {
             return dedupe("pp-patch-base-cards-around-key", oldFactory, (...args) => {
             let view = oldFactory && oldFactory.apply(this, args) as CardsBasesView
 
-            let old_view_updateVirtualDisplay = view.updateVirtualDisplay
 
-            view.updateVirtualDisplay = (...args2) => {
-                let update = old_view_updateVirtualDisplay.call(view)
-                processBaseCardProperties(view, plugin)
-                return update
+            if (!view.pp_patched) {
+                view.pp_patched = true
+                let old_view_updateVirtualDisplay = view.updateVirtualDisplay
+
+                view.updateVirtualDisplay = (...args2) => {
+                    let update = old_view_updateVirtualDisplay.call(view)
+                    processBaseCardProperties(view, plugin)
+                    return update
+                }
             }
+            
 
             return view
             })

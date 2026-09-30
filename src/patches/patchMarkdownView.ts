@@ -59,26 +59,35 @@ export const patchMarkdownView = (plugin: PrettyPropertiesPlugin) => {
         // Update images after the view is completely rendered
 
         const previewMode = this.previewMode as MarkdownPreviewViewPatched
-        const old_onRenderComplete = previewMode.onRenderComplete
 
-        previewMode.onRenderComplete = (...args2) => {
-          let result = old_onRenderComplete.call(previewMode, ...args2) 
-          let view = getView()
-          updateImagesForView(view, plugin)
-          return result
+        if (!previewMode.pp_patched) {
+          previewMode.pp_patched = true
+          const old_onRenderComplete = previewMode.onRenderComplete
+
+          previewMode.onRenderComplete = (...args2) => {
+            let result = old_onRenderComplete.call(previewMode, ...args2) 
+            let view = getView()
+            updateImagesForView(view, plugin)
+            return result
+          }
         }
+
 
 
         // Update title icon if needed
 
         const editMode = this.editMode as MarkdownEditViewPatched
-        const old_editMode_show = editMode.show
 
-        editMode.show = (...args2) => {
-          let result = old_editMode_show.call(editMode, ...args2) 
-          let view = getView()
-          void renderTitleIcon(view, plugin)
-          return result
+        if (!editMode.pp_patched) {
+          editMode.pp_patched = true
+          const old_editMode_show = editMode.show
+
+          editMode.show = (...args2) => {
+            let result = old_editMode_show.call(editMode, ...args2) 
+            let view = getView()
+            void renderTitleIcon(view, plugin)
+            return result
+          }
         }
 
         return old && old.apply(this, args)
