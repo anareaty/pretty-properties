@@ -208,5 +208,9 @@ export default {
   DELETE_COVER_PROPERTY_PROMPT: "Are you sure you want to delete cover property? If you have a cover formatting template set it will be lost.",
   DELETE_COLOR_SETTINGS_FOR_PROPERTY: "Delete color settings for property",
   ENABLE_PROPERTY_SEARCH: "Enable property search",
-  ENABLE_PROPERTY_SEARCH_DESC: "If enabled, you can open search by property value by using Ctrl+click / Cmd+click on the property."
+  ENABLE_PROPERTY_SEARCH_DESC: "If enabled, you can open search by property value by using Ctrl+click / Cmd+click on the property.",
+  NN_INTEGRATION: "Notebook Navigator integration",
+  SET_NN_COLORS: "Set Notebook Navigator colors from Pretty Properties",
+  PREFER_NN_COLORS: "Prefer Notebook Navigator colors for properties"
+
 };

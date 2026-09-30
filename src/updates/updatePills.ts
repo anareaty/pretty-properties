@@ -5,6 +5,8 @@ import { querySelectorsWithIframesForContainer } from "../utils/querySelectorsHe
 import { getPropertyFormatObj, updatePropertyFormatting } from "./updatePropertyFormattings";
 import { updateProgress } from "./updateProgress";
 import { updateSelectButton } from "./updateSelectButton";
+import { getNNColorSetting } from "src/utils/nn_integration";
+import { PillColorSettings } from "src/settings/settings";
 
 
 export const getTextLightness = (color: HSL) => {
@@ -25,70 +27,97 @@ export const generateInlineStyles = (propName: string, propVal: string, plugin: 
     let colorClass = ""
 	let textColorClass = "";
 	let styleProps: Record<string, string> = {}
+
+	let NNColorSetting
+
+	if (propName && propVal) {
+		NNColorSetting = getNNColorSetting(propName, propVal, plugin)
+	}
+
+
 	let colorSettings = plugin.settings.propertyColors[propName]
+	let colorSetting: PillColorSettings | undefined
 
-    if (colorSettings) {
+	if (colorSettings) {
+		colorSetting = colorSettings[propVal];
+	}
 
-		let colorSetting = colorSettings[propVal];
-
-		if (colorSetting) {
-	
-		  let color = colorSetting.pillColor
-		  let textColor = colorSetting.textColor
-	
-		  if (color && color != "default") {
-			colorClass = "colored";
-
-			if (colors.find((c) => c == color) && typeof color == "string") {
-			  styleProps = {
-				"--pp-color": "rgb(var(--color-" + color + "-rgb))",
-				"--pp-bg": "rgba(var(--color-" + color + "-rgb), 0.15)",
-				"--pp-bg-hov": "rgba(var(--color-" + color + "-rgb), 0.25)"
-			  };
-			} else if (color == "accent") {
-			  styleProps = {
-				"--pp-color": "var(--text-accent)",
-				"--pp-bg": "hsla(var(--interactive-accent-hsl), 0.15)",
-				"--pp-bg-hov": "hsla(var(--interactive-accent-hsl), 0.25)"
-			  };
-			} else if (color == "none") {
-			  colorClass = "transparent-color"
-			} else if (typeof color != "string") {
-			  let textLightness = getTextLightness(color);
-			  let hslString = color.h + " ," + color.s + "% ," + color.l + "%";
-			  let hslStringHover = color.h + " ," + color.s + "% ," + (color.l - 5) + "%";
-			  let hslStringText = color.h + " ," + color.s + "% ," + textLightness + "%";
-			  styleProps = {
-				"--pp-color": "hsl(" + hslStringText + ")",
-				"--pp-bg": "hsl(" + hslString + ")",
-				"--pp-bg-hov": "hsl(" + hslStringHover + ")"
-			  };
+	if (NNColorSetting) {
+		if (NNColorSetting.pillColor || NNColorSetting.textColor) {
+			if (!colorSetting) colorSetting = {
+				pillColor: "default",
+				textColor: "default"
 			}
-		  }
-	
-	
-		  if (textColor && textColor != "default") {
-			textColorClass = "text-colored";
-			if (colors.find((c) => c == textColor) && typeof textColor == "string") {
-			  styleProps["--pp-color"] = "rgb(var(--color-" + textColor + "-rgb))"
-			  
-			} else if (textColor == "accent") {
-			  styleProps["--pp-color"] = "var(--text-accent)"
-			} else if (textColor == "none") {
-			  textColorClass = "none-text-color";
-			} else if (typeof textColor != "string") {
-			  let hslStringText = textColor.h + " ," + textColor.s + "% ," + textColor.l + "%";
-			  styleProps["--pp-color"] = "hsl(" + hslStringText + ")"
+
+			if (NNColorSetting.pillColor) {
+				colorSetting.pillColor = NNColorSetting.pillColor
 			}
-		  }
-	
-	
-	
+
+			if (NNColorSetting.textColor) {
+				colorSetting.textColor = NNColorSetting.textColor
+			}
 		}
-	  }
+	}
+
+
+	if (colorSetting) {
+
+		let color = colorSetting.pillColor
+		let textColor = colorSetting.textColor
+
+		if (color && color != "default") {
+		colorClass = "colored";
+
+		if (colors.find((c) => c == color) && typeof color == "string") {
+			styleProps = {
+			"--pp-color": "rgb(var(--color-" + color + "-rgb))",
+			"--pp-bg": "rgba(var(--color-" + color + "-rgb), 0.15)",
+			"--pp-bg-hov": "rgba(var(--color-" + color + "-rgb), 0.25)"
+			};
+		} else if (color == "accent") {
+			styleProps = {
+			"--pp-color": "var(--text-accent)",
+			"--pp-bg": "hsla(var(--interactive-accent-hsl), 0.15)",
+			"--pp-bg-hov": "hsla(var(--interactive-accent-hsl), 0.25)"
+			};
+		} else if (color == "none") {
+			colorClass = "transparent-color"
+		} else if (typeof color != "string") {
+			let textLightness = getTextLightness(color);
+			let hslString = color.h + " ," + color.s + "% ," + color.l + "%";
+			let hslStringHover = color.h + " ," + color.s + "% ," + (color.l - 5) + "%";
+			let hslStringText = color.h + " ," + color.s + "% ," + textLightness + "%";
+			styleProps = {
+			"--pp-color": "hsl(" + hslStringText + ")",
+			"--pp-bg": "hsl(" + hslString + ")",
+			"--pp-bg-hov": "hsl(" + hslStringHover + ")"
+			};
+		}
+		}
+
+
+		if (textColor && textColor != "default") {
+		textColorClass = "text-colored";
+		if (colors.find((c) => c == textColor) && typeof textColor == "string") {
+			styleProps["--pp-color"] = "rgb(var(--color-" + textColor + "-rgb))"
+			
+		} else if (textColor == "accent") {
+			styleProps["--pp-color"] = "var(--text-accent)"
+		} else if (textColor == "none") {
+			textColorClass = "none-text-color";
+		} else if (typeof textColor != "string") {
+			let hslStringText = textColor.h + " ," + textColor.s + "% ," + textColor.l + "%";
+			styleProps["--pp-color"] = "hsl(" + hslStringText + ")"
+		}
+		}
+
+
+
+	}
+	  
 	
 	
-	  return { colorClass, textColorClass, styleProps };
+	return { colorClass, textColorClass, styleProps };
 }
 
 

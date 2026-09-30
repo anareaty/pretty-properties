@@ -101,6 +101,8 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 
 
+
+
 		
 		
 
@@ -236,6 +238,10 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			await migrateColorSettings(this)
 			await migrateCoverProperties(this)
 			reloadAllTabs(this)
+
+			registerNNListener(this)
+
+			
 		})
 
 

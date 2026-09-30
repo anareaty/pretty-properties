@@ -254,6 +254,34 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
                     });
                 })
             }
+        },
+
+
+
+
+
+        {
+            type: "group",
+            heading: i18n.t("NN_INTEGRATION"),
+            items: [
+                {
+                    name: i18n.t("SET_NN_COLORS"), 
+                    control: { type: 'toggle', key: 'enableSetNNColors' }
+                },{
+                    name: i18n.t("PREFER_NN_COLORS"),
+                    render: (setting: Setting) => {
+                        setting.addToggle(toggle => {
+                            toggle.setValue(plugin.settings.preferNNColors)
+                            .onChange(async (value) => {
+                                plugin.settings.preferNNColors = value
+                                await plugin.saveSettings()
+                                updateAllProperties(plugin);
+                            })
+                        });
+                    }
+                }
+
+            ]
         }
     ]
 

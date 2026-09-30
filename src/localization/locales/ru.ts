@@ -218,5 +218,8 @@ export default {
   DELETE_COVER_PROPERTY_PROMPT: "Вы уверены, что хотите удалить свойство обложки? Если у вас настроен шаблон форматирования обложки, он будет потерян.",
   DELETE_COLOR_SETTINGS_FOR_PROPERTY: "Удалить настройки цвета для свойства",
   ENABLE_PROPERTY_SEARCH: "Включить поиск по свойствам",
-  ENABLE_PROPERTY_SEARCH_DESC: "Если включено, вы можете открыть поиск по значению свойства, применив Ctrl+клик / Cmd+клик на свойстве."
+  ENABLE_PROPERTY_SEARCH_DESC: "Если включено, вы можете открыть поиск по значению свойства, применив Ctrl+клик / Cmd+клик на свойстве.",
+  NN_INTEGRATION: "Интеграция с плагином Notebook Navigator",
+  SET_NN_COLORS: "Изменять цвета плагина Notebook Navigator из Pretty Properties",
+  PREFER_NN_COLORS: "Предпочитать цвета из Notebook Navigator для свойств"
 };

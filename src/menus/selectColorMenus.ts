@@ -5,6 +5,7 @@ import { ColorPickerModal } from "src/modals/colorPickerModal";
 import { updateRelativeDateColors } from "src/updates/updateStyles";
 import { updateAllProperties } from "src/updates/updateElements";
 import { PillColorSettings } from "src/settings/settings";
+import { setNotebookNavigatorColors } from "src/utils/nn_integration";
 
 
 
@@ -39,6 +40,9 @@ export const propertyColorSaveCallback = async (
     if (requireApiVersion("1.13.0")) {
         plugin.settingTab?.update()			
     }
+
+    setNotebookNavigatorColors(pillColorSettings, propName, propVal, plugin)
+    
 }
 
 
@@ -125,6 +129,8 @@ export const setColorMenuItems = (
                 }
 
                 saveCallback(pillColorSettings)
+
+
             });
             
             item.setChecked(savedColor == color)
