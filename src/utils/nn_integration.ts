@@ -4,32 +4,12 @@ import { HSL, Plugin } from "obsidian"
 import PrettyPropertiesPlugin from "src/main"
 import { PillColorSettings } from "src/settings/settings"
 import { updateAllProperties } from "src/updates/updateElements";
-
+import type { NotebookNavigatorAPI, PropertyMetadata, TagMetadata } from '../../notebook-navigator';
+import { propertyColorSaveCallback } from "src/menus/selectColorMenus";
+import { getPropertyType } from "./propertyUtils";
 
 interface NNPlugin extends Plugin {
-    api: NNAPI
-}
-
-
-
-interface NNAPI {
-    on: (event: string, callback: () => void) => void,
-    metadata: {
-        getTagMeta: (tagVal: string) => PropertyMetadata,
-        getPropertyMeta: (nodeId: string) => PropertyMetadata,
-        setTagMeta: (tagVal: string, meta: PropertyMetadata) => void,
-        setPropertyMeta: (nodeId: string, meta: PropertyMetadata) => void
-    },
-    propertyNodes: {
-        buildValue: (key: string, value: string) => string
-    }
-}
-
-
-interface PropertyMetadata {
-    color?: string;
-    backgroundColor?: string;
-    icon?: string;
+    api: NotebookNavigatorAPI
 }
 
 
@@ -41,17 +21,17 @@ const getNNApi = (plugin: PrettyPropertiesPlugin) => {
 
 
 
-
-
 export const registerNNListener = (plugin: PrettyPropertiesPlugin) => {
     let nnApi = getNNApi(plugin)
     if (!nnApi) return
 
-    nnApi.on("property-changed", () => {
-        if (plugin.settings.preferNNColors) {
-            updateAllProperties(plugin)
-        }
-    })
+    plugin.registerEvent(nnApi.on("property-changed", (data: { nodeId: string, metadata: PropertyMetadata | null }) => {
+        void setPPcolorsFromNN(data, nnApi, plugin)
+    }))
+
+    plugin.registerEvent(nnApi.on("tag-changed", (data: { tag: string, metadata: TagMetadata | null }) => {
+        void setPPcolorsFromNN(data, nnApi, plugin)
+    }))
 }
 
 
@@ -59,49 +39,83 @@ export const registerNNListener = (plugin: PrettyPropertiesPlugin) => {
 
 
 
-export const getNNColorSetting = (
-    propName: string,
-    propVal: string, 
+const setPPcolorsFromNN = async (
+    data: { nodeId: string, metadata: PropertyMetadata | null } | { tag: string, metadata: TagMetadata | null }, 
+    nnApi: NotebookNavigatorAPI, 
     plugin: PrettyPropertiesPlugin
 ) => {
 
-    if (!plugin.settings.preferNNColors) return
+    if (!plugin.settings.enableSetPPColorsFromNN) return
 
-    let nnApi = getNNApi(plugin)
-    if (!nnApi) return
+    let propKey = ""
+    let propVal = ""
 
-    let meta
-
-    if (propName == "tags") {
-        meta = nnApi.metadata.getTagMeta(propVal)
-    } else {
-        let propId = nnApi.propertyNodes.buildValue(propName, propVal)
-        meta = nnApi.metadata.getPropertyMeta(propId)
+    if ("tag" in data) {
+        propKey = "tags"
+        propVal = data.tag
     }
 
-    let NNColorSetting: PillColorSettings = {}
+    else if ("nodeId" in data) {
+        let nodeId = data.nodeId
+        let propParts = nnApi.propertyNodes.parse(nodeId)
 
-    if (meta) {
-        let color = meta.color
-        let bgColor = meta.backgroundColor
-
-        if (color && typeof color == "string" && color.startsWith("#")) {
-            let nnColor = convertHexToHSL(color)
-            if (nnColor) {
-                NNColorSetting.textColor = nnColor
-            }
-        }
-
-        if (bgColor && typeof bgColor == "string" && bgColor.startsWith("#")) {
-            let nnBgColor = convertHexToHSL(bgColor)
-            if (nnBgColor) {
-                NNColorSetting.pillColor = nnBgColor
-            }
+        if (propParts && propParts.kind == "value") {
+            propKey = propParts.key
+            propVal = propParts.valuePath
         }
     }
 
-    return NNColorSetting
+    if (propKey && propVal) {
+
+        let propType = getPropertyType(propKey, plugin)
+
+        let allowedTypes = ["text", "multitext", "tags", "aliases"]
+
+        if (!propType || typeof propType != "string" || !allowedTypes.includes(propType)) return
+
+
+        let propName = plugin.app.metadataTypeManager.getPropertyInfo(propKey.toLowerCase())?.name || propKey
+        let metadata = data.metadata
+
+        let pillColorSettings = plugin.settings.propertyColors[propName]?.[propVal]
+
+        if (!pillColorSettings || !metadata) {
+            pillColorSettings = {
+                pillColor: "default",
+                textColor: "default"
+            }
+        }
+
+        if (metadata) {
+            let color = metadata.color
+
+            if (color && typeof color == "string" && color.startsWith("#")) {
+                let textColor = convertHexToHSL(color)
+                if (textColor) {
+                    pillColorSettings.textColor = textColor
+                }
+            } else if (!color) {
+                pillColorSettings.textColor = "default"
+            }
+
+            let backgroundColor = metadata.backgroundColor
+
+            if (backgroundColor && typeof backgroundColor == "string" && backgroundColor.startsWith("#")) {
+                let pillColor = convertHexToHSL(backgroundColor)
+                if (pillColor) {
+                    pillColorSettings.pillColor = pillColor
+                }
+            } else if (!backgroundColor) {
+                pillColorSettings.pillColor = "default"
+            }   
+        }
+
+        await propertyColorSaveCallback(propName, propVal, pillColorSettings, plugin, true)
+        updateAllProperties(plugin)
+    }
 }
+
+
 
 
 
@@ -115,11 +129,8 @@ export const setNotebookNavigatorColors = (
 ) => {
 
     if (!plugin.settings.enableSetNNColors) return
-
     let nnApi = getNNApi(plugin)
     if (!nnApi) return
-
-
 
     let pillColor = pillColorSettings["pillColor"]
     let textColor = pillColorSettings["textColor"]
@@ -136,9 +147,8 @@ export const setNotebookNavigatorColor = (
     propName: string, 
     propVal: string, 
     colorType: string, 
-    nnApi: NNAPI
+    nnApi: NotebookNavigatorAPI
 ) => {
-
 
 
   let themeColors = [
@@ -179,8 +189,6 @@ export const setNotebookNavigatorColor = (
   }
   
   else {
-
-    
     if (colorType == "pillColor") {
       meta.backgroundColor = null
     } else if (colorType == "textColor") {
@@ -193,7 +201,10 @@ export const setNotebookNavigatorColor = (
   } else {
 
     let propId = nnApi.propertyNodes.buildValue(propName, propVal)
-    nnApi.metadata.setPropertyMeta(propId, meta)
+    if (propId) {
+        nnApi.metadata.setPropertyMeta(propId, meta)
+    }
+    
   }
 }
 
@@ -238,12 +249,10 @@ const convertHexToHSL = (hex: string): HSL | undefined => {
                 h = (r - g) / d + 4;
                 break;
         }
-        h /= 6;
+        h = h / 6;
     }
-    s = s * 100;
-    s = Math.round(s);
-    l = l * 100;
-    l = Math.round(l);
+    s = Math.round(s * 100);
+    l = Math.round(l * 100);
     h = Math.round(360 * h);
 
     return { h, s, l }

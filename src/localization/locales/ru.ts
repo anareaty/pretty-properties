@@ -220,6 +220,6 @@ export default {
   ENABLE_PROPERTY_SEARCH: "Включить поиск по свойствам",
   ENABLE_PROPERTY_SEARCH_DESC: "Если включено, вы можете открыть поиск по значению свойства, применив Ctrl+клик / Cmd+клик на свойстве.",
   NN_INTEGRATION: "Интеграция с плагином Notebook Navigator",
-  SET_NN_COLORS: "Изменять цвета плагина Notebook Navigator из Pretty Properties",
-  PREFER_NN_COLORS: "Предпочитать цвета из Notebook Navigator для свойств"
+  SET_NN_COLORS: "Изменять цвета в Notebook Navigator при изменении цвета свойств в Pretty Properties",
+  SET_PP_COLORS_FROM_NN: "Изменять цвета в Pretty Properties при изменении цвета свойств в Notebook Navigator"
 };

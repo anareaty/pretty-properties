@@ -41,6 +41,7 @@ export class ColorPickerModal extends Modal {
             color.onChange(async (value) => {
                 let hsl = color.getValueHsl()
             
+                
                 if (!this.pillColorSettings) {
                     this.pillColorSettings = {
                       pillColor: "default",

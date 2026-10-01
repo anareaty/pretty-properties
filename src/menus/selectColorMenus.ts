@@ -31,7 +31,8 @@ export const propertyColorSaveCallback = async (
     propName: string,
     propVal: string,
     pillColorSettings: PillColorSettings,
-    plugin: PrettyPropertiesPlugin
+    plugin: PrettyPropertiesPlugin,
+    setFromNN?: boolean
 ) => {
     if (!plugin.settings.propertyColors[propName]) plugin.settings.propertyColors[propName] = {}
     plugin.settings.propertyColors[propName][propVal] = pillColorSettings
@@ -41,7 +42,10 @@ export const propertyColorSaveCallback = async (
         plugin.settingTab?.update()			
     }
 
-    setNotebookNavigatorColors(pillColorSettings, propName, propVal, plugin)
+    if (!setFromNN) {
+        setNotebookNavigatorColors(pillColorSettings, propName, propVal, plugin)
+    }
+    
     
 }
 

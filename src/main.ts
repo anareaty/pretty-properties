@@ -239,9 +239,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			await migrateCoverProperties(this)
 			reloadAllTabs(this)
 
-			registerNNListener(this)
-
-			
+			registerNNListener(this)		
 		})
 
 

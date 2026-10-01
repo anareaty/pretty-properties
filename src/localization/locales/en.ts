@@ -211,6 +211,6 @@ export default {
   ENABLE_PROPERTY_SEARCH_DESC: "If enabled, you can open search by property value by using Ctrl+click / Cmd+click on the property.",
   NN_INTEGRATION: "Notebook Navigator integration",
   SET_NN_COLORS: "Set Notebook Navigator colors from Pretty Properties",
-  PREFER_NN_COLORS: "Prefer Notebook Navigator colors for properties"
+  SET_PP_COLORS_FROM_NN: "Set Pretty Properties colors from Notebook Navigator"
 
 };

@@ -5,7 +5,6 @@ import { querySelectorsWithIframesForContainer } from "../utils/querySelectorsHe
 import { getPropertyFormatObj, updatePropertyFormatting } from "./updatePropertyFormattings";
 import { updateProgress } from "./updateProgress";
 import { updateSelectButton } from "./updateSelectButton";
-import { getNNColorSetting } from "src/utils/nn_integration";
 import { PillColorSettings } from "src/settings/settings";
 
 
@@ -28,12 +27,6 @@ export const generateInlineStyles = (propName: string, propVal: string, plugin: 
 	let textColorClass = "";
 	let styleProps: Record<string, string> = {}
 
-	let NNColorSetting
-
-	if (propName && propVal) {
-		NNColorSetting = getNNColorSetting(propName, propVal, plugin)
-	}
-
 
 	let colorSettings = plugin.settings.propertyColors[propName]
 	let colorSetting: PillColorSettings | undefined
@@ -41,24 +34,6 @@ export const generateInlineStyles = (propName: string, propVal: string, plugin: 
 	if (colorSettings) {
 		colorSetting = colorSettings[propVal];
 	}
-
-	if (NNColorSetting) {
-		if (NNColorSetting.pillColor || NNColorSetting.textColor) {
-			if (!colorSetting) colorSetting = {
-				pillColor: "default",
-				textColor: "default"
-			}
-
-			if (NNColorSetting.pillColor) {
-				colorSetting.pillColor = NNColorSetting.pillColor
-			}
-
-			if (NNColorSetting.textColor) {
-				colorSetting.textColor = NNColorSetting.textColor
-			}
-		}
-	}
-
 
 	if (colorSetting) {
 

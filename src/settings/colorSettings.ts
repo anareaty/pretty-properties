@@ -268,12 +268,12 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
                     name: i18n.t("SET_NN_COLORS"), 
                     control: { type: 'toggle', key: 'enableSetNNColors' }
                 },{
-                    name: i18n.t("PREFER_NN_COLORS"),
+                    name: i18n.t("SET_PP_COLORS_FROM_NN"),
                     render: (setting: Setting) => {
                         setting.addToggle(toggle => {
-                            toggle.setValue(plugin.settings.preferNNColors)
+                            toggle.setValue(plugin.settings.enableSetPPColorsFromNN)
                             .onChange(async (value) => {
-                                plugin.settings.preferNNColors = value
+                                plugin.settings.enableSetPPColorsFromNN = value
                                 await plugin.saveSettings()
                                 updateAllProperties(plugin);
                             })
