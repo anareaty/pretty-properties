@@ -15,7 +15,7 @@ export const showHiddenSettings = (settingTab: PPSettingTab) => {
     const addHiddenSetting = (property: string) => {
         let propertyHiddenSetting = new Setting(hiddenSettingsEl)
         .setName(property)
-        .addButton(btn => btn
+        .addExtraButton(btn => btn
             .setIcon("x")
             .onClick(async() => {
                 plugin.settings.hiddenProperties = plugin.settings.hiddenProperties.filter(p => p != property)
@@ -37,7 +37,7 @@ export const showHiddenSettings = (settingTab: PPSettingTab) => {
             .setValue("")
             .onChange(value => newProperty = value)
         )
-        .addButton(btn => btn
+        .addExtraButton(btn => btn
             .setIcon("plus")
             .onClick(async () => {
                 newProperty = newProperty.trim()
@@ -68,7 +68,7 @@ export const showHiddenEmptySettings = (settingTab: PPSettingTab) => {
     const addHiddenSetting = (property: string) => {
         let propertyHiddenSetting = new Setting(hiddenSettingsEl)
         .setName(property)
-        .addButton(btn => btn
+        .addExtraButton(btn => btn
             .setIcon("x")
             .onClick(async () => {
                 plugin.settings.hiddenWhenEmptyProperties = plugin.settings.hiddenWhenEmptyProperties.filter(p => p != property)
@@ -90,7 +90,7 @@ export const showHiddenEmptySettings = (settingTab: PPSettingTab) => {
             .setValue("")
             .onChange(value => newProperty = value)
         )
-        .addButton(btn => btn
+        .addExtraButton(btn => btn
             .setIcon("plus")
             .onClick(async() => {
                 newProperty = newProperty.trim()

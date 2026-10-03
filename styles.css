@@ -1023,37 +1023,6 @@ body {
 
 
 
-.property-color-setting-button.color-red svg {
-  color: var(--color-red)
-}
-
-.property-color-setting-button.color-orange svg {
-  color: var(--color-orange)
-}
-
-.property-color-setting-button.color-yellow svg {
-  color: var(--color-yellow)
-}
-
-.property-color-setting-button.color-green svg {
-  color: var(--color-green)
-}
-
-.property-color-setting-button.color-cyan svg {
-  color: var(--color-cyan)
-}
-
-.property-color-setting-button.color-blue svg {
-  color: var(--color-blue)
-}
-
-.property-color-setting-button.color-purple svg {
-  color: var(--color-purple)
-}
-
-.property-color-setting-button.color-pink svg {
-  color: var(--color-pink)
-}
 
 .setting-group .setting-item.pp-settings-tabs {
   padding: 10px 5px;
@@ -1917,6 +1886,16 @@ button.cover-has-format {
   */
 
 .pp-settings-list-inner-container > .setting-item:not(:first-child) {
+  margin-left: 2em;
+}
+
+
+.pp-settings-list-rule-inner-container > * {
+  margin-left: 2em;
+}
+
+
+.pp-settings-list-options-inner-container > .setting-item {
   margin-left: 2em;
 }
 

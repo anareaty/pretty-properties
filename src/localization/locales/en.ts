@@ -49,7 +49,7 @@ export default {
   ADD_HIDDEN_PROPERTY: "Add hidden property",
   ADD_HIDDEN_EMPTY_PROPERTY: "Add property to hide when empty",
   SELECT_ICON: "Select icon",
-  LOCAL_IMAGE: "Local image",
+  SELECT_LOCAL_IMAGE: "Select local image",
   LUCIDE_ICON: "Lucide icon",
   EMOJI: "Emoji",
   GAP_AFTER_BANNER_WITH_ICON: "Gap after banner with icon",
@@ -211,6 +211,9 @@ export default {
   ENABLE_PROPERTY_SEARCH_DESC: "If enabled, you can open search by property value by using Ctrl+click / Cmd+click on the property.",
   NN_INTEGRATION: "Notebook Navigator integration",
   SET_NN_COLORS: "Set Notebook Navigator colors from Pretty Properties",
-  SET_PP_COLORS_FROM_NN: "Set Pretty Properties colors from Notebook Navigator"
+  SET_PP_COLORS_FROM_NN: "Set Pretty Properties colors from Notebook Navigator",
+  ADD_LINK_MANUALLY: "Add an image link manually",
+  ADD_IMAGE_LINK: "Image link",
+  ADD_IMAGE_LINK_DESC: "You can use Wikilink, Markdown link, raw external link or file path. You can also paste base64 encoded image."
 
 };

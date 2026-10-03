@@ -93,7 +93,7 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
                             {
                                 name: i18n.t("DELETE_COLOR_SETTINGS_FOR_PROPERTY") + " " + propName,
                                 render: (setting: Setting) => {
-                                    setting.addButton(btn => btn
+                                    setting.addExtraButton(btn => btn
                                         .setIcon("x")
                                         .onClick(async () => {
                                             delete plugin.settings.propertyColors[propName]
@@ -153,7 +153,7 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
                                         setting.addButton((btn) => {
                                             btn
                                             .setIcon("paintbrush")
-                                            .setClass("property-color-setting-button")
+                                            .setClass("clickable-icon").setClass("extra-setting-button")
                                             .onClick((e) => {
                                                 let menu = new Menu();
                                                 setColorMenuItems(menu, "pillColor", pillColorSettings, saveCallback, plugin);
@@ -163,7 +163,7 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
                                         .addButton((btn) => {
                                             btn
                                             .setIcon("type")
-                                            .setClass("property-color-setting-button")
+                                            .setClass("clickable-icon").setClass("extra-setting-button")
                                             .onClick((e) => {
                                                 let menu = new Menu();
                                                 setColorMenuItems(menu, "textColor", pillColorSettings, saveCallback, plugin);
@@ -193,7 +193,9 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
 
                 setting
                 .addButton((btn) => {
-                    btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
+                    btn.setIcon("paintbrush")
+                    .setClass("clickable-icon").setClass("extra-setting-button")
+                    .onClick((e) => {
                         let menu = new Menu();
                         setDateColorMenuItems(menu, "past", "pillColor", plugin);
                         
@@ -201,7 +203,9 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
                     });
                 })
                 .addButton((btn) => {
-                    btn.setIcon("type").setClass("property-color-setting-button").onClick((e) => {
+                    btn.setIcon("type")
+                    .setClass("clickable-icon").setClass("extra-setting-button")
+                    .onClick((e) => {
                         let menu = new Menu();
                         setDateColorMenuItems(menu, "past", "textColor", plugin);
                         menu.showAtMouseEvent(e);
@@ -217,14 +221,14 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
 
                 setting
                 .addButton((btn) => {
-                    btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
+                    btn.setIcon("paintbrush").setClass("clickable-icon").setClass("extra-setting-button").onClick((e) => {
                         let menu = new Menu();
                         setDateColorMenuItems(menu, "present", "pillColor", plugin);
                         menu.showAtMouseEvent(e);
                     });
                 })
                 .addButton((btn) => {
-                    btn.setIcon("type").setClass("property-color-setting-button").onClick((e) => {
+                    btn.setIcon("type").setClass("clickable-icon").setClass("extra-setting-button").onClick((e) => {
                         let menu = new Menu();
                         setDateColorMenuItems(menu, "present", "textColor", plugin);
                         menu.showAtMouseEvent(e);
@@ -240,20 +244,105 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
 
                 setting
                 .addButton((btn) => {
-                    btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
+                    btn.setIcon("paintbrush").setClass("clickable-icon").setClass("extra-setting-button").onClick((e) => {
                         let menu = new Menu();
                         setDateColorMenuItems(menu, "future", "pillColor", plugin);
                         menu.showAtMouseEvent(e);
                     });
                 })
                 .addButton((btn) => {
-                    btn.setIcon("type").setClass("property-color-setting-button").onClick((e) => {
+                    btn.setIcon("type").setClass("clickable-icon").setClass("extra-setting-button").onClick((e) => {
                         let menu = new Menu();
                         setDateColorMenuItems(menu, "future", "textColor", plugin);
                         menu.showAtMouseEvent(e);
                     });
                 })
             }
+        },
+
+
+
+
+
+
+        {
+            type: "page",
+            name: i18n.t("EDIT_COLOR_MENU"),
+            visible: plugin.settings.enableColoredProperties,
+            items: [
+                {
+                    type: "group",
+                    heading: i18n.t("THEME_COLORS"),
+                    items: plugin.settings.themeColors.map((item) => ({
+                        name: item.name,
+                        render: (setting: Setting) => {
+                            setting.addToggle(toggle => {
+                                toggle.setValue(item.enabled)
+                                .onChange(async (value) => {
+                                    item.enabled = value
+                                    await plugin.saveSettings()
+                                })
+                            })
+                        }
+                    }))
+                },
+                {
+                    type: "list",
+                    heading: i18n.t("CUSTOM_COLORS"),
+                    addItem: {
+                        name: i18n.t("ADD_CUSTOM_COLOR"),
+                        action: () => {
+                            new AddTextModal(plugin, i18n.t("ADD_COLOR_NAME"), async (newValue) => {
+                                if (newValue && !plugin.settings.extraColors.find(i => i.name == newValue)) {
+
+
+                                    plugin.settings.extraColors.push({
+                                        name: newValue,
+                                        value: {h: 0, s: 0, l: 0}
+                                    })
+
+
+                                    await plugin.saveSettings()
+                                    if (requireApiVersion("1.13.0")) {
+                                        tab.update()			
+                                    }
+                                }
+                            }).open()
+                        }
+                    },
+                    onDelete: async (idx: number) => {
+                        plugin.settings.extraColors.splice(idx, 1);
+                        await plugin.saveSettings();
+                        if (requireApiVersion("1.13.0")) {
+                            tab.update()			
+                        }
+                        
+                    },
+                    onReorder: async (oldIndex: number, newIndex: number) => {
+                        let [moved] = plugin.settings.extraColors.splice(oldIndex, 1)
+                        if (moved) {
+                            plugin.settings.extraColors.splice(newIndex, 0, moved)
+                        }
+                        await plugin.saveSettings()
+                        if (requireApiVersion("1.13.0")) {
+                            tab.update()			
+                        }
+                    },
+                    items: plugin.settings.extraColors.map((item) => ({
+                        name: item.name,
+                        render: (setting: Setting) => {
+                            setting.addColorPicker(color => color
+                                .setValueHsl(item.value)
+                                .onChange(async (value) => {
+                                    let hsl = color.getValueHsl()
+                                    item.value = hsl
+                                    await plugin.saveSettings();
+                                })
+                            )
+                        }
+                    }))
+                }
+            ]
         },
 
 
@@ -269,16 +358,7 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
                     control: { type: 'toggle', key: 'enableSetNNColors' }
                 },{
                     name: i18n.t("SET_PP_COLORS_FROM_NN"),
-                    render: (setting: Setting) => {
-                        setting.addToggle(toggle => {
-                            toggle.setValue(plugin.settings.enableSetPPColorsFromNN)
-                            .onChange(async (value) => {
-                                plugin.settings.enableSetPPColorsFromNN = value
-                                await plugin.saveSettings()
-                                updateAllProperties(plugin);
-                            })
-                        });
-                    }
+                    control: { type: 'toggle', key: 'enableSetPPColorsFromNN' }
                 }
 
             ]
@@ -324,14 +404,13 @@ export const showColorSettings = (settingTab: PPSettingTab) => {
 
     new Setting(containerEl)
     .setName(i18n.t("SHOW_COLORED_PROPERTIES"))
-    .addButton(button =>
+    .addExtraButton(button =>
         {
             let icon = "chevron-right"
             if (plugin.settings.showColorSettings) {
                 icon = "chevron-down"
             }
             button.setIcon(icon)
-            .setClass("bare-button")
             .onClick(async () => {
                 plugin.settings.showColorSettings = !plugin.settings.showColorSettings
                 await plugin.saveSettings()
@@ -357,6 +436,15 @@ export const showColorSettings = (settingTab: PPSettingTab) => {
 
 
 
+
+
+
+
+
+
+
+
+
     let format = plugin.settings.customDateFormat
     if (!format) {format = "L"}
 
@@ -369,14 +457,14 @@ export const showColorSettings = (settingTab: PPSettingTab) => {
     pastSetting.setName(i18n.t("PAST_DATE_COLOR"))
 
     .addButton((btn) => {
-        btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
+        btn.setIcon("paintbrush").setClass("clickable-icon").setClass("extra-setting-button").onClick((e) => {
             let menu = new Menu();
             setDateColorMenuItems(menu, "past", "pillColor", plugin);
             menu.showAtMouseEvent(e);
         });
     })
     .addButton((btn) => {
-        btn.setIcon("type").setClass("property-color-setting-button").onClick((e) => {
+        btn.setIcon("type").setClass("clickable-icon").setClass("extra-setting-button").onClick((e) => {
             let menu = new Menu();
             setDateColorMenuItems(menu, "past", "textColor", plugin);
             menu.showAtMouseEvent(e);
@@ -389,14 +477,14 @@ export const showColorSettings = (settingTab: PPSettingTab) => {
     presentSEtting.controlEl.createSpan({text: presentDate, cls: "custom-date setting-custom-date-present"})
     presentSEtting.setName(i18n.t("PRESENT_DATE_COLOR"))
     .addButton((btn) => {
-        btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
+        btn.setIcon("paintbrush").setClass("clickable-icon").setClass("extra-setting-button").onClick((e) => {
             let menu = new Menu();
             setDateColorMenuItems(menu, "present", "pillColor", plugin);
             menu.showAtMouseEvent(e);
         });
     })
     .addButton((btn) => {
-        btn.setIcon("type").setClass("property-color-setting-button").onClick((e) => {
+        btn.setIcon("type").setClass("clickable-icon").setClass("extra-setting-button").onClick((e) => {
             let menu = new Menu();
             setDateColorMenuItems(menu, "present", "textColor", plugin);
             menu.showAtMouseEvent(e);
@@ -407,19 +495,270 @@ export const showColorSettings = (settingTab: PPSettingTab) => {
     futureSetting.controlEl.createSpan({text: futureDate, cls: "custom-date setting-custom-date-future"})
     futureSetting.setName(i18n.t("FUTURE_DATE_COLOR"))
     .addButton((btn) => {
-        btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
+        btn.setIcon("paintbrush").setClass("clickable-icon").setClass("extra-setting-button").onClick((e) => {
             let menu = new Menu();
             setDateColorMenuItems(menu, "future", "pillColor", plugin);
             menu.showAtMouseEvent(e);
         });
     })
     .addButton((btn) => {
-        btn.setIcon("type").setClass("property-color-setting-button").onClick((e) => {
+        btn.setIcon("type")
+        .setClass("clickable-icon").setClass("extra-setting-button")
+        .onClick((e) => {
             let menu = new Menu();
             setDateColorMenuItems(menu, "future", "textColor", plugin);
             menu.showAtMouseEvent(e);
         });
     })
+
+
+
+
+
+
+
+
+
+
+    
+    new Setting(containerEl)
+    .setName(i18n.t("SHOW_THEME_COLORS"))
+    .addExtraButton(button =>
+        {
+            let icon = "chevron-right"
+            if (plugin.settings.showThemeColors) {
+                icon = "chevron-down"
+            }
+            button.setIcon(icon)
+            .onClick(async () => {
+                plugin.settings.showThemeColors = !plugin.settings.showThemeColors
+                await plugin.saveSettings()
+                settingTab.display()
+            })
+        }
+    );
+
+
+
+
+
+
+    if (plugin.settings.showThemeColors) {
+
+        let colorSettingsWrapper = containerEl.createDiv()
+        colorSettingsWrapper.classList.add("pp-settings-list-container")
+        let colorSettingsEl = colorSettingsWrapper.createDiv()
+
+        for (let item of plugin.settings.themeColors) {
+
+            let propContainer = colorSettingsEl.createDiv()
+            propContainer.classList.add("pp-settings-list-inner-container")
+
+            new Setting(propContainer)
+            .setName(item.name)
+            .addToggle(toggle => {
+                toggle.setValue(item.enabled)
+                .onChange(async (value) => {
+                    item.enabled = value
+                    await plugin.saveSettings()
+                })
+            })
+
+        }
+    }
+
+
+
+
+
+
+
+
+    new Setting(containerEl)
+    .setName(i18n.t("SHOW_EXTRA_COLORS"))
+    .addExtraButton(button =>
+        {
+            let icon = "chevron-right"
+            if (plugin.settings.showExtraColors) {
+                icon = "chevron-down"
+            }
+            button.setIcon(icon)
+            .onClick(async () => {
+                plugin.settings.showExtraColors = !plugin.settings.showExtraColors
+                await plugin.saveSettings()
+                settingTab.display()
+            })
+        }
+    );
+
+
+
+
+
+
+
+
+
+
+    if (plugin.settings.showExtraColors) {
+
+        let colorSettingsWrapper = containerEl.createDiv()
+        colorSettingsWrapper.classList.add("pp-settings-list-container")
+        let colorSettingsEl = colorSettingsWrapper.createDiv()
+
+        for (let i = 0; i < plugin.settings.extraColors.length; i++) {
+            let item = plugin.settings.extraColors[i]
+            if (!item) return
+
+            let propContainer = colorSettingsEl.createDiv()
+            propContainer.classList.add("pp-settings-list-inner-container")
+
+            new Setting(propContainer)
+            .setName(item.name)
+            .addColorPicker(color => color
+                .setValueHsl(item.value)
+                .onChange(async (value) => {
+                    let hsl = color.getValueHsl()
+                    item.value = hsl
+                    await plugin.saveSettings();
+                })
+            )
+
+
+            .addExtraButton((button) =>
+                button
+                    .setIcon("arrow-up")
+                    .setTooltip("Move up")
+                    .setDisabled(i === 0)
+                    .onClick(async () => {
+                        if (i === 0)
+                            return;
+                        const extraColors = plugin.settings.extraColors;
+
+                        let c1 = extraColors[i];
+                        let c2 = extraColors[i - 1];
+
+                        if (c1 && c2) {
+                            [extraColors[i - 1], extraColors[i]] = [c1, c2];
+                        }
+
+                        await plugin.saveSettings();
+                        settingTab.display();
+                    }),
+            )
+            .addExtraButton((button) =>
+                button
+                    .setIcon("arrow-down")
+                    .setTooltip("Move down")
+                    .setDisabled(i === plugin.settings.extraColors.length - 1)
+                    .onClick(async () => {
+                        if (i === plugin.settings.extraColors.length - 1)
+                            return;
+                        const extraColors = plugin.settings.extraColors;
+
+
+                        let c1 = extraColors[i];
+                        let c2 = extraColors[i + 1];
+
+                        if (c1 && c2) {
+                            [extraColors[i + 1], extraColors[i]] = [c1, c2];
+                        }
+                        
+
+                        await plugin.saveSettings();
+                        settingTab.display();
+                    }),
+            )
+            .addExtraButton((button) =>
+                button.setIcon("x").onClick(async () => {
+                    plugin.settings.extraColors.splice(i, 1);
+
+                    await plugin.saveSettings();
+                    settingTab.display();
+                }),
+            );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        }
+
+
+
+
+        new Setting(colorSettingsWrapper)
+        .setName(i18n.t("ADD_CUSTOM_COLOR"))
+
+        .addExtraButton(btn => btn
+            .setIcon("plus")
+            .onClick(async () => {
+
+                new AddTextModal(plugin, i18n.t("ADD_COLOR_NAME"), async (newValue) => {
+                    if (newValue && !plugin.settings.extraColors.find(i => i.name == newValue)) {
+                        plugin.settings.extraColors.push({
+                            name: newValue,
+                            value: {h: 0, s: 0, l: 0}
+                        })
+                        await plugin.saveSettings()
+                        settingTab.display()
+                    }
+                }).open()
+            })
+        )
+
+
+    }
+
+
+
+
+
+
+
+    new Setting(containerEl)
+    .setHeading()
+	.setName(i18n.t("NN_INTEGRATION"))
+
+
+    new Setting(containerEl)
+    .setName(i18n.t("SET_NN_COLORS"))
+    .addToggle(toggle => {
+        toggle.setValue(plugin.settings.enableSetNNColors)
+        .onChange(async (value) => {
+            plugin.settings.enableSetNNColors = value
+            await plugin.saveSettings()
+        })
+    });
+
+
+
+    new Setting(containerEl)
+    .setName(i18n.t("SET_PP_COLORS_FROM_NN"))
+    .addToggle(toggle => {
+        toggle.setValue(plugin.settings.enableSetPPColorsFromNN)
+        .onChange(async (value) => {
+            plugin.settings.enableSetPPColorsFromNN = value
+            await plugin.saveSettings()
+        })
+    });
+
+
+    
 
 
 

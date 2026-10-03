@@ -19,8 +19,8 @@ export class ImageSuggestModal extends SuggestModal<string> {
         this.folder = folder
         this.shape = shape
         this.options = {
-            image: i18n.t("LOCAL_IMAGE"),
-            link: i18n.t("EXTERNAL_IMAGE"),
+            image: i18n.t("SELECT_LOCAL_IMAGE"),
+            link: i18n.t("ADD_LINK_MANUALLY"),
         }
     }
 

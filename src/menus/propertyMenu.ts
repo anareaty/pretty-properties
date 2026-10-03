@@ -213,7 +213,10 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                         let type = getPropertyType(p, plugin)
                         return type == "number";
                     })
-                    //.map((p) => properties[p].name);
+                    .map((p) => properties[p]!.name);
+
+
+                console.log(numberProperties)
 
                 for (let numberProp of numberProperties) {
                     sub.addItem((subitem: MenuItem) => {
@@ -250,9 +253,7 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                 .setSection("pretty-properties")
                 .onClick(async () => {
                     if (propName) {
-                        delete plugin.settings.progressProperties[
-                            propName
-                        ];
+                        delete plugin.settings.progressProperties[propName];
                     }
                     await plugin.saveSettings();
                     updateAllProperties(plugin)

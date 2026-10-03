@@ -284,14 +284,13 @@ export const showHiddenSettingsTab = (settingTab: PPSettingTab) => {
 
     new Setting(containerEl)
     .setName(i18n.t("SHOW_HIDDEN_PROPERTIES_LIST"))
-    .addButton(button =>
+    .addExtraButton(button =>
         {
             let icon = "chevron-right"
             if (plugin.settings.showHiddenSettings) {
                 icon = "chevron-down"
             }
             button.setIcon(icon)
-            .setClass("bare-button")
             .onClick(async () => {
                 plugin.settings.showHiddenSettings = !plugin.settings.showHiddenSettings
                 await plugin.saveSettings()
@@ -314,14 +313,13 @@ export const showHiddenSettingsTab = (settingTab: PPSettingTab) => {
 
     new Setting(containerEl)
     .setName(i18n.t("SHOW_HIDDEN_WHEN_EMPTY_PROPERTIES_LIST"))
-    .addButton(button =>
+    .addExtraButton(button =>
         {
             let icon = "chevron-right"
             if (plugin.settings.showHiddenEmptySettings) {
                 icon = "chevron-down"
             }
             button.setIcon(icon)
-            .setClass("bare-button")
             .onClick(async () => {
                 plugin.settings.showHiddenEmptySettings = !plugin.settings.showHiddenEmptySettings
                 await plugin.saveSettings()

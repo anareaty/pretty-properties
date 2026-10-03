@@ -165,9 +165,9 @@ export const getIconSettingsDefinitions = (tab: PPSettingTab) => {
                 updateIconStyles(plugin);
             })
         )
-        .addButton(btn => btn
+        .addExtraButton(btn => btn
             .setIcon("rotate-ccw")
-            .onClick(async (e) => {
+            .onClick(async () => {
                 plugin.settings.iconColor = ""
                 if (requireApiVersion("1.13.0")) {
                     tab.update()			
@@ -191,9 +191,9 @@ export const getIconSettingsDefinitions = (tab: PPSettingTab) => {
                 updateIconStyles(plugin);
             })
         )
-        .addButton(btn => btn
+        .addExtraButton(btn => btn
             .setIcon("rotate-ccw")
-            .onClick(async (e) => {
+            .onClick(async () => {
                 plugin.settings.iconColorDark = ""
                 if (requireApiVersion("1.13.0")) {
                     tab.update()			
@@ -466,9 +466,9 @@ export const showIconSettings = (settingTab: PPSettingTab) => {
                 updateIconStyles(plugin);
             })
         )
-        .addButton(btn => btn
+        .addExtraButton(btn => btn
             .setIcon("rotate-ccw")
-            .onClick(async (e) => {
+            .onClick(async () => {
                 plugin.settings.iconColor = ""
                 await plugin.saveSettings();
                 updateIconStyles(plugin);
@@ -486,9 +486,9 @@ export const showIconSettings = (settingTab: PPSettingTab) => {
                 updateIconStyles(plugin);
             })
         )
-        .addButton(btn => btn
+        .addExtraButton(btn => btn
             .setIcon("rotate-ccw")
-            .onClick(async (e) => {
+            .onClick(async () => {
                 plugin.settings.iconColorDark = ""
                 await plugin.saveSettings();
                 updateIconStyles(plugin);

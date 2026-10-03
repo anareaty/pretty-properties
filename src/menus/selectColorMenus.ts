@@ -10,20 +10,15 @@ import { setNotebookNavigatorColors } from "src/utils/nn_integration";
 
 
 
-const colors = [
-    "red",
-    "orange",
-    "yellow",
-    "green",
-    "cyan",
-    "blue",
-    "purple",
-    "pink",
-    "accent",
-    "none",
-    "default"
-];
-
+const getColors = (plugin: PrettyPropertiesPlugin) => {
+    let colors = []
+    for (let colorItem of plugin.settings.themeColors) {
+        if (colorItem.enabled) {
+            colors.push(colorItem.name)
+        }
+    }
+    return colors
+}
 
 
 
@@ -92,44 +87,41 @@ export const setColorMenuItems = (
 
     let savedColor: string | HSL | undefined
 
+    
+
     if (pillColorSettings && (colorType == "pillColor" || colorType == "textColor")) {
         savedColor = pillColorSettings[colorType]
     }
+
+    let colors = getColors(plugin)
 
     for (let color of colors) {
 
         menu.addItem((item: MenuItem) => {
             item.setIcon("square");
-            if (color != "default" && color != "none" && color != "accent") {
+            if (color != "accent") {
                 item.iconEl.style =
                     "color: transparent; background-color: rgba(var(--color-" +
                     color +
                     "-rgb), 0.3);";
-            } else if (color == "accent") {
-              
+            } else  {
                 item.iconEl.style =
                     "color: transparent; background-color: hsla(var(--interactive-accent-hsl), 0.3);";
-            } else if (color == "none") {
-                item.iconEl.style = "opacity: 0.2;";
-            }
+            } 
 
             item.setTitle(i18n.t(color))
             .onClick(async() => {
 
 
                 if (colorType == "pillColor" || colorType == "textColor") {
-                    if (color == "default") {						
-                        delete pillColorSettings?.[colorType]
-                    } else {   
 
-                        if (!pillColorSettings) {
-                            pillColorSettings = {
-                                pillColor: "default",
-                                textColor: "default"
-                            }
+                    if (!pillColorSettings) {
+                        pillColorSettings = {
+                            pillColor: "default",
+                            textColor: "default"
                         }
-                        pillColorSettings[colorType] = color;  
                     }
+                    pillColorSettings[colorType] = color;  
                 }
 
                 saveCallback(pillColorSettings)
@@ -139,11 +131,98 @@ export const setColorMenuItems = (
             
             item.setChecked(savedColor == color)
 
-            if (color == "default") {
-                item.setChecked(savedColor == color || !savedColor)
-            }
         });
     }
+
+
+    let extraColorChecked = false
+    let extraColors = plugin.settings.extraColors
+
+    for (let colorItem of extraColors) {
+        let color = colorItem.value
+        if (!color) continue
+        menu.addItem((item: MenuItem) => {
+            item.setTitle(colorItem.name)
+            item.setIcon("square");
+            let hslString = color.h + " ," + color.s + "% ," + color.l + "%";
+            item.iconEl.style = "color: transparent; background-color: hsl(" + hslString + ");";
+            item.onClick(() => {
+
+                if (colorType == "pillColor" || colorType == "textColor") {
+                    if (!pillColorSettings) {
+                        pillColorSettings = {
+                            pillColor: "default",
+                            textColor: "default"
+                        }
+                    }
+                    pillColorSettings[colorType] = color;  
+                }
+
+                saveCallback(pillColorSettings)
+                
+            })
+            let colorSelected = savedColor != undefined && 
+                typeof savedColor != "string" &&
+                savedColor.h == color.h &&
+                savedColor.s == color.s &&
+                savedColor.l == color.l
+
+            if (colorSelected) {
+                extraColorChecked = true
+            }
+
+            item.setChecked(colorSelected)
+        })
+    }
+
+
+
+
+    menu.addItem((item: MenuItem) => {
+        item.setIcon("square");
+        item.iconEl.style = "opacity: 0.2;"
+        item.setTitle(i18n.t("none"))
+        .onClick(async () => {
+          if (colorType == "pillColor" || colorType == "textColor") {
+            if (!pillColorSettings) {
+              pillColorSettings = {
+                pillColor: "default",
+                textColor: "default"
+              };
+            }
+            pillColorSettings[colorType] = "none";
+            
+          }
+          saveCallback(pillColorSettings);
+        });
+        item.setChecked(savedColor == "none")
+      });
+    
+    
+    
+    
+    
+    
+    
+    
+      menu.addItem((item: MenuItem) => {
+        item.setIcon("square");
+        item.setTitle(i18n.t("default"))
+        .onClick(async () => {
+          if (colorType == "pillColor" || colorType == "textColor") {
+            delete pillColorSettings![colorType];
+          }
+          saveCallback(pillColorSettings);
+        });
+        item.setChecked(savedColor == "default" || !savedColor);
+      });
+
+
+
+
+
+
+
 
     menu.addItem((item: MenuItem) => {
         item.setTitle(i18n.t("CUSTOM_COLOR"))
@@ -152,7 +231,7 @@ export const setColorMenuItems = (
         item.onClick(() => {
             new ColorPickerModal(colorType, pillColorSettings, saveCallback, plugin).open()
         })
-            item.setChecked(savedColor != undefined && typeof savedColor != "string")
+            item.setChecked(savedColor != undefined && typeof savedColor != "string" && !extraColorChecked)
     })
 }
 

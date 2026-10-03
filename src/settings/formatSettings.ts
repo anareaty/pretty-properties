@@ -134,6 +134,7 @@ export const getFormatSettingsDefinitions = (tab: PPSettingTab) => {
 
                             setting.addButton(btn => {
                                 let format = property.format || ""
+                                btn.setClass("clickable-icon").setClass("extra-setting-button")
                                 if (format) {
                                     btn.setClass("cover-has-format")
                                 }
@@ -282,14 +283,13 @@ export const showFormatSettingsTab = (settingTab: PPSettingTab) => {
 
 	new Setting(containerEl)
     .setName(i18n.t("SHOW_EXTRA_PROPERTY_FORMATTINGS"))
-    .addButton(button =>
+    .addExtraButton(button =>
         {
             let icon = "chevron-right"
             if (plugin.settings.showExtraFormattings) {
                 icon = "chevron-down"
             }
             button.setIcon(icon)
-            .setClass("bare-button")
             .onClick(async () => {
                 plugin.settings.showExtraFormattings = !plugin.settings.showExtraFormattings
                 await plugin.saveSettings()
@@ -309,14 +309,13 @@ export const showFormatSettingsTab = (settingTab: PPSettingTab) => {
 
     new Setting(containerEl)
     .setName(i18n.t("SHOW_MARKDOWN_PROPERTIES_LIST"))
-    .addButton(button =>
+    .addExtraButton(button =>
         {
             let icon = "chevron-right"
             if (plugin.settings.showMdProperties) {
                 icon = "chevron-down"
             }
             button.setIcon(icon)
-            .setClass("bare-button")
             .onClick(async () => {
                 plugin.settings.showMdProperties = !plugin.settings.showMdProperties
                 await plugin.saveSettings()
@@ -369,7 +368,7 @@ const showFormatSettings = (settingTab: PPSettingTab) => {
                 updateAllProperties(plugin);
             });
 		})
-        .addButton(btn => btn
+        .addExtraButton(btn => btn
             .setIcon("x")
             .onClick(async () => {
                 delete plugin.settings.propertyFormats[property]
@@ -405,7 +404,7 @@ const showFormatSettings = (settingTab: PPSettingTab) => {
 				suggester.close();
 			});
 		})
-        .addButton(btn => btn
+        .addExtraButton(btn => btn
             .setIcon("plus")
             .onClick(async () => {
 				newProperty = newProperty.trim()
@@ -441,7 +440,7 @@ const showMdPropsList = (settingTab: PPSettingTab) => {
 
         propertyFormatSetting
 		.setName(property)
-        .addButton(btn => btn
+        .addExtraButton(btn => btn
             .setIcon("x")
             .onClick(async () => {
                 plugin.settings.markdownProperties = plugin.settings.markdownProperties.filter((p) => p != property)
@@ -477,7 +476,7 @@ const showMdPropsList = (settingTab: PPSettingTab) => {
 				suggester.close();
 			});
 		})
-        .addButton(btn => btn
+        .addExtraButton(btn => btn
             .setIcon("plus")
             .onClick(async () => {
 				newProperty = newProperty.trim()

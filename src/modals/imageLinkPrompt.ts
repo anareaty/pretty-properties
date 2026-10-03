@@ -29,7 +29,8 @@ export class ImageLinkPrompt extends Modal {
     
 
         let promptSetting = new Setting(contentEl)
-        .setName(i18n.t("LINK_TO_EXTERNAL_IMAGE"))
+        .setName(i18n.t("ADD_IMAGE_LINK"))
+        .setDesc(i18n.t("ADD_IMAGE_LINK_DESC"))
         .addText(text => text
             .setValue(this.result)
             .onChange((value) => {
@@ -53,7 +54,7 @@ export class ImageLinkPrompt extends Modal {
         contentEl.empty()
         this.contentEl.removeEventListener("keydown", this.eventInput) 
         
-        if (this.result && this.result.startsWith("http")) {
+        if (this.result) {
             let file = this.app.workspace.getActiveFile()
             if (file instanceof TFile) {
                 void this.app.fileManager.processFrontMatter(file, (fm: FrontMatterCache) => {
@@ -61,5 +62,6 @@ export class ImageLinkPrompt extends Modal {
                 })
             }
         }
+        
     } 
 }

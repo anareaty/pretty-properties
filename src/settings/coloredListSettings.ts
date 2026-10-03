@@ -10,6 +10,7 @@ import { AddPropertyModal, AddTextModal } from 'src/modals/settingItemModals';
 
 
 
+
 export const showColoredListSettings = (settingTab: PPSettingTab) => {
     const {containerEl, plugin} = settingTab
 
@@ -41,20 +42,20 @@ export const showColoredListSettings = (settingTab: PPSettingTab) => {
 
         propertyColorSetting
         .addButton((btn) => {
-            btn.setIcon("paintbrush").setClass("property-color-setting-button").onClick((e) => {
+            btn.setIcon("paintbrush").setClass("clickable-icon").setClass("extra-setting-button").onClick((e) => {
                 let menu = new Menu();
                 setColorMenuItems(menu, "pillColor", pillColorSettings, saveCallback, plugin);
                 menu.showAtMouseEvent(e);
             });
         })
         .addButton((btn) => {
-            btn.setIcon("type").setClass("property-color-setting-button").onClick((e) => {
+            btn.setIcon("type").setClass("clickable-icon").setClass("extra-setting-button").onClick((e) => {
                 let menu = new Menu();
                 setColorMenuItems(menu, "textColor", pillColorSettings, saveCallback, plugin);
                 menu.showAtMouseEvent(e);
             });
         })
-        .addButton(btn => btn
+        .addExtraButton(btn => btn
             .setIcon("x")
             .onClick(async () => {
                 delete plugin.settings.propertyColors[propName]![propVal]
@@ -72,10 +73,9 @@ export const showColoredListSettings = (settingTab: PPSettingTab) => {
 
         new Setting(propContainer)
         .setName(propName)
-        .addButton(button => {
+        .addExtraButton(button => {
             button
             .setIcon("plus")
-            .setClass("bare-button")
             .onClick(async () => {
                 new AddTextModal(plugin, i18n.t("ADD_PROPERTY_VALUE"), async (newValue) => {
                     if (newValue && !plugin.settings.propertyColors[propName]![newValue]) {
@@ -86,14 +86,13 @@ export const showColoredListSettings = (settingTab: PPSettingTab) => {
                 }).open()
             })
         })
-        .addButton(button =>
+        .addExtraButton(button =>
             {
                 let icon = "chevron-right"
                 if (plugin.settings.propertyColorSettingRevealed == propName) {
                     icon = "chevron-down"
                 }
                 button.setIcon(icon)
-                .setClass("bare-button")
                 .onClick(async () => {
 
                     if (plugin.settings.propertyColorSettingRevealed == propName) {
@@ -105,6 +104,15 @@ export const showColoredListSettings = (settingTab: PPSettingTab) => {
                     settingTab.display()
                 })
             }
+        )
+        .addExtraButton(btn => btn
+            .setIcon("x")
+            .onClick(async () => {
+                delete plugin.settings.propertyColors[propName]
+                await plugin.saveSettings()
+                updateAllProperties(plugin)
+                settingTab.display()
+            })
         )
 
 
@@ -123,7 +131,7 @@ export const showColoredListSettings = (settingTab: PPSettingTab) => {
     new Setting(colorSettingsWrapper)
         .setName(i18n.t("ADD_COLORED_PROPERTY"))
 
-        .addButton(btn => btn
+        .addExtraButton(btn => btn
             .setIcon("plus")
             .onClick(async () => {
 

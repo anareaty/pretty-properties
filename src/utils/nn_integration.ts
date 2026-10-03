@@ -7,21 +7,60 @@ import { updateAllProperties } from "src/updates/updateElements";
 import type { NotebookNavigatorAPI, PropertyMetadata, TagMetadata } from '../../notebook-navigator';
 import { propertyColorSaveCallback } from "src/menus/selectColorMenus";
 import { getPropertyType } from "./propertyUtils";
+import { Plugins } from "@obsidian-typings/obsidian-public-latest";
 
 interface NNPlugin extends Plugin {
     api: NotebookNavigatorAPI
 }
 
 
+interface PluginsPatched extends Plugins {
+    pp_patched?: boolean
+}
+
+
 const getNNApi = (plugin: PrettyPropertiesPlugin) => {
-    let nn = plugin.app.plugins.getPlugin("notebook-navigator") as NNPlugin
+    let nn = plugin.app.plugins.getPlugin("notebook-navigator") as NNPlugin | undefined
     return nn?.api
 }
 
 
 
 
-export const registerNNListener = (plugin: PrettyPropertiesPlugin) => {
+
+
+export const trackNNPluginEnabled = (plugin: PrettyPropertiesPlugin) => {
+
+    // Try to register events immediately in case NN plugin is already loaded
+    registerNNEvents(plugin)
+
+    // Patch enablePlugin to be able to know when NN plugin is turned on (in case it is disabled or user reloads it manually at some point).
+    // Register events again after NN is enabled
+    const pluginsManifests = plugin.app.plugins as PluginsPatched
+
+    if (!pluginsManifests.pp_patched) {
+      pluginsManifests.pp_patched = true
+
+      const originalEnable = pluginsManifests.enablePlugin.bind(pluginsManifests);
+      pluginsManifests.enablePlugin = async (id) => {
+          const result = await originalEnable(id);
+          if(id == "notebook-navigator") {
+            registerNNEvents(plugin)
+          }
+          return result;
+      };
+    }
+}
+
+
+
+
+
+
+
+
+export const registerNNEvents = (plugin: PrettyPropertiesPlugin) => {
+
     let nnApi = getNNApi(plugin)
     if (!nnApi) return
 
@@ -197,12 +236,12 @@ export const setNotebookNavigatorColor = (
   }
 
   if (propName == "tags") {
-    nnApi.metadata.setTagMeta(propVal, meta)
+    void nnApi.metadata.setTagMeta(propVal, meta)
   } else {
 
     let propId = nnApi.propertyNodes.buildValue(propName, propVal)
     if (propId) {
-        nnApi.metadata.setPropertyMeta(propId, meta)
+        void nnApi.metadata.setPropertyMeta(propId, meta)
     }
     
   }

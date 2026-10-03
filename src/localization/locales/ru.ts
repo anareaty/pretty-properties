@@ -60,7 +60,7 @@ export default {
   SHOW_HIDDEN_WHEN_EMPTY_PROPERTIES_LIST: "Показать список скрытых свойств, скрытых, когда пустые",
   ADD_HIDDEN_EMPTY_PROPERTY: "Добавить свойство, чтобы скрывать, когда пустое",
   SELECT_ICON: "Выбрать иконку",
-  LOCAL_IMAGE: "Локальное изображение",
+  SELECT_LOCAL_IMAGE: "Выбрать локальное изображение",
   LUCIDE_ICON: "Иконка Lucide",
   EMOJI: "Эмодзи",
   GAP_AFTER_BANNER_WITH_ICON: "Отступ после баннера с иконкой",
@@ -221,5 +221,8 @@ export default {
   ENABLE_PROPERTY_SEARCH_DESC: "Если включено, вы можете открыть поиск по значению свойства, применив Ctrl+клик / Cmd+клик на свойстве.",
   NN_INTEGRATION: "Интеграция с плагином Notebook Navigator",
   SET_NN_COLORS: "Изменять цвета в Notebook Navigator при изменении цвета свойств в Pretty Properties",
-  SET_PP_COLORS_FROM_NN: "Изменять цвета в Pretty Properties при изменении цвета свойств в Notebook Navigator"
+  SET_PP_COLORS_FROM_NN: "Изменять цвета в Pretty Properties при изменении цвета свойств в Notebook Navigator",
+  ADD_LINK_MANUALLY: "Добавить ссылку на изображение вручную",
+  ADD_IMAGE_LINK: "Ссылка на изображение",
+  ADD_IMAGE_LINK_DESC: "Это может быть Wiki-ссылка, Markdown-ссылка, ссылка на внешнее изображение или путь к файлу. Также можно вставить изображение, кодированное как base64."
 };

@@ -82,6 +82,7 @@ export const getCoverSettingsDefinitions = (tab: PPSettingTab) => {
                 searchable: false,
                 render: (setting: Setting) => {
                     setting.addButton(btn => {
+                        btn.setClass("clickable-icon").setClass("extra-setting-button")
                         if (cover.format) {
                             btn.setClass("cover-has-format")
                         }
@@ -481,7 +482,7 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
                     suggester.close();
                 });
             })
-			.addButton((button) =>
+			.addExtraButton((button) =>
 				button.setIcon("plus").onClick(async () => {
                     if (newProperty && !plugin.settings.coverProperties.find(c => c.property.toLowerCase() == newProperty.toLowerCase())) {
                         plugin.settings.coverProperties.push({ property: newProperty, format: "" });
@@ -552,7 +553,7 @@ export const showCoverSettings = (settingTab: PPSettingTab) => {
 							settingTab.display();
 						}),
 				)
-				.addButton((button) =>
+				.addExtraButton((button) =>
 					button.setIcon("x").onClick(async () => {
 						plugin.settings.coverProperties.splice(i, 1);
 

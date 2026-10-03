@@ -33,6 +33,8 @@ export const updateProgress = (propertyEl: HTMLElement, plugin: PrettyProperties
 
             let maxProperty = progressSettings.maxProperty
 
+            
+
             if (!sourcePath || sourcePath.endsWith(".canvas")) {
                 sourcePath = propertyEl.getAttribute("data-source-path") || ""
             }

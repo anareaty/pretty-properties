@@ -290,7 +290,7 @@ export class PPSettingTab extends PluginSettingTab {
 	}
 
 
-	
+
 
 
 
@@ -317,6 +317,7 @@ export class PPSettingTab extends PluginSettingTab {
 			"COLORED_PROPERTIES", 
 			"HIDDEN_PROPERTIES", 
 			"PROPERTY_FORMATTINGS", 
+			"ADDITIONAL_ELEMENTS",
 			"OTHER"
 		]
 		let tabsEl = containerEl.createDiv({cls: "pp-settings-tabs"})
@@ -361,6 +362,13 @@ export class PPSettingTab extends PluginSettingTab {
 
 		else if (this.plugin.settings.settingsTab == "PROPERTY_FORMATTINGS") {
 			showFormatSettingsTab(this)
+		}
+
+
+
+
+		else if (this.plugin.settings.settingsTab == "ADDITIONAL_ELEMENTS") {
+			showAdditionalSettingsTab(this)
 		}
 
 		
