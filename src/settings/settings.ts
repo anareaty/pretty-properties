@@ -244,7 +244,7 @@ export class PPSettingTab extends PluginSettingTab {
 
 
 	
-
+/*
 	getSettingDefinitions() {
 
 		let settingDefinitions = [
@@ -289,7 +289,7 @@ export class PPSettingTab extends PluginSettingTab {
 		return settingDefinitions
 	}
 
-
+*/
 
 
 

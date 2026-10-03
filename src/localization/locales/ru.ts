@@ -224,5 +224,12 @@ export default {
   SET_PP_COLORS_FROM_NN: "Изменять цвета в Pretty Properties при изменении цвета свойств в Notebook Navigator",
   ADD_LINK_MANUALLY: "Добавить ссылку на изображение вручную",
   ADD_IMAGE_LINK: "Ссылка на изображение",
-  ADD_IMAGE_LINK_DESC: "Это может быть Wiki-ссылка, Markdown-ссылка, ссылка на внешнее изображение или путь к файлу. Также можно вставить изображение, кодированное как base64."
+  ADD_IMAGE_LINK_DESC: "Это может быть Wiki-ссылка, Markdown-ссылка, ссылка на внешнее изображение или путь к файлу. Также можно вставить изображение, кодированное как base64.",
+  EDIT_COLOR_MENU: "Редактировать цвета меню",
+  DEFAULT_COLORS: "Цвета по умолчанию",
+  CUSTOM_COLORS: "Свои цвета",
+  ADD_COLOR_NAME: "Добавить название цвета",
+  SHOW_DEFAULT_COLORS: "Показать цвета по умолчанию",
+  SHOW_CUSTOM_COLORS: "Показать свои цвета",
+  ADD_CUSTOM_COLOR: "Добавить свой цвет",
 };

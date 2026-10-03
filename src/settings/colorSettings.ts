@@ -272,7 +272,7 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
             items: [
                 {
                     type: "group",
-                    heading: i18n.t("THEME_COLORS"),
+                    heading: i18n.t("DEFAULT_COLORS"),
                     items: plugin.settings.themeColors.map((item) => ({
                         name: item.name,
                         render: (setting: Setting) => {
@@ -518,11 +518,13 @@ export const showColorSettings = (settingTab: PPSettingTab) => {
 
 
 
-
+    new Setting(containerEl)
+    .setHeading()
+	.setName(i18n.t("EDIT_COLOR_MENU"))
 
     
     new Setting(containerEl)
-    .setName(i18n.t("SHOW_THEME_COLORS"))
+    .setName(i18n.t("SHOW_DEFAULT_COLORS"))
     .addExtraButton(button =>
         {
             let icon = "chevron-right"
@@ -555,7 +557,7 @@ export const showColorSettings = (settingTab: PPSettingTab) => {
             propContainer.classList.add("pp-settings-list-inner-container")
 
             new Setting(propContainer)
-            .setName(item.name)
+            .setName(i18n.t(item.name))
             .addToggle(toggle => {
                 toggle.setValue(item.enabled)
                 .onChange(async (value) => {
@@ -575,7 +577,7 @@ export const showColorSettings = (settingTab: PPSettingTab) => {
 
 
     new Setting(containerEl)
-    .setName(i18n.t("SHOW_EXTRA_COLORS"))
+    .setName(i18n.t("SHOW_CUSTOM_COLORS"))
     .addExtraButton(button =>
         {
             let icon = "chevron-right"

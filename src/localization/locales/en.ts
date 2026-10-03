@@ -214,6 +214,13 @@ export default {
   SET_PP_COLORS_FROM_NN: "Set Pretty Properties colors from Notebook Navigator",
   ADD_LINK_MANUALLY: "Add an image link manually",
   ADD_IMAGE_LINK: "Image link",
-  ADD_IMAGE_LINK_DESC: "You can use Wikilink, Markdown link, raw external link or file path. You can also paste base64 encoded image."
+  ADD_IMAGE_LINK_DESC: "You can use Wikilink, Markdown link, raw external link or file path. You can also paste base64 encoded image.",
 
+  EDIT_COLOR_MENU: "Edit color menu",
+  DEFAULT_COLORS: "Default colors",
+  CUSTOM_COLORS: "Custom colors",
+  ADD_COLOR_NAME: "Add color name",
+  SHOW_DEFAULT_COLORS: "Show default colors",
+  SHOW_CUSTOM_COLORS: "Show custom colors",
+  ADD_CUSTOM_COLOR: "Add custom color",
 };
