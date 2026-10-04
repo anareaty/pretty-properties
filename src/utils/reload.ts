@@ -15,7 +15,7 @@ export const updateAfterEnable = (plugin: PrettyPropertiesPlugin) => {
             let viewType = view.getViewType()
 
             if (viewTypesToReload.find(t => t == viewType)) {
-                leaf.rebuildView()
+                void leaf.rebuildView()
             }
         }
     })
@@ -35,7 +35,7 @@ export const updateAfterDisable = (plugin: PrettyPropertiesPlugin) => {
             let viewType = view.getViewType()
 
             if (viewTypesToReload.find(t => t == viewType)) {
-                leaf.rebuildView()
+                void leaf.rebuildView()
             } 
         }
     })
