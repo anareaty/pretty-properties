@@ -229,6 +229,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 		
 
+
 		this.addSettingTab(new PPSettingTab(this.app, this));
 
 
@@ -237,10 +238,9 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		this.app.workspace.onLayoutReady(async () => {
 			await migrateColorSettings(this)
 			await migrateCoverProperties(this)
-			reloadAllTabs(this)
 			trackNNPluginEnabled(this)		
+			reloadAllTabs(this)
 		})
-
 
 	}
 

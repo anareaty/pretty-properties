@@ -2,9 +2,15 @@ import PrettyPropertiesPlugin from "src/main";
 
 
 export const reloadAllTabs = (plugin: PrettyPropertiesPlugin) => {
-    plugin.app.workspace.iterateAllLeaves(leaf => {
+    let viewTypesToReload = ["canvas", "markdown", "bases", "tag", "file-properties"]
+
+    plugin.app.workspace.iterateAllLeaves(async (leaf) => {
         if (leaf) {
-            void leaf.rebuildView()
+            let viewType = leaf.view.getViewType()
+
+            if (viewTypesToReload.find(t => t == viewType)) {
+                await leaf.rebuildView()
+            }
         }
     })
 }

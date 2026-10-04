@@ -117,6 +117,8 @@ Chosing the "Select color" option will affect both text color and the background
 
 In the color selection menu you can chose from the set of the rainbow colors and the accent color that are defined by you theme. You can also chose a custom color from the color picker. Finally you can chose the options "none" or "default". "None" will make the property background transparent and the property text the same as the regular text color. "Default" will return the property colors to those that are defined by your theme. 
 
+You can edit the color menu by adding your own saved custom colors and disable the theme colors you don't want to use.
+
 You can also add you own styling to the properties via CSS. For this each property element get special data-attribute containing the actual value. It can be used for styling like this:
 
 ```
@@ -124,6 +126,9 @@ You can also add you own styling to the properties via CSS. For this each proper
 [data-property-value="my-text-property-value"] {    /* my styles */}
 [data-property-value="my-tag-value"] {    /* my styles */}
 ```
+
+If you are using Pretty Properties alongside the Notebook Navigator plugin, you can enable sync the property colors of two plugins. You can set the options to change Notebook Navigator colors when Pretty Properties colors are edited, or change Pretty Properties colors when Notebook Navigator colors are edited, or both.
+
 
 # Relative date colors
 
@@ -236,22 +241,6 @@ Show a steamid property as an iframe (to render cover as iframe add this templat
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # Progress bars
 
 Right-click on the number property icon to add simple progress bar to any number property. By default maximum value of progress bar is 100 and property value is treated as percent. If you want to add custom number as progress maximum, you need to add additional number property to the note and in the first property menu select the option "Set max progress from another property".
@@ -278,6 +267,16 @@ if(note["maxProperty"], (if(note["valueProperty"], note["valueProperty"], 0) / n
 ```
 
 ![progress bar](images/image-6.png)
+
+
+
+# Selection buttons
+
+You can add selection buttons to the text properties. Clicking the button opens dropdown menu that allows you to select from predefined options. It can be useful, for example, to quickly switch between note statuses.
+
+To add selection button go to the additional elements settings and add the rule for the selected property. You can add different sets of options based on the note folder. For example, in the "Books" folder your "status" property can have options "want to read", "reading" and "finished", but in the "Tasks" folder you statuses can be "to do", "done" or anything else.
+
+If the property is added to the list but have no rules, selection button will show all it's existing values instead. These values can not be filtered. Clicking on the property directly, instead of the button, will show the original selection dropdown.
 
 
 # Property quick search
