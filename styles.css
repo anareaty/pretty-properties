@@ -1956,8 +1956,7 @@ button.cover-has-format {
 
 
 
-.metadata-property button.pp-property-select-button {
-  margin: 0 0 0 6px;
+button.pp-property-select-button {
   background-color: transparent;
   box-shadow: none;
   padding: 0;
@@ -1991,3 +1990,49 @@ button.pp-property-select-button  svg {
 button.pp-property-select-button:hover {
   opacity: 1;
 }
+
+
+.is-mobile button.pp-property-select-button {
+  margin: 0.1em 0 0.1em 6px;
+  --icon-size: 1.3em;
+}
+
+
+
+.metadata-input-longtext:focus .pp-property-select-button {
+  display: none;
+}
+
+
+
+
+
+
+button.longtext-color-button {
+  margin: 2px;
+  border: none;
+  box-shadow: none;
+  background-color: var(--background-primary);
+  height: calc(var(--input-height) - 4px);
+  width: 2.5em;
+  display: none;
+  color: var(--text-muted);
+  padding: unset;
+  position: absolute;
+  right: 0;
+  top: 0;
+  opacity: 0.2;
+}
+
+button.longtext-color-button:hover {
+  background-color: var(--background-primary-alt);
+  opacity: 1;
+}
+
+.metadata-property-value:hover button.longtext-color-button, .longtext-color-button:active {
+  display: flex;
+}
+
+
+
+
