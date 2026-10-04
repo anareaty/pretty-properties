@@ -3,7 +3,7 @@ import PrettyPropertiesPlugin from "src/main"
 import { updateLongtext, updateMultiselectPill, updateNumberWidget, updateTagPill } from "src/updates/updatePills"
 import { updateDateInput, updateDateTimeInput } from "src/updates/updateDates"
 import { around, dedupe } from "monkey-around";
-import { AliasesPropertyWidgetComponent, MultitextPropertyWidgetComponent, PropertyRenderContext, PropertyWidgetComponentBase, TagsPropertyWidgetComponent, TextPropertyWidgetComponent, TypeInfo } from "@obsidian-typings/obsidian-public-latest";
+import { AliasesPropertyWidgetComponent, MultitextPropertyWidgetComponent, PropertyWidgetComponentBase, TagsPropertyWidgetComponent, TextPropertyWidgetComponent, TypeInfo } from "@obsidian-typings/obsidian-public-latest";
 import { updateHiddenCSSClasses } from "src/updates/updateHiddenProperties";
 import { updateSelectButton } from "src/updates/updateSelectButton";
 
