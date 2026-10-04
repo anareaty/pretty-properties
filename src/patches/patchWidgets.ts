@@ -227,6 +227,10 @@ export const patchPropertyWidgets = (plugin: PrettyPropertiesPlugin) => {
 
 
 
+
+
+
+
       plugin.patches.uninstallWidgetPatch[type] = around(widget, {
         render(oldRender) {
 
@@ -234,6 +238,9 @@ export const patchPropertyWidgets = (plugin: PrettyPropertiesPlugin) => {
           return dedupe("pp-patch-widgets-around-key", oldRender, (...args) => {
             let rendered = oldRender && oldRender.apply(this, args)
             let widgetArgs = args as WidgetArgs
+
+
+        
 
 
         
@@ -251,6 +258,10 @@ export const patchPropertyWidgets = (plugin: PrettyPropertiesPlugin) => {
                 return undefined
               }
             }
+
+
+
+            
 
 
 

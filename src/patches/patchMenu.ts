@@ -203,7 +203,7 @@ const handlePillMenu = (menu: Menu, pill: HTMLElement, plugin: PrettyPropertiesP
                 createColorMenu(propName, pillVal, "pillColor", menu, plugin);
                 createColorMenu(propName, pillVal, "textColor", menu, plugin);
             } 
-        } 
+        }
     }
 }
 

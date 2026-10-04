@@ -9,6 +9,7 @@ import { getOtherSettingsDefinitions, showOtherSettings } from './otherSettings'
 import { getColorSettingsDefinitions, showColorSettings } from './colorSettings';
 import { getHiddenSettingsDefinitions, showHiddenSettingsTab } from './hiddenSettingsTab';
 import { getFormatSettingsDefinitions, showFormatSettingsTab } from './formatSettings';
+import { getAdditionalSettingsDefinitions, showAdditionalSettingsTab } from './additionalSettings';
 
 
 
@@ -112,8 +113,28 @@ export interface PPPluginSettings {
 	dontShowColorMigrationMessage: boolean;
 	propertyColors: Record<string, Record<string, PillColorSettings>>;
 	propertyColorSettingRevealed: string
-	coverClassesMigrated2: boolean
-	enablePropertySearch: boolean
+	coverClassesMigrated2: boolean,
+	propertySelectOptions: Record<string, {
+		path: string,
+		options: string[]
+	}[]>
+	enablePropertySearch: boolean,
+	enableSetNNColors: boolean,
+	enableSetPPColorsFromNN: boolean,
+	extraColors: {
+		name: string,
+		value: HSL
+	}[],
+	themeColors: {
+		name: string,
+		enabled: boolean
+	}[],
+	showThemeColors: boolean,
+	showExtraColors: boolean,
+	showProgressBars: boolean,
+	showSelectionButtons: boolean
+	propertySelectSettingRevealed: string
+	propertySelectPathRevealed: string | undefined
 }
 
 
@@ -229,7 +250,55 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	propertyColors: {},
 	propertyColorSettingRevealed: "",
 	coverClassesMigrated2: false,
-	enablePropertySearch: true
+	propertySelectOptions: {},
+	enablePropertySearch: true,
+	enableSetNNColors: false,
+	enableSetPPColorsFromNN: false,
+	extraColors: [],
+	themeColors: [
+		{
+			name: "red",
+			enabled: true
+		},
+		{
+			name: "orange",
+			enabled: true
+		},
+		{
+			name: "yellow",
+			enabled: true
+		},
+		{
+			name: "green",
+			enabled: true
+		},
+		{
+			name: "cyan",
+			enabled: true
+		},
+		{
+			name: "blue",
+			enabled: true
+		},
+		{
+			name: "purple",
+			enabled: true
+		},
+		{
+			name: "pink",
+			enabled: true
+		},
+		{
+			name: "accent",
+			enabled: true
+		}
+	],
+	showThemeColors: false,
+	showExtraColors: false,
+	showProgressBars: false,
+	showSelectionButtons: false,
+	propertySelectSettingRevealed: "",
+	propertySelectPathRevealed: undefined
 }
 
 
@@ -281,6 +350,14 @@ export class PPSettingTab extends PluginSettingTab {
 				name: i18n.t("PROPERTY_FORMATTINGS"),
 				items: getFormatSettingsDefinitions(this)
 			},
+
+			
+			{
+				type: "page",
+				name: i18n.t("ADDITIONAL_ELEMENTS"),
+				items: getAdditionalSettingsDefinitions(this)
+			},
+			
 			{
 				type: "page",
 				name: i18n.t("OTHER"),

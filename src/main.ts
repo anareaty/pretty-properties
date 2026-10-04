@@ -44,6 +44,9 @@ import { MarkdownRenderChild } from "obsidian";
 import { clearUnusedRenderComponents } from "./updates/updatePropertyFormattings";
 import { migrateColorSettings, migrateCoverProperties, migrateCoverSettings } from "./utils/settingsMigration";
 import { registerPropertySearch } from "./utils/propertySearch";
+import { CustomPropertySuggester } from "./updates/updateSelectButton";
+import { trackNNPluginEnabled } from "./utils/nn_integration";
+
 
 type Patch = () => void
 type PatchList = Record<string, Patch>
@@ -229,7 +232,6 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 		
 
-
 		this.addSettingTab(new PPSettingTab(this.app, this));
 
 
@@ -238,9 +240,10 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		this.app.workspace.onLayoutReady(async () => {
 			await migrateColorSettings(this)
 			await migrateCoverProperties(this)
-			trackNNPluginEnabled(this)		
 			reloadAllTabs(this)
+			trackNNPluginEnabled(this)		
 		})
+
 
 	}
 
@@ -263,4 +266,3 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		
 	}
 }
-

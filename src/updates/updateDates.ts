@@ -156,6 +156,8 @@ export const updateDateTimeInput = (input: HTMLInputElement, plugin: PrettyPrope
 
 	if (!grandParent) return
 
+	let sourcePath = grandParent.getAttribute("data-source-path") || ""
+
 	let propKey = grandParent.getAttribute("data-property-key")
 
 	let propName

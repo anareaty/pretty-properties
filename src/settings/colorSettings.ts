@@ -75,17 +75,6 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
                             }).open()
                         }
                     },
-                    /*
-                    onDelete: async (idx: number) => {
-                        let key = propertyColorsKeys[idx] || ""
-                        delete plugin.settings.propertyColors[key]
-                        await plugin.saveSettings();
-                        if (requireApiVersion("1.13.0")) {
-                            tab.update()			
-                        }
-
-                    },
-                    */
                     items: propertyColorsKeys.map(propName => ({
                         type: "page",
                         name: propName,
