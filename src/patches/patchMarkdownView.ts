@@ -49,7 +49,7 @@ export const patchMarkdownView = (plugin: PrettyPropertiesPlugin) => {
     onLoadFile(old) {
 
       return dedupe("pp-patch-markdown-around-key", old, async function(this: MarkdownView, ...args) {
-
+        
         // We need a function to bind this, so we can reach it later in lower level functions
         const getView = () => this
 

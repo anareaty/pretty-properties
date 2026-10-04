@@ -8,7 +8,8 @@ import { MetadataEditorPatched, patchMetadataEditor } from "./patchMarkdownView"
 
 
 interface ReadViewRendererExtended extends ReadViewRenderer {
-  onRender: () => void
+  onRender: () => void,
+  pp_patched: boolean
 }
 
 interface EmbedMarkdownComponentExtended extends EmbedMarkdownComponent {
@@ -33,12 +34,19 @@ export const patchEmbed = (plugin: PrettyPropertiesPlugin) => {
 
                         const renderer = view.previewMode.renderer as ReadViewRendererExtended
                         const old_renderer_onRender = renderer.onRender
-
-                        renderer.onRender = (...args2) => {
-                            let result = old_renderer_onRender.call(renderer, ...args2)
-                            updateCoverForView(view, plugin)  
-                            return result
+                       
+                        if (!renderer.pp_patched) {
+                            renderer.pp_patched = true
+                            renderer.onRender = (...args2) => {
+                                let result = old_renderer_onRender.call(renderer, ...args2)
+                                if (plugin._loaded) {
+                                    updateCoverForView(view, plugin)
+                                }
+                                return result
+                            }
                         }
+                        
+                            
                     }
                 return view
             })

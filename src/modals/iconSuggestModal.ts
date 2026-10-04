@@ -16,7 +16,7 @@ export class IconSuggestModal extends SuggestModal<string> {
         super(app)
         this.plugin = plugin
         this.options = {
-            image: i18n.t("LOCAL_IMAGE"),
+            image: i18n.t("SELECT_LOCAL_IMAGE"),
             link: i18n.t("EXTERNAL_IMAGE"),
             svg: i18n.t("LUCIDE_ICON"),
             emoji: i18n.t("EMOJI"),

@@ -19,7 +19,8 @@ import { AliasesPropertyWidgetComponent,
     MetadataEditor, 
     MultitextPropertyWidgetComponent,  
     TagsPropertyWidgetComponent, 
-    TextPropertyWidgetComponent 
+    TextPropertyWidgetComponent, 
+    WidgetEditorView
 } from "@obsidian-typings/obsidian-public-latest";
 import { updateTags } from "src/extensions/tagFixExtension";
 import { KanbanBasesView, processBaseKanbanProperties } from "src/patches/patchBaseKanban";
@@ -406,3 +407,118 @@ export const updateSourcePaths = (file: TFile, plugin: PrettyPropertiesPlugin) =
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+export const removeAllExtraElements = (plugin: PrettyPropertiesPlugin) => {
+
+    let mdLeaves = plugin.app.workspace.getLeavesOfType("markdown");
+    for (let leaf of mdLeaves) {
+        let view = leaf.view;
+        if (view instanceof MarkdownView) {
+            removeExtraElementsForView(view)
+        }
+    }
+
+    let canvasLeaves = plugin.app.workspace.getLeavesOfType("canvas");
+    for (let leaf of canvasLeaves) {
+        let view = leaf.view as CanvasView
+
+        view.canvas?.nodes?.forEach(node => {
+            let nodeView = node.child
+
+            if (nodeView) {
+                removeExtraElementsForView(nodeView)
+            }
+        })
+    }
+}
+
+
+
+
+
+
+
+export const removeExtraElementsForView = (view: MarkdownView | WidgetEditorView ) => {
+
+
+    if ("contentEl" in view) {
+        let contentEl = view.contentEl;
+        let oldBannerDivSource = contentEl?.querySelector(".cm-scroller .pp-banner");
+        let oldBannerDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .pp-banner");
+        oldBannerDivSource?.remove();
+        oldBannerDivPreview?.remove();
+        contentEl.classList.remove("has-banner")
+
+        let oldIconDivSource = contentEl?.querySelector(".cm-scroller .icon-wrapper");
+        let oldIconDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .icon-wrapper");
+        oldIconDivSource?.remove();
+        oldIconDivPreview?.remove();
+        contentEl.classList.remove("has-icon")
+        let titleIconWrappers = contentEl?.querySelectorAll(".title-icon-wrapper")
+        for (let titleIconWrapper of titleIconWrappers) {
+            titleIconWrapper.remove()
+        } 
+    }
+
+    let containerEl = view.containerEl
+
+    let oldCoverDiv = containerEl?.querySelector(".pp-cover");
+    oldCoverDiv?.remove();
+    const mdContainer = containerEl.querySelector(".metadata-container");
+    mdContainer?.classList.remove("has-cover")
+    
+
+    let progressWrappers = containerEl.querySelectorAll(".metadata-progress-wrapper")
+
+    for (let progressWrapper of progressWrappers) {
+        progressWrapper.remove()
+    }
+
+    let overlays = containerEl.querySelectorAll(".pp-formatted-value-overlay")
+
+    for (let overlay of overlays) {
+        let property = overlay.closest(".has-property-formatting")
+        overlay.remove()
+        if (property) {
+            property.classList.remove("has-property-formatting")
+        }
+    }
+
+
+    if ("metadataEditor" in view) {
+        let metadataEditor = view.metadataEditor
+
+        metadataEditor.rendered.forEach(p => {
+            p.renderProperty(p.entry, !0)
+            
+        })
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

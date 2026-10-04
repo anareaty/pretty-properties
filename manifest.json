@@ -1,7 +1,7 @@
 {
 	"id": "pretty-properties",
 	"name": "Pretty Properties",
-	"version": "2.1.0",
+	"version": "2.1.1",
 	"minAppVersion": "1.6.7",
 	"description": "Transform the way properties in the note are displayed: add colors, custom formats and additional elements, or even hide unused properties. Also you can add decorative images to the note like banners, icons and covers.",
 	"author": "Anareaty",

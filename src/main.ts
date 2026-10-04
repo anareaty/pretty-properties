@@ -36,7 +36,7 @@ import { unPatchWidgets } from "./patches/removePatches";
 import { patchHoverPopover } from "./patches/patchHoverPopover";
 import { API, createApi } from "./utils/createApi";
 import { patchMenu } from "./patches/patchMenu";
-import { reloadAllTabs } from "./utils/reload";
+import { updateAfterDisable, updateAfterEnable } from "./utils/reload";
 import { patchEmbed } from "./patches/patchEmbed";
 import { patchMetadataSuggester } from "./patches/patchMetadataSuggester";
 import { patchBaseKanban } from "./patches/patchBaseKanban";
@@ -242,7 +242,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			await migrateColorSettings(this)
 			await migrateCoverProperties(this)
 			trackNNPluginEnabled(this)
-			reloadAllTabs(this)		
+			updateAfterEnable(this)	
 		})
 
 
@@ -252,7 +252,7 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		unPatchWidgets(this)
 		removeColoredTagsStyle()
 		clearUnusedRenderComponents(this)
-		reloadAllTabs(this)
+		updateAfterDisable(this)
 	}
 
 
