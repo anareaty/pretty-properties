@@ -6,11 +6,13 @@ import { setPillStyles } from "./updatePills"
 export const updateSelectButton = (pill: HTMLElement, propName: string, sourcePath: string, plugin: PrettyPropertiesPlugin) => {
 
     let options = getSelectionOptions(propName, sourcePath, plugin)
+
     if (!options) return
     
     let selectButton = createEl("button")
     setIcon(selectButton, "chevron-down")
     selectButton.classList.add("pp-property-select-button")
+
     pill.append(selectButton)
 
 
@@ -111,7 +113,11 @@ export class CustomPropertySuggester extends PopoverSuggest<string> {
                 suggestPill.append(value);
                 suggestPill.classList.add("suggestion-pill");
                 suggestPill.classList.add("longtext-suggest-pill");
-                setPillStyles(suggestPill, this.propName, value, this.plugin);
+
+                if (this.plugin.settings.enableColoredProperties) {
+                    setPillStyles(suggestPill, this.propName, value, this.plugin);
+                }
+                
             }
         } 
     }

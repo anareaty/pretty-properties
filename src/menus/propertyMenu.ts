@@ -216,7 +216,6 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                     .map((p) => properties[p]!.name);
 
 
-                console.log(numberProperties)
 
                 for (let numberProp of numberProperties) {
                     sub.addItem((subitem: MenuItem) => {

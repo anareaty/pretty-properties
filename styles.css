@@ -1386,6 +1386,26 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 }
 
 
+
+
+
+
+.pp-pill-padding-all .metadata-input-longtext .pp-property-select-button,
+.pp-pill-padding-colored .metadata-input-longtext.colored .pp-property-select-button,
+.pp-pill-padding-non-transparent .metadata-input-longtext.colored .pp-property-select-button,
+
+.pp-pill-padding-all .pp-formatted-value-overlay.text-overlay .pp-property-select-button,
+.pp-pill-padding-colored .pp-formatted-value-overlay.text-overlay.colored .pp-property-select-button,
+.pp-pill-padding-non-transparent .pp-formatted-value-overlay.text-overlay.colored .pp-property-select-button
+
+{
+  margin-right: calc(0px - var(--tag-padding-x) / 2);
+}
+
+
+
+
+
 .pp-pill-padding-all .metadata-input-number {
   padding-left: calc(var(--tag-padding-x) + 8px);
 }
@@ -1951,6 +1971,10 @@ button.cover-has-format {
   margin: auto 0 auto 0;
 
   display: inline-block;
+
+
+  margin-left: calc(var(--tag-padding-x) / 2);
+  
 
 
 }

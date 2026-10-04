@@ -89,9 +89,11 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
                     items: propertyColorsKeys.map(propName => ({
                         type: "page",
                         name: propName,
+                        searchable: false,
                         items: [
                             {
                                 name: i18n.t("DELETE_COLOR_SETTINGS_FOR_PROPERTY") + " " + propName,
+                                searchable: false,
                                 render: (setting: Setting) => {
                                     setting.addExtraButton(btn => btn
                                         .setIcon("x")
@@ -330,6 +332,7 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
                     },
                     items: plugin.settings.extraColors.map((item) => ({
                         name: item.name,
+                        searchable: false,
                         render: (setting: Setting) => {
                             setting.addColorPicker(color => color
                                 .setValueHsl(item.value)

@@ -238,7 +238,6 @@ export default class PrettyPropertiesPlugin extends Plugin {
 			await migrateColorSettings(this)
 			await migrateCoverProperties(this)
 			reloadAllTabs(this)
-
 			trackNNPluginEnabled(this)		
 		})
 
@@ -247,9 +246,9 @@ export default class PrettyPropertiesPlugin extends Plugin {
 
 	onunload() {
 		unPatchWidgets(this)
-		reloadAllTabs(this)
 		removeColoredTagsStyle()
 		clearUnusedRenderComponents(this)
+		reloadAllTabs(this)
 	}
 
 

@@ -244,7 +244,7 @@ export class PPSettingTab extends PluginSettingTab {
 
 
 	
-/*
+
 	getSettingDefinitions() {
 
 		let settingDefinitions = [
@@ -253,6 +253,9 @@ export class PPSettingTab extends PluginSettingTab {
 				name: i18n.t("BANNERS"),
 				items: getBannerSettingsDefinitions(this)
 			},
+
+
+			
 			{
 				type: "page",
 				name: i18n.t("ICONS"),
@@ -283,13 +286,15 @@ export class PPSettingTab extends PluginSettingTab {
 				name: i18n.t("OTHER"),
 				items: getOtherSettingsDefinitions(this)
 			}
+
+			
 		]
 
 		
 		return settingDefinitions
 	}
 
-*/
+
 
 
 
@@ -381,4 +386,7 @@ export class PPSettingTab extends PluginSettingTab {
 			showOtherSettings(this)
 		}
 	}
+
+
+
 }

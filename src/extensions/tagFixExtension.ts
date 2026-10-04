@@ -51,69 +51,67 @@ export const registerTagFixExtension = (plugin: PrettyPropertiesPlugin) => {
             const builder = new RangeSetBuilder<Decoration>();
             if (!view.state.field(editorLivePreviewField)) {return builder.finish();}
 
-            try {
-                if (plugin.settings.enableColoredProperties) {
-                    for (let { from, to } of view.visibleRanges) {
-    
-                        let tagTextStart = 0;
-                        
-                        (syntaxTree as (state: EditorState) => Tree)(view.state).iterate({
-                            from,
-                            to,
-                            enter(node: SyntaxNode) {
-                                if (node.type.name.includes('hashtag-begin')) {
-                                    tagTextStart = node.to
+            
+            if (plugin.settings.enableColoredProperties) {
+                for (let { from, to } of view.visibleRanges) {
+
+                    let tagTextStart = 0;
+                    
+                    (syntaxTree as (state: EditorState) => Tree)(view.state).iterate({
+                        from,
+                        to,
+                        enter(node: SyntaxNode) {
+                            if (node.type.name.includes('hashtag-begin')) {
+                                tagTextStart = node.to
+                            }
+
+                            if (node.type.name.includes('hashtag-end')) {
+                                
+                                let tagId = view.state.doc.sliceString(tagTextStart, node.to)
+                                let styles = generateInlineStyles("tags", tagId, plugin)
+                                let { styleProps, colorClass, textColorClass } = styles
+                                let styleText = ""
+                                for (let key in styleProps) {
+                                    styleText = styleText + key + ": " + styleProps[key] + "; "
                                 }
-    
-                                if (node.type.name.includes('hashtag-end')) {
-                                    
-                                    let tagId = view.state.doc.sliceString(tagTextStart, node.to)
-                                    let styles = generateInlineStyles("tags", tagId, plugin)
-                                    let { styleProps, colorClass, textColorClass } = styles
-                                    let styleText = ""
-                                    for (let key in styleProps) {
-                                        styleText = styleText + key + ": " + styleProps[key] + "; "
-                                    }
-    
-                                    let decoBegin = Decoration.mark({ 
-                                        attributes: {
-                                            "data-property-value": tagId, 
-                                            style: styleText
-                                        }, 
-                                        class: "cm-hashtag-inner cm-hashtag cm-hashtag-begin cm-meta cm-tag-" + tagId + " " + colorClass + " " + textColorClass
-                                    })
-    
-                                    let decoMiddle = Decoration.mark({ 
-                                        attributes: {
-                                            "data-property-value": tagId, 
-                                            style: styleText
-                                        }, 
-                                        class: "cm-hashtag-inner cm-hashtag cm-hashtag-middle cm-meta cm-tag-" + tagId + " " + colorClass + " " + textColorClass
-                                    })
-    
-                                    let decoEnd = Decoration.mark({ 
-                                        attributes: {
-                                            "data-property-value": tagId, 
-                                            style: styleText
-                                        }, 
-                                        class: "cm-hashtag-inner cm-hashtag cm-hashtag-end cm-meta cm-tag-" + tagId + " " + colorClass + " " + textColorClass
-                                    })
-                                    
-                                    builder.add(tagTextStart - 1, tagTextStart, decoBegin);
-    
-                                    if (tagTextStart < node.from) {
-                                        builder.add(tagTextStart, node.from, decoMiddle);
-                                    }
-                                    
-                                    builder.add(node.from, node.to, decoEnd);
+
+                                let decoBegin = Decoration.mark({ 
+                                    attributes: {
+                                        "data-property-value": tagId, 
+                                        style: styleText
+                                    }, 
+                                    class: "cm-hashtag-inner cm-hashtag cm-hashtag-begin cm-meta cm-tag-" + tagId + " " + colorClass + " " + textColorClass
+                                })
+
+                                let decoMiddle = Decoration.mark({ 
+                                    attributes: {
+                                        "data-property-value": tagId, 
+                                        style: styleText
+                                    }, 
+                                    class: "cm-hashtag-inner cm-hashtag cm-hashtag-middle cm-meta cm-tag-" + tagId + " " + colorClass + " " + textColorClass
+                                })
+
+                                let decoEnd = Decoration.mark({ 
+                                    attributes: {
+                                        "data-property-value": tagId, 
+                                        style: styleText
+                                    }, 
+                                    class: "cm-hashtag-inner cm-hashtag cm-hashtag-end cm-meta cm-tag-" + tagId + " " + colorClass + " " + textColorClass
+                                })
+                                
+                                builder.add(tagTextStart - 1, tagTextStart, decoBegin);
+
+                                if (tagTextStart < node.from) {
+                                    builder.add(tagTextStart, node.from, decoMiddle);
                                 }
-                            },
-                        });
-                    }
+                                
+                                builder.add(node.from, node.to, decoEnd);
+                            }
+                        },
+                    });
                 }
-            } catch {
-                console.error("Can not build tag decorations")
             }
+            
 
             return builder.finish();
         }

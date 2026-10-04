@@ -229,69 +229,77 @@ export const updateLongtext = (pill: HTMLElement, plugin: PrettyPropertiesPlugin
 	}
 	
 
-	//if (plugin.settings.enableColoredProperties || plugin.settings.enableMath) {
 		
-		let isBase = parent?.classList.contains("bases-table-cell") 
+	let isBase = parent?.classList.contains("bases-table-cell") 
 
-		let existingColorButton = parent?.querySelector(".longtext-color-button")
-		existingColorButton?.remove()
+	let existingColorButton = parent?.querySelector(".longtext-color-button")
+	existingColorButton?.remove()
+
+
+
+	let propEl = parent?.parentElement
+
+	let propKey = propEl?.getAttribute("data-property-key") || ""
+
+	propName = plugin.app.metadataTypeManager.getPropertyInfo(propKey.toLowerCase())?.name || propKey
+	
+
+	if (isBase) {
+		propName = propEl?.getAttribute("data-property") || ""
+		propName = propName.replace(/^note./, "")
+	}
+
+	let propertyFormatObj = getPropertyFormatObj(propName, text, plugin)
+
+
+	let overlayElement
+	if (grandParent) {
+		overlayElement = updatePropertyFormatting(grandParent, propName, text, "text", propertyFormatObj.format, propertyFormatObj.textFormat, plugin)
+	}
+
+	if (plugin.settings.enableColoredProperties) {
+		if (text) {
+			text = text.slice(0, 200).trim()
+		}
+
+		setPillStyles(pill, propName, text, plugin)
+
+		if (overlayElement) {
+			setPillStyles(overlayElement, propName, text, plugin)
+		}
+
+
+		if (parent && grandParent) {
+			updateColorButton(parent, propName, text, isBase, plugin)
+		}
+	}
+
+
+
+	if (parent && grandParent) {
+
+
+		let sourcePath = grandParent.getAttribute("data-source-path") || "";
+		let linkEl = parent.querySelector(".metadata-link-inner")
+
+		if (overlayElement) {
+			updateSelectButton(overlayElement, propName, sourcePath, plugin);
+		}
+		else if (linkEl instanceof HTMLElement && (linkEl.classList.contains("internal-link") || linkEl.classList.contains("external-link"))) {
+			updateSelectButton(linkEl, propName, sourcePath, plugin);
+		} else {
+			updateSelectButton(pill, propName, sourcePath, plugin);
+		}
+	}
 
 	
 
-		let propEl = parent?.parentElement
-
-		let propKey = propEl?.getAttribute("data-property-key") || ""
-
-		propName = plugin.app.metadataTypeManager.getPropertyInfo(propKey.toLowerCase())?.name || propKey
-		
-
-		if (isBase) {
-			propName = propEl?.getAttribute("data-property") || ""
-			propName = propName.replace(/^note./, "")
-		}
-
-		let propertyFormatObj = getPropertyFormatObj(propName, text, plugin)
-
-
-		let overlayElement
-		if (grandParent) {
-			overlayElement = updatePropertyFormatting(grandParent, propName, text, "text", propertyFormatObj.format, propertyFormatObj.textFormat, plugin)
-		}
-
-		if (plugin.settings.enableColoredProperties) {
-			if (text) {
-				text = text.slice(0, 200).trim()
-			}
-
-			setPillStyles(pill, propName, text, plugin)
-
-			if (overlayElement) {
-				setPillStyles(overlayElement, propName, text, plugin)
-			}
-
-
-			if (parent && grandParent) {
-				updateColorButton(parent, propName, text, isBase, plugin)
-
-				let sourcePath = grandParent.getAttribute("data-source-path") || "";
-				let linkEl = parent.querySelector(".metadata-link-inner")
-
-				if (linkEl instanceof HTMLElement && (linkEl.classList.contains("internal-link") || linkEl.classList.contains("external-link"))) {
-					updateSelectButton(linkEl, propName, sourcePath, plugin);
-				} else {
-					updateSelectButton(pill, propName, sourcePath, plugin);
-				}
-			}
-		}
-
-		
-
-		
-		
+	
+	
 
 
 
-	//}
+	
 
 
 }

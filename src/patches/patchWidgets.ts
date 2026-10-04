@@ -20,9 +20,6 @@ interface MetadataTypeManagerOld {
   getTypeInfo: (obj: {key: string, value: unknown}) => TypeInfo
 }
 
-export interface PropertyRenderContextPatched extends PropertyRenderContext {
-  pp_patched: boolean
-}
 
 
 export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBase, args: WidgetArgs, plugin: PrettyPropertiesPlugin) => {
@@ -122,18 +119,19 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
 
   if (type == "text") {
 
-    const checkAndUpdateLongText = () => {
-      let longText = el.querySelector(".metadata-input-longtext");
-      let link = el.querySelector(".metadata-link");
+    let textRendered = rendered as TextPropertyWidgetComponent
 
-      if (longText?.instanceOf(HTMLElement)) {
+    let longText = textRendered.inputEl
+
+    const checkAndUpdateLongText = () => {
+      let link = el.querySelector(".metadata-link");
+      if (longText.parentElement) {
           const isEditing = longText.matches(":focus") || longText.contains(document.activeElement);
           if (!isEditing) {
             updateLongtext(longText, plugin, propName);
           }
       } else if (link) {
         parent?.classList.remove("is-empty")
-
         let linkEl = link.querySelector(".metadata-link-inner")
         if (linkEl instanceof HTMLElement && (linkEl.classList.contains("internal-link") || linkEl.classList.contains("external-link"))) {
           updateSelectButton(linkEl, propName, sourcePath, plugin);
@@ -142,21 +140,16 @@ export const updateWidgets = (type: string, rendered: PropertyWidgetComponentBas
     }
 
     checkAndUpdateLongText()
-    let textRendered = rendered as TextPropertyWidgetComponent
-    let ctx = textRendered.ctx as PropertyRenderContextPatched
 
+    let old_onblur = longText.onblur?.bind(longText)
 
-    if (!ctx.pp_patched) {
-      ctx.pp_patched = true
-      let old_onChange = ctx.onChange.bind(ctx)
-
-      ctx.onChange = (...args) => {
-        old_onChange(...args);
-        checkAndUpdateLongText();
-      };
-
+    longText.onblur = (ev: FocusEvent) => {
+      if (old_onblur) {
+        old_onblur(ev)
+      }
+      checkAndUpdateLongText()
     }
-    
+
 
 
     if (propName == plugin.settings.bannerProperty) {
@@ -236,6 +229,8 @@ export const patchPropertyWidgets = (plugin: PrettyPropertiesPlugin) => {
 
       plugin.patches.uninstallWidgetPatch[type] = around(widget, {
         render(oldRender) {
+
+          
           return dedupe("pp-patch-widgets-around-key", oldRender, (...args) => {
             let rendered = oldRender && oldRender.apply(this, args)
             let widgetArgs = args as WidgetArgs
