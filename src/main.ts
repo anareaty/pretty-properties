@@ -231,3 +231,4 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		
 	}
 }
+
