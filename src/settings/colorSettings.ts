@@ -265,7 +265,7 @@ export const getColorSettingsDefinitions = (tab: PPSettingTab) => {
                     type: "group",
                     heading: i18n.t("DEFAULT_COLORS"),
                     items: plugin.settings.themeColors.map((item) => ({
-                        name: item.name,
+                        name: i18n.t(item.name),
                         render: (setting: Setting) => {
                             setting.addToggle(toggle => {
                                 toggle.setValue(item.enabled)
