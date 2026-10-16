@@ -15,6 +15,7 @@ export interface MetadataEditorPatched extends MetadataEditor {
 export interface MarkdownPreviewViewPatched extends MarkdownPreviewView {
   pp_patched: boolean,
   onRenderComplete: (...args: unknown[]) => unknown
+  show: (...args: unknown[]) => unknown
 }
 
 export interface MarkdownEditViewPatched extends MarkdownEditView {
@@ -63,6 +64,7 @@ export const patchMarkdownView = (plugin: PrettyPropertiesPlugin) => {
         if (!previewMode.pp_patched) {
           previewMode.pp_patched = true
           const old_onRenderComplete = previewMode.onRenderComplete
+          const old_previewMode_show = previewMode.show
 
           previewMode.onRenderComplete = (...args2) => {
             let result = old_onRenderComplete.call(previewMode, ...args2) 
@@ -70,6 +72,17 @@ export const patchMarkdownView = (plugin: PrettyPropertiesPlugin) => {
             updateImagesForView(view, plugin)
             return result
           }
+
+          // Update title icon if needed (required if the note was first opened in edit view)
+
+          previewMode.show = (...args2) => {
+            let result = old_previewMode_show.call(previewMode, ...args2) 
+            let view = getView()
+            void renderTitleIcon(view, plugin)
+            return result
+          }
+
+
         }
 
 

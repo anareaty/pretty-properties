@@ -135,6 +135,10 @@ export interface PPPluginSettings {
 	showSelectionButtons: boolean
 	propertySelectSettingRevealed: string
 	propertySelectPathRevealed: string | undefined
+	stripLucidePrefix: boolean
+	iconColorLightProperty: string
+	iconColorDarkProperty: string
+	iconBgProperty: string
 }
 
 
@@ -298,7 +302,11 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	showProgressBars: false,
 	showSelectionButtons: false,
 	propertySelectSettingRevealed: "",
-	propertySelectPathRevealed: undefined
+	propertySelectPathRevealed: undefined,
+	stripLucidePrefix: false,
+	iconColorLightProperty: "icon_color_light",
+	iconColorDarkProperty: "icon_color_dark",
+	iconBgProperty: "icon_bg"
 }
 
 

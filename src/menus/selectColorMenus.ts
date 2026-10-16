@@ -221,6 +221,8 @@ export const setColorMenuItems = (
 
 
 
+    
+
 
 
 
@@ -229,11 +231,33 @@ export const setColorMenuItems = (
         item.setIcon("square");
         item.iconEl.classList.add("menu-item-custom-color")
         item.onClick(() => {
-            new ColorPickerModal(colorType, pillColorSettings, saveCallback, plugin).open()
+
+            let savedColor: string | HSL | undefined
+            if (pillColorSettings && (colorType == "pillColor" || colorType == "textColor")) {
+                savedColor = pillColorSettings[colorType]
+            }
+
+            const colorPickerSaveCallback = (hsl: HSL, hex: string) => {
+                if (!pillColorSettings) {
+                    pillColorSettings = {
+                      pillColor: "default",
+                      textColor: "default"
+                    }
+                }
+
+                if (colorType == "pillColor" || colorType == "textColor") {
+                    pillColorSettings[colorType] = hsl
+                }
+
+                saveCallback(pillColorSettings)
+            }
+
+            new ColorPickerModal(savedColor, colorPickerSaveCallback, plugin).open()
         })
             item.setChecked(savedColor != undefined && typeof savedColor != "string" && !extraColorChecked)
     })
 }
+
 
 
 

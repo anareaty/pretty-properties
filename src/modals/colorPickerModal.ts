@@ -1,25 +1,21 @@
-import { Modal, Setting } from "obsidian";
+import { HSL, Modal, Setting } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
-import { PillColorSettings } from "src/settings/settings";
 
 
 
 export class ColorPickerModal extends Modal {
     plugin: PrettyPropertiesPlugin
-    colorType: string
-    pillColorSettings: PillColorSettings | undefined
-    saveCallback: (pillColorSettings: PillColorSettings | undefined) => void
+    saveCallback: (hsl: HSL, hex: string) => void
+    savedColor: string | HSL | undefined
 
     constructor(
-        colorType: string,
-        pillColorSettings: PillColorSettings | undefined,
-        saveCallback: (pillColorSettings: PillColorSettings | undefined) => void,
+        savedColor: string | HSL | undefined,
+        saveCallback: (hsl: HSL, hex: string) => void,
         plugin: PrettyPropertiesPlugin, 
     ) {
         super(plugin.app);
         this.plugin = plugin
-        this.colorType = colorType
-        this.pillColorSettings = pillColorSettings
+        this.savedColor = savedColor
         this.saveCallback = saveCallback
     }
     
@@ -30,30 +26,19 @@ export class ColorPickerModal extends Modal {
         new Setting(contentEl)
         .addColorPicker(color => {
 
-            if (this.pillColorSettings && (this.colorType == "pillColor" || this.colorType == "textColor")) {
-                let savedColor = this.pillColorSettings[this.colorType]
+            if (this.savedColor) {
 
-                if (savedColor && typeof savedColor != "string") {
-                    color.setValueHsl(savedColor)
+                if (typeof this.savedColor == "string") {
+                    color.setValue(this.savedColor)
+                } else {
+                    color.setValueHsl(this.savedColor)
                 }
+                
             }
             
             color.onChange(async (value) => {
                 let hsl = color.getValueHsl()
-            
-                
-                if (!this.pillColorSettings) {
-                    this.pillColorSettings = {
-                      pillColor: "default",
-                      textColor: "default"
-                    }
-                }
-
-                if (this.colorType == "pillColor" || this.colorType == "textColor") {
-                    this.pillColorSettings[this.colorType] = hsl
-                }
-
-                this.saveCallback(this.pillColorSettings)
+                this.saveCallback(hsl, value)
             })
         })
     }

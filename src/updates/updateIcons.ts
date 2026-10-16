@@ -25,20 +25,20 @@ export const renderIcon = async (
 
 
 
-    let oldIconDivSource: Element | undefined
+    let oldIconDivSource: HTMLElement | undefined
     let oldIconDivSources = source?.querySelectorAll(".icon-wrapper");
     if (oldIconDivSources) {
       oldIconDivSources.forEach((div, i) => {
-        if (i == 0) oldIconDivSource = div
+        if (i == 0) oldIconDivSource = div as HTMLElement
         else div.remove()
       })
     } 
 
-    let oldIconDivPreview: Element | undefined
+    let oldIconDivPreview: HTMLElement | undefined
     let oldIconDivPreviews = preview?.querySelectorAll(".icon-wrapper");
     if (oldIconDivPreviews) {
       oldIconDivPreviews.forEach((div, i) => {
-        if (i == 0) oldIconDivPreview = div
+        if (i == 0) oldIconDivPreview = div as HTMLElement
         else div.remove()
       })
     } 
@@ -50,6 +50,28 @@ export const renderIcon = async (
     let titleIconWrapper = contentEl?.querySelector(".title-icon-wrapper");
 
     let iconVal = getIconValue(frontmatter, plugin)
+    let iconColorValLight = getNestedProperty(frontmatter, plugin.settings.iconColorLightProperty)
+    if (typeof iconColorValLight != "string") iconColorValLight = ""
+    let iconColorValDark = getNestedProperty(frontmatter, plugin.settings.iconColorDarkProperty)
+    if (typeof iconColorValDark != "string") iconColorValDark = ""
+
+    let iconBgColor = ""
+    let iconBgVal = getNestedProperty(frontmatter, plugin.settings.iconBgProperty)
+    if (iconBgVal) {
+        iconBgColor = "var(--background-primary)"
+    } else if (iconBgVal === false) {
+        iconBgColor = "transparent"
+    }
+
+
+
+    contentEl.setCssProps({
+        "--pp-icon-color-light": iconColorValLight,
+        "--pp-icon-color-dark": iconColorValDark,
+        "--pp-icon-background": iconBgColor 
+    })
+
+    
 
     let oldIconValue
     if (plugin.settings.iconInTitle) {
@@ -61,6 +83,9 @@ export const renderIcon = async (
     if (!iconVal && !oldIconValue) return
 
     if (iconVal == oldIconValue) {
+
+
+
         if (plugin.settings.iconInTitle && titleIconWrapper) return
         if (!plugin.settings.iconInTitle && oldIconDivSource) return
     }
@@ -116,6 +141,8 @@ export const renderIcon = async (
 
                 titleWrapper = createDiv()
                 titleWrapper.classList.add("title-wrapper")
+
+                
                 
                 
                 titleWrapper.append(inlineTitle)
@@ -154,6 +181,8 @@ export const renderIcon = async (
             let iconDiv = createDiv();
             iconDiv.setAttribute("data-value", iconVal)
             iconDiv.classList.add("icon-wrapper");
+
+
 
             if (image) {
 

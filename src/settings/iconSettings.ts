@@ -33,18 +33,6 @@ export const getIconSettingsDefinitions = (tab: PPSettingTab) => {
             }));
             }
         }, {
-            name: i18n.t("ICON_IN_TITLE"),
-            visible: visible,
-            render: (setting: Setting) => {
-                setting.addToggle(toggle => toggle
-            .setValue(plugin.settings.iconInTitle)
-            .onChange(async (value) => {
-                plugin.settings.iconInTitle = value
-                await plugin.saveSettings();
-                updateAllIcons(plugin)
-            }));
-            }
-        }, {
             name: i18n.t("ICON_PROPERTY"),
             visible: visible,
             render: (setting: Setting) => {
@@ -66,11 +54,148 @@ export const getIconSettingsDefinitions = (tab: PPSettingTab) => {
                 key: "iconsFolder"
             }
         }, {
+            name: i18n.t("ICON_IN_TITLE"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addToggle(toggle => toggle
+            .setValue(plugin.settings.iconInTitle)
+            .onChange(async (value) => {
+                plugin.settings.iconInTitle = value
+                await plugin.saveSettings();
+                updateAllIcons(plugin)
+            }));
+            }
+        }, {
+            name: i18n.t("TEXT_ICON_IN_TITLE_MATCH_TITLE_SIZE"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addToggle(toggle => toggle
+            .setValue(plugin.settings.titleTextIconMatchTitleSize)
+            .onChange(async (value) => {
+                plugin.settings.titleTextIconMatchTitleSize = value
+                await plugin.saveSettings();
+                updateIconStyles(plugin);
+            }));
+
+            }
+        },{
+            name: i18n.t("STRIP_LUCIDE_PREFIX"),
+            visible,
+            control: {
+              type: "toggle",
+              key: "stripLucidePrefix"
+            }
+        }, {
             name: i18n.t("SHOW_ICONS_IN_PAGE_PREVIEWS"),
             visible: visible,
             control: {
                 type: "toggle",
                 key: "enableIconsInPopover"
+            }
+        }, {
+            name: i18n.t("ICON_BACKGROUND"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addToggle(toggle => toggle
+            .setValue(plugin.settings.iconBackground)
+            .onChange(async (value) => {
+                plugin.settings.iconBackground = value
+                await plugin.saveSettings();
+                updateIconStyles(plugin);
+            }));
+
+            }
+        }, {
+            name: i18n.t("ICON_COLOR_LIGHT"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addColorPicker(color => color
+            .setValue(plugin.settings.iconColor)
+            .onChange(async (value) => {
+                plugin.settings.iconColor = value
+                await plugin.saveSettings();
+                updateIconStyles(plugin);
+            })
+        )
+        .addExtraButton(btn => btn
+            .setIcon("rotate-ccw")
+            .onClick(async () => {
+                plugin.settings.iconColor = ""
+                if (requireApiVersion("1.13.0")) {
+                    tab.update()			
+                }
+                await plugin.saveSettings();
+                updateIconStyles(plugin);
+                
+            })
+        )
+
+            }
+        }, {
+            name: i18n.t("ICON_COLOR_DARK"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addColorPicker(color => color
+            .setValue(plugin.settings.iconColorDark)
+            .onChange(async (value) => {
+                plugin.settings.iconColorDark = value
+                await plugin.saveSettings();
+                updateIconStyles(plugin);
+            })
+        )
+        .addExtraButton(btn => btn
+            .setIcon("rotate-ccw")
+            .onClick(async () => {
+                plugin.settings.iconColorDark = ""
+                if (requireApiVersion("1.13.0")) {
+                    tab.update()			
+                }
+                await plugin.saveSettings();
+                updateIconStyles(plugin);
+                
+                
+            })
+        )
+
+            }
+        }, {
+            name: i18n.t("ICON_BACKGROUND_PROPERTY"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => text
+            .setValue(plugin.settings.iconBgProperty)
+            .onChange(async (value) => {
+                plugin.settings.iconBgProperty = value;
+                await plugin.saveSettings();
+                updateAllIcons(plugin)
+            }));
+
+            }
+        },{
+            name: i18n.t("ICON_COLOR_PROPERTY_LIGHT"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => text
+            .setValue(plugin.settings.iconColorLightProperty)
+            .onChange(async (value) => {
+                plugin.settings.iconColorLightProperty = value;
+                await plugin.saveSettings();
+                updateAllIcons(plugin)
+            }));
+
+            }
+        }, {
+            name: i18n.t("ICON_COLOR_PROPERTY_DARK"),
+            visible: visible,
+            render: (setting: Setting) => {
+                setting.addText(text => text
+            .setValue(plugin.settings.iconColorDarkProperty)
+            .onChange(async (value) => {
+                plugin.settings.iconColorDarkProperty = value;
+                await plugin.saveSettings();
+                updateAllIcons(plugin)
+            }));
+
             }
         }, {
             name: i18n.t("ICON_SIZE"),
@@ -138,85 +263,6 @@ export const getIconSettingsDefinitions = (tab: PPSettingTab) => {
                 updateIconStyles(plugin);
             })
         });
-
-            }
-        }, {
-            name: i18n.t("TEXT_ICON_IN_TITLE_MATCH_TITLE_SIZE"),
-            visible: visible,
-            render: (setting: Setting) => {
-                setting.addToggle(toggle => toggle
-            .setValue(plugin.settings.titleTextIconMatchTitleSize)
-            .onChange(async (value) => {
-                plugin.settings.titleTextIconMatchTitleSize = value
-                await plugin.saveSettings();
-                updateIconStyles(plugin);
-            }));
-
-            }
-        }, {
-            name: i18n.t("ICON_COLOR"),
-            visible: visible,
-            render: (setting: Setting) => {
-                setting.addColorPicker(color => color
-            .setValue(plugin.settings.iconColor)
-            .onChange(async (value) => {
-                plugin.settings.iconColor = value
-                await plugin.saveSettings();
-                updateIconStyles(plugin);
-            })
-        )
-        .addExtraButton(btn => btn
-            .setIcon("rotate-ccw")
-            .onClick(async () => {
-                plugin.settings.iconColor = ""
-                if (requireApiVersion("1.13.0")) {
-                    tab.update()			
-                }
-                await plugin.saveSettings();
-                updateIconStyles(plugin);
-                
-            })
-        )
-
-            }
-        }, {
-            name: i18n.t("ICON_COLOR_DARK"),
-            visible: visible,
-            render: (setting: Setting) => {
-                setting.addColorPicker(color => color
-            .setValue(plugin.settings.iconColorDark)
-            .onChange(async (value) => {
-                plugin.settings.iconColorDark = value
-                await plugin.saveSettings();
-                updateIconStyles(plugin);
-            })
-        )
-        .addExtraButton(btn => btn
-            .setIcon("rotate-ccw")
-            .onClick(async () => {
-                plugin.settings.iconColorDark = ""
-                if (requireApiVersion("1.13.0")) {
-                    tab.update()			
-                }
-                await plugin.saveSettings();
-                updateIconStyles(plugin);
-                
-                
-            })
-        )
-
-            }
-        }, {
-            name: i18n.t("ICON_BACKGROUND"),
-            visible: visible,
-            render: (setting: Setting) => {
-                setting.addToggle(toggle => toggle
-            .setValue(plugin.settings.iconBackground)
-            .onChange(async (value) => {
-                plugin.settings.iconBackground = value
-                await plugin.saveSettings();
-                updateIconStyles(plugin);
-            }));
 
             }
         }, {
@@ -352,6 +398,16 @@ export const showIconSettings = (settingTab: PPSettingTab) => {
                 await plugin.saveSettings();
                 settingTab.display();
                 updateAllIcons(plugin)
+            }));
+
+
+        new Setting(containerEl)
+        .setName(i18n.t("STRIP_LUCIDE_PREFIX"))
+        .addToggle(toggle => toggle
+            .setValue(plugin.settings.stripLucidePrefix)
+            .onChange(async (value) => {
+                plugin.settings.stripLucidePrefix = value
+                await plugin.saveSettings();
             }));
 
 

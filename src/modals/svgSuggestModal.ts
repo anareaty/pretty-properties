@@ -6,11 +6,13 @@ import { setNestedProperty } from "src/utils/propertyUtils";
 export class SvgSuggestModal extends SuggestModal<string> {
     propName: string
     iconIds: string[]
+    plugin: PrettyPropertiesPlugin
 
     constructor(app: App, plugin: PrettyPropertiesPlugin) {
         super(app)
         this.propName = plugin.settings.iconProperty;
         this.iconIds = getIconIds();
+        this.plugin = plugin
     }
 
     getSuggestions(query: string): string[] {
@@ -26,6 +28,9 @@ export class SvgSuggestModal extends SuggestModal<string> {
     }
     onChooseSuggestion(id: string) {
         if (id) {
+            if (this.plugin.settings.stripLucidePrefix) {
+                id = id.replace(/^lucide-/, "")
+            }
             let file = this.app.workspace.getActiveFile();
             if (file instanceof TFile) {
                 void this.app.fileManager.processFrontMatter(file, (fm: FrontMatterCache) => {

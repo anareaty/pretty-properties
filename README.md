@@ -77,7 +77,7 @@ If you are using some other banner plugin, like Pixel Banner or Simple Banner, i
 
 # Icon
 
-You can add icons alongside tha banner or just on their own. To do this run the command "Select icon". This will ad the "icon" property to you note. For the icon you can use images, built-in Lucide icons or any symbols, including emoji. You can set a specific folder to look for local icon images.
+You can add icons alongside tha banner or just on their own. To do this run the command "Select icon". This will ad the "icon" property to you note. For the icon you can use images, built-in Obsidian icons or any symbols, including emoji. You can set a specific folder to look for local icon images.
 
 You can edit the icon property manually. There are the supported kinds of property data for icons:
 - for image icons:
@@ -86,7 +86,7 @@ You can edit the icon property manually. There are the supported kinds of proper
   - raw URL links: `https://...`;
   - raw file links: `file://...`;
   - base64-encoded images: `data:image/...base64...`;
-- for SVG icons add the name of lucide icon, for example `star`;
+- for SVG icons add the name of the icon, for example `star`;
 - any other text will be rendered as is, you can use it to add the one or several emojis or some additional title. Just keep in mind that the icon text will not wrap, so don't make it too long.
 
 In the settings you can select the opion to show icon inside the inline title instead of the top of the note. 

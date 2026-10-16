@@ -18,7 +18,7 @@ export class IconSuggestModal extends SuggestModal<string> {
         this.options = {
             image: i18n.t("SELECT_LOCAL_IMAGE"),
             link: i18n.t("EXTERNAL_IMAGE"),
-            svg: i18n.t("LUCIDE_ICON"),
+            svg: i18n.t("OBSIDIAN_ICON"),
             emoji: i18n.t("EMOJI"),
         };
     }

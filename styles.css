@@ -1405,7 +1405,6 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 
 
 
-
 .pp-pill-padding-all .metadata-input-number {
   padding-left: calc(var(--tag-padding-x) + 8px);
 }
