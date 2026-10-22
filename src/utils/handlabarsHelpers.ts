@@ -284,7 +284,7 @@ export const registerCustomHelpers = (handlebars: typeof Handlebars) => {
 
         if (format && hasKey(momentObj, format)) {
             let getMomentOutput = momentObj[format] as (f: typeof formatParams, f1: typeof formatParams1, f2: typeof formatParams2) => string
-            momentOutput = getMomentOutput(formatParams, formatParams1, formatParams2)
+			momentOutput = getMomentOutput.call(momentObj, formatParams, formatParams1, formatParams2)
         } else {
             momentOutput = momentObj.format(format)
         }
