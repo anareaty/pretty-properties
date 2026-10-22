@@ -48,6 +48,16 @@
 }
 
 
+.pp-image-color {
+  width: 100%;
+  height: var(--banner-height);
+  background-color: var(--pp-banner-color);
+  mask-image: var(--banner-fading);
+	-webkit-mask-image: var(--banner-fading);
+ 
+}
+
+
 .pp-banner-image {
   object-position: var(--banner-position);
 }
@@ -56,7 +66,13 @@
 
 
 
-
+.pp-image-gradient {
+  width: 100%;
+  height: var(--banner-height);
+  background-image: var(--pp-banner-gradient);
+  mask-image: var(--banner-fading);
+	-webkit-mask-image: var(--banner-fading);
+}
 
 
 
@@ -230,7 +246,8 @@
   height: var(--pp-icon-size);
   margin-top: var(--pp-icon-top-margin-wb);
   margin-left: var(--pp-icon-left-margin);
-  container-type: inline-size;
+  /*container-type: inline-size;*/
+  min-width: fit-content;
   background-color: var(--pp-icon-background);
   border-radius:8px;
   padding: 6px;
@@ -274,8 +291,10 @@
 
 
 .pp-icon .pp-text-icon {
-  font-size: 80cqw;
+  font-size: calc(var(--pp-icon-size) * 0.75);
   white-space: nowrap;
+  display: flex;
+  align-items: center;
 
 }
 
@@ -2035,3 +2054,71 @@ button.longtext-color-button:hover {
 
 
 
+
+
+
+.pp-image-buttons-row {
+  position: absolute;
+  z-index: 3;
+  top: var(--header-height);
+  left: 32px;
+  display: flex;
+  gap: 4px;
+  width: fit-content;
+  opacity: 0;
+}
+
+.pp-image-buttons-row:hover {
+  opacity: 1;
+}
+
+.view-content.has-banner .pp-image-buttons-row {
+  top: calc(var(--header-height) + 16px);
+}
+
+.pp-image-buttons-row button svg {
+  margin-right: 4px;
+ 
+}
+
+
+
+.gradient-preview-wrapper {
+  width: 100%; 
+  height: 112px; 
+  position: sticky;
+  top: 0;
+  padding-bottom: 12px;
+  background-color: var(--background-primary);
+  z-index: 1;
+}
+
+
+.gradient-preview-box {
+  width: 100%; 
+  height: 100%; 
+  border-radius: 4px; 
+  
+}
+
+
+.pp-gradient-color-wrapper {
+  background-color: var(--background-secondary);
+  padding: 8px;
+  border-radius: 4px;
+  margin: 0 0 8px;
+
+}
+
+.gradient-modal-buttons {
+  position: sticky;
+  bottom: 0;
+  padding-bottom: 16px;
+  margin-bottom: -16px;
+  margin-top: 16px;
+  background-color: var(--background-primary);
+}
+
+.modal-close-button {
+  z-index: 2;
+}

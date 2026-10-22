@@ -259,4 +259,29 @@ export default {
   SET_ICON_BACKGROUND: "Добавить фон иконки",
   REMOVE_ICON_BACKGROUND: "Отключить фон иконки",
   ICON_BACKGROUND_PROPERTY: "Свойство для фона иконки",
+
+
+
+  BANNER: "Баннер",
+  COVER: "Обложка",
+  ICON: "Иконка",
+
+
+
+  SELECT_BANNER: "Выбрать баннер",
+  COLOR: "Цвет",
+  GRADIENT: "Градиент",
+  LINEAR: "Линейный",
+  RADIAL: "Радиальный",
+  MESH: "Сетчатый",
+  RANDOM: "Случайный",
+
+
+
+  SET_BANNER_FADING: "Добавить выцветание баннера",
+  REMOVE_BANNER_FADING: "Убрать выцветание баннера",
+
+
+
+
 };

@@ -1,4 +1,4 @@
-import { TFile, CachedMetadata, MarkdownView, BasesView, HoverPopover, requireApiVersion } from "obsidian";
+import { TFile, CachedMetadata, MarkdownView, BasesView, HoverPopover, requireApiVersion, setIcon } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { renderCover, updateCoverForView } from "./updateCovers";
 import { renderIcon, updateIconForView } from "./updateIcons";
@@ -24,6 +24,10 @@ import { AliasesPropertyWidgetComponent,
 } from "@obsidian-typings/obsidian-public-latest";
 import { updateTags } from "src/extensions/tagFixExtension";
 import { KanbanBasesView, processBaseKanbanProperties } from "src/patches/patchBaseKanban";
+import { selectCoverImage } from "src/utils/imageUtils";
+import { IconSuggestModal } from "src/modals/iconSuggestModal";
+import { BannerSuggestModal } from "src/modals/bannerSuggestModal";
+import { i18n } from "src/localization/localization";
 
 
 interface Popover extends HoverPopover {
@@ -33,6 +37,8 @@ interface Popover extends HoverPopover {
 
 
 export const updateAllProperties = (plugin:PrettyPropertiesPlugin) => { 
+
+    
 
 
 
@@ -254,6 +260,8 @@ export const updateImagesForView = (view: MarkdownView, plugin: PrettyProperties
 
 
 export const updateImagesOnCacheChanged = (file: TFile, cache: CachedMetadata, plugin: PrettyPropertiesPlugin) => {
+
+    
     
     let sourcePath = file.path || ""
 
@@ -300,6 +308,24 @@ export const updateImagesWithCacheForView = (cache: CachedMetadata, view: Markdo
         enableCover = plugin.settings.enableCover && plugin.settings.enableCoversInPopover
         enableIcon = plugin.settings.enableIcon && plugin.settings.enableIconsInPopover
     }
+
+    let bannerPropVal
+    let iconPropVal
+    let hasCover = false
+
+    if (frontmatter) {
+        for (let extraCover of plugin.settings.coverProperties) {
+            if (getNestedProperty(frontmatter, extraCover.property)) {
+                hasCover = true
+                break
+            }
+        }
+
+        bannerPropVal = getNestedProperty(frontmatter, plugin.settings.bannerProperty)
+        iconPropVal = getNestedProperty(frontmatter, plugin.settings.iconProperty)
+    }
+
+    renderImageButtons(bannerPropVal, iconPropVal, hasCover, contentEl, view, plugin)
     
     if (frontmatter && getNestedProperty(frontmatter, plugin.settings.bannerProperty)  && enableBanner) {
         void renderBanner(contentEl, frontmatter, sourcePath, view, plugin);
@@ -311,16 +337,7 @@ export const updateImagesWithCacheForView = (cache: CachedMetadata, view: Markdo
         contentEl.classList.remove("has-banner")
     }
 
-    let hasCover = false
-
-    if (frontmatter) {
-        for (let extraCover of plugin.settings.coverProperties) {
-            if (getNestedProperty(frontmatter, extraCover.property)) {
-                hasCover = true
-                break
-            }
-        }
-    }
+    
 
     if (frontmatter && hasCover && enableCover) {
         void renderCover(view, contentEl, frontmatter, sourcePath, plugin);
@@ -517,7 +534,56 @@ export const removeExtraElementsForView = (view: MarkdownView | WidgetEditorView
 
 
 
+var renderImageButtons = (bannerPropVal: unknown, iconPropVal:unknown, hasCover:boolean, contentEl:HTMLElement, view: MarkdownView | HoverPopover, plugin: PrettyPropertiesPlugin) => {
 
+    let existingButtonsRow = contentEl.querySelector(".pp-image-buttons-row")
+    existingButtonsRow?.remove()
+  
+    if (plugin.settings.enableImageButtons) {
+      let buttonsRow = document.createElement("div")
+      buttonsRow.classList.add("pp-image-buttons-row")
+  
+      if (!bannerPropVal && plugin.settings.enableBanner && plugin.settings.bannerProperty) {
+        let addBannerButton = buttonsRow.createEl("button")
+        setIcon(addBannerButton, "image-plus")
+        addBannerButton.append(i18n.t("BANNER"))
+
+
+        addBannerButton.onclick = () => {
+          new BannerSuggestModal(plugin.app, plugin).open()
+        }
+      }
+
+  
+      if (!hasCover && plugin.settings.enableCover && (plugin.settings.coverProperties[0]?.property)) {
+        let addCoverButton = buttonsRow.createEl("button")
+
+        setIcon(addCoverButton, "image-plus")
+        addCoverButton.append(i18n.t("COVER"))
+
+        addCoverButton.onclick = () => {
+          selectCoverImage(plugin)
+        }
+      }
+  
+      if (!iconPropVal && plugin.settings.enableIcon && plugin.settings.iconProperty) {
+        let addIconButton = buttonsRow.createEl("button")
+
+        setIcon(addIconButton, "image-plus")
+        addIconButton.append(i18n.t("ICON"))
+
+  
+        addIconButton.onclick = () => {
+          new IconSuggestModal(plugin.app, plugin).open()
+        }
+      }
+  
+      contentEl.prepend(buttonsRow)
+    }
+  
+    
+  
+  }
 
 
 

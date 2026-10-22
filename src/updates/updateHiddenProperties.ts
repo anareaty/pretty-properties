@@ -26,6 +26,8 @@ export const updateHiddenCSSClasses = (propEl: HTMLElement, propName: string, pl
 // It also helps us to handle property renaming
 
 export const updateMetadataEditor = (metadataEditor: MetadataEditor, plugin: PrettyPropertiesPlugin) => {
+
+    
     let mcHidden = true
 
   
@@ -67,7 +69,10 @@ export const updateMetadataEditor = (metadataEditor: MetadataEditor, plugin: Pre
 // because it is probably not active when this function is called
 
 export const updateHiddenProperties = (plugin: PrettyPropertiesPlugin) => {
+
     
+
+
     let leaves = plugin.app.workspace.getLeavesOfType("markdown");
     for (let leaf of leaves) {
         let view = leaf.view

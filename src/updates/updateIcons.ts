@@ -65,6 +65,7 @@ export const renderIcon = async (
 
 
 
+    
     contentEl.setCssProps({
         "--pp-icon-color-light": iconColorValLight,
         "--pp-icon-color-dark": iconColorValDark,

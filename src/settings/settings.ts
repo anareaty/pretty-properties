@@ -139,6 +139,8 @@ export interface PPPluginSettings {
 	iconColorLightProperty: string
 	iconColorDarkProperty: string
 	iconBgProperty: string
+	bannerFadingProperty: string
+	enableImageButtons: boolean
 }
 
 
@@ -306,7 +308,9 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	stripLucidePrefix: false,
 	iconColorLightProperty: "icon_color_light",
 	iconColorDarkProperty: "icon_color_dark",
-	iconBgProperty: "icon_bg"
+	iconBgProperty: "icon_bg",
+	bannerFadingProperty: "banner_fade",
+	enableImageButtons: true,
 }
 
 

@@ -74,6 +74,22 @@ export const renderBanner = async (
       return
     }
 
+
+
+    const setBannerFading = () => {
+      let bannerFading = ""
+        let bannerFadingVal = getNestedProperty(frontmatter, plugin.settings.bannerFadingProperty)
+
+        if (bannerFadingVal) {
+          bannerFading = "linear-gradient(to bottom, black 25%, transparent)"
+        } else if (bannerFadingVal === false) {
+            bannerFading = "none"
+        }
+
+        contentEl.setCssProps({
+            "--banner-fading": bannerFading
+        })
+    }
     
 
     let bannerDiv: HTMLElement | undefined
@@ -83,6 +99,7 @@ export const renderBanner = async (
     let oldBannerValue = oldBannerDivSource?.getAttribute("data-value") || ""
 
     if (bannerVal == oldBannerValue) {
+      
       let oldPositionValue = oldBannerDivSource?.getAttribute("data-position") || ""
 
       if (positionString != oldPositionValue) {
@@ -94,6 +111,8 @@ export const renderBanner = async (
         oldBannerDivSource?.setAttribute("data-position", positionString)
         oldBannerDivPreview?.setAttribute("data-position", positionString)
       }
+
+      setBannerFading()
       return
     }
 
@@ -103,6 +122,17 @@ export const renderBanner = async (
       bannerDiv = await renderImageFromValue(bannerVal, "banner", sourcePath, component, plugin)
       
       if (bannerDiv) {
+
+
+        
+        setBannerFading()
+
+
+
+
+
+
+
         contentEl.classList.add("has-banner")
         bannerDiv.setAttribute("data-position", positionString)
         bannerDiv.setCssProps({

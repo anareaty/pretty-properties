@@ -13,6 +13,8 @@ const localFileRegex = /^(file:\/\/\/\/.).+\.[a-z]{2,6}$/i;
 const wikiLinkRegex = /^\[\[.+?\]\]$/;
 const imagePathRegex = /^[^\n]+\.(?:avif|bmp|gif|jpeg|jpg|png|svg|webp)$/
 const base64Regex = /^data:image\/.*?;base64.*/i;
+const colorHexRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/
+const gradientRegex = /^(?:linear|radial)-gradient\(.+$/
 
 
 
@@ -187,7 +189,27 @@ export const renderImageFromValue = async (
 		return createImageWrapper(img, value, "mode-image", type)
 	}
 
-    if (type == "banner") return
+    if (type == "banner") {
+
+        if (colorHexRegex.test(value)) {
+        let colorBlock = createEl("div", {cls: "pp-image-color"})
+        colorBlock.setCssProps({
+            "--pp-banner-color": value
+        })
+        return createImageWrapper(colorBlock, value, "mode-color", type)
+        }
+        
+          
+        if (gradientRegex.test(value)) {
+            let colorBlock = createEl("div", {cls: "pp-image-gradient"})
+            colorBlock.setCssProps({
+                "--pp-banner-gradient": value
+            })
+            return createImageWrapper(colorBlock, value, "mode-gradient", type)
+        }
+        
+        return
+    }
 
     const svg = imageTemp.querySelector("svg");
 	if (svg instanceof SVGElement) {

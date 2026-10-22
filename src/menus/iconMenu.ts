@@ -25,6 +25,8 @@ export const handleIconMenu = (menu: Menu, plugin: PrettyPropertiesPlugin, icon:
 
     
 
+        
+
     .addItem((item: MenuItem) => item
         .setTitle(i18n.t("REMOVE_ICON"))
         .setIcon("image-off")
@@ -103,13 +105,15 @@ export const handleIconMenu = (menu: Menu, plugin: PrettyPropertiesPlugin, icon:
                     .setSection("pretty-properties")
                     .onClick(async () => {
                         if (file instanceof TFile) {
-                            void plugin.app.fileManager.processFrontMatter(file, (fm: FrontMatterCache) => {
+                            await plugin.app.fileManager.processFrontMatter(file, (fm: FrontMatterCache) => {
                                 if (plugin.settings.iconBackground) {
                                     deleteNestedProperty(fm, iconBgProperty);
                                 } else {
                                     setNestedProperty(fm, iconBgProperty, true);
                                 }
                             });
+
+                            //updateHiddenProperties(plugin)
                         }
                     }))
             } else {

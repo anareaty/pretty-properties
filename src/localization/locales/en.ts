@@ -249,4 +249,23 @@ export default {
   SET_ICON_BACKGROUND: "Set icon background",
   REMOVE_ICON_BACKGROUND: "Remove icon background",
   ICON_BACKGROUND_PROPERTY: "Icon background property",
+
+
+
+  ADD_BANNER: "Add banner",
+  ADD_COVER: "Add cover",
+  ADD_ICON: "Add icon",
+
+
+  SELECT_BANNER: "Select banner",
+  COLOR: "Color",
+  GRADIENT: "Gradient",
+  LINEAR: "Linear",
+  RADIAL: "Radial",
+  MESH: "Mesh",
+  RANDOM: "Random",
+
+
+  SET_BANNER_FADING: "Set banner fading",
+  REMOVE_BANNER_FADING: "Remove banner fading",
 };
