@@ -80,7 +80,6 @@ export default {
   HIDE_ICON_PROPERTY: "Скрыть свойства иконки",
   UNHIDE_ICON_PROPERTY: "Показать свойства иконки",
   ICON_BACKGROUND: "Включить фон иконки по умолчанию",
-  EXTERNAL_IMAGE: "Вставить ссылку вручную",
   LINK_TO_EXTERNAL_IMAGE: "Ссылка на внешнее изображение",
   SAVE: "Сохранить",
   SHOW_IMAGES_MENU: "Показать меню изображений",
@@ -237,7 +236,7 @@ export default {
   NN_INTEGRATION: "Интеграция с плагином Notebook Navigator",
   SET_NN_COLORS: "Изменять цвета в Notebook Navigator при изменении цвета свойств в Pretty Properties",
   SET_PP_COLORS_FROM_NN: "Изменять цвета в Pretty Properties при изменении цвета свойств в Notebook Navigator",
-  ADD_LINK_MANUALLY: "Добавить ссылку на изображение вручную",
+  ADD_LINK_MANUALLY: "Вставить ссылку вручную",
   ADD_IMAGE_LINK: "Ссылка на изображение",
   ADD_IMAGE_LINK_DESC: "Это может быть Wiki-ссылка, Markdown-ссылка, ссылка на внешнее изображение или путь к файлу. Также можно вставить изображение, кодированное как base64.",
   EDIT_COLOR_MENU: "Редактировать цвета меню",
@@ -280,6 +279,25 @@ export default {
 
   SET_BANNER_FADING: "Добавить выцветание баннера",
   REMOVE_BANNER_FADING: "Убрать выцветание баннера",
+
+
+  ANGLE: "Угол",
+  OPACITY: "Непрозрачность",
+  SIZE: "Размер",
+  TYPE: "Тип",
+
+  ADD_COLOR: "Добавить цвет",
+  RANDOMIZE: "Случайно",
+  SAVE_GRADIENT: "Сохранить градиент",
+
+  RADIAL_GRADIENT_TYPE: "Тип радиального градиента",
+  POSITION: "Положение",
+  CIRCLE_GRAD: "круг",
+  ELLIPSE_GRAD: "эллипс",
+
+  INNER_OUTER_RADIUS: "Внутренний / внешний радиус",
+
+  ENABLE_IMAGE_TOP_BUTTONS: "Показывать кнопки для добавления изображений вверху заметки",
 
 
 

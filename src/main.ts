@@ -20,7 +20,7 @@ import {
 import { i18n } from "./localization/localization";
 import { PPSettingTab, PPPluginSettings, DEFAULT_SETTINGS } from "./settings/settings";
 import { registerCommands } from "./utils/registerCommands";
-import {updateEmptyProperties, updateImagesOnCacheChanged, updateSourcePaths } from "./updates/updateElements";
+import {updateImagesOnCacheChanged, updateSourcePaths } from "./updates/updateElements";
 import { registerTagFixExtension } from "./extensions/tagFixExtension";
 import { updatePillPaddings } from "./updates/updateStyles";
 import { registerTagPostProcessor } from "./extensions/tagPostProcessor";
@@ -92,7 +92,6 @@ export default class PrettyPropertiesPlugin extends Plugin {
 		updateIconStyles(this);
 		updateCoverStyles(this);
 		updatePillPaddings(this)
-		updateEmptyProperties(this)
 		updatePropertiesInPropTab(this)
 		updateHiddenEmptyProperties(this)
 		updateHiddenMetadataContainer(this)

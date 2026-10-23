@@ -69,7 +69,6 @@ export default {
   UNHIDE_ICON_PROPERTY: "Unhide icon properties",
   HIDE_ICON_PROPERTY: "Hide icon properties",
   ICON_BACKGROUND: "Add icon background by default",
-  EXTERNAL_IMAGE: "Add link manually",
   LINK_TO_EXTERNAL_IMAGE: "Link to external image",
   SAVE: "Save",
   SHOW_IMAGES_MENU: "Show images menu",
@@ -227,7 +226,7 @@ export default {
   NN_INTEGRATION: "Notebook Navigator integration",
   SET_NN_COLORS: "Set Notebook Navigator colors from Pretty Properties",
   SET_PP_COLORS_FROM_NN: "Set Pretty Properties colors from Notebook Navigator",
-  ADD_LINK_MANUALLY: "Add an image link manually",
+  ADD_LINK_MANUALLY: "Add link manually",
   ADD_IMAGE_LINK: "Image link",
   ADD_IMAGE_LINK_DESC: "You can use Wikilink, Markdown link, raw external link or file path. You can also paste base64 encoded image.",
   EDIT_COLOR_MENU: "Edit color menu",
@@ -268,4 +267,23 @@ export default {
 
   SET_BANNER_FADING: "Set banner fading",
   REMOVE_BANNER_FADING: "Remove banner fading",
+
+
+  ANGLE: "Angle",
+  OPACITY: "Opacity",
+  SIZE: "Size",
+  TYPE: "Type",
+
+  ADD_COLOR: "Add color",
+  RANDOMIZE: "Randomize",
+  SAVE_GRADIENT: "Save gradient",
+
+  RADIAL_GRADIENT_TYPE: "Radial gradient type",
+  POSITION: "Position",
+  CIRCLE_GRAD: "circle",
+  ELLIPSE_GRAD: "ellipse",
+
+  INNER_OUTER_RADIUS: "Inner / outer radius",
+
+  ENABLE_IMAGE_TOP_BUTTONS: "Show image buttons on the top of the note",
 };

@@ -2,7 +2,7 @@ import { Setting, Notice, Platform, Modal, requireApiVersion } from 'obsidian';
 import { i18n } from 'src/localization/localization';
 import { DEFAULT_SETTINGS, PPSettingTab } from 'src/settings/settings';
 import { updateAutoHideProps, updateBannerStyles, updateCoverStyles, updateHiddenEmptyProperties, updateHiddenMetadataContainer, updatePropertiesInPropTab, updateHideMetadataAddButton, updateHidePropTitle, updateIconStyles, updatePillPaddings, updateRelativeDateColors } from 'src/updates/updateStyles';
-import { updateAllProperties } from 'src/updates/updateElements';
+import { updateAllImageButtons, updateAllProperties } from 'src/updates/updateElements';
 import { updateLongTexts } from 'src/updates/updatePills';
 
 
@@ -50,6 +50,22 @@ export const getOtherSettingsDefinitions = (tab: PPSettingTab) => {
                 )
             }
         },
+
+        {
+            name: i18n.t("ENABLE_IMAGE_TOP_BUTTONS"),
+            render: (setting: Setting) => {
+                setting.addToggle(toggle => toggle
+                    .setValue(plugin.settings.enableImageButtons)
+                    .onChange(async (value) => {
+                        plugin.settings.enableImageButtons = value
+                        await plugin.saveSettings();
+                        updateAllImageButtons(plugin)
+                        		
+                    }));
+            }
+        },
+
+
         {
             name: i18n.t("ENABLE_MATH"),
             render: (setting: Setting) => {

@@ -127,13 +127,12 @@ class GradientTypeSuggestModal extends SuggestModal<string> {
         el.append(this.options[key]!);
     }
     onChooseSuggestion(val: string) {
-        var _a, _b;
         let file = this.plugin.app.workspace.getActiveFile();
         if (file instanceof TFile) {
         let bannerValue = "";
         let cache = this.plugin.app.metadataCache.getFileCache(file);
-        if (typeof ((_a = cache == null ? void 0 : cache.frontmatter) == null ? void 0 : _a[this.plugin.settings.bannerProperty]) == "string") {
-            bannerValue = (_b = cache == null ? void 0 : cache.frontmatter) == null ? void 0 : _b[this.plugin.settings.bannerProperty];
+        if (typeof cache?.frontmatter?.[this.plugin.settings.bannerProperty] == "string") {
+            bannerValue = cache.frontmatter[this.plugin.settings.bannerProperty] as "string"
         }
 
         const saveCalback = (newValue: string) => {

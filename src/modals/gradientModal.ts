@@ -1,6 +1,7 @@
-import { HSL, Modal, Setting } from "obsidian";
+import { HSL, Modal, Setting, Platform } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
-import { AngleUnit, ColorStop, GradientNode, LengthNode, LinearGradientNode, parse, RadialGradientNode, stringify } from "gradient-parser"
+import { ColorStop, DefaultRadialNode, GradientNode, LengthNode, LinearGradientNode, LinearOrientation, parse, PositionKeywordNode, PositionNode, RadialGradientNode, RadialOrientation, ShapeNode, stringify } from "gradient-parser"
+import { i18n } from "src/localization/localization";
 
 
 
@@ -44,12 +45,12 @@ export const generateRandomGradient = () => {
 
   if (chosenType === 'linear') {
     const angle = Math.floor(Math.random() * 360);
-    return `linear-gradient(${angle}deg, ${getContrastHexColor(baseHue, saturation)}, ${getContrastHexColor(baseHue, saturation)})`;
+    return `linear-gradient(${angle}deg, ${getContrastHexColor(baseHue, saturation)}, ${getContrastHexColor(baseHue, saturation)} 100%)`;
   } 
   
   else if (chosenType === 'radial') {
     const shape = Math.random() > 0.5 ? 'circle' : 'ellipse';
-    return `radial-gradient(${shape} at ${randomPercent()}% ${randomPercent()}%, ${getContrastHexColor(baseHue, saturation)}, ${getContrastHexColor(baseHue, saturation)})`;
+    return `radial-gradient(${shape} at ${randomPercent()}% ${randomPercent()}%, ${getContrastHexColor(baseHue, saturation)}, ${getContrastHexColor(baseHue, saturation)} 100%)`;
   } 
   
   else {
@@ -93,8 +94,13 @@ const ColorStopNode = class {
 
 
 class PositionAt {
-  constructor(xPos, yPos) {
-    this.type = "position",
+  type: "position"
+  value: {
+    x?: LengthNode | PositionKeywordNode;
+    y?: LengthNode | PositionKeywordNode;
+}
+  constructor(xPos: string, yPos: string) {
+    this.type = "position"
     this.value = {
       x: { type: "%", value: xPos },
       y: { type: "%", value: yPos }
@@ -105,6 +111,9 @@ class PositionAt {
 
 
 class PositionOrientation {
+  at: PositionNode
+  hasAtKeyword: boolean
+  type: string
 
   constructor(xPos: string, yPos: string) {
     this.at = new PositionAt(xPos, yPos)
@@ -116,12 +125,15 @@ class PositionOrientation {
 
 
 class PositionGradient {
-  constructor(color, colorLength, transparentLength, xPos, yPos) {
-    this.type = "radial-gradient",
-    this.orientation = [new PositionOrientation(xPos, yPos)],
+  type: string
+  orientation: PositionOrientation[]
+  colorStops: ColorStop[]
+  constructor(color: string, colorLength: string, transparentLength: string, xPos: string, yPos: string) {
+    this.type = "radial-gradient"
+    this.orientation = [new PositionOrientation(xPos, yPos)]
     this.colorStops = [
-      new ColorStopNode(color, colorLength),
-      new ColorStopNode("00000000", transparentLength)
+      new ColorStopNode(color, colorLength) as ColorStop,
+      new ColorStopNode("00000000", transparentLength)  as ColorStop
     ]
   }
 }
@@ -132,7 +144,6 @@ class PositionGradient {
 const createColorLengthSlider = (color: ColorStop, setting: Setting, updateCallback: () => void) => {
   setting.addSlider(
     (slider) => {
-      var _a2;
       slider.setLimits(0, 100, 1);
       slider.setDynamicTooltip();
       let sliderValue = color.length?.value || 0
@@ -153,35 +164,33 @@ const createColorLengthSlider = (color: ColorStop, setting: Setting, updateCallb
 
 
 const createPositionSlider = (container: HTMLElement, gradient: RadialGradientNode, updateCallback: () => void) => {
-  new Setting(container).setName("Position X / Y").addSlider(
+  new Setting(container).setName(i18n.t("POSITION") + " X / Y").addSlider(
     (slider) => {
-      var _a, _b;
       slider.setLimits(0, 100, 1);
       slider.setDynamicTooltip();
 
 
-      let orientation = gradient.orientation[0]
+      let orientation = gradient.orientation![0]
 
      
-      return slider.setValue(Number(gradient.orientation[0].at?.value.x?.value)).onChange((value) => {
+      return slider.setValue(Number(gradient.orientation![0]!.at?.value.x?.value)).onChange((value) => {
         let valueString = value.toString();
 
-        if (!orientation.at) {
-          orientation.at = new PositionAt("50", "50")
+        if (!orientation!.at) {
+          orientation!.at = new PositionAt("50", "50")
         }
 
-        gradient.orientation[0].at.value.x.value = valueString;
+        gradient.orientation![0]!.at!.value.x!.value = valueString;
         updateCallback()
       });
     }
   ).addSlider(
     (slider) => {
-      var _a, _b;
       slider.setLimits(0, 100, 1);
       slider.setDynamicTooltip();
-      return slider.setValue(Number(gradient.orientation[0].at?.value.y?.value)).onChange((value) => {
+      return slider.setValue(Number(gradient.orientation![0]!.at?.value.y?.value)).onChange((value) => {
         let valueString = value.toString();
-        gradient.orientation[0].at.value.y.value = valueString;
+        gradient.orientation![0]!.at!.value.y!.value = valueString;
         updateCallback()
       });
     }
@@ -202,6 +211,41 @@ const createColorStopSetting = (
   let colorHex: string
   let colorAlpha: string
   let alpha = 100;
+
+
+
+
+  if (color.type == "rgba" || color.type == "hsla") {
+    alpha = Number(color.value[3]) * 100
+
+    colorAlpha = Math.floor(alpha * 255 / 100).toString(16);
+    if (alpha == 100) {
+      colorAlpha = ""
+    } else if (alpha == 0) {
+      colorAlpha = "00"
+    }
+    if (colorAlpha.length == 1) colorAlpha = "0" + colorAlpha
+  }
+
+
+  if (color.type == "rgb" || color.type == "hsl") {
+    alpha = 100
+    colorAlpha = ""
+  }
+
+
+  if (color.type == "rgba" || color.type == "rgb") {
+    let value = color.value.slice(0,3)
+    colorHex = value.map(x => Number(x).toString(16).padStart(2, "0")).join("")
+  }
+
+
+  if (color.type == "hsla" || color.type == "hsl") {
+    let value = color.value.slice(0,3)
+    colorHex = convertHslToHex({ h: Number(value[0]), s: Number(value[1]), l: Number(value[2]) })
+    colorHex = colorHex.replace("#", "")
+  }
+
   if (color.type == "hex") {
     colorHex = color.value.slice(0, 6);
     colorAlpha = color.value.slice(6);
@@ -224,23 +268,33 @@ const createColorStopSetting = (
     alpha = 0
   }
 
-  let settingName = "Color / Opacity"
+  
+
+  let settingName = i18n.t("TYPE") + " / " + i18n.t("COLOR") + " / " + i18n.t("OPACITY")
 
   if (gradientType == "shape") {
-    settingName = "Color / Opacity / Size"
+    settingName = i18n.t("COLOR") + " / " + i18n.t("OPACITY") + " / " + i18n.t("SIZE")
   }
 
   let colorSetting = new Setting(contentEl).setName(settingName)
   
   if (gradientType == "mesh") {
 
-    let radialType = gradient.orientation[0].value || "ellipse"
+    let orientation = gradient.orientation as RadialOrientation[]
+    let orientationNode = orientation[0]! as ShapeNode
+
+
+
+    let radialType = orientationNode.value || "ellipse"
+    
+
+    
 
     colorSetting.addDropdown((drop) => drop.addOptions({
-      "circle": "circle",
-      "ellipse": "ellipse"
+      "circle": i18n.t("CIRCLE_GRAD"),
+      "ellipse": i18n.t("ELLIPSE_GRAD")
     }).setValue(radialType).onChange((value) => {
-      gradient.orientation[0].value = value;
+      orientationNode.value = value as "circle" | "ellipse"
       updateCallback();
     }))
 
@@ -268,11 +322,11 @@ const createColorStopSetting = (
       return slider.setValue(alpha).onChange((value) => {
         colorAlpha = Math.floor(value * 255 / 100).toString(16);
         if (value == 100) {
-          colorAlpha = "";
+          colorAlpha = ""
         } else if (value == 0) {
-          colorAlpha = "00";
+          colorAlpha = "00"
         }
-        if (colorAlpha.length == 1) colorAlpha = "0" + colorAlpha;
+        if (colorAlpha.length == 1) colorAlpha = "0" + colorAlpha
         color.value = colorHex + colorAlpha;
         color.type = "hex";
         updateCallback();
@@ -298,17 +352,17 @@ const createColorStopSetting = (
 
 
 
-const createGradientButtonsSetting = (contentEl, modal) => {
-  const addColorFunc = (modal) => {
+const createGradientButtonsSetting = (contentEl: HTMLElement, modal: LinearGradientModal | RadialGradientModal | MeshGradientModal) => {
+  const addColorFunc = (modal: LinearGradientModal | RadialGradientModal | MeshGradientModal) => {
     if (modal instanceof LinearGradientModal || modal instanceof RadialGradientModal) {
-      let newColor = new ColorStopNode("0000ff", "100");
-      modal.gradientData[0].colorStops.push(newColor);
+      let newColor = new ColorStopNode("0000ff", "100") as ColorStop
+      modal.gradientData[0]!.colorStops.push(newColor);
     } else if (modal instanceof MeshGradientModal) {
-      modal.gradientData.push(new PositionGradient("ff0000", "0", "50", "50", "50"))
+      modal.gradientData.push(new PositionGradient("ff0000", "0", "50", "50", "50") as GradientNode)
     }
   }
 
-  const randomizeGradient = (modal) => {
+  const randomizeGradient = (modal: LinearGradientModal | RadialGradientModal | MeshGradientModal) => {
     if (modal instanceof LinearGradientModal) {
       modal.gradientData[0] = createRandomLinearGradientData()
     } else if (modal instanceof RadialGradientModal) {
@@ -322,7 +376,12 @@ const createGradientButtonsSetting = (contentEl, modal) => {
   .setClass("gradient-modal-buttons")
   .addButton(
     (btn) => {
-      btn.setButtonText("Add color");
+      btn.setButtonText(i18n.t("ADD_COLOR"));
+
+      if (Platform.isMobile) {
+        btn.setIcon("plus-circle")
+      }
+
       btn.onClick(() => {
         addColorFunc(modal)
         modal.onOpen()
@@ -330,7 +389,13 @@ const createGradientButtonsSetting = (contentEl, modal) => {
     }
   ).addButton(
     (btn) => {
-      btn.setButtonText("Randomize");
+      btn.setButtonText(i18n.t("RANDOMIZE"));
+
+      if (Platform.isMobile) {
+        btn.setIcon("dice")
+      }
+
+
       btn.onClick(() => {
         randomizeGradient(modal)
         modal.onOpen()
@@ -338,9 +403,16 @@ const createGradientButtonsSetting = (contentEl, modal) => {
     }
   ).addButton(
     (btn) => {
-      btn.setButtonText("Save gradient");
+      btn.setButtonText(i18n.t("SAVE_GRADIENT"));
       btn.setCta();
+
+      if (Platform.isMobile) {
+        btn.setIcon("save")
+      }
+
       btn.onClick(() => {
+
+        console.log(modal.gradientData)
         let cssString = stringify(modal.gradientData);
         cssString = cssString.replace(" #00000000 ", " transparent ")
         modal.saveCallback(cssString);
@@ -356,21 +428,21 @@ const createGradientButtonsSetting = (contentEl, modal) => {
 
 
 
-const createRandomLinearGradientData = () => {
+const createRandomLinearGradientData = (): LinearGradientNode => {
   const angle = Math.floor(Math.random() * 360)
   const baseHue = Math.floor(Math.random() * 360);
   const saturation = 90;
 
-  let data = {
-    type: "linear-gradient",
+  const data = {
+    type: "linear-gradient" as const,
     orientation: {
       type: "angular",
       unit: "deg",
       value: angle.toString()
-    },
+    } as LinearOrientation,
     colorStops: [
-      new ColorStopNode(getContrastHexColor(baseHue, saturation).replace("#", ""), "0"),
-      new ColorStopNode(getContrastHexColor(baseHue, saturation).replace("#", ""), "100")
+      new ColorStopNode(getContrastHexColor(baseHue, saturation).replace("#", ""), "0") as ColorStop,
+      new ColorStopNode(getContrastHexColor(baseHue, saturation).replace("#", ""), "100") as ColorStop
     ]
   }
 
@@ -379,15 +451,15 @@ const createRandomLinearGradientData = () => {
 
 
 
-const createRandomRadialGradientData = () => {
+const createRandomRadialGradientData = (): RadialGradientNode => {
 
   const randomPercent = () => Math.floor(Math.random() * 101)
   const shape = Math.random() > 0.5 ? "circle" : "ellipse"
   const baseHue = Math.floor(Math.random() * 360);
   const saturation = 90;
 
-  let data = {
-    type: "radial-gradient",
+  const data = {
+    type: "radial-gradient" as const,
     orientation: [{
       type: "shape",
       value: shape,
@@ -398,10 +470,10 @@ const createRandomRadialGradientData = () => {
           y: { type: "%", value: randomPercent().toString() }
         }
       }
-    }],
+    }] as ShapeNode[],
     colorStops: [
-      new ColorStopNode(getContrastHexColor(baseHue, saturation).replace("#", ""), "0"),
-      new ColorStopNode(getContrastHexColor(baseHue, saturation).replace("#", ""), "100")
+      new ColorStopNode(getContrastHexColor(baseHue, saturation).replace("#", ""), "0") as ColorStop,
+      new ColorStopNode(getContrastHexColor(baseHue, saturation).replace("#", ""), "100") as ColorStop
     ]
   }
 
@@ -410,16 +482,11 @@ const createRandomRadialGradientData = () => {
 
 
 
-const createRandomMeshGradientData = () => {
+const createRandomMeshGradientData = () : RadialGradientNode[] => {
   const randomPercent = () => Math.floor(Math.random() * 101)
   const baseHue = Math.floor(Math.random() * 360);
   const saturation = 90;
   const baseColor = convertHslToHex({ h: baseHue, s: saturation, l: 45 })
-
-
-  //const layersCount = Math.floor(Math.random() * 2) + 4
-
-  //const layersCount = Math.floor(Math.random() * 3) + 3
 
   const layersCount = Math.floor(Math.random() * 4) + 2
 
@@ -434,8 +501,8 @@ const createRandomMeshGradientData = () => {
 
     
 
-    let layer = {
-      type: "radial-gradient",
+    const layer = {
+      type: "radial-gradient" as const,
       orientation: [{
         type: "shape",
         value: shape,
@@ -446,10 +513,10 @@ const createRandomMeshGradientData = () => {
             y: { type: "%", value: randomPercent().toString() }
           }
         }
-      }],
+      }] as ShapeNode[],
       colorStops: [
-        new ColorStopNode(getContrastHexColor(baseHue, saturation).replace("#", ""), "0"),
-        new ColorStopNode("00000000", radius)
+        new ColorStopNode(getContrastHexColor(baseHue, saturation).replace("#", ""), "0") as ColorStop,
+        new ColorStopNode("00000000", radius) as ColorStop
       ]
     }
 
@@ -460,7 +527,7 @@ const createRandomMeshGradientData = () => {
 
 
   data.push({
-    type: "radial-gradient",
+    type: "radial-gradient" as const,
     orientation: [{
       type: "default-radial",
       hasAtKeyword: true,
@@ -471,10 +538,10 @@ const createRandomMeshGradientData = () => {
           y: { type: "%", value: "50" }
         }
       }
-    }],
+    }] as DefaultRadialNode[],
     colorStops: [
-      new ColorStopNode(baseColor.replace("#", ""), "100"),
-      new ColorStopNode("00000000", "100")
+      new ColorStopNode(baseColor.replace("#", ""), "100") as ColorStop,
+      new ColorStopNode("00000000", "100") as ColorStop
     ]
   })
 
@@ -515,16 +582,21 @@ export class LinearGradientModal extends Modal {
         if (bannerValue) {
           try {
             let parsed = parse(bannerValue);
+
+
+            console.log(parsed)
             if (parsed && parsed.length > 0) {
     
-              if (parsed[0].type == "linear-gradient") {
-                this.gradientData = [parsed[0]]
-              } else if (parsed[0].type == "radial-gradient") {
-                this.gradientData[0].colorStops = parsed[0].colorStops
+              if (parsed[0]!.type == "linear-gradient") {
+                this.gradientData = [parsed[0]!]
+              } else if (parsed[0]!.type == "radial-gradient") {
+                this.gradientData[0]!.colorStops = parsed[0]!.colorStops
               } 
             }
           } catch (err) {
-        }
+            void err
+            // Not a valid gradient, use random
+          }
         }
 
   }
@@ -533,6 +605,7 @@ export class LinearGradientModal extends Modal {
   onOpen() {
     const { contentEl } = this;
     contentEl.empty();
+    this.containerEl.classList.add("pp-gradient-modal")
     const previewElWrapper = contentEl.createEl("div", { cls: "gradient-preview-wrapper" })
     const previewEl = previewElWrapper.createEl("div", { cls: "gradient-preview-box" })
 
@@ -542,11 +615,11 @@ export class LinearGradientModal extends Modal {
 
     
 
-    new Setting(contentEl).setName("Angle (deg)").addSlider(
+    new Setting(contentEl).setName(i18n.t("ANGLE")).addSlider(
       (slider) => {
         slider.setLimits(0, 360, 1);
         slider.setDynamicTooltip();
-        var _a2;
+
         return slider.setValue(Number(gradient.orientation?.value)).onChange((value) => {
             let valueString = value.toString();
             gradient.orientation = gradient.orientation || {
@@ -563,8 +636,8 @@ export class LinearGradientModal extends Modal {
     for (let idx = 0; idx < gradient.colorStops.length; idx++) {
       let color = gradient.colorStops[idx]!
 
-      const onDeleteColor = (idx) => {
-        this.gradientData[0].colorStops.splice(idx, 1)
+      const onDeleteColor = (idx: number) => {
+        this.gradientData[0]!.colorStops.splice(idx, 1)
         this.onOpen()
       }
 
@@ -594,24 +667,27 @@ export class RadialGradientModal extends Modal {
 
     if (bannerValue) {
       try {
-              let parsed = parse(bannerValue);
-      
-              if (parsed && parsed.length > 0) {
-                if (parsed[0].type == "radial-gradient") {
-                  this.gradientData = [parsed[0]]
-                } else if (parsed[0].type == "linear-gradient") {
-                  this.gradientData[0].colorStops = parsed[0].colorStops
-                } 
-              }
-            } catch (err) {
+          let parsed = parse(bannerValue);
+  
+          if (parsed && parsed.length > 0) {
+            if (parsed[0]!.type == "radial-gradient") {
+              this.gradientData = [parsed[0]!]
+            } else if (parsed[0]!.type == "linear-gradient") {
+              this.gradientData[0]!.colorStops = parsed[0]!.colorStops
+            } 
+          }
+        } catch (err) {
+          void err
+          // Not a valid gradient, use random
+        }
       }
-    }
   }
 
 
   onOpen() {
     const { contentEl } = this;
     contentEl.empty();
+    this.containerEl.classList.add("pp-gradient-modal")
     const previewElWrapper = contentEl.createEl("div", { cls: "gradient-preview-wrapper" })
     const previewEl = previewElWrapper.createEl("div", { cls: "gradient-preview-box" })
 
@@ -622,14 +698,15 @@ export class RadialGradientModal extends Modal {
 
 
 
+    let orientationNode = gradient.orientation![0]! as ShapeNode
+    let radialType = orientationNode.value || "ellipse"
 
-    let radialType = gradient.orientation?.[0]?.value || "ellipse"
-
-    new Setting(contentEl).setName("Radial gradient type").addDropdown((drop) => drop.addOptions({
-        "circle": "circle",
-        "ellipse": "ellipse"
+    new Setting(contentEl).setName(i18n.t("RADIAL_GRADIENT_TYPE")).addDropdown((drop) => drop.addOptions({
+        "circle": i18n.t("CIRCLE_GRAD"),
+        "ellipse": i18n.t("ELLIPSE_GRAD")
     }).setValue(radialType).onChange((value) => {
-      gradient.orientation[0].value = value
+      
+      orientationNode.value = value as "circle" | "ellipse"
       this.onOpen();
     }));
 
@@ -639,8 +716,8 @@ export class RadialGradientModal extends Modal {
     for (let idx = 0; idx < gradient.colorStops.length; idx++) {
       let color = gradient.colorStops[idx]!
 
-      const onDeleteColor = (idx) => {
-        this.gradientData[0].colorStops.splice(idx, 1)
+      const onDeleteColor = (idx: number) => {
+        this.gradientData[0]!.colorStops.splice(idx, 1)
         this.onOpen()
       }
 
@@ -659,7 +736,10 @@ export class RadialGradientModal extends Modal {
 
 
 export class MeshGradientModal extends Modal {
-  constructor(plugin, bannerValue, saveCallback) {
+  gradientData: GradientNode[]
+  saveCallback: (cssString: string) => void
+
+  constructor(plugin: PrettyPropertiesPlugin, bannerValue: string | null | undefined, saveCallback: (cssString: string) => void) {
     super(plugin.app);
     this.saveCallback = saveCallback;
 
@@ -673,20 +753,22 @@ export class MeshGradientModal extends Modal {
           if (parsed.length > 1) {
             this.gradientData = parsed
           } else {
-            parsed[0].colorStops = [parsed[0].colorStops[0], parsed[0].colorStops[1]]
-            parsed[0].colorStops[1].type = "hex"
-            parsed[0].colorStops[1].value = "00000000"
+            parsed[0]!.colorStops = [parsed[0]!.colorStops[0]!, parsed[0]!.colorStops[1]!]
+            parsed[0]!.colorStops[1]!.type = "hex"
+            parsed[0]!.colorStops[1]!.value = "00000000"
 
-            if (parsed[0].type == "radial-gradient") {
+            if (parsed[0]!.type == "radial-gradient") {
               this.gradientData = parsed
-            } else if (parsed[0].type == "linear-gradient") {
-              this.gradientData = [this.gradientData[0]]
-              this.gradientData[0].colorStops = parsed[0].colorStops
+            } else if (parsed[0]!.type == "linear-gradient") {
+              this.gradientData = [this.gradientData[0]!]
+              this.gradientData[0]!.colorStops = parsed[0]!.colorStops
             } 
           }
 
         }
       } catch (err) {
+        void err
+        // Not a valid gradient, use random
       }
     }
 
@@ -697,6 +779,8 @@ export class MeshGradientModal extends Modal {
   onOpen() {
     const { contentEl } = this;
     contentEl.empty();
+    this.containerEl.classList.add("pp-gradient-modal")
+    this.containerEl.classList.add("pp-mesh-gradient-modal")
     const previewElWrapper = contentEl.createEl("div", { cls: "gradient-preview-wrapper" })
     const previewEl = previewElWrapper.createEl("div", { cls: "gradient-preview-box" })
 
@@ -705,31 +789,30 @@ export class MeshGradientModal extends Modal {
 
     for (let idx = 0; idx < this.gradientData.length; idx++) {
 
-      let gradient = this.gradientData[idx]
+      let gradient = this.gradientData[idx]! as RadialGradientNode
 
       let gradientWrapper = contentEl.createEl("div", {cls: "pp-gradient-color-wrapper"})
 
-      const onDeleteColor = (idx) => {
+      const onDeleteColor = (idx: number) => {
         this.gradientData.splice(idx, 1)
         this.onOpen()
       }
 
 
-      let color = gradient.colorStops[0]
+      let color = gradient.colorStops[0]!
       createColorStopSetting(gradient, color, idx, gradientWrapper, () => updatePreview(previewEl, this.gradientData), onDeleteColor, "mesh")
 
-      let transparentColor = gradient.colorStops[1]
+      let transparentColor = gradient.colorStops[1]!
 
-      let colorLengthSetting = new Setting(gradientWrapper).setName("Size color / transparent")
+      let colorLengthSetting = new Setting(gradientWrapper).setName(i18n.t("INNER_OUTER_RADIUS"))
 
       createColorLengthSlider(color, colorLengthSetting, () => updatePreview(previewEl, this.gradientData))
 
       colorLengthSetting.addSlider(
         (slider) => {
-          var _a2;
           slider.setLimits(0, 100, 1);
           slider.setDynamicTooltip();
-          let sliderValue = ((_a2 = transparentColor.length) == null ? void 0 : _a2.value) || 0;
+          let sliderValue = transparentColor.length?.value || 0;
           return slider.setValue(Number(sliderValue)).onChange((value) => {
             if (!transparentColor.length) {
               transparentColor.length = {

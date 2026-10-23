@@ -209,15 +209,7 @@ export const updateAllProperties = (plugin:PrettyPropertiesPlugin) => {
 
 
 
-export const updateEmptyProperties = (plugin: PrettyPropertiesPlugin) => {
-    /*
-    let propertyEls = querySelectorsWithIframes(".metadata-property")
-    for (let propertyEl of propertyEls) {
-        let emptyLongtext = propertyEl.querySelector(".metadata-input-longtext:empty")
-    }
-    //??????????????????????
-    */
-}
+
 
 
 
@@ -293,7 +285,44 @@ export const updateImagesOnCacheChanged = (file: TFile, cache: CachedMetadata, p
 
 
 
+export const updateAllImageButtons = (plugin: PrettyPropertiesPlugin) => {
+    let mdLeaves = plugin.app.workspace.getLeavesOfType("markdown");
+    for (let leaf of mdLeaves) {
+        let view = leaf.view
 
+        if (view instanceof MarkdownView) {
+            let file = view.file;
+
+            if (file) {
+                let cache = plugin.app.metadataCache.getFileCache(file);
+                let sourcePath = file.path || "";
+                let contentEl = view.contentEl;
+                if (cache) {
+                    let frontmatter = cache?.frontmatter
+
+                    let bannerPropVal
+                    let iconPropVal
+                    let hasCover = false
+
+                    if (frontmatter) {
+                        for (let extraCover of plugin.settings.coverProperties) {
+                            if (getNestedProperty(frontmatter, extraCover.property)) {
+                                hasCover = true
+                                break
+                            }
+                        }
+
+                        bannerPropVal = getNestedProperty(frontmatter, plugin.settings.bannerProperty)
+                        iconPropVal = getNestedProperty(frontmatter, plugin.settings.iconProperty)
+                    }
+                    renderImageButtons(bannerPropVal, iconPropVal, hasCover, contentEl, plugin)
+                }
+                
+            }
+            
+        }
+    }
+}
 
 
 
@@ -325,7 +354,10 @@ export const updateImagesWithCacheForView = (cache: CachedMetadata, view: Markdo
         iconPropVal = getNestedProperty(frontmatter, plugin.settings.iconProperty)
     }
 
-    renderImageButtons(bannerPropVal, iconPropVal, hasCover, contentEl, view, plugin)
+    if (view instanceof MarkdownView) {
+        renderImageButtons(bannerPropVal, iconPropVal, hasCover, contentEl, plugin)
+    }
+    
     
     if (frontmatter && getNestedProperty(frontmatter, plugin.settings.bannerProperty)  && enableBanner) {
         void renderBanner(contentEl, frontmatter, sourcePath, view, plugin);
@@ -534,7 +566,7 @@ export const removeExtraElementsForView = (view: MarkdownView | WidgetEditorView
 
 
 
-var renderImageButtons = (bannerPropVal: unknown, iconPropVal:unknown, hasCover:boolean, contentEl:HTMLElement, view: MarkdownView | HoverPopover, plugin: PrettyPropertiesPlugin) => {
+const renderImageButtons = (bannerPropVal: unknown, iconPropVal:unknown, hasCover:boolean, contentEl:HTMLElement, plugin: PrettyPropertiesPlugin) => {
 
     let existingButtonsRow = contentEl.querySelector(".pp-image-buttons-row")
     existingButtonsRow?.remove()

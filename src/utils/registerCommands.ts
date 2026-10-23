@@ -11,7 +11,7 @@ import { FileImageSuggestModal } from "src/modals/fileImageSuggestModal";
 import { IconSuggestModal } from "src/modals/iconSuggestModal";
 import { LocalImageSuggestModal } from "src/modals/localImageSuggestModal";
 import { EmojiSuggestModal } from "src/modals/emojiSuggestModal";
-import { ImageSuggestModal } from "src/modals/imageSuggestModal";
+import { BannerSuggestModal } from "src/modals/bannerSuggestModal";
 
 
 
@@ -36,13 +36,7 @@ export function registerCommands(plugin: PrettyPropertiesPlugin) {
                 plugin.settings.bannerProperty
             ) {
                 if (!checking) {
-                    new ImageSuggestModal(
-                        plugin.app, 
-                        plugin, 
-                        plugin.settings.bannerProperty, 
-                        plugin.settings.bannersFolder,
-                        "banner"
-                    ).open();
+                   new BannerSuggestModal(plugin.app, plugin).open()
                 }
                 return true;
             }

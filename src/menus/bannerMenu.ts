@@ -4,7 +4,6 @@ import { i18n } from "src/localization/localization";
 import { updateHiddenProperties } from "src/updates/updateHiddenProperties";
 import { selectBannerPosition } from "src/utils/imageUtils";
 import { deleteNestedProperty, removeProperty, setNestedProperty } from "src/utils/propertyUtils";
-import { ImageSuggestModal } from "src/modals/imageSuggestModal";
 import { BannerSuggestModal } from "src/modals/bannerSuggestModal";
 
 
@@ -149,7 +148,7 @@ export const handleBannerMenu = (menu: Menu, plugin: PrettyPropertiesPlugin) => 
     }
 
 
-    if (!bannerPropHidden || !bannerPositionPropHidden || bannerFadingPropHidden) {
+    if (!bannerPropHidden || !bannerPositionPropHidden || !bannerFadingPropHidden) {
         menu.addItem((item: MenuItem) => item
             .setTitle(i18n.t("HIDE_BANNER_PROPERTY"))
             .setIcon("lucide-eye-off")

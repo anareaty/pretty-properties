@@ -2087,7 +2087,8 @@ button.longtext-color-button:hover {
   width: 100%; 
   height: 112px; 
   position: sticky;
-  top: 0;
+  top: 0.75em;
+  margin-bottom: 0.75em;
   padding-bottom: 12px;
   background-color: var(--background-primary);
   z-index: 1;
@@ -2096,29 +2097,57 @@ button.longtext-color-button:hover {
 
 .gradient-preview-box {
   width: 100%; 
-  height: 100%; 
+  height: 100px; 
   border-radius: 4px; 
   
 }
 
 
 .pp-gradient-color-wrapper {
-  background-color: var(--background-secondary);
-  padding: 8px;
-  border-radius: 4px;
-  margin: 0 0 8px;
+  background-color: var(--setting-items-background);
+  padding: 20px;
+  border-radius: var(--setting-items-radius);
+  margin: 0 0 12px;
 
 }
 
 .gradient-modal-buttons {
   position: sticky;
-  bottom: 0;
+  bottom: -16px;
+
+  
+  
+}
+
+
+.modal:not(.mod-settings) .setting-item.gradient-modal-buttons:not(.setting-item-heading):where(:not(.setting-group *)) {
   padding-bottom: 16px;
   margin-bottom: -16px;
-  margin-top: 16px;
-  background-color: var(--background-primary);
 }
+
+
+.modal:not(.mod-settings) .setting-item.gradient-modal-buttons:not(.setting-item-heading):where(:not(.setting-group *)) {
+  background-color: var(--modal-background);
+}
+
+
+
 
 .modal-close-button {
   z-index: 2;
+}
+
+
+
+.is-phone .pp-gradient-modal .setting-item-control input[type="color"] {
+  width: unset;
+}
+
+.is-phone .pp-mesh-gradient-modal .setting-item-control .dropdown {
+  width: fit-content;
+}
+
+
+.pp-gradient-modal {
+  --dialog-width: 600px;
 }
