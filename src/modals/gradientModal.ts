@@ -412,7 +412,6 @@ const createGradientButtonsSetting = (contentEl: HTMLElement, modal: LinearGradi
 
       btn.onClick(() => {
 
-        console.log(modal.gradientData)
         let cssString = stringify(modal.gradientData);
         cssString = cssString.replace(" #00000000 ", " transparent ")
         modal.saveCallback(cssString);
@@ -583,8 +582,6 @@ export class LinearGradientModal extends Modal {
           try {
             let parsed = parse(bannerValue);
 
-
-            console.log(parsed)
             if (parsed && parsed.length > 0) {
     
               if (parsed[0]!.type == "linear-gradient") {
