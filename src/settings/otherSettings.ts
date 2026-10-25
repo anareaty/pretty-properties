@@ -59,7 +59,9 @@ export const getOtherSettingsDefinitions = (tab: PPSettingTab) => {
                     .onChange(async (value) => {
                         plugin.settings.enableImageButtons = value
                         await plugin.saveSettings();
-                        updateAllImageButtons(plugin)
+                        if (Platform.isDesktop) {
+                            updateAllImageButtons(plugin)
+                        }
                         		
                     }));
             }

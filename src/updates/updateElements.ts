@@ -1,4 +1,4 @@
-import { TFile, CachedMetadata, MarkdownView, BasesView, HoverPopover, requireApiVersion, setIcon } from "obsidian";
+import { TFile, CachedMetadata, MarkdownView, BasesView, HoverPopover, requireApiVersion, setIcon, Platform } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { renderCover, updateCoverForView } from "./updateCovers";
 import { renderIcon, updateIconForView } from "./updateIcons";
@@ -354,7 +354,7 @@ export const updateImagesWithCacheForView = (cache: CachedMetadata, view: Markdo
         iconPropVal = getNestedProperty(frontmatter, plugin.settings.iconProperty)
     }
 
-    if (view instanceof MarkdownView) {
+    if (view instanceof MarkdownView && Platform.isDesktop) {
         renderImageButtons(bannerPropVal, iconPropVal, hasCover, contentEl, plugin)
     }
     
