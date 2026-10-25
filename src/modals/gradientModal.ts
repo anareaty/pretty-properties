@@ -554,7 +554,9 @@ const createRandomMeshGradientData = () : RadialGradientNode[] => {
 const updatePreview = (previewEl: HTMLElement, gradientData: GradientNode[]) => {
   let cssString = stringify(gradientData);
   cssString = cssString.replace(" #00000000 ", " transparent ")
-  previewEl.style.backgroundImage = cssString;
+  previewEl.setCssStyles({
+    backgroundImage: cssString
+  })
 }
 
 

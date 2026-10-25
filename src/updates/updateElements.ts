@@ -295,7 +295,7 @@ export const updateAllImageButtons = (plugin: PrettyPropertiesPlugin) => {
 
             if (file) {
                 let cache = plugin.app.metadataCache.getFileCache(file);
-                let sourcePath = file.path || "";
+                //let sourcePath = file.path || "";
                 let contentEl = view.contentEl;
                 if (cache) {
                     let frontmatter = cache?.frontmatter

@@ -1,9 +1,9 @@
-import { SuggestModal, App, HSL, TFile, FrontMatterCache } from "obsidian";
+import { SuggestModal, App, TFile, FrontMatterCache } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { i18n } from "src/localization/localization";
 import { ImageLinkPrompt } from "./imageLinkPrompt";
 import { selectLocalImage } from "src/utils/imageUtils";
-import { ColorPickerModal } from "./colorPickerModal";
+import { ColorPickerWithOpasityModal } from "./colorPickerModal";
 import { setNestedProperty } from "src/utils/propertyUtils";
 import { generateRandomGradient, LinearGradientModal, MeshGradientModal, RadialGradientModal } from "./gradientModal";
 
@@ -60,7 +60,7 @@ export class BannerSuggestModal extends SuggestModal<string> {
 
             
             if (val == "color") {
-                new ColorPickerModal(bannerValue, (hsl: HSL, hex: string) => {
+                new ColorPickerWithOpasityModal(bannerValue, (hex: string) => {
                     if (file instanceof TFile) {
                         void this.plugin.app.fileManager.processFrontMatter(file, (fm: FrontMatterCache) => {
                             setNestedProperty(fm, this.plugin.settings.bannerProperty, hex);
@@ -71,20 +71,7 @@ export class BannerSuggestModal extends SuggestModal<string> {
 
 
             if (val == "gradient") {
-
                 new GradientTypeSuggestModal(this.plugin.app, this.plugin).open()
-
-
-                /*
-                new GradientModal(this.plugin, bannerValue, (newValue) => {
-                    if (file instanceof TFile) {
-                        void this.plugin.app.fileManager.processFrontMatter(file, (fm: FrontMatterCache) => {
-                        setNestedProperty(fm, this.plugin.settings.bannerProperty, newValue);
-                        });
-                    }
-                }).open()
-
-                */
             }
 
         }
