@@ -286,4 +286,10 @@ export default {
   INNER_OUTER_RADIUS: "Inner / outer radius",
 
   ENABLE_IMAGE_TOP_BUTTONS: "Show image buttons on the top of the note",
+
+
+  SET_RANDOM_GRADIENT: "Set random gradient banner for the current note",
+  SET_RANDOM_LINEAR_GRADIENT: "Set random linear gradient banner for the current note",
+  SET_RANDOM_RADIAL_GRADIENT: "Set random radial gradient banner for the current note",
+  SET_RANDOM_MESH_GRADIENT: "Set random mesh gradient banner for the current note",
 };

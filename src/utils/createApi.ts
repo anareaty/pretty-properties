@@ -1,5 +1,6 @@
 import PrettyPropertiesPlugin from "src/main"
 import { getTextLightness } from "../updates/updatePills";
+import { generateRandomGradient } from "src/modals/gradientModal";
 
 declare global {
     interface Window { PrettyPropertiesApi: API; }
@@ -24,6 +25,14 @@ export class API {
     constructor(plugin: PrettyPropertiesPlugin) {
 		this.plugin = plugin
 	}
+
+
+
+
+    generateRandomGradientString(type?: "linear" | "radial" | "mesh") {
+        return generateRandomGradient(type) || ""
+    }
+
 
     
 

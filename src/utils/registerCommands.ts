@@ -1,7 +1,7 @@
 import PrettyPropertiesPlugin from "src/main";
-import { TFile, MarkdownView, Editor, MarkdownFileInfo } from "obsidian";
+import { TFile, MarkdownView, Editor, MarkdownFileInfo, FrontMatterCache } from "obsidian";
 import { i18n } from "src/localization/localization";
-import { removeProperty } from "./propertyUtils";
+import { removeProperty, setNestedProperty } from "./propertyUtils";
 import { selectCoverImage } from "./imageUtils";
 import { getCurrentProperty } from "./propertyUtils";
 import { getCurrentCoverProperty } from "./imageUtils";
@@ -12,6 +12,7 @@ import { IconSuggestModal } from "src/modals/iconSuggestModal";
 import { LocalImageSuggestModal } from "src/modals/localImageSuggestModal";
 import { EmojiSuggestModal } from "src/modals/emojiSuggestModal";
 import { BannerSuggestModal } from "src/modals/bannerSuggestModal";
+import { generateRandomGradient } from "src/modals/gradientModal";
 
 
 
@@ -200,6 +201,98 @@ export function registerCommands(plugin: PrettyPropertiesPlugin) {
 
 
 
+
+
+
+
+    plugin.addCommand({
+        id: "set-random-gradient-banner",
+        name: i18n.t("SET_RANDOM_GRADIENT"),
+        checkCallback: (checking: boolean) => {
+          let file = plugin.app.workspace.getActiveFile();
+          if (file instanceof TFile && plugin.settings.enableBanner && plugin.settings.bannerProperty) {
+            if (!checking) {
+              let newValue = generateRandomGradient();
+              if (newValue) {
+                void plugin.app.fileManager.processFrontMatter(file, (fm: FrontMatterCache) => {
+                  setNestedProperty(fm, plugin.settings.bannerProperty, newValue);
+                });
+              }
+            }
+            return true;
+          }
+          return false;
+        }
+      })
+    
+    
+    
+    
+      plugin.addCommand({
+        id: "set-random-linear-gradient-banner",
+        name: i18n.t("SET_RANDOM_LINEAR_GRADIENT"),
+        checkCallback: (checking: boolean) => {
+          let file = plugin.app.workspace.getActiveFile();
+          if (file instanceof TFile && plugin.settings.enableBanner && plugin.settings.bannerProperty) {
+            if (!checking) {
+              let newValue = generateRandomGradient("linear");
+              if (newValue) {
+                void plugin.app.fileManager.processFrontMatter(file, (fm: FrontMatterCache) => {
+                  setNestedProperty(fm, plugin.settings.bannerProperty, newValue);
+                });
+              }
+            }
+            return true;
+          }
+          return false;
+        }
+      })
+    
+    
+    
+    
+      plugin.addCommand({
+        id: "set-random-radial-gradient-banner",
+        name: i18n.t("SET_RANDOM_RADIAL_GRADIENT"),
+        checkCallback: (checking: boolean) => {
+          let file = plugin.app.workspace.getActiveFile();
+          if (file instanceof TFile && plugin.settings.enableBanner && plugin.settings.bannerProperty) {
+            if (!checking) {
+              let newValue = generateRandomGradient("radial");
+              if (newValue) {
+                void plugin.app.fileManager.processFrontMatter(file, (fm: FrontMatterCache) => {
+                  setNestedProperty(fm, plugin.settings.bannerProperty, newValue);
+                });
+              }
+            }
+            return true;
+          }
+          return false;
+        }
+      })
+    
+    
+    
+    
+      plugin.addCommand({
+        id: "set-random-mesh-gradient-banner",
+        name: i18n.t("SET_RANDOM_MESH_GRADIENT"),
+        checkCallback: (checking: boolean) => {
+          let file = plugin.app.workspace.getActiveFile();
+          if (file instanceof TFile && plugin.settings.enableBanner && plugin.settings.bannerProperty) {
+            if (!checking) {
+              let newValue = generateRandomGradient("mesh");
+              if (newValue) {
+                void plugin.app.fileManager.processFrontMatter(file, (fm: FrontMatterCache) => {
+                  setNestedProperty(fm, plugin.settings.bannerProperty, newValue);
+                });
+              }
+            }
+            return true;
+          }
+          return false;
+        }
+      })
 
 
 

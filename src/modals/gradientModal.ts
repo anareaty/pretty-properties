@@ -35,13 +35,15 @@ const getContrastHexColor = (baseHue: number, saturation: number) => {
 
 
 
-export const generateRandomGradient = () => {
+export const generateRandomGradient = (chosenType?: "linear" | "radial" | "mesh") => {
   const randomPercent = () => Math.floor(Math.random() * 101);
   const baseHue = Math.floor(Math.random() * 360);
   const saturation = 90
 
-  const types = ['linear', 'radial', 'mesh'];
-  const chosenType = types[Math.floor(Math.random() * types.length)];
+  if (!chosenType) {
+    const types = ['linear', 'radial', 'mesh']
+    chosenType = types[Math.floor(Math.random() * types.length)] as "linear" | "radial" | "mesh"
+  }
 
   if (chosenType === 'linear') {
     const angle = Math.floor(Math.random() * 360);
@@ -53,7 +55,7 @@ export const generateRandomGradient = () => {
     return `radial-gradient(${shape} at ${randomPercent()}% ${randomPercent()}%, ${getContrastHexColor(baseHue, saturation)}, ${getContrastHexColor(baseHue, saturation)} 100%)`;
   } 
   
-  else {
+  else if (chosenType === 'mesh') {
     const layersCount = Math.floor(Math.random() * 4) + 2; // 4 или 5 контрастных пятен
     const layers = [];
     
@@ -70,6 +72,7 @@ export const generateRandomGradient = () => {
     
     return layers.join(', ');
   }
+  return
 }
 
 
