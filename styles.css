@@ -1318,6 +1318,26 @@ body:not(.show-hidden-properties) .hover-popover .metadata-property.is-empty.pp-
 
 
 
+.pp-formatted-value-overlay .metadata-progress-wrapper{
+  display: inline-flex;
+  padding-left: 0;
+  max-width: unset;
+}
+
+.pp-formatted-value-overlay .metadata-progress{
+  padding-right: 8px;
+}
+
+.pp-progress-label {
+  white-space: nowrap;
+}
+
+.pp-formatted-value-overlay {
+  min-width: 100px;
+}
+
+
+
 
 
 .has-property-formatting:not(:focus-within) .metadata-input-longtext {
