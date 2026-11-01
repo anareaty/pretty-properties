@@ -51,9 +51,7 @@ export const updateAllProperties = (plugin:PrettyPropertiesPlugin) => {
                 p.renderProperty(p.entry, !0)
             })
 
-            updateBannerForView(view, plugin);
-            updateIconForView(view, plugin);
-            updateCoverForView(view, plugin);
+            updateImagesForView(view, plugin);
             processTagsInPreviewElement(view.containerEl, plugin)
             
             let state = view.getState()
@@ -475,19 +473,6 @@ export const removeAllExtraElements = (plugin: PrettyPropertiesPlugin) => {
             removeExtraElementsForView(view)
         }
     }
-
-    let canvasLeaves = plugin.app.workspace.getLeavesOfType("canvas");
-    for (let leaf of canvasLeaves) {
-        let view = leaf.view as CanvasView
-
-        view.canvas?.nodes?.forEach(node => {
-            let nodeView = node.child
-
-            if (nodeView) {
-                removeExtraElementsForView(nodeView)
-            }
-        })
-    }
 }
 
 
@@ -496,29 +481,28 @@ export const removeAllExtraElements = (plugin: PrettyPropertiesPlugin) => {
 
 
 
-export const removeExtraElementsForView = (view: MarkdownView | WidgetEditorView ) => {
-
-
-    if ("contentEl" in view) {
-        let contentEl = view.contentEl;
-        let oldBannerDivSource = contentEl?.querySelector(".cm-scroller .pp-banner");
-        let oldBannerDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .pp-banner");
-        oldBannerDivSource?.remove();
-        oldBannerDivPreview?.remove();
-        contentEl.classList.remove("has-banner")
-
-        let oldIconDivSource = contentEl?.querySelector(".cm-scroller .icon-wrapper");
-        let oldIconDivPreview = contentEl?.querySelector(".markdown-reading-view > .markdown-preview-view .icon-wrapper");
-        oldIconDivSource?.remove();
-        oldIconDivPreview?.remove();
-        contentEl.classList.remove("has-icon")
-        let titleIconWrappers = contentEl?.querySelectorAll(".title-icon-wrapper")
-        for (let titleIconWrapper of titleIconWrappers) {
-            titleIconWrapper.remove()
-        } 
-    }
+export const removeExtraElementsForView = (view: MarkdownView ) => {
 
     let containerEl = view.containerEl
+
+    let buttonsRow = containerEl.querySelector(".pp-image-buttons-row")
+    buttonsRow?.remove()
+
+    let oldBannerDivSource = containerEl?.querySelector(".cm-scroller .pp-banner");
+    let oldBannerDivPreview = containerEl?.querySelector(".markdown-reading-view > .markdown-preview-view .pp-banner");
+    oldBannerDivSource?.remove();
+    oldBannerDivPreview?.remove();
+    containerEl.classList.remove("has-banner")
+
+    let oldIconDivSource = containerEl?.querySelector(".cm-scroller .icon-wrapper");
+    let oldIconDivPreview = containerEl?.querySelector(".markdown-reading-view > .markdown-preview-view .icon-wrapper");
+    oldIconDivSource?.remove();
+    oldIconDivPreview?.remove();
+    containerEl.classList.remove("has-icon")
+    let titleIconWrappers = containerEl?.querySelectorAll(".title-icon-wrapper")
+    for (let titleIconWrapper of titleIconWrappers) {
+        titleIconWrapper.remove()
+    } 
 
     let oldCoverDiv = containerEl?.querySelector(".pp-cover");
     oldCoverDiv?.remove();
@@ -543,14 +527,14 @@ export const removeExtraElementsForView = (view: MarkdownView | WidgetEditorView
     }
 
 
-    if ("metadataEditor" in view) {
-        let metadataEditor = view.metadataEditor
+    
+    let metadataEditor = view.metadataEditor
 
-        metadataEditor.rendered.forEach(p => {
-            p.renderProperty(p.entry, !0)
-            
-        })
-    }
+    metadataEditor.rendered.forEach(p => {
+        p.renderProperty(p.entry, !0)
+        
+    })
+    
 };
 
 

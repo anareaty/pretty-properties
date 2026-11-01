@@ -27,7 +27,7 @@ export const updateAfterEnable = (plugin: PrettyPropertiesPlugin) => {
 
 
 export const updateAfterDisable = (plugin: PrettyPropertiesPlugin) => {
-    let viewTypesToReload = ["tag", "file-properties", "bases"]
+    let viewTypesToReload = ["tag", "file-properties", "bases", "canvas"]
 
     plugin.app.workspace.iterateAllLeaves((leaf) => {
         if (leaf) {
