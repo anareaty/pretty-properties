@@ -1,7 +1,7 @@
 /* Here we are using some helpers from https://www.npmjs.com/package/handlebars.moment */
 /* but rewritten to work better with Obsidian */
 
-import { moment } from "obsidian";
+import { moment, setTooltip } from "obsidian";
 import momentDurationFormatSetup from "moment-duration-format";
 
 
@@ -485,6 +485,61 @@ export const registerCustomHelpers = (handlebars: typeof Handlebars) => {
         if (duration.milliseconds() > 0 || parts.length === 0) parts.push(`${duration.milliseconds()}ms`);
         return parts.join(" ");
     });
+
+
+
+
+
+
+
+    handlebars.registerHelper("split", (str: string, separator:string) => {
+        return str.split(separator)
+    })
+    
+    
+    
+    
+    handlebars.registerHelper("progressBarFromString", (str: string, withLabel?: boolean) => {
+        let args = str.split("/")
+
+        if (args.length == 0 || args.length > 2) return str
+
+        let value = Number(args[0])
+
+        if (isNaN(value)) return str
+
+        let max = 100
+
+        if (args.length == 2) {
+            let tryMax = Number(args[1])
+            if (!tryMax) return str
+            max = tryMax
+        }
+
+        let percent = Math.round(value * 100 / max) + " %"
+
+        let progressWrapper = createDiv();
+        progressWrapper.classList.add("metadata-progress-wrapper");
+        progressWrapper.setAttribute("data-progress-percent", percent);
+        let progress = createEl("progress");
+        progress.classList.add("metadata-progress");
+        progress.value = value;
+        progress.max = max;
+        setTooltip(progress, percent, {
+            delay: 500,
+            placement: "top"
+        });
+        progressWrapper.append(progress)
+
+
+        if (withLabel === true) {
+            let label = createEl("span", {text: str, cls: "pp-progress-label"})
+            progressWrapper.append(label)
+        }
+
+        return new handlebars.SafeString(progressWrapper.outerHTML)
+
+    })
 
 
 
