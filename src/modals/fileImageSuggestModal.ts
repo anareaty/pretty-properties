@@ -2,7 +2,6 @@ import { SuggestModal, App } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { i18n } from "src/localization/localization";
 import { selectCoverImage } from "src/utils/imageUtils";
-import { ImageSuggestModal } from "./imageSuggestModal";
 import { IconSuggestModal } from "./iconSuggestModal";
 import { BannerSuggestModal } from "./bannerSuggestModal";
 

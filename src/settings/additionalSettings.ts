@@ -4,6 +4,7 @@ import { AddPropertyModal, AddTextModal } from "src/modals/settingItemModals";
 import { requireApiVersion, Setting } from "obsidian";
 import { updateAllProperties } from "src/updates/updateElements";
 import { PropertyNameSuggest } from "src/utils/propertyNameSuggester";
+import { getPropertyType } from "src/utils/propertyUtils";
 
 
 
@@ -22,20 +23,34 @@ export const getAdditionalSettingsDefinitions = (tab: PPSettingTab) => {
             type: "page",
             name: i18n.t("PROGRESS_BARS"),
             items: [
-
                 {
                     name: i18n.t("SELECT_PROGRESS_SETTING"),
                     searchable: false
                 },
-
-                
+                {
+                    name: i18n.t("ALLOW_PROGRESS_BARS_IT_TEXT_PROPS"),
+                    render: (setting: Setting) => {
+                        setting.addToggle(toggle => toggle
+                        .setValue(plugin.settings.enableProgressBarsForTextProperties)
+                        .onChange(async (value) => {
+                            plugin.settings.enableProgressBarsForTextProperties = value
+                            await plugin.saveSettings();
+                            updateAllProperties(plugin)
+                        }));
+        
+                    }
+                },
                 {
                     type: "list",
                     heading: i18n.t("PROPERTIES"),
                     addItem: {
                         name: i18n.t("ADD_PROPERTY"),
                         action: () => {
-                            new AddPropertyModal(["number"], plugin, async (newProperty) => {
+                            let allowed = ["number"]
+                            if (plugin.settings.enableProgressBarsForTextProperties) {
+                                allowed = ["number", "text"]
+                            }
+                            new AddPropertyModal(allowed, plugin, async (newProperty) => {
                                 if (newProperty && !plugin.settings.progressProperties[newProperty]) {
                                     plugin.settings.progressProperties[newProperty] = {"maxNumber": 100}
                                     await plugin.saveSettings()
@@ -51,8 +66,6 @@ export const getAdditionalSettingsDefinitions = (tab: PPSettingTab) => {
                         name: propName,
                         searchable: false,
                         items: [
-
-                            
                             {
                                 name: i18n.t("REMOVE_PROGRESS_BAR"),
                                 searchable: false,
@@ -73,17 +86,14 @@ export const getAdditionalSettingsDefinitions = (tab: PPSettingTab) => {
                             {
                                 name: i18n.t("SET_MAX_VALUE_PROPERTY"),
                                 desc: i18n.t("SET_MAX_VALUE_PROPERTY_DESC"),
+                                visible: getPropertyType(propName, plugin) == "number",
                                 searchable: false,
                                 render: (setting: Setting) => {
-
                                     let maxProperty = plugin.settings.progressProperties[propName]!.maxProperty || ""
-
-
                                     setting
                                     .addSearch((search) => {
                                         search.setValue(maxProperty)
                                         search.setPlaceholder(i18n.t("PROPERTY_SEARCH_PLACEHOLDER"));
-                            
                                         const suggester = new PropertyNameSuggest(plugin.app, search.inputEl, ["number"]);
                                         suggester.onSelect(async (value) => {
 

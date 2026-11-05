@@ -141,6 +141,7 @@ export interface PPPluginSettings {
 	iconBgProperty: string
 	bannerFadingProperty: string
 	enableImageButtons: boolean
+	enableProgressBarsForTextProperties: boolean
 }
 
 
@@ -311,6 +312,7 @@ export const DEFAULT_SETTINGS: PPPluginSettings = {
 	iconBgProperty: "icon_bg",
 	bannerFadingProperty: "banner_fade",
 	enableImageButtons: true,
+	enableProgressBarsForTextProperties: false
 }
 
 

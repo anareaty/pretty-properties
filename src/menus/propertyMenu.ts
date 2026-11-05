@@ -154,10 +154,8 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
 
 
 
-        if (
-            propertyType == "number" &&
-            !plugin.settings.progressProperties[propName]
-        ) {
+        if ((propertyType == "number" || (propertyType == "text" && plugin.settings.enableProgressBarsForTextProperties) ) &&
+            !plugin.settings.progressProperties[propName]) {
             menu.addItem((item: MenuItem) =>
                 item
                 .setTitle(i18n.t("SHOW_PROGRESS_BAR"))
@@ -172,94 +170,98 @@ export const handlePropertyMenu = (menu: Menu, propEl: HTMLElement, plugin: Pret
                 })  
             );
         } else if (plugin.settings.progressProperties[propName]) {
-            if (
-                plugin.settings.progressProperties[propName].maxProperty
-            ) {
+            if (propertyType == "number") {
+
+                if (plugin.settings.progressProperties[propName].maxProperty) {
+                    menu.addItem((item: MenuItem) =>
+                        item
+                        .setTitle(
+                            i18n.t("SET_PROGRESS_MAX_VALUE_100")
+                        )
+                        .setIcon("lucide-bar-chart-horizontal-big")
+                        .setSection("pretty-properties")
+                        .onClick(async () => {
+                            if (propName) {
+                                let propSettings = plugin.settings.progressProperties[propName]
+                                if (!propSettings) {
+                                    propSettings = {}
+                                }
+                                
+                                delete propSettings.maxProperty;
+                                propSettings.maxNumber = 100;
+                                
+                            }
+                            await plugin.saveSettings();
+                            updateAllProperties(plugin)
+                        })
+                    );
+                }
+
+                menu.addItem((item: MenuItem) => {
+                    item.setTitle(
+                        i18n.t("SET_PROGRESS_MAX_VALUE_PROPERTY")
+                    )
+                        .setIcon("lucide-bar-chart-horizontal-big")
+                        .setSection("pretty-properties");
+
+                
+                    let sub = item.setSubmenu();
+                    
+                    let properties = plugin.app.metadataTypeManager.getAllProperties();
+                    let numberProperties = Object.keys(properties)
+                        .filter((p) => {
+                            let type = getPropertyType(p, plugin)
+                            return type == "number";
+                        })
+                        .map((p) => properties[p]!.name);
+
+
+
+                    for (let numberProp of numberProperties) {
+                        sub.addItem((subitem: MenuItem) => {
+                            if (propName) {
+
+                                let propSettings = plugin.settings.progressProperties[propName]
+                                subitem
+                                .setTitle(numberProp)
+                                .setChecked(
+                                    propSettings?.maxProperty == numberProp
+                                )
+                                .onClick(async () => {
+
+                                    if (!propSettings) {
+                                        propSettings = {}
+                                    }
+
+                                    if (propName) {
+                                        delete propSettings?.maxNumber;
+                                        propSettings.maxProperty = numberProp;
+                                    }
+                                    await plugin.saveSettings();
+                                    updateAllProperties(plugin)
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+
+
+            if (propertyType == "number" || (propertyType == "text" && plugin.settings.enableProgressBarsForTextProperties)) {
                 menu.addItem((item: MenuItem) =>
                     item
-                    .setTitle(
-                        i18n.t("SET_PROGRESS_MAX_VALUE_100")
-                    )
+                    .setTitle(i18n.t("REMOVE_PROGRESS_BAR"))
                     .setIcon("lucide-bar-chart-horizontal-big")
                     .setSection("pretty-properties")
                     .onClick(async () => {
                         if (propName) {
-                            let propSettings = plugin.settings.progressProperties[propName]
-                            if (!propSettings) {
-                                propSettings = {}
-                            }
-                            
-                            delete propSettings.maxProperty;
-                            propSettings.maxNumber = 100;
-                            
+                            delete plugin.settings.progressProperties[propName];
                         }
                         await plugin.saveSettings();
                         updateAllProperties(plugin)
                     })
                 );
             }
-
-            menu.addItem((item: MenuItem) => {
-                item.setTitle(
-                    i18n.t("SET_PROGRESS_MAX_VALUE_PROPERTY")
-                )
-                    .setIcon("lucide-bar-chart-horizontal-big")
-                    .setSection("pretty-properties");
-
-               
-                let sub = item.setSubmenu();
-                
-                let properties = plugin.app.metadataTypeManager.getAllProperties();
-                let numberProperties = Object.keys(properties)
-                    .filter((p) => {
-                        let type = getPropertyType(p, plugin)
-                        return type == "number";
-                    })
-                    .map((p) => properties[p]!.name);
-
-
-
-                for (let numberProp of numberProperties) {
-                    sub.addItem((subitem: MenuItem) => {
-                        if (propName) {
-
-                            let propSettings = plugin.settings.progressProperties[propName]
-                            subitem
-                            .setTitle(numberProp)
-                            .setChecked(
-                                propSettings?.maxProperty == numberProp
-                            )
-                            .onClick(async () => {
-
-                                if (!propSettings) {
-                                    propSettings = {}
-                                }
-
-                                if (propName) {
-                                    delete propSettings?.maxNumber;
-                                    propSettings.maxProperty = numberProp;
-                                }
-                                await plugin.saveSettings();
-                                updateAllProperties(plugin)
-                            });
-                        }
-                    });
-                }
-            });
-
-            menu.addItem((item: MenuItem) =>
-                item
-                .setTitle(i18n.t("REMOVE_PROGRESS_BAR"))
-                .setIcon("lucide-bar-chart-horizontal-big")
-                .setSection("pretty-properties")
-                .onClick(async () => {
-                    if (propName) {
-                        delete plugin.settings.progressProperties[propName];
-                    }
-                    await plugin.saveSettings();
-                    updateAllProperties(plugin)
-                })
-            );
         }
     }
     

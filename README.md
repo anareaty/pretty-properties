@@ -259,6 +259,8 @@ Show a steamid property as an iframe (to render cover as iframe add this templat
 
 Right-click on the number property icon to add simple progress bar to any number property. By default maximum value of progress bar is 100 and property value is treated as percent. If you want to add custom number as progress maximum, you need to add additional number property to the note and in the first property menu select the option "Set max progress from another property".
 
+Alternatively you can set up progress bar for the text property the same way, but text properties support is disabled by default, you need to enable it in the settings. Text properties will only show progress bars it they have numeric values (for example, "50") or two numbers separated by slash (for example, "50 / 100"). With text properties you can not set maximum value from another property.
+
 Progress bars are not supported in bases, because you can create progress-bars using regular base formulas. Here is a couple of examples of formulas you can use (or you can write your own).
 
 Progress-bar formula:

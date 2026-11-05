@@ -237,7 +237,7 @@ export default {
   SHOW_CUSTOM_COLORS: "Show custom colors",
   ADD_CUSTOM_COLOR: "Add custom color",
 
-  SELECT_PROGRESS_SETTING: "Select number properies to show progress bars",
+  SELECT_PROGRESS_SETTING: "Select properies to show progress bars",
   SELECT_SELECTION_BUTTON_SETTING: "Select text properties to show selection buttons",
   SELECT_SELECTION_BUTTON_DESC: "The button allows you to select from predefined options. For each property you can add several sets of options based on the note folder.",
   STRIP_LUCIDE_PREFIX: 'Remove the "lucide-" prefix when selecting Obsidian built-in icons',
@@ -292,4 +292,7 @@ export default {
   SET_RANDOM_LINEAR_GRADIENT: "Set random linear gradient banner for the current note",
   SET_RANDOM_RADIAL_GRADIENT: "Set random radial gradient banner for the current note",
   SET_RANDOM_MESH_GRADIENT: "Set random mesh gradient banner for the current note",
+
+
+  ALLOW_PROGRESS_BARS_IT_TEXT_PROPS: 'Allow progress bars for text properties'
 };

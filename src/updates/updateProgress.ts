@@ -4,7 +4,7 @@ import { getNestedProperty } from "../utils/propertyUtils";
 import { querySelectorsWithIframes } from "../utils/querySelectorsHelper";
 
 
-export const updateProgress = (propertyEl: HTMLElement, plugin: PrettyPropertiesPlugin, sourcePath?: string) => {
+export const updateNumberProgress = (propertyEl: HTMLElement, plugin: PrettyPropertiesPlugin, sourcePath?: string) => {
 
     
 
@@ -16,12 +16,8 @@ export const updateProgress = (propertyEl: HTMLElement, plugin: PrettyProperties
     let propName = plugin.app.metadataTypeManager.getPropertyInfo(propKey.toLowerCase())?.name || propKey
     let progressSettings = plugin.settings.progressProperties[propName]
     let existingProgressWrapper = propertyEl.querySelector(".metadata-progress-wrapper")
-
-   
 	
     if (progressSettings) {
-
-       
 
 
         let maxVal
@@ -109,6 +105,89 @@ export const updateProgress = (propertyEl: HTMLElement, plugin: PrettyProperties
 }
 
 
+export const updateTextProgress = (text: string, propertyEl: HTMLElement, sourcePath: string, plugin: PrettyPropertiesPlugin) => {
+
+    if (propertyEl.classList.contains("bases-td")) {
+        return
+    }
+
+    let propKey = propertyEl.getAttribute("data-property-key") || ""
+    let propName = plugin.app.metadataTypeManager.getPropertyInfo(propKey.toLowerCase())?.name || propKey
+    let progressSettings = plugin.settings.progressProperties[propName]
+    let existingProgressWrapper = propertyEl.querySelector(".metadata-progress-wrapper")
+
+
+    if (progressSettings && plugin.settings.enableProgressBarsForTextProperties) {
+
+        let maxVal
+        let value
+        let args = text.split("/")
+
+        if (args.length == 1 || args.length == 2) {
+            value = Number(args[0])
+
+            if (!isNaN(value)) {
+                if (args.length == 2) {
+                    let tryMax = Number(args[1])
+                    if (!isNaN(tryMax)) {
+                        maxVal = tryMax
+                    }
+                }
+                else {
+                    maxVal = 100
+                }
+            }
+        }
+
+        if (maxVal && typeof maxVal == "number" && value && typeof value == "number") {  
+            
+            let percent = Math.round((value * 100) / maxVal) + " %";
+            let progress
+
+            if (existingProgressWrapper?.instanceOf(HTMLElement)) {
+                let existingProgressValue = existingProgressWrapper.getAttribute("data-progress-percent")
+                if (existingProgressValue == percent) {
+                    return
+                } else {
+                    //update existing progress
+                    progress = existingProgressWrapper.querySelector("progress.metadata-progress")
+                    if (progress instanceof HTMLProgressElement) {
+                        progress.value = value;
+                        progress.max = maxVal;
+                    }
+                    existingProgressWrapper.setAttribute("data-progress-percent", percent)
+                }
+
+            } else {
+                //create new progress
+                let progressWrapper = createDiv();
+                progressWrapper.classList.add("metadata-progress-wrapper");
+                progressWrapper.setAttribute("data-progress-percent", percent)
+                progress = createEl("progress");
+                progress.classList.add("metadata-progress");
+                progress.value = value;
+                progress.max = maxVal;
+
+                setTooltip(progress, percent, {
+                    delay: 500,
+                    placement: "top",
+                });
+                
+                progressWrapper.append(progress);
+                let propertyKeyEl = propertyEl.querySelector(".metadata-property-key");
+
+                if (propertyKeyEl?.instanceOf(HTMLElement)) {
+                    propertyKeyEl.after(progressWrapper);
+                }
+            }
+
+        } else {
+        existingProgressWrapper?.remove()
+        }
+    } else {
+        existingProgressWrapper?.remove()
+    }
+}
 
 
 
@@ -132,9 +211,9 @@ export const updateAllProgressElsOnMaxChange = (file: TFile, cache: CachedMetada
                         let num = input.closest(".metadata-property")
                         let sourcePath = num?.getAttribute("data-source-path") || ""
                         if (num?.instanceOf(HTMLElement)) {
-                            updateProgress(num, plugin, sourcePath)
+                            updateNumberProgress(num, plugin, sourcePath)
                             input.onchange = () => {
-                                if (num?.instanceOf(HTMLElement)) updateProgress(num, plugin, sourcePath)
+                                if (num?.instanceOf(HTMLElement)) updateNumberProgress(num, plugin, sourcePath)
                             }
                         }
                     }

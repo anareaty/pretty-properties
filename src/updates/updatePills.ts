@@ -3,7 +3,7 @@ import { createColorButton } from "src/menus/selectColorMenus";
 import { HSL } from "obsidian"
 import { querySelectorsWithIframesForContainer } from "../utils/querySelectorsHelper";
 import { getPropertyFormatObj, updatePropertyFormatting } from "./updatePropertyFormattings";
-import { updateProgress } from "./updateProgress";
+import { updateNumberProgress, updateTextProgress } from "./updateProgress";
 import { updateSelectButton } from "./updateSelectButton";
 import { PillColorSettings } from "src/settings/settings";
 
@@ -254,23 +254,33 @@ export const updateLongtext = (pill: HTMLElement, plugin: PrettyPropertiesPlugin
 
 	let overlayElement
 	if (grandParent) {
+
+
+
+		
+
+
+
+
 		overlayElement = updatePropertyFormatting(grandParent, propName, text, "text", propertyFormatObj.format, propertyFormatObj.textFormat, plugin)
 	}
 
 	if (plugin.settings.enableColoredProperties) {
-		if (text) {
-			text = text.slice(0, 200).trim()
+
+		let shortText = text
+		if (shortText) {
+			shortText = shortText.slice(0, 200).trim()
 		}
 
-		setPillStyles(pill, propName, text, plugin)
+		setPillStyles(pill, propName, shortText, plugin)
 
 		if (overlayElement) {
-			setPillStyles(overlayElement, propName, text, plugin)
+			setPillStyles(overlayElement, propName, shortText, plugin)
 		}
 
 
 		if (parent && grandParent) {
-			updateColorButton(parent, propName, text, isBase, plugin)
+			updateColorButton(parent, propName, shortText, isBase, plugin)
 		}
 	}
 
@@ -281,6 +291,15 @@ export const updateLongtext = (pill: HTMLElement, plugin: PrettyPropertiesPlugin
 
 		let sourcePath = grandParent.getAttribute("data-source-path") || "";
 		let linkEl = parent.querySelector(".metadata-link-inner")
+
+
+
+
+		updateTextProgress(text, grandParent, sourcePath, plugin)
+
+
+
+
 
 		if (overlayElement) {
 			updateSelectButton(overlayElement, propName, sourcePath, plugin);
@@ -487,7 +506,7 @@ export const updateTagPaneTagsAll = (plugin: PrettyPropertiesPlugin) => {
 
 export const updateNumberWidget = (propName: string, value: string, parent: HTMLElement, sourcePath: string, plugin: PrettyPropertiesPlugin) => {
 	let propertyFormatObj = getPropertyFormatObj(propName, value, plugin)
-	updateProgress(parent, plugin, sourcePath)
+	updateNumberProgress(parent, plugin, sourcePath)
 	updatePropertyFormatting(parent, propName, value, "number", propertyFormatObj.format, propertyFormatObj.textFormat, plugin)
 
 	if (value === "") {

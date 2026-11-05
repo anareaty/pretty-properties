@@ -1,9 +1,9 @@
 import { TFile, CachedMetadata, MarkdownView, BasesView, HoverPopover, requireApiVersion, setIcon, Platform } from "obsidian";
 import PrettyPropertiesPlugin from "src/main";
 import { renderCover, updateCoverForView } from "./updateCovers";
-import { renderIcon, updateIconForView } from "./updateIcons";
+import { renderIcon } from "./updateIcons";
 import { updateSettingPills, updateTagPaneTagsAll } from "./updatePills";
-import { renderBanner, updateBannerForView } from "./updateBanners";
+import { renderBanner } from "./updateBanners";
 import { getNestedProperty } from "../utils/propertyUtils";
 import { processTagsInPreviewElement } from "src/extensions/tagPostProcessor";
 import { updateWidgets } from "src/patches/patchWidgets";
@@ -19,8 +19,7 @@ import { AliasesPropertyWidgetComponent,
     MetadataEditor, 
     MultitextPropertyWidgetComponent,  
     TagsPropertyWidgetComponent, 
-    TextPropertyWidgetComponent, 
-    WidgetEditorView
+    TextPropertyWidgetComponent
 } from "@obsidian-typings/obsidian-public-latest";
 import { updateTags } from "src/extensions/tagFixExtension";
 import { KanbanBasesView, processBaseKanbanProperties } from "src/patches/patchBaseKanban";
