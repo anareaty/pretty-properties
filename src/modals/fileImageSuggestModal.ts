@@ -4,6 +4,7 @@ import { i18n } from "src/localization/localization";
 import { selectCoverImage } from "src/utils/imageUtils";
 import { ImageSuggestModal } from "./imageSuggestModal";
 import { IconSuggestModal } from "./iconSuggestModal";
+import { BannerSuggestModal } from "./bannerSuggestModal";
 
 
 
@@ -20,7 +21,7 @@ export class FileImageSuggestModal extends SuggestModal<string> {
             this.options["cover"] = i18n.t("SELECT_COVER_IMAGE");
         }
         if (plugin.settings.enableBanner && plugin.settings.bannerProperty) {
-            this.options["banner"] = i18n.t("SELECT_BANNER_IMAGE");
+            this.options["banner"] = i18n.t("SELECT_BANNER");
         }
         if (plugin.settings.enableIcon && plugin.settings.iconProperty) {
             this.options["icon"] = i18n.t("SELECT_ICON");
@@ -42,13 +43,7 @@ export class FileImageSuggestModal extends SuggestModal<string> {
             selectCoverImage(this.plugin);
         }
         if (val == "banner") {
-            new ImageSuggestModal(
-                this.plugin.app, 
-                this.plugin, 
-                this.plugin.settings.bannerProperty, 
-                this.plugin.settings.bannersFolder, 
-                "banner"
-            ).open();
+            new BannerSuggestModal(this.plugin.app, this.plugin).open()
         }
         if (val == "icon") {
             new IconSuggestModal(this.plugin.app, this.plugin).open();
