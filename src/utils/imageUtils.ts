@@ -7,9 +7,10 @@ import { CoverShapeSuggestModal } from "src/modals/coverShapeSuggestModal";
 import { CoverPositionSuggestModal } from "src/modals/coverPositionSuggestModal";
 import { ImageSuggestModal } from "src/modals/imageSuggestModal";
 
-const pdfRegex = /^(!)?(?:\[\[(.+\.pdf)\]\]|\[([^\]]*)\]\((.+\.pdf)\))$/;
+const pdfRegex = /^(!)?(?:\[\[(.+\.pdf)\]\]|\[([^\]]*)\]\((.+\.pdf)\))$/
+const mdLinkRegex = /\[([^\]]+)\]\(([^)]+\.(?:avif|bmp|gif|jpeg|jpg|png|svg|webp))\)$/
 const urlRegex = /^http[s]?:\/\/[^\s]*$/i;
-const localFileRegex = /^(file:\/\/\/\/.).+\.[a-z]{2,6}$/i;
+const localFileRegex = /^(file:\/\/\/.).+\.[a-z]{2,6}$/i;
 const wikiLinkRegex = /^\[\[.+?\]\]$/;
 const imagePathRegex = /^[^\n]+\.(?:avif|bmp|gif|jpeg|jpg|png|svg|webp)$/
 const base64Regex = /^data:image\/.*?;base64.*/i;
@@ -131,7 +132,7 @@ export const getImageValue = (value: string) => {
     else if (urlRegex.test(value) || localFileRegex.test(value)) {
         value = value.replace(/^(https:\/\/www\.youtube.com\/watch\?v=)(.*)/, "https://img.youtube.com/vi/$2/maxresdefault.jpg")
 		value = `![](${value})`
-    }  else if (wikiLinkRegex.test(value)) {
+    }  else if (wikiLinkRegex.test(value) || mdLinkRegex.test(value)) {
 		value = `!${value}`;
 	} 
     return value
