@@ -67,7 +67,21 @@ You can edit the banner property manually. There are the supported kinds of prop
 - markdown links: `![My cover](My%20cover.png)` or `[My cover](My%20cover.png)`;
 - raw URL links: `https://...`;
 - raw file links: `file://...`;
-- base64-encoded images: `data:image/...base64...`.
+- base64-encoded images: `data:image/...base64...`;
+- css color value: `#dd4bb660`;
+- css gradient value: `linear-gradient(258deg, #99fad0 0%, #094aa5 100%)`.
+
+With color or grafdient values you can create banners without any images. You don't have to write any css yourself: in banner selection menu you can find a color picker and gradient editor. It is also possible to generate random gradients. You can do this from banner menu or using special commands. 
+
+Pretty Properties API also exposes a method `generateRandomGradientString()`. It creates a css gradient string that can be used by Templater or other plugins. It can be called whithout parameters or can take parameters `"linear"`, `"radial"` or `"mesh"` if you want a gradient of the specific type.
+
+For example here is a Templater template to create a note with random linear gradient banner:
+
+```
+<%"---"%>
+banner: <%`"${PrettyPropertiesApi.generateRandomGradientString("linear")}"`%>
+<%"---"%>
+```
 
 If you are using some other banner plugin, like Pixel Banner or Simple Banner, it may conflict with the Pretty Properties' banners. To avoid this you can go to the settings and turn the banner feature off. Alternatively you can just change the banner property. This way you can use Pretty Properties' banners in some notes and the different plugin's banners in another notes.
 
